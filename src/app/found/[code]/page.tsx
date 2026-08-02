@@ -17,6 +17,7 @@ interface LookupResult {
   types: ('baggage' | 'pilgrim')[];
   baggage: boolean;
   pilgrim: boolean;
+  pilgrimCode: string | null; // The actual pilgrim qrCode to use for Pass Identity link
 }
 
 type PageState = 'loading' | 'selector' | 'not_found' | 'error';
@@ -199,8 +200,16 @@ export default function FoundSelectorPage() {
                 transition={{ delay: 0.35, type: 'spring', stiffness: 180 }}
               >
                 <Card
-                  className="cursor-pointer border-2 border-transparent hover:border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98]"
-                  onClick={() => router.push('/p/' + code)}
+                  className={`border-2 border-transparent transition-all duration-200 shadow-md hover:shadow-lg ${
+                    lookupData?.pilgrim
+                      ? 'cursor-pointer hover:border-emerald-400 active:scale-[0.98]'
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
+                  onClick={() => {
+                    if (lookupData?.pilgrim && lookupData?.pilgrimCode) {
+                      router.push('/p/' + lookupData.pilgrimCode);
+                    }
+                  }}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4 w-full">
@@ -215,19 +224,25 @@ export default function FoundSelectorPage() {
                           Pass Identity
                         </h3>
                         <p className="text-sm text-gray-500 mt-0.5">
-                          Identité et informations médicales
+                          {lookupData?.pilgrim
+                            ? 'Identité et informations médicales'
+                            : 'Non activé pour ce code'}
                         </p>
                       </div>
                       <div className="shrink-0">
-                        <svg
-                          className="w-5 h-5 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
+                        {lookupData?.pilgrim ? (
+                          <svg
+                            className="w-5 h-5 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        ) : (
+                          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">Bientôt</span>
+                        )}
                       </div>
                     </div>
                   </CardContent>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { generateReferencesBulk, generateSetId } from '@/lib/qr';
+import { generateReferencesBulk, generateUniqueSetId } from '@/lib/qr';
 import { db } from '@/lib/db';
 
 // Schema for agency generation — Hajj only
@@ -62,10 +62,10 @@ async function generateBaggagesBatch(options: {
 
   console.log(`[GENERATE] Starting bulk generation: ${travelerCount} pilgrims × ${count} bags = ${totalBaggages} QR codes`);
 
-  // Pre-generate all set IDs (no DB calls needed)
+  // Pre-generate all set IDs with uniqueness check (async, checks pilgrim table)
   const setIds: string[] = [];
   for (let t = 0; t < travelerCount; t++) {
-    setIds.push(generateSetId(type));
+    setIds.push(await generateUniqueSetId(type));
   }
 
   // Generate ALL references in bulk
@@ -107,7 +107,25 @@ async function generateBaggagesBatch(options: {
     console.log(`[GENERATE] Inserted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} baggages (total: ${Math.min(i + BATCH_SIZE, allData.length)}/${allData.length})`);
   }
 
-  console.log(`[GENERATE] Complete: ${totalBaggages} QR codes generated for ${travelerCount} pilgrims`);
+  // Create a Pilgrim record per set (Pass Identity linked to the baggage set)
+  // The pilgrim's qrCode = the setId, so the selector page can find it
+  const pilgrimData = setIds.map((setId) => ({
+    qrCode: setId,
+    fullName: '', // Will be filled during activation
+    nationality: '', // Will be filled during activation
+    isActive: false,
+    duration: '30d',
+  }));
+
+  // Batch insert pilgrims in chunks of 200
+  for (let i = 0; i < pilgrimData.length; i += BATCH_SIZE) {
+    const batch = pilgrimData.slice(i, i + BATCH_SIZE);
+    // Use createMany with skipDuplicates to avoid conflicts if pilgrim already exists
+    await db.pilgrim.createMany({ data: batch, skipDuplicates: true });
+    console.log(`[GENERATE] Inserted pilgrims batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} pilgrims`);
+  }
+
+  console.log(`[GENERATE] Complete: ${totalBaggages} QR codes + ${travelerCount} pilgrim identities generated for ${travelerCount} pilgrims`);
   return allReferences;
 }
 

@@ -105,6 +105,33 @@ export function generateSetId(type: 'hajj' | 'voyageur'): string {
 }
 
 /**
+ * Generate a unique set ID that doesn't conflict with existing pilgrim qrCodes.
+ * Since the setId is also used as the pilgrim's qrCode, we need to ensure uniqueness
+ * across both the Baggage.setId and Pilgrim.qrCode fields.
+ */
+export async function generateUniqueSetId(type: 'hajj' | 'voyageur'): Promise<string> {
+  let attempts = 0;
+  const maxAttempts = 50;
+
+  while (attempts < maxAttempts) {
+    const setId = generateSetId(type);
+    
+    // Check if this setId already exists as a pilgrim qrCode
+    const existingPilgrim = await db.pilgrim.findUnique({
+      where: { qrCode: setId },
+    });
+    
+    if (!existingPilgrim) {
+      return setId;
+    }
+    
+    attempts++;
+  }
+
+  throw new Error('Failed to generate unique set ID');
+}
+
+/**
  * @deprecated Use bulk generation from the API route instead for large batches.
  * This function is kept for backwards compatibility with small individual generations.
  */

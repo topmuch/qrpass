@@ -15,6 +15,7 @@ export async function OPTIONS() {
 
 // GET - Lookup a QR code across both Baggage and Pilgrim tables
 // Used by /found/:code selector page to determine what type of item was scanned
+// Also checks if a baggage's setId links to a Pilgrim record (Pass Identity)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
@@ -22,15 +23,42 @@ export async function GET(
   try {
     const { code } = await params;
 
-    // Parallel lookups for better performance
+    // Direct parallel lookups
     const [baggage, pilgrim] = await Promise.all([
       db.baggage.findUnique({ where: { reference: code } }),
       db.pilgrim.findUnique({ where: { qrCode: code } }),
     ]);
 
     const types: ('baggage' | 'pilgrim')[] = [];
-    if (baggage) types.push('baggage');
-    if (pilgrim) types.push('pilgrim');
+    let linkedPilgrimCode: string | null = null;
+
+    if (baggage) {
+      types.push('baggage');
+      // Check if there's a linked pilgrim via the baggage's setId
+      // The pilgrim's qrCode is set to the setId when generating baggage
+      if (baggage.setId) {
+        const linkedPilgrim = await db.pilgrim.findUnique({
+          where: { qrCode: baggage.setId },
+        });
+        if (linkedPilgrim) {
+          linkedPilgrimCode = linkedPilgrim.qrCode;
+          if (!types.includes('pilgrim')) {
+            types.push('pilgrim');
+          }
+        }
+      }
+    }
+
+    if (pilgrim) {
+      if (!types.includes('pilgrim')) {
+        types.push('pilgrim');
+      }
+      // If found directly by pilgrim code, no need for linkedPilgrimCode
+      // The code itself IS the pilgrim code
+      if (!linkedPilgrimCode) {
+        linkedPilgrimCode = pilgrim.qrCode;
+      }
+    }
 
     const found = types.length > 0;
 
@@ -39,14 +67,17 @@ export async function GET(
         found,
         types,
         baggage: !!baggage,
-        pilgrim: !!pilgrim,
+        pilgrim: types.includes('pilgrim'),
+        // The pilgrim code to use for Pass Identity link
+        // This is the setId (which is the pilgrim's qrCode) when found via baggage
+        pilgrimCode: linkedPilgrimCode,
       },
       { headers: corsHeaders }
     );
   } catch (error) {
     console.error('Pilgrim lookup error:', error);
     return NextResponse.json(
-      { found: false, types: [], baggage: false, pilgrim: false, error: 'Internal server error' },
+      { found: false, types: [], baggage: false, pilgrim: false, pilgrimCode: null, error: 'Internal server error' },
       { status: 500, headers: corsHeaders }
     );
   }
