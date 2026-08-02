@@ -240,7 +240,7 @@ model Notification {
 model EmailSettings {
   id              String   @id @default(cuid())
   provider        String   @default("console") // "console" or "smtp"
-  fromEmail       String   @default("noreply@qrbag.com")
+  fromEmail       String   @default("noreply@qrpass.com")
   fromName        String   @default("QRPass")
   recipientEmail  String?  // Destination for admin notification emails
   // SMTP settings

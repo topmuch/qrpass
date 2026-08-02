@@ -2,13 +2,13 @@
 FROM node:20-alpine
 
 # Install required packages
-RUN apk add --no-cache git libc6-compat sqlite
+RUN apk add --no-cache libc6-compat sqlite
 RUN npm install -g bun
 
 WORKDIR /app
 
-# Clone the repository
-RUN git clone https://github.com/topmuch/qrpass.git .
+# Copy source code (Coolify provides it via git)
+COPY . .
 
 # Install dependencies
 RUN bun install
