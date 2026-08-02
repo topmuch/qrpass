@@ -14,12 +14,12 @@ async function main() {
   // Create settings
   console.log('Creating settings...');
   const settings = [
-    { key: 'company_name', value: 'QRBag' },
+    { key: 'company_name', value: 'QRPass' },
     { key: 'company_address', value: 'Poissy, France' },
     { key: 'company_phone', value: '+33 7 45 34 93 39' },
-    { key: 'company_email', value: 'contact@qrbag.com' },
-    { key: 'seo_title', value: 'QRBag - Protection intelligente des bagages' },
-    { key: 'seo_description', value: 'Protégez vos bagages avec un autocollant QR intelligent. Sans application, sans batterie, sans GPS.' },
+    { key: 'company_email', value: 'contact@qrpass.com' },
+    { key: 'seo_title', value: 'QRPass - Pass Bagage & Pass Identity pour pèlerins' },
+    { key: 'seo_description', value: 'Pass Bagage & Pass Identity pour pèlerins Hajj & Omrah. Protection bagages et bracelets d\'identité avec QR codes.' },
     { key: 'seo_keywords', value: 'QR, bagage, voyage, hajj, protection, sticker' },
     { key: 'languages', value: 'fr,en,ar' },
     { key: 'default_language', value: 'fr' },
@@ -52,13 +52,13 @@ async function main() {
   // Create superadmin user
   console.log('Creating superadmin user...');
   await prisma.user.upsert({
-    where: { email: 'admin@qrbag.com' },
+    where: { email: 'admin@qrpass.com' },
     update: {
       password: await hashPassword('admin123'),
     },
     create: {
-      email: 'admin@qrbag.com',
-      name: 'SuperAdmin',
+      email: 'admin@qrpass.com',
+      name: 'SuperAdmin QRPass',
       password: await hashPassword('admin123'),
       role: 'superadmin',
     },
@@ -67,13 +67,13 @@ async function main() {
   // Create agency user
   console.log('Creating agency user...');
   await prisma.user.upsert({
-    where: { email: 'agency@qrbag.com' },
+    where: { email: 'agency@qrpass.com' },
     update: {
       password: await hashPassword('agency123'),
     },
     create: {
-      email: 'agency@qrbag.com',
-      name: 'Chef Agence',
+      email: 'agency@qrpass.com',
+      name: 'Chef Agence QRPass',
       password: await hashPassword('agency123'),
       role: 'agency',
       agencyId: agency.id,
@@ -158,8 +158,8 @@ async function main() {
   console.log('✅ Seed completed successfully!');
   console.log('');
   console.log('📋 Demo credentials:');
-  console.log('  SuperAdmin: admin@qrbag.com / admin123');
-  console.log('  Agency: agency@qrbag.com / agency123');
+  console.log('  SuperAdmin: admin@qrpass.com / admin123');
+  console.log('  Agency: agency@qrpass.com / agency123');
   console.log('');
   console.log('📱 Test QR codes:');
   console.log('  VOL25-DEMO01 - Active traveler baggage');

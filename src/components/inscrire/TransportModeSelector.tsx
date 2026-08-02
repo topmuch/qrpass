@@ -5,10 +5,10 @@
  * Chaque bouton affiche la VRAIE IMAGE du moyen de transport (PNG)
  * + label i18n + description.
  *
- * Style (palette QRBag — bleu #0047d6 + jaune #fcd616):
+ * Style (palette QRPass — bleu #0047d6 + jaune #fcd616):
  *   - Non sélectionné: carte jaune #fcd616 + bordure noire dashed + image (mix-blend multiply).
  *   - Sélectionné: carte jaune #fcd616 + bordure noire solide + image (mix-blend multiply)
- *     + checkmark jaune QRBag en haut à droite.
+ *     + checkmark jaune QRPass en haut à droite.
  *
  * Usage:
  *   <TransportModeSelector
@@ -98,7 +98,7 @@ export default function TransportModeSelector({
               {description}
             </span>
 
-            {/* Selected indicator — pastille noire avec checkmark jaune QRBag */}
+            {/* Selected indicator — pastille noire avec checkmark jaune QRPass */}
             {isSelected && (
               <div className="absolute top-2 right-2 w-5 h-5 bg-black rounded-full flex items-center justify-center ring-2 ring-white">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#fcd616" strokeWidth={3}>

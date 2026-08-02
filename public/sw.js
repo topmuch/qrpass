@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-const CACHE_NAME = 'qrbag-v1';
+const CACHE_NAME = 'qrpass-v1';
 
 // Assets to pre-cache on install
 const PRECACHE_ASSETS = [
@@ -14,7 +14,7 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (event: ExtendableEvent) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[QRBag SW] Precaching app shell');
+      console.log('[QRPass SW] Precaching app shell');
       return cache.addAll(PRECACHE_ASSETS);
     })
   );
@@ -30,7 +30,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
         cacheNames
           .filter((name) => name !== CACHE_NAME)
           .map((name) => {
-            console.log('[QRBag SW] Deleting old cache:', name);
+            console.log('[QRPass SW] Deleting old cache:', name);
             return caches.delete(name);
           })
       );

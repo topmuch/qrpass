@@ -129,7 +129,7 @@ export async function GET(
     }
     );
 
-    // AI-FEATURE: Set qrbag_locale cookie (7 days) so server can detect language on next request
+    // AI-FEATURE: Set qrpass_locale cookie (7 days) so server can detect language on next request
     try {
       response.cookies.set(LANGUAGE_COOKIE_NAME, detectedLocale, {
         path: '/',
@@ -283,7 +283,7 @@ export async function POST(
             minute: '2-digit',
           });
 
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrbags.com';
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrpasss.com';
 
           const aiResult = await generateWhatsAppMessage({
             reference: baggage.reference,
@@ -391,7 +391,7 @@ export async function POST(
     // ─── refonte-7: Nouveau template de message WhatsApp envoyé au propriétaire ───
     // Le frontend construit sa propre URL wa.me via la clé i18n `whatsapp.found_message`.
     // Ce `whatsappUrl` backend est retourné pour les consommateurs API / audit.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrbags.com';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrpasss.com';
     const trackingUrl = `${appUrl}/suivi/${reference}`;
 
     // [Prénom] — prénom du propriétaire
@@ -422,7 +422,7 @@ export async function POST(
       `Tu peux aussi voir tous les détails ici :\n` +
       `👉 ${trackingUrl}\n` +
       `Ne panique pas, tout va bien se passer ! 💪\n` +
-      `L'équipe QRBag`;
+      `L'équipe QRPass`;
 
     // Clean phone number
     const phone = baggage.whatsappOwner.replace(/[^0-9]/g, '');

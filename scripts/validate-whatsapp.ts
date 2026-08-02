@@ -7,10 +7,10 @@
  *   ✅ Message généré sans crash
  *   ✅ Longueur ≤ 400 caractères
  *   ✅ Présence du formatage WhatsApp (*gras*, `monospace`)
- *   ✅ Lien de suivi qrbags.com/suivi/[REF] présent
+ *   ✅ Lien de suivi qrpasss.com/suivi/[REF] présent
  *   ✅ Icône du mode de transport présente
  *   ✅ Icône du contexte présente
- *   ✅ Signature QRBag présente
+ *   ✅ Signature QRPass présente
  *
  * Usage : bun run scripts/validate-whatsapp.ts
  */
@@ -113,7 +113,7 @@ function runTest(mode: string, context: string, locale: string): TestResult {
     errors.push('❌ Pas de formatage `monospace`');
   }
 
-  // CHECK 5: Tracking link (localhost ou qrbags.com selon env)
+  // CHECK 5: Tracking link (localhost ou qrpasss.com selon env)
   if (message.includes('/suivi/VOL26-TEST99')) {
     checks.push('✅ Lien suivi présent');
   } else {
@@ -136,11 +136,11 @@ function runTest(mode: string, context: string, locale: string): TestResult {
     errors.push(`❌ Icône contexte ${ctxEmoji} manquante`);
   }
 
-  // CHECK 8: QRBag signature
-  if (message.includes('QRBag')) {
-    checks.push('✅ Signature QRBag présente');
+  // CHECK 8: QRPass signature
+  if (message.includes('QRPass')) {
+    checks.push('✅ Signature QRPass présente');
   } else {
-    errors.push('❌ Signature QRBag manquante');
+    errors.push('❌ Signature QRPass manquante');
   }
 
   // CHECK 9: buildWhatsAppUrl works

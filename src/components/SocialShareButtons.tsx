@@ -11,40 +11,40 @@ interface SocialShareProps {
   lang: string;
 }
 
-const QRBAG_URL = 'https://qrbags.com';
+const QRPASS_URL = 'https://qrpasss.com';
 
 function getShareText(props: SocialShareProps): string {
   const { reference, scanCount, lastCity, lastCountry, status, lang } = props;
   const loc = lastCity ? `${lastCity}${lastCountry ? `, ${lastCountry}` : ''}` : '';
 
   if (lang === 'ar') {
-    if (status === 'lost') return `🚨 أمتعتي ${reference} مفقودة! آخر موقع: ${loc}. ساعدوني #QRBag`;
-    if (scanCount > 0) return `✅ تم مسح أمتعتي ${reference} في ${loc} — ${scanCount} مسح. محمي بـ QRBag! #QRBag`;
-    return `🎒 أمتعتي ${reference} محمية بـ QRBag. تابعو موقعها! #QRBag`;
+    if (status === 'lost') return `🚨 أمتعتي ${reference} مفقودة! آخر موقع: ${loc}. ساعدوني #QRPass`;
+    if (scanCount > 0) return `✅ تم مسح أمتعتي ${reference} في ${loc} — ${scanCount} مسح. محمي بـ QRPass! #QRPass`;
+    return `🎒 أمتعتي ${reference} محمية بـ QRPass. تابعو موقعها! #QRPass`;
   }
   if (lang === 'en') {
-    if (status === 'lost') return `🚨 My luggage ${reference} is lost! Last location: ${loc}. Help me find it #QRBag`;
-    if (scanCount > 0) return `✅ My luggage ${reference} was scanned in ${loc} — ${scanCount} scans. Protected by QRBag! #QRBag`;
-    return `🎒 My luggage ${reference} is protected by QRBag. Track it live! #QRBag`;
+    if (status === 'lost') return `🚨 My luggage ${reference} is lost! Last location: ${loc}. Help me find it #QRPass`;
+    if (scanCount > 0) return `✅ My luggage ${reference} was scanned in ${loc} — ${scanCount} scans. Protected by QRPass! #QRPass`;
+    return `🎒 My luggage ${reference} is protected by QRPass. Track it live! #QRPass`;
   }
   // French (default)
-  if (status === 'lost') return `🚨 Mon bagage ${reference} est perdu ! Dernier lieu : ${loc}. Aidez-moi #QRBag`;
-  if (scanCount > 0) return `✅ Mon bagage ${reference} a été scanné à ${loc} — ${scanCount} scans. Protégé par QRBag ! #QRBag`;
-  return `🎒 Mon bagage ${reference} est protégé par QRBag. Suivez-le en direct ! #QRBag`;
+  if (status === 'lost') return `🚨 Mon bagage ${reference} est perdu ! Dernier lieu : ${loc}. Aidez-moi #QRPass`;
+  if (scanCount > 0) return `✅ Mon bagage ${reference} a été scanné à ${loc} — ${scanCount} scans. Protégé par QRPass ! #QRPass`;
+  return `🎒 Mon bagage ${reference} est protégé par QRPass. Suivez-le en direct ! #QRPass`;
 }
 
 export function SocialShareButtons(props: SocialShareProps) {
   const text = getShareText(props);
   const encodedText = encodeURIComponent(text);
-  const url = encodeURIComponent(`${QRBAG_URL}/suivi/${props.reference}`);
+  const url = encodeURIComponent(`${QRPASS_URL}/suivi/${props.reference}`);
 
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `QRBag — ${props.reference}`,
+          title: `QRPass — ${props.reference}`,
           text,
-          url: `${QRBAG_URL}/suivi/${props.reference}`,
+          url: `${QRPASS_URL}/suivi/${props.reference}`,
         });
       } catch {
         // User cancelled

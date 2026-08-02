@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     // ─── Build absolute public URL ───
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    const host = request.headers.get('host') || 'qrbags.com';
+    const host = request.headers.get('host') || 'qrpasss.com';
     const baseUrl = `${protocol}://${host}`;
     const publicUrl = buildPublicChecklistUrl(code, baseUrl);
 
@@ -219,10 +219,10 @@ export async function POST(request: NextRequest) {
       departureDate: checklist.departureDate,
     });
 
-    const attachmentFilename = `QRBag-attestation-${code}.pdf`;
+    const attachmentFilename = `QRPass-attestation-${code}.pdf`;
     const emailResult = await sendEmail({
       to: checklist.email,
-      subject: `🎒 Votre attestation d'inventaire QRBag (${code})`,
+      subject: `🎒 Votre attestation d'inventaire QRPass (${code})`,
       html: template.html,
       text: template.text,
       type: 'checklist',

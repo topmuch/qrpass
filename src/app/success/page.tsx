@@ -8,7 +8,7 @@ import SuccessOverlay from '@/components/ui/SuccessOverlay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { toast } from '@/hooks/use-toast';
 
-// ─── Brand constants (QRBag palette: blue #0047d6 + yellow #fcd616) ───
+// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
 const BRAND = '#0047d6'; // bleu vif — fonds, boutons primaires
 const ACCENT = '#fcd616'; // jaune vif — cards, accents
 const INK = '#1a1a1a'; // noir — texte sur jaune, bordures dashed
@@ -83,8 +83,8 @@ function SuccessContent() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Mon bagage QRBag',
-          text: 'Suivez mon bagage en temps réel avec QRBag.',
+          title: 'Mon bagage QRPass',
+          text: 'Suivez mon bagage en temps réel avec QRPass.',
           url: trackingUrl,
         });
       } catch (err) {
@@ -161,7 +161,7 @@ function SuccessContent() {
           <p className="text-white/80">Votre bagage est maintenant protégé</p>
         </div>
 
-        {/* ═══ 2. Carte QR Code (fond jaune QRBag + bordure dashed noire) ═══ */}
+        {/* ═══ 2. Carte QR Code (fond jaune QRPass + bordure dashed noire) ═══ */}
         <div
           className="border-2 border-dashed rounded-2xl p-5 mb-4 text-center"
           style={{ backgroundColor: ACCENT, borderColor: INK }}
@@ -249,7 +249,7 @@ function SuccessContent() {
           </button>
         </div>
 
-        {/* ═══ 5. Encart Checklist (fond jaune QRBag + bordure dashed noire) ═══ */}
+        {/* ═══ 5. Encart Checklist (fond jaune QRPass + bordure dashed noire) ═══ */}
         <div
           className="border-2 border-dashed rounded-2xl p-5 text-center"
           style={{ backgroundColor: ACCENT, borderColor: INK }}

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useAgency } from '../layout';
 
-// ─── Brand constants (QRBag palette: blue #0047d6 + yellow #fcd616) ───
+// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
 const BRAND = '#0047d6';   // bleu vif — boutons primaires
 const ACCENT = '#fcd616';  // jaune vif — cards
 const INK = '#1a1a1a';     // noir — texte sur jaune

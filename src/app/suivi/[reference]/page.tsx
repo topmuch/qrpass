@@ -41,14 +41,14 @@ import { safeTransportMode, getTransportImage } from '@/lib/transport';
 import type { TransportMode } from '@/lib/transport';
 import { useAudioAlert, POLL_INTERVAL_MS } from '@/hooks/useAudioAlert';
 
-// ─── Brand constants (QRBag palette: blue #0047d6 + yellow #fcd616) ───
+// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
 const BRAND = '#0047d6';   // bleu vif — fonds principaux
 const ACCENT = '#fcd616'; // jaune vif — cards, accents
 const INK = '#1a1a1a';    // noir — texte sur jaune, bordures dashed
-const CREAM = '#0047d6';  // (alias — désormais bleu QRBag)
+const CREAM = '#0047d6';  // (alias — désormais bleu QRPass)
 const URGENT_RED = '#EF4444';
 const URGENT_BG = '#FEF2F2';
-const QRBAG_SUPPORT_PHONE = '+33745349339';
+const QRPASS_SUPPORT_PHONE = '+33745349339';
 
 // ═══════════════════════════════════════════════════════
 //  TYPES
@@ -621,7 +621,7 @@ export default function SuiviPage() {
   // ─── WhatsApp Support handler (emergency) ───
   const handleSupportWhatsApp = useCallback(() => {
     const message = t('tracking.urgent_support_message', { ref: reference });
-    const url = buildWhatsAppUrl(QRBAG_SUPPORT_PHONE, message);
+    const url = buildWhatsAppUrl(QRPASS_SUPPORT_PHONE, message);
     const isIOSUA = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOSUA) {
       window.location.href = url;
@@ -727,7 +727,7 @@ export default function SuiviPage() {
   const supportBody = encodeURIComponent(
     `Bonjour, je rencontre un problème avec mon bagage ${reference}.\n\nDescription du problème :\n`
   );
-  const supportHref = `mailto:contact@qrbags.com?subject=${supportSubject}&body=${supportBody}`;
+  const supportHref = `mailto:contact@qrpasss.com?subject=${supportSubject}&body=${supportBody}`;
 
   // Checklist CTA link
   const checklistHref = `/checklist?ref=${encodeURIComponent(reference)}&source=tracking_page`;

@@ -29,7 +29,7 @@ import {
   getTransportImage,
 } from '@/lib/transport';
 
-// ─── Brand constants (QRBag palette: blue #0047d6 + yellow #fcd616) ───
+// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
 const BRAND = '#0047d6'; // bleu vif — fonds principaux, headers
 const ACCENT = '#fcd616'; // jaune vif — cards, badges, accents
 const INK = '#1a1a1a'; // noir — texte sur jaune, bordures dashed
@@ -231,7 +231,7 @@ function InscrireContent() {
           <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
         </Link>
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="QRBag" className="h-16 w-auto object-contain" />
+          <img src="/logo.png" alt="QRPass" className="h-16 w-auto object-contain" />
         </div>
         <LanguageSelector lang={lang} setLang={setLang} />
       </header>
@@ -259,7 +259,7 @@ function InscrireContent() {
           </span>
         </div>
 
-        {/* ═══ BLOC PRINCIPAL — Formulaire Activation (jaune QRBag) ═══ */}
+        {/* ═══ BLOC PRINCIPAL — Formulaire Activation (jaune QRPass) ═══ */}
         <div
           className="w-full rounded-2xl p-5 md:p-6 mb-5 shadow-xl"
           style={{ backgroundColor: ACCENT, boxShadow: `0 20px 40px ${INK}15` }}

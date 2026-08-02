@@ -39,11 +39,11 @@ const ChatbotWidget = dynamic(() => import('@/components/finder/ChatbotWidget'),
   loading: () => null,
 });
 
-// ─── Brand constants (QRBag palette: blue #0047d6 + yellow #fcd616) ───
+// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
 const BRAND = '#0047d6';   // bleu vif — fonds principaux
 const ACCENT = '#fcd616'; // jaune vif — cards, accents
 const INK = '#1a1a1a';    // noir — texte sur jaune, bordures dashed
-const CREAM = '#0047d6';  // (alias — désormais bleu QRBag)
+const CREAM = '#0047d6';  // (alias — désormais bleu QRPass)
 
 const FALLBACK_PHONE = '33745349339';
 
@@ -376,7 +376,7 @@ export default function ScanPage() {
     travelerName: string,
     baggageType: string
   ) => {
-    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://qrbags.com'}/suivi/${reference}`;
+    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://qrpasss.com'}/suivi/${reference}`;
 
     // Extract owner's first name from full name
     const firstName = travelerName.split(' ')[0] || travelerName || '';

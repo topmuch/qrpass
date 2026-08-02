@@ -95,7 +95,7 @@
     "travel_section": "الرحلة"
   },
   "whatsapp": {
-    "found_message": "🎉 أخبار سارة {firstName}!\n\nشخص ما وجد أمتعتك {type} في {location}!\n📍 هي حالياً في {address}\n👤 الشخص الذي وجدها اسمه {name}\n📞 اتصل به بسرعة على {phone}\n💬 أو راسله على واتساب\nيمكنك أيضاً رؤية جميع التفاصيل هنا:\n👉 {url}\nلا تقلق، كل شيء سيكون على ما يرام! 💪\nفريق QRBag",
+    "found_message": "🎉 أخبار سارة {firstName}!\n\nشخص ما وجد أمتعتك {type} في {location}!\n📍 هي حالياً في {address}\n👤 الشخص الذي وجدها اسمه {name}\n📞 اتصل به بسرعة على {phone}\n💬 أو راسله على واتساب\nيمكنك أيضاً رؤية جميع التفاصيل هنا:\n👉 {url}\nلا تقلق، كل شيء سيكون على ما يرام! 💪\nفريق QRPass",
     "location_not_shared": "غير محدد",
     "gps_shared_label": "تمت مشاركة موقع GPS",
     "title_departure_urgent": "عاجل — أمتعة في {place} !",
@@ -110,21 +110,21 @@
     "bag_type_soute": "شحن",
     "bag_type_pont": "سطح",
     "see_bagage": "👉 رؤية الأمتعة المحددة :",
-    "whatsapp_signature": "QRBag – احمِ أمتعتك براحة بال."
+    "whatsapp_signature": "QRPass – احمِ أمتعتك براحة بال."
   },
   "chatbot": {
-    "title": "مساعد QRBag",
+    "title": "مساعد QRPass",
     "placeholder": "اطرح سؤالك...",
     "send": "إرسال",
     "close": "إغلاق",
     "thinking": "المساعد يفكر...",
     "error": "خطأ في الاتصال. حاول مرة أخرى.",
-    "error_fallback": "أواجه مشكلة تقنية. يرجى التواصل مع الدعم: support@qrbags.com",
+    "error_fallback": "أواجه مشكلة تقنية. يرجى التواصل مع الدعم: support@qrpasss.com",
     "suggestion_1": "ماذا أفعل بهذه الأمتعة؟",
     "suggestion_2": "كيف أتواصل مع الوكالة؟",
     "suggestion_3": "هل الأمر عاجل؟",
-    "suggestion_4": "كيف يعمل QRBag؟",
-    "welcome": "مرحباً! 👋 أنا مساعد QRBag. كيف يمكنني مساعدتك بخصوص هذه الأمتعة؟",
+    "suggestion_4": "كيف يعمل QRPass؟",
+    "welcome": "مرحباً! 👋 أنا مساعد QRPass. كيف يمكنني مساعدتك بخصوص هذه الأمتعة؟",
     "aria_open": "فتح الدردشة",
     "aria_close": "إغلاق الدردشة",
     "aria_message": "رسالة الدردشة"
@@ -193,7 +193,7 @@
     "badge_found": "تم العثور على الأمتعة",
     "badge_active": "أمتعتك محمية",
     "lost_description": "تم الإبلاغ عن فقدان هذه الأمتعة. سيتم إبلاغك إذا وجدها أحد.",
-    "active_description": "أمتعتك تحت حماية QRBag. سيتم إبلاغك إذا قام أحد بمسحها.",
+    "active_description": "أمتعتك تحت حماية QRPass. سيتم إبلاغك إذا قام أحد بمسحها.",
     "found_description": "تم العثور على أمتعتك! اتصل بمن وجدها لترتيب الاستلام.",
     "scan_count": "{count} مسح",
     "trust_note": "كيو آر باغ — تتبع آمن لأمتعتك",
@@ -379,7 +379,7 @@
   },
   "checklist": {
     "title": "قائمة جرد السفر",
-    "subtitle": "اختر عناصرك لإنشاء شهادتك الرسمية من QRBag",
+    "subtitle": "اختر عناصرك لإنشاء شهادتك الرسمية من QRPass",
     "step_passenger": "معلومات الراكب",
     "first_name": "الاسم الأول",
     "last_name": "الاسم العائلي",
@@ -409,7 +409,7 @@
     "view_public_page": "عرض الصفحة العامة",
     "create_another": "إنشاء قائمة أخرى",
     "error": "حدث خطأ. حاول مرة أخرى.",
-    "view_title": "شهادة جرد QRBag",
+    "view_title": "شهادة جرد QRPass",
     "view_locked": "أدخل مفتاح التحقق لعرض ملف PDF",
     "view_locked_desc": "هذه الشهادة محمية بمفتاح تحقق من 8 أحرف. أدخله أدناه لفتحها.",
     "view_key_input": "مفتاح التحقق",
