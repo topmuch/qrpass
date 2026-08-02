@@ -2,13 +2,13 @@
 FROM node:20-alpine
 
 # Install required packages
-RUN apk add --no-cache libc6-compat sqlite
+RUN apk add --no-cache git libc6-compat sqlite
 RUN npm install -g bun
 
 WORKDIR /app
 
-# Copy source code (Coolify provides it via git)
-COPY . .
+# Clone the repository
+RUN git clone https://github.com/topmuch/qrpass.git .
 
 # Install dependencies
 RUN bun install
@@ -19,6 +19,7 @@ RUN npx prisma generate
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL=file:/app/data/qrpass.db
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN bun run build
 
 # Create data directory
