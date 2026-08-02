@@ -2,15 +2,15 @@
 FROM node:20-alpine
 
 # Install required packages
-RUN apk add --no-cache git libc6-compat sqlite
+RUN apk add --no-cache git libc6-compat sqlite curl
 RUN npm install -g bun
 
 WORKDIR /app
 
-# Clone the repository, verify package.json exists, and install dependencies in one step
-# This ensures Docker cannot cache a broken git clone layer
-RUN git clone --depth 1 https://github.com/topmuch/qrpass.git . && \
-    echo "=== Clone successful ===" && \
+# Download source from GitHub as tarball (NOT git clone - avoids Docker cache issues)
+# Using main branch tarball - this always fetches fresh content
+RUN curl -sL https://github.com/topmuch/qrpass/archive/refs/heads/main.tar.gz | tar xz --strip-components=1 && \
+    echo "=== Download successful ===" && \
     ls -la package.json && \
     echo "=== Installing dependencies ===" && \
     bun install
