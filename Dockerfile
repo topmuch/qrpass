@@ -18,7 +18,7 @@ RUN npx prisma generate
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=file:/app/data/qrbag.db
+ENV DATABASE_URL=file:/app/data/qrpass.db
 RUN bun run build
 
 # Create data directory
@@ -28,7 +28,7 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV DATABASE_URL=file:/app/data/qrbag.db
+ENV DATABASE_URL=file:/app/data/qrpass.db
 
 # Start command - create admin and start server
-CMD sh -c "mkdir -p /app/data && export DATABASE_URL=file:/app/data/qrbag.db && npx prisma db push --skip-generate 2>/dev/null || true && node scripts/create-admin.cjs 2>/dev/null || true && exec node .next/standalone/server.js"
+CMD sh -c "mkdir -p /app/data && export DATABASE_URL=file:/app/data/qrpass.db && npx prisma db push --skip-generate 2>/dev/null || true && node scripts/create-admin.cjs 2>/dev/null || true && exec node .next/standalone/server.js"
