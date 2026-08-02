@@ -42,7 +42,6 @@ interface Stats {
   totalSets: number;
   totalQr: number;
   hajjSets: number;
-  voyageurSets: number;
 }
 
 interface Agency {
@@ -58,7 +57,7 @@ export default function QRCodesPage() {
     totalSets: 0,
     totalQr: 0,
     hajjSets: 0,
-    voyageurSets: 0,
+
   });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -80,7 +79,7 @@ export default function QRCodesPage() {
   const [exportForm, setExportForm] = useState({
     mode: 'selected' as 'selected' | 'agency' | 'type',
     agencyId: '',
-    type: 'hajj' as 'hajj' | 'voyageur',
+    type: 'hajj' as 'hajj',
   });
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState('');
@@ -324,7 +323,7 @@ export default function QRCodesPage() {
   };
 
   const handleShareSet = async (set: QRSet) => {
-    const shareText = `QRPass - ${set.setId}\n${set.qrCount} QR codes générés\nType: ${set.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}`;
+    const shareText = `QRPass - ${set.setId}\n${set.qrCount} QR codes générés\nType: Hajj 2026`;
 
     if (navigator.share) {
       try {
@@ -354,7 +353,6 @@ export default function QRCodesPage() {
   const filterButtons = [
     { id: 'all', label: 'Tous' },
     { id: 'hajj', label: 'Hajj' },
-    { id: 'voyageur', label: 'Voyageur' },
   ];
 
   // KPI Cards
@@ -362,7 +360,6 @@ export default function QRCodesPage() {
     { title: 'Total Sets', value: stats.totalSets, icon: QrCode, color: 'text-[#b8860b]' },
     { title: 'Total QR', value: stats.totalQr, icon: Luggage, color: 'text-white' },
     { title: 'Hajj', value: stats.hajjSets, icon: Plane, color: 'text-green-400' },
-    { title: 'Voyageur', value: stats.voyageurSets, icon: Luggage, color: 'text-blue-600' },
   ];
 
   // Calculate total QR in selection
@@ -548,7 +545,7 @@ export default function QRCodesPage() {
                         </span>
                       </div>
                       <div className="text-[#a0a8b8] text-sm flex flex-wrap gap-3">
-                        <span>👤 {set.travelerName || '1 voyageur'}</span>
+                        <span>👤 {set.travelerName || '1 pèlerin'}</span>
                         <span>🔢 {set.qrCount} QR</span>
                         <span>📅 {formatDate(set.createdAt)}</span>
                         {set.agencyName && <span>🏢 {set.agencyName}</span>}
@@ -694,7 +691,7 @@ export default function QRCodesPage() {
                   >
                     <QrCode className="w-5 h-5 mx-auto mb-1" />
                     <p className="text-xs font-medium">Par type</p>
-                    <p className="text-[10px] opacity-70">Hajj/Voyageur</p>
+                    <p className="text-[10px] opacity-70">Hajj</p>
                   </button>
                 </div>
               </div>
@@ -732,17 +729,7 @@ export default function QRCodesPage() {
                       <Plane className="w-5 h-5 mx-auto mb-1" />
                       <p className="text-xs font-medium">Hajj</p>
                     </button>
-                    <button
-                      onClick={() => setExportForm(prev => ({ ...prev, type: 'voyageur' }))}
-                      className={`p-3 rounded-xl border text-center transition-all ${
-                        exportForm.type === 'voyageur'
-                          ? 'bg-[#1D4ED8] border-[#1D4ED8] text-white'
-                          : 'bg-[#080c1a] border-[#1a2238] text-[#a0a8b8]'
-                      }`}
-                    >
-                      <Luggage className="w-5 h-5 mx-auto mb-1" />
-                      <p className="text-xs font-medium">Voyageur</p>
-                    </button>
+
                   </div>
                 </div>
               )}
@@ -758,7 +745,7 @@ export default function QRCodesPage() {
                         ? `${selectedSetIds.size} sets sélectionnés`
                         : exportForm.mode === 'agency'
                           ? exportAgencies.find(a => a.id === exportForm.agencyId)?.name || 'Non défini'
-                          : exportForm.type === 'hajj' ? 'Tous les Hajj' : 'Tous les Voyageurs'
+                          : 'Tous les Hajj'
                       }
                     </span>
                   </div>
@@ -769,9 +756,7 @@ export default function QRCodesPage() {
                         ? selectedQrCount
                         : exportForm.mode === 'agency'
                           ? 'Tous les QR de l\'agence'
-                          : exportForm.type === 'hajj'
-                            ? stats.hajjSets * 3
-                            : stats.voyageurSets * 3
+                          : stats.hajjSets * 3
                       }
                     </span>
                   </div>
@@ -855,7 +840,7 @@ export default function QRCodesPage() {
               <div>
                 <h2 className="text-lg font-bold text-white">{selectedSet.setId}</h2>
                 <p className="text-[#a0a8b8] text-sm">
-                  {selectedSet.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'} • {selectedSet.qrCount} QR codes
+                  Hajj 2026 • {selectedSet.qrCount} QR codes
                 </p>
               </div>
               <button
@@ -885,7 +870,7 @@ export default function QRCodesPage() {
                       level="H"
                       includeMargin={true}
                       bgColor="#ffffff"
-                      fgColor={selectedSet.type === 'hajj' ? '#0d5e34' : '#1D4ED8'}
+                      fgColor="#0d5e34"
                     />
                     <p className="text-gray-800 font-mono font-bold mt-2 text-sm">
                       {ref}

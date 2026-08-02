@@ -7,8 +7,11 @@ RUN npm install -g bun
 
 WORKDIR /app
 
-# Clone the repository
-RUN git clone https://github.com/topmuch/qrpass.git .
+# Build arg to bust Docker cache - change this value to force a fresh build
+ARG CACHEBUST=1
+
+# Clone the repository with depth 1 for faster clone
+RUN git clone --depth 1 https://github.com/topmuch/qrpass.git . && echo "Clone successful" && ls -la package.json
 
 # Install dependencies
 RUN bun install

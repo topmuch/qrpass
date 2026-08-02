@@ -89,7 +89,6 @@ export async function GET(request: NextRequest) {
       totalSets: sets.length,
       totalQr: baggages.length,
       hajjSets: sets.filter(s => s.type === 'hajj').length,
-      voyageurSets: sets.filter(s => s.type === 'voyageur').length,
     };
 
     return NextResponse.json({

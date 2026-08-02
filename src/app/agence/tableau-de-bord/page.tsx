@@ -1074,13 +1074,12 @@ export default function AgencyDashboardPage() {
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                   >
                     <option value="hajj">Hajj 2026 (3 QR/pèlerin)</option>
-                    <option value="voyageur">Voyageurs Standard (1 ou 2 QR)</option>
                   </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
-                    Nombre de {commandForm.type === 'hajj' ? 'pèlerins' : 'voyageurs'}
+                    Nombre de pèlerins
                   </label>
                   <input
                     type="number"
@@ -1109,7 +1108,7 @@ export default function AgencyDashboardPage() {
                     <strong className="text-slate-800 dark:text-white">Estimation :</strong> {' '}
                     {commandForm.type === 'hajj' 
                       ? `${commandForm.count * 3} QR codes (${commandForm.count} pèlerins × 3)`
-                      : `${commandForm.count} QR codes voyageur`
+                      : `${commandForm.count} QR codes`
                     }
                   </p>
                 </div>

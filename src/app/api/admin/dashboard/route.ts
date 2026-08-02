@@ -24,7 +24,7 @@ export async function GET() {
     // Calculate statistics
     const totalQR = baggages.length;
     const qrActivatedHajj = baggages.filter(b => b.type === 'hajj' && isActive(b.status)).length;
-    const qrActivatedVoyageur = baggages.filter(b => b.type === 'voyageur' && isActive(b.status)).length;
+    const qrActivatedVoyageur = 0;
 
     // Count unique pilgrims (Hajj) - group by name
     const hajjBaggages = baggages.filter(b => b.type === 'hajj' && b.travelerFirstName);
@@ -33,10 +33,7 @@ export async function GET() {
     ).size;
 
     // Count unique travelers (Voyageur)
-    const voyageurBaggages = baggages.filter(b => b.type === 'voyageur' && b.travelerFirstName);
-    const uniqueVoyageurs = new Set(
-      voyageurBaggages.map(b => `${b.travelerFirstName}_${b.travelerLastName}`)
-    ).size;
+    const uniqueVoyageurs = 0;
 
     // Count expiring soon (within 7 days)
     const now = new Date();
@@ -96,7 +93,7 @@ export async function GET() {
     const recentActivities: ActivityType[] = recentScans.map((scan) => {
       const timeAgo = getTimeAgo(new Date(scan.createdAt));
       const name = scan.baggage.travelerFirstName 
-        ? `${scan.baggage.travelerFirstName} ${scan.baggage.travelerLastName || ''} - ${scan.baggage.type === 'hajj' ? 'Hajj' : 'Voyageur'}`
+        ? `${scan.baggage.travelerFirstName} ${scan.baggage.travelerLastName || ''} - Hajj`
         : `Scan ${scan.baggage.reference}`;
 
       return {
@@ -118,10 +115,10 @@ export async function GET() {
         .map((b, index) => ({
           id: `activation-${index}`,
           type: 'activation' as const,
-          name: `${b.travelerFirstName} ${b.travelerLastName || ''} - ${b.type === 'hajj' ? 'Hajj' : 'Voyageur'}`,
+          name: `${b.travelerFirstName} ${b.travelerLastName || ''} - Hajj`,
           reference: '',
           time: getTimeAgo(new Date(b.createdAt)),
-          details: b.type === 'hajj' ? '3 QR activés' : '1 QR activé',
+          details: '3 QR activés',
           status: 'success' as const,
         }));
 
