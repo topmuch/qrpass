@@ -118,11 +118,20 @@ async function generateBaggagesBatch(options: {
   }));
 
   // Batch insert pilgrims in chunks of 200
+  // Note: skipDuplicates is not supported by SQLite, so we filter out existing qrCodes first
   for (let i = 0; i < pilgrimData.length; i += BATCH_SIZE) {
     const batch = pilgrimData.slice(i, i + BATCH_SIZE);
-    // Use createMany with skipDuplicates to avoid conflicts if pilgrim already exists
-    await db.pilgrim.createMany({ data: batch, skipDuplicates: true });
-    console.log(`[GENERATE] Inserted pilgrims batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} pilgrims`);
+    // Check which qrCodes already exist to avoid unique constraint violations
+    const existingCodes = await db.pilgrim.findMany({
+      where: { qrCode: { in: batch.map(p => p.qrCode) } },
+      select: { qrCode: true },
+    });
+    const existingSet = new Set(existingCodes.map(p => p.qrCode));
+    const newPilgrims = batch.filter(p => !existingSet.has(p.qrCode));
+    if (newPilgrims.length > 0) {
+      await db.pilgrim.createMany({ data: newPilgrims });
+    }
+    console.log(`[GENERATE] Inserted pilgrims batch ${Math.floor(i / BATCH_SIZE) + 1}: ${newPilgrims.length} new pilgrims (${existingSet.size} duplicates skipped)`);
   }
 
   console.log(`[GENERATE] Complete: ${totalBaggages} QR codes + ${travelerCount} pilgrim identities generated for ${travelerCount} pilgrims`);
