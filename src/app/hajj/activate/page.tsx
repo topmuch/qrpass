@@ -126,6 +126,27 @@ function HajjActivateContent() {
     setLoading(true);
 
     try {
+      let photoUrl: string | null = null;
+
+      // Upload photo first if selected
+      if (photoFile) {
+        try {
+          const photoFormData = new FormData();
+          photoFormData.append('file', photoFile);
+          const uploadRes = await fetch('/api/baggage/upload-photo', {
+            method: 'POST',
+            body: photoFormData,
+          });
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            photoUrl = uploadData.photoUrl;
+          }
+        } catch (uploadErr) {
+          console.error('Photo upload error (non-blocking):', uploadErr);
+          // Continue without photo — non-blocking
+        }
+      }
+
       const response = await fetch('/api/activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,12 +159,13 @@ function HajjActivateContent() {
           flightNumber: flightNumber.trim().toUpperCase() || undefined,
           destination: destination.trim() || undefined,
           transportMode: 'flight',
+          photoUrl: photoUrl || undefined,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        // Store activation data for success page
+        // Store activation data for confirmation page
         sessionStorage.setItem('activationData', JSON.stringify({
           reference: reference.toUpperCase(),
           firstName,
@@ -155,8 +177,22 @@ function HajjActivateContent() {
           type: 'hajj',
           activatedAt: new Date().toISOString(),
           expiresAt: data.baggage?.expiresAt,
+          photoUrl: photoUrl || data.baggage?.photoUrl || null,
         }));
-        router.push('/success?type=hajj');
+
+        // Redirect to confirmation page with URL params
+        const params = new URLSearchParams({
+          code: reference.toUpperCase(),
+          firstName,
+          lastName,
+          flight: flightNumber || airline,
+          destination: destination || '',
+          chefPhone,
+        });
+        if (photoUrl) {
+          params.set('photo', photoUrl);
+        }
+        router.push(`/activate/confirmation?${params.toString()}`);
       } else {
         const error = await response.json();
         toast({ title: error.message || "Erreur lors de l'activation", variant: 'destructive' });

@@ -120,6 +120,7 @@ export async function GET(
         createdAt: baggage.createdAt?.toISOString() || null,
         departureDate: baggage.departureDate?.toISOString() || null,
         departureTime: baggage.departureTime || null,
+        photoUrl: baggage.photoUrl || null,
       }
     },
     {

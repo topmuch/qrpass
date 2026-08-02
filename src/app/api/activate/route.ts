@@ -22,6 +22,8 @@ const activateSchema = z.object({
   shipCabin: z.string().optional(),
   busCompany: z.string().optional(),
   busLineNumber: z.string().optional(),
+  // Photo upload
+  photoUrl: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -75,6 +77,7 @@ export async function POST(request: NextRequest) {
         shipCabin: validatedData.shipCabin || null,
         busCompany: validatedData.busCompany || null,
         busLineNumber: validatedData.busLineNumber || null,
+        photoUrl: validatedData.photoUrl || null,
         status: 'active',
         expiresAt,
       }
@@ -130,6 +133,7 @@ export async function POST(request: NextRequest) {
         type: updatedBaggage.type,
         status: updatedBaggage.status,
         expiresAt: updatedBaggage.expiresAt,
+        photoUrl: updatedBaggage.photoUrl,
       }
     });
 

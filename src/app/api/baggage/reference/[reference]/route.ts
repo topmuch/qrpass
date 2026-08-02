@@ -128,6 +128,13 @@ function buildUpdateData(body: Record<string, unknown>): Record<string, unknown>
     updateData.baggageType = body.baggageType;
   }
 
+  // --- Photo URL ---
+  if (body.photoUrl !== undefined) {
+    updateData.photoUrl = typeof body.photoUrl === 'string' && body.photoUrl.trim() !== ''
+      ? body.photoUrl.trim()
+      : null;
+  }
+
   return updateData;
 }
 
@@ -162,6 +169,7 @@ function shapeBaggageResponse(baggage: Record<string, unknown>) {
     lastLocation: baggage.lastLocation,
     declaredLostAt: baggage.declaredLostAt,
     foundAt: baggage.foundAt,
+    photoUrl: baggage.photoUrl,
   };
 }
 
@@ -281,6 +289,7 @@ export async function GET(
       lastLocation: baggage.lastLocation,
       declaredLostAt: baggage.declaredLostAt,
       foundAt: baggage.foundAt,
+      photoUrl: baggage.photoUrl,
     });
 
   } catch (error) {
