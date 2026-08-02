@@ -160,7 +160,7 @@ function IdentityActivateContent() {
         try {
           const photoFormData = new FormData();
           photoFormData.append('file', photoFile);
-          const uploadRes = await fetch('/api/baggage/upload-photo', {
+          const uploadRes = await fetch('/api/pilgrims/upload-photo', {
             method: 'POST',
             body: photoFormData,
           });
