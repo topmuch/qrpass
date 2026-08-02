@@ -39,11 +39,13 @@ const ChatbotWidget = dynamic(() => import('@/components/finder/ChatbotWidget'),
   loading: () => null,
 });
 
-// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
-const BRAND = '#0047d6';   // bleu vif — fonds principaux
-const ACCENT = '#fcd616'; // jaune vif — cards, accents
-const INK = '#1a1a1a';    // noir — texte sur jaune, bordures dashed
-const CREAM = '#0047d6';  // (alias — désormais bleu QRPass)
+// ─── Brand constants (PassHajj palette: yellow #f4b400 + white cards + black buttons) ───
+const BRAND = '#f4b400';   // jaune — fond principal
+const CARD_BG = '#ffffff'; // blanc — cartes
+const INK = '#1a1a1a';     // noir — texte, boutons
+const MUTED = '#6b7280';   // gris — texte secondaire
+const INPUT_BG = '#f3f4f6'; // gris clair — inputs
+const BTN_PRIMARY = '#111827'; // noir — boutons principaux
 
 const FALLBACK_PHONE = '33745349339';
 
@@ -94,14 +96,14 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border-2 border-[#1a1a1a] rounded-full text-[#1a1a1a] hover:bg-[#fcd616] transition-colors text-xs sm:text-sm md:text-base font-medium shadow-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-black/10 rounded-full text-sm font-medium hover:bg-white transition-colors min-h-[36px]"
       >
-        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+        <Globe className="w-4 h-4" />
         <span>{LANGUAGE_NAMES[lang]}</span>
       </button>
 
       {isOpen && (
-        <div role="listbox" aria-label="Language" className="absolute top-full right-0 mt-1 sm:mt-2 bg-white border-2 border-[#1a1a1a] rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px] sm:min-w-[160px]">
+        <div role="listbox" aria-label="Language" className="absolute top-full right-0 mt-1 bg-white border border-black/10 rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px]">
           {(['fr', 'en', 'ar'] as Language[]).map((l) => (
             <button
               key={l}
@@ -111,10 +113,10 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
                 setLang(l);
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2.5 sm:px-5 sm:py-3 text-left text-xs sm:text-sm md:text-base font-medium transition-colors ${
+              className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
                 lang === l
-                  ? 'bg-[#fcd616] text-[#1a1a1a]'
-                  : 'text-[#1a1a1a] hover:bg-[#fcd616]/30'
+                  ? 'bg-[#f4b400] text-black'
+                  : 'text-black hover:bg-[#f4b400]/30'
               }`}
             >
               {LANGUAGE_NAMES[l]}
@@ -126,7 +128,7 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
   );
 }
 
-// ─── Activation Redirect Component (recolored with brand) ───
+// ─── Activation Redirect Component (harmonized with PassHajj design system) ───
 // ACTIVATION-FLOW: User selects transport mode BEFORE being redirected to /inscrire?qr=REF&mode=XXX.
 function ActivationRedirect({ type, reference, t, lang, setLang }: {
   type: string;
@@ -148,105 +150,132 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
   };
 
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center p-5 md:p-8">
-      <div className="relative max-w-md w-full bg-[#fcd616] border-2 border-dashed border-[#1a1a1a] rounded-2xl p-6 md:p-8 text-center shadow-xl">
-        <div className="absolute top-4 right-4">
+    <main dir={lang === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col items-center justify-center p-5 md:p-8" style={{ background: BRAND }}>
+      <div className="relative max-w-[420px] w-full">
+        {/* ─── Header ─── */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="text-2xl font-extrabold tracking-tight text-black">
+              <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+            </div>
+            <div className="text-sm mt-1" style={{ color: MUTED }}>
+              {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}
+            </div>
+          </div>
           <LanguageSelector lang={lang} setLang={setLang} />
         </div>
 
-        <div className="relative inline-block mb-5 mt-6">
-          <div className="w-16 h-16 bg-white border-2 border-[#1a1a1a] rounded-full flex items-center justify-center">
-            {selectedMode ? (
-              <Image
-                src={getTransportImage(selectedMode)}
-                alt={selectedMode}
-                width={36}
-                height={36}
-                className="mix-blend-multiply"
-              />
-            ) : (
-              <Luggage className="w-8 h-8 text-[#1a1a1a]" />
-            )}
+        {/* ─── White Card ─── */}
+        <div
+          className="rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+          style={{ background: CARD_BG }}
+        >
+          {/* Icon */}
+          <div className="relative inline-block mb-5">
+            <div className="w-16 h-16 bg-[#fef3c7] rounded-full flex items-center justify-center mx-auto">
+              {selectedMode ? (
+                <Image
+                  src={getTransportImage(selectedMode)}
+                  alt={selectedMode}
+                  width={36}
+                  height={36}
+                  className="mix-blend-multiply"
+                />
+              ) : (
+                <Luggage className="w-8 h-8 text-[#f4b400]" />
+              )}
+            </div>
+            <div className="absolute -top-1 -right-1 w-7 h-7 bg-[#111827] rounded-full flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5 text-[#f4b400]" />
+            </div>
           </div>
-          <div className="absolute -top-1 -right-1 w-7 h-7 bg-[#1a1a1a] rounded-full flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-[#fcd616]" />
-          </div>
+
+          <h1 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: INK }}>
+            {t('common.welcome')}
+          </h1>
+          <p className="text-sm md:text-base mb-5" style={{ color: MUTED }}>
+            {t('inscrire.subtitle')}
+          </p>
+
+          {isHajj && (
+            <>
+              {/* Baggage type box */}
+              <div className="rounded-xl p-4 mb-5" style={{ background: INPUT_BG }}>
+                <p className="text-sm mb-2" style={{ color: MUTED }}>{t('common.baggage_type')}</p>
+                <Badge className="text-white text-base md:text-lg px-5 py-1.5" style={{ background: BTN_PRIMARY }}>
+                  {t('common.hajj_label')}
+                </Badge>
+              </div>
+              <button
+                className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+                style={{ background: BTN_PRIMARY }}
+                onClick={handleContinue}
+              >
+                {t('common.start_activation')}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
+
+          {!isHajj && (
+            <>
+              {/* Baggage type box */}
+              <div className="rounded-xl p-4 mb-5" style={{ background: INPUT_BG }}>
+                <p className="text-sm mb-2" style={{ color: MUTED }}>{t('common.baggage_type')}</p>
+                <Badge className="text-white text-base md:text-lg px-5 py-1.5" style={{ background: BTN_PRIMARY }}>
+                  {t('common.voyageur_label')}
+                </Badge>
+              </div>
+
+              {/* Transport mode selector */}
+              <div className="text-left mb-5">
+                <p className="font-semibold text-sm mb-3 text-center" style={{ color: INK }}>
+                  {t('transport.select_mode')}
+                </p>
+                <TransportModeSelector
+                  selectedMode={selectedMode}
+                  onSelect={setSelectedMode}
+                  t={t}
+                  lang={lang}
+                />
+              </div>
+
+              <button
+                className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+                style={{ background: BTN_PRIMARY }}
+                onClick={handleContinue}
+                disabled={!selectedMode}
+              >
+                {t('common.start_activation')}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-1">
-          {t('common.welcome')}
-        </h1>
-        <p className="text-[#1a1a1a]/70 text-sm md:text-base mb-5">
-          {t('inscrire.subtitle')}
-        </p>
-
-        {isHajj && (
-          <>
-            <div className="border-2 border-dashed border-[#1a1a1a] rounded-xl p-4 mb-5 bg-white/40">
-              <p className="text-[#1a1a1a]/80 text-sm mb-2">{t('common.baggage_type')}</p>
-              <Badge className="bg-[#1a1a1a] text-white text-base md:text-lg px-5 py-1.5">
-                {t('common.hajj_label')}
-              </Badge>
-            </div>
-            <button
-              className="w-full py-4 px-6 bg-[#1a1a1a] hover:bg-black text-white rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px]"
-              onClick={handleContinue}
-            >
-              {t('common.start_activation')}
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </>
-        )}
-
-        {!isHajj && (
-          <>
-            <div className="border-2 border-dashed border-[#1a1a1a] rounded-xl p-4 mb-5 bg-white/40">
-              <p className="text-[#1a1a1a]/80 text-sm mb-2">{t('common.baggage_type')}</p>
-              <Badge className="bg-[#1a1a1a] text-white text-base md:text-lg px-5 py-1.5">
-                {t('common.voyageur_label')}
-              </Badge>
-            </div>
-
-            <div className="text-left mb-5">
-              <p className="text-[#1a1a1a] font-semibold text-sm mb-3 text-center">
-                {t('transport.select_mode')}
-              </p>
-              <TransportModeSelector
-                selectedMode={selectedMode}
-                onSelect={setSelectedMode}
-                t={t}
-                lang={lang}
-              />
-            </div>
-
-            <button
-              className="w-full py-4 px-6 bg-[#1a1a1a] hover:bg-black disabled:bg-[#1a1a1a]/30 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px]"
-              onClick={handleContinue}
-              disabled={!selectedMode}
-            >
-              {t('common.start_activation')}
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </>
-        )}
+        {/* ─── Footer ─── */}
+        <div className="mt-auto pt-6 text-center text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+          Propulsé par <strong>PassHajj</strong> ·{' '}
+          <a href="/support" className="text-black font-semibold underline">Aide</a>
+        </div>
       </div>
     </main>
   );
 }
 
-// ─── Loading Component (recolored) ───
+// ─── Loading Component (harmonized with PassHajj design) ───
 function LoadingScreen({ t }: { t: (key: string) => string }) {
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center">
+    <main className="min-h-screen flex items-center justify-center" style={{ background: BRAND }}>
       <div className="text-center">
-        <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-[#fcd616] rounded-full mx-auto mb-4"></div>
-        <p className="text-lg text-white">{t('common.loading')}</p>
+        <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full mx-auto mb-4"></div>
+        <p className="text-lg font-medium text-black">{t('common.loading')}</p>
       </div>
     </main>
   );
 }
 
-// ─── Error Screen (recolored) ───
+// ─── Error Screen (harmonized with PassHajj design) ───
 function ErrorScreen({
   type,
   t,
@@ -267,12 +296,12 @@ function ErrorScreen({
       message: t('errors.qr_not_valid_desc')
     },
     blocked: {
-      icon: <Shield className="w-12 h-12 text-[#1a1a1a]/40" />,
+      icon: <Shield className="w-12 h-12 text-gray-400" />,
       title: t('errors.baggage_blocked'),
       message: t('errors.baggage_blocked_desc')
     },
     expired: {
-      icon: <Clock className="w-12 h-12 text-[#1a1a1a]/40" />,
+      icon: <Clock className="w-12 h-12 text-gray-400" />,
       title: t('errors.protection_expired'),
       message: t('errors.protection_expired_desc')
     }
@@ -281,19 +310,23 @@ function ErrorScreen({
   const config = errorConfig[type as keyof typeof errorConfig] || errorConfig.not_found;
 
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center p-5 md:p-8 relative">
+    <main className="min-h-screen flex items-center justify-center p-5 md:p-8" style={{ background: BRAND }}>
       <div className="absolute top-4 right-4">
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
 
-      <div className="max-w-md w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-6 md:p-8 text-center shadow-xl">
-        <div className="w-20 h-20 bg-[#fcd616]/30 border-2 border-dashed border-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-6">
+      <div
+        className="max-w-md w-full rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+        style={{ background: CARD_BG }}
+      >
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
           {config.icon}
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-3">{config.title}</h1>
-        <p className="text-[#1a1a1a] text-base md:text-lg mb-6">{config.message}</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: INK }}>{config.title}</h1>
+        <p className="text-base md:text-lg mb-6" style={{ color: MUTED }}>{config.message}</p>
         <button
-          className="w-full py-4 px-6 bg-[#1a1a1a] hover:bg-black text-white rounded-xl hover:bg-[#fcd616] hover:text-[#1a1a1a] transition-colors text-base font-medium min-h-[56px]"
+          className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-base transition-all hover:-translate-y-0.5 active:scale-[0.98] min-h-[56px]"
+          style={{ background: BTN_PRIMARY }}
           onClick={() => router.push('/')}
         >
           {t('common.back_home')}
@@ -303,10 +336,10 @@ function ErrorScreen({
   );
 }
 
-// ─── Dashed Encart Helper (light variant: dashed black on white) ───
-function DashedEncart({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+// ─── Info Encart Helper (light gray bg, for white cards) ───
+function InfoEncart({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`border-2 border-dashed border-[#1a1a1a]/60 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`}>
+    <div className={`border border-gray-200 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`} style={{ background: INPUT_BG }}>
       {children}
     </div>
   );
@@ -698,26 +731,28 @@ export default function ScanPage() {
   const isDeclaredLost = baggage?.declaredLostAt && !baggage?.foundAt;
 
   // ═══════════════════════════════════════════════════════════════
-  // ─── MAIN RENDER — Cream bg + White dashed cards + Yellow finder encart ───
+  // ─── MAIN RENDER — Yellow bg + White cards + Black accents (PassHajj design) ───
   // ═══════════════════════════════════════════════════════════════
   return (
     <main
-      className="min-h-screen bg-[#0047d6] flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
+      className="min-h-screen flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
+      style={{ background: BRAND }}
       dir={dir}
     >
       {/* ─── Header ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#0047d6]">
+      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4" style={{ background: BRAND }}>
         {/* ✏️ Modifier button — visible only for active/lost baggage */}
         {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[#fcd616] border-2 border-[#1a1a1a] rounded-full text-[#1a1a1a] hover:bg-[#fcd616]/80 transition-colors text-xs sm:text-sm md:text-base font-bold shadow-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-black/10 rounded-full text-sm font-bold hover:bg-white/80 transition-colors min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+            style={{ color: INK }}
           >
             <span>{t('finder.edit_btn')}</span>
           </button>
         )}
         {isEditing && (
-          <div className="text-white font-bold text-sm sm:text-base">
+          <div className="font-bold text-sm sm:text-base" style={{ color: INK }}>
             {t('finder.edit_title')}
           </div>
         )}
@@ -730,9 +765,9 @@ export default function ScanPage() {
 
       {/* Success Toast — inline confirmation */}
       {showSuccess && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(4rem+env(safe-area-inset-top,0px))] right-3 sm:right-5 bg-[#1a1a1a] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-right duration-300 max-w-[calc(100vw-2rem)] sm:max-w-sm">
+        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(4rem+env(safe-area-inset-top,0px))] right-3 sm:right-5 bg-[#111827] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-right duration-300 max-w-[calc(100vw-2rem)] sm:max-w-sm">
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-[#fcd616]" />
+            <CheckCircle className="w-6 h-6 text-[#f4b400]" />
             <div>
               <div className="font-bold text-lg">{t('finder.success_title')} 🎉</div>
               <div className="text-base opacity-90">{t('finder.message_sent')}</div>
@@ -746,86 +781,88 @@ export default function ScanPage() {
 
         {/* ═══ 🏷️ TITRE : ✅ BAGAGE TROUVÉ ═══ */}
         <div className="text-center mb-5 sm:mb-6">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: INK }}>
             {isDeclaredLost
               ? `🚨 ${t('finder.lost_badge')}`
               : `✅ ${t('finder.success_badge')}`}
           </h1>
-          <p className="mt-2 text-sm md:text-base text-white/80 leading-relaxed max-w-md mx-auto">
+          <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto" style={{ color: MUTED }}>
             {isDeclaredLost
               ? t('finder.lost_description')
               : t('finder.bagage_trouve_desc')}
           </p>
         </div>
 
-        {/* ═══ 🟦 BLOC 1 : IDENTITÉ PROPRIÉTAIRE (white + dashed black) ═══ */}
+        {/* ═══ 🟦 BLOC 1 : IDENTITÉ PROPRIÉTAIRE (white card) ═══ */}
         {baggage && !isEditing && (
-          <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4">
-            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
               <span>👤</span> {t('finder.owner_section')}
             </h2>
 
             {/* Full Name — kept */}
-            <DashedEncart>
+            <InfoEncart>
               <div className="flex items-center gap-3">
                 <span className="text-xl">👤</span>
                 <div>
-                  <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('finder.fullName')}</p>
-                  <p className="text-base md:text-lg font-bold text-[#1a1a1a]">{baggage.travelerName || t('finder.notSet')}</p>
+                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.fullName')}</p>
+                  <p className="text-base md:text-lg font-bold" style={{ color: INK }}>{baggage.travelerName || t('finder.notSet')}</p>
                 </div>
               </div>
-            </DashedEncart>
+            </InfoEncart>
 
             {/* NOTE: Agency + Baggage Type REMOVED per refonte-4 brief */}
 
             {/* Contact — Secured (NEVER show WhatsApp number) */}
-            <DashedEncart className="mb-0">
+            <InfoEncart className="mb-0">
               <div className="flex items-center gap-3">
                 <span className="text-xl">🔒</span>
                 <div>
-                  <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('finder.contact_label')}</p>
-                  <p className="text-base font-bold text-[#1a1a1a]">{t('finder.secure_contact')}</p>
-                  <p className="text-xs text-[#1a1a1a]/60 mt-0.5">{t('finder.contact_reveal_note')}</p>
+                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.contact_label')}</p>
+                  <p className="text-base font-bold" style={{ color: INK }}>{t('finder.secure_contact')}</p>
+                  <p className="text-xs mt-0.5" style={{ color: MUTED }}>{t('finder.contact_reveal_note')}</p>
                 </div>
               </div>
-            </DashedEncart>
+            </InfoEncart>
           </div>
         )}
 
-        {/* ═══ 🟦 EDIT MODE: BLOC 1 — Owner Info (white + dashed black) ═══ */}
+        {/* ═══ 🟦 EDIT MODE: BLOC 1 — Owner Info (white card) ═══ */}
         {baggage && isEditing && (
-          <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
               <span>👤</span> {t('finder.owner_section')}
             </h2>
 
             {/* First Name */}
             <div className="mb-3">
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_first_name')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_first_name')}</label>
               <input
                 type="text"
                 value={editFirstName}
                 onChange={(e) => setEditFirstName(e.target.value)}
                 placeholder={t('inscrire.first_name_placeholder')}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
             {/* Last Name */}
             <div className="mb-3">
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_last_name')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_last_name')}</label>
               <input
                 type="text"
                 value={editLastName}
                 onChange={(e) => setEditLastName(e.target.value)}
                 placeholder={t('inscrire.last_name_placeholder')}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
             {/* WhatsApp Number */}
             <div>
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_whatsapp')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_whatsapp')}</label>
               <PhoneInput
                 countryCode={editPhoneCountry}
                 onCountryChange={setEditPhoneCountry}
@@ -838,15 +875,15 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* ═══ 🟦 BLOC 2 : DÉTAILS DU VOYAGE (white + dashed black, transport images) ═══ */}
+        {/* ═══ 🟦 BLOC 2 : DÉTAILS DU VOYAGE (white card, transport images) ═══ */}
         {baggage && !isEditing && (() => {
           const mode = safeTransportMode(baggage.transportMode) as TransportMode;
           const transportImg = getTransportImage(mode);
           const blockHeader = getTransportBlockHeader(mode, lang);
 
           return (
-            <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4">
-              <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+            <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+              <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
                 <Image
                   src={transportImg}
                   alt={mode}
@@ -859,23 +896,23 @@ export default function ScanPage() {
 
               {/* TRANSPORT-FEATURE: Flight info */}
               {mode === 'flight' && (baggage.airlineName || baggage.flightNumber) && (
-                <DashedEncart>
+                <InfoEncart>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       {baggage.airlineName && (
                         <div className="mb-1.5">
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.airline')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.airlineName}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.airline')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.airlineName}</p>
                         </div>
                       )}
                       {baggage.flightNumber && (
                         <div>
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.flight_number')}</p>
-                          <p className="text-xl font-bold text-[#1a1a1a] font-mono tracking-widest">{baggage.flightNumber}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.flight_number')}</p>
+                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.flightNumber}</p>
                         </div>
                       )}
                     </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
                       <Image
                         src={transportImg}
                         alt="flight"
@@ -885,28 +922,28 @@ export default function ScanPage() {
                       />
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
 
               {/* TRANSPORT-FEATURE: Train info */}
               {mode === 'train' && (baggage.trainCompany || baggage.trainNumber) && (
-                <DashedEncart>
+                <InfoEncart>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       {baggage.trainCompany && (
                         <div className="mb-1.5">
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.train_company')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.trainCompany}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_company')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.trainCompany}</p>
                         </div>
                       )}
                       {baggage.trainNumber && (
                         <div>
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.train_number')}</p>
-                          <p className="text-xl font-bold text-[#1a1a1a] font-mono tracking-widest">{baggage.trainNumber}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_number')}</p>
+                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.trainNumber}</p>
                         </div>
                       )}
                     </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
                       <Image
                         src={transportImg}
                         alt="train"
@@ -916,28 +953,28 @@ export default function ScanPage() {
                       />
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
 
               {/* TRANSPORT-FEATURE: Boat info */}
               {mode === 'boat' && (baggage.shipName || baggage.shipCabin) && (
-                <DashedEncart>
+                <InfoEncart>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       {baggage.shipName && (
                         <div className="mb-1.5">
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.ship_name')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.shipName}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_name')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipName}</p>
                         </div>
                       )}
                       {baggage.shipCabin && (
                         <div>
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.ship_cabin')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.shipCabin}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_cabin')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipCabin}</p>
                         </div>
                       )}
                     </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
                       <Image
                         src={transportImg}
                         alt="boat"
@@ -947,28 +984,28 @@ export default function ScanPage() {
                       />
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
 
               {/* TRANSPORT-FEATURE: Bus info */}
               {mode === 'bus' && (baggage.busCompany || baggage.busLineNumber) && (
-                <DashedEncart>
+                <InfoEncart>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       {baggage.busCompany && (
                         <div className="mb-1.5">
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.bus_company')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.busCompany}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_company')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busCompany}</p>
                         </div>
                       )}
                       {baggage.busLineNumber && (
                         <div>
-                          <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.bus_line')}</p>
-                          <p className="text-base font-bold text-[#1a1a1a]">{baggage.busLineNumber}</p>
+                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_line')}</p>
+                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busLineNumber}</p>
                         </div>
                       )}
                     </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
                       <Image
                         src={transportImg}
                         alt="bus"
@@ -978,44 +1015,44 @@ export default function ScanPage() {
                       />
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
 
               {/* Destination */}
               {baggage.destination && (
-                <DashedEncart>
+                <InfoEncart>
                   <div className="flex items-center gap-3">
                     <span className="text-xl">📍</span>
                     <div>
-                      <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.common_destination')}</p>
-                      <p className="text-base font-bold text-[#1a1a1a]">{baggage.destination}</p>
+                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_destination')}</p>
+                      <p className="text-base font-bold" style={{ color: INK }}>{baggage.destination}</p>
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
 
               {/* Departure Date */}
               {(baggage.departureDate || baggage.createdAt) && (
-                <DashedEncart className="mb-0">
+                <InfoEncart className="mb-0">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">📅</span>
                     <div>
-                      <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.common_departure_date')}</p>
-                      <p className="text-base font-bold text-[#1a1a1a]">
+                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_departure_date')}</p>
+                      <p className="text-base font-bold" style={{ color: INK }}>
                         {formatDate(baggage.departureDate || baggage.createdAt)}{baggage.departureTime ? ` — ${baggage.departureTime}` : ''}
                       </p>
                     </div>
                   </div>
-                </DashedEncart>
+                </InfoEncart>
               )}
             </div>
           );
         })()}
 
-        {/* ═══ 🟦 EDIT MODE: BLOC 2 — Transport Details (white + dashed black) ═══ */}
+        {/* ═══ 🟦 EDIT MODE: BLOC 2 — Transport Details (white card) ═══ */}
         {baggage && isEditing && (
-          <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
               <span>✈️</span> {t('finder.edit_transport_mode')}
             </h2>
 
@@ -1033,23 +1070,25 @@ export default function ScanPage() {
             {editTransportMode === 'flight' && (
               <div className="space-y-3 mb-4">
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.airline')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.airline')}</label>
                   <input
                     type="text"
                     value={editAirlineName}
                     onChange={(e) => setEditAirlineName(e.target.value)}
                     placeholder={t('transport.airline_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.flight_number')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.flight_number')}</label>
                   <input
                     type="text"
                     value={editFlightNumber}
                     onChange={(e) => setEditFlightNumber(e.target.value)}
                     placeholder={t('transport.flight_number_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
               </div>
@@ -1059,23 +1098,25 @@ export default function ScanPage() {
             {editTransportMode === 'train' && (
               <div className="space-y-3 mb-4">
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.train_company')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_company')}</label>
                   <input
                     type="text"
                     value={editTrainCompany}
                     onChange={(e) => setEditTrainCompany(e.target.value)}
                     placeholder={t('transport.train_company_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.train_number')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_number')}</label>
                   <input
                     type="text"
                     value={editTrainNumber}
                     onChange={(e) => setEditTrainNumber(e.target.value)}
                     placeholder={t('transport.train_number_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
               </div>
@@ -1085,23 +1126,25 @@ export default function ScanPage() {
             {editTransportMode === 'boat' && (
               <div className="space-y-3 mb-4">
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.ship_name')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_name')}</label>
                   <input
                     type="text"
                     value={editShipName}
                     onChange={(e) => setEditShipName(e.target.value)}
                     placeholder={t('transport.ship_name_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.ship_cabin')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_cabin')}</label>
                   <input
                     type="text"
                     value={editShipCabin}
                     onChange={(e) => setEditShipCabin(e.target.value)}
                     placeholder={t('transport.ship_cabin_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
               </div>
@@ -1111,23 +1154,25 @@ export default function ScanPage() {
             {editTransportMode === 'bus' && (
               <div className="space-y-3 mb-4">
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.bus_company')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_company')}</label>
                   <input
                     type="text"
                     value={editBusCompany}
                     onChange={(e) => setEditBusCompany(e.target.value)}
                     placeholder={t('transport.bus_company_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.bus_line')}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_line')}</label>
                   <input
                     type="text"
                     value={editBusLineNumber}
                     onChange={(e) => setEditBusLineNumber(e.target.value)}
                     placeholder={t('transport.bus_line_placeholder')}
-                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                   />
                 </div>
               </div>
@@ -1135,35 +1180,38 @@ export default function ScanPage() {
 
             {/* Destination — common to all modes */}
             <div className="mb-3">
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_destination')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_destination')}</label>
               <input
                 type="text"
                 value={editDestination}
                 onChange={(e) => setEditDestination(e.target.value)}
                 placeholder={t('transport.common_destination_placeholder')}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
             {/* Departure Date */}
             <div className="mb-3">
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_departure_date')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_date')}</label>
               <input
                 type="date"
                 value={editDepartureDate}
                 onChange={(e) => setEditDepartureDate(e.target.value)}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
             {/* Departure Time */}
             <div>
-              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_departure_time')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_time')}</label>
               <input
                 type="time"
                 value={editDepartureTime}
                 onChange={(e) => setEditDepartureTime(e.target.value)}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
           </div>
@@ -1172,15 +1220,16 @@ export default function ScanPage() {
         {/* ═══ 🟦 EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
         {isEditing && (
           <div className="flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            {/* Save Button — yellow #fcd616 accent */}
+            {/* Save Button — primary black */}
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex-1 py-4 px-6 bg-[#fcd616] hover:bg-[#fcd616]/80 disabled:opacity-70 text-[#1a1a1a] border-2 border-[#1a1a1a] rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px] shadow-md"
+              className="flex-1 py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+              style={{ background: BTN_PRIMARY }}
             >
               {isSaving ? (
                 <>
-                  <svg className="animate-spin h-5 w-5 text-[#1a1a1a] inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -1197,21 +1246,23 @@ export default function ScanPage() {
             <button
               onClick={() => setIsEditing(false)}
               disabled={isSaving}
-              className="flex-1 py-4 px-6 bg-white hover:bg-gray-50 disabled:opacity-70 text-[#1a1a1a] border-2 border-[#1a1a1a] rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px]"
+              className="flex-1 py-4 px-6 bg-white hover:bg-gray-50 disabled:opacity-50 border-2 border-black rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+              style={{ color: INK }}
             >
               <span>{t('finder.edit_cancel')}</span>
             </button>
           </div>
         )}
 
-        {/* ═══ 🟡 BLOC 3 : ENCART FINDER (yellow #fcd616 + solid black border) ═══ */}
-        <div className="w-full bg-[#fcd616] border-2 border-solid border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 shadow-lg">
+        {/* ═══ 🟡 BLOC 3 : ENCART FINDER (white card) ═══ */}
+        <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
 
           {/* ─── 1. BIG "📞 Contacter le propriétaire" CTA button (FIRST) ─── */}
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full py-4 px-6 bg-[#1a1a1a] hover:bg-black text-white rounded-xl font-bold text-lg md:text-xl transition-colors flex items-center justify-center gap-2 min-h-[56px] shadow-md"
+              className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+              style={{ background: BTN_PRIMARY }}
             >
               <Phone className="w-5 h-5" />
               <span>{t('finder.contact_owner_cta')}</span>
@@ -1233,7 +1284,8 @@ export default function ScanPage() {
                 placeholder={t('finder.first_name')}
                 value={finderName}
                 onChange={(e) => setFinderName(e.target.value)}
-                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
 
               {/* Phone (PhoneInput with dark=false but on yellow bg → white input) */}
@@ -1254,13 +1306,14 @@ export default function ScanPage() {
                   placeholder={t('finder.location_placeholder')}
                   value={otherLocation}
                   onChange={(e) => setOtherLocation(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                 />
               </div>
 
-              {/* ─── Contact choice: WhatsApp (GREEN + GPS auto) + Phone (YELLOW) ─── */}
+              {/* ─── Contact choice: WhatsApp (GREEN + GPS auto) + Phone (BLACK) ─── */}
               <div className="pt-1">
-                <h3 className="text-[#1a1a1a] text-xs font-bold uppercase tracking-widest text-center mb-2.5">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-center mb-2.5" style={{ color: INK }}>
                   {t('finder.contact_choice')}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1293,17 +1346,18 @@ export default function ScanPage() {
                       </>
                     )}
                   </button>
-                  {/* Phone Button — BLACK #1a1a1a + white text (consistent with primary CTA) */}
+                  {/* Phone Button — BLACK + white text (consistent with primary CTA) */}
                   <button
                     onClick={handlePhoneCall}
                     disabled={isLocating || isSubmitting}
-                    className="py-3.5 px-4 bg-[#1a1a1a] hover:bg-black disabled:opacity-70 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[52px]"
+                    className="py-3.5 px-4 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[52px] disabled:opacity-70"
+                    style={{ background: BTN_PRIMARY }}
                   >
                     <Phone className="w-5 h-5" />
                     {t('finder.by_phone')}
                   </button>
                 </div>
-                <p className="text-[#1a1a1a]/70 text-xs text-center mt-2.5 leading-relaxed">
+                <p className="text-xs text-center mt-2.5 leading-relaxed" style={{ color: MUTED }}>
                   {t('finder.gps_auto_shared')}
                 </p>
               </div>
@@ -1312,7 +1366,7 @@ export default function ScanPage() {
         </div>
 
         {/* ─── Trust Note ─── */}
-        <div className="mt-1 mb-4 text-center text-xs text-white/70 tracking-wide flex items-center justify-center gap-1.5">
+        <div className="mt-1 mb-4 text-center text-xs tracking-wide flex items-center justify-center gap-1.5" style={{ color: 'rgba(0,0,0,0.6)' }}>
           <Shield className="w-4 h-4 inline" />
           <span>{t('finder.trust_note')}</span>
         </div>
