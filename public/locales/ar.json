@@ -92,7 +92,21 @@
     "finder_form_help": "املأ بياناتك لإبلاغ المالك.",
     "contact_choice": "اختر كيفية الاتصال بالمالك",
     "owner_section": "المالك",
-    "travel_section": "الرحلة"
+    "travel_section": "الرحلة",
+    "edit_btn": "✏️ تعديل",
+    "edit_title": "تعديل المعلومات",
+    "edit_first_name": "الاسم الأول",
+    "edit_last_name": "الاسم الأخير",
+    "edit_whatsapp": "رقم واتساب",
+    "edit_transport_mode": "وسيلة النقل",
+    "edit_destination": "الوجهة",
+    "edit_departure_date": "تاريخ المغادرة",
+    "edit_departure_time": "وقت المغادرة",
+    "edit_save": "حفظ",
+    "edit_cancel": "إلغاء",
+    "edit_saving": "جارٍ الحفظ...",
+    "edit_success": "تم تحديث المعلومات!",
+    "edit_error": "خطأ أثناء الحفظ"
   },
   "whatsapp": {
     "found_message": "🎉 أخبار سارة {firstName}!\n\nشخص ما وجد أمتعتك {type} في {location}!\n📍 هي حالياً في {address}\n👤 الشخص الذي وجدها اسمه {name}\n📞 اتصل به بسرعة على {phone}\n💬 أو راسله على واتساب\nيمكنك أيضاً رؤية جميع التفاصيل هنا:\n👉 {url}\nلا تقلق، كل شيء سيكون على ما يرام! 💪\nفريق QRPass",

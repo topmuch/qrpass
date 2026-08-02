@@ -165,18 +165,18 @@ function shapeBaggageResponse(baggage: Record<string, unknown>) {
   };
 }
 
-// PUT - Update a baggage by ID
+// PUT - Update a baggage by reference
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ reference: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { reference } = await params;
     const body = await request.json();
 
-    // Check if baggage exists
+    // Check if baggage exists by reference
     const existingBaggage = await db.baggage.findUnique({
-      where: { id },
+      where: { reference },
     });
 
     if (!existingBaggage) {
@@ -208,7 +208,7 @@ export async function PUT(
 
     // Update the baggage
     const updatedBaggage = await db.baggage.update({
-      where: { id },
+      where: { reference },
       data: updateData,
     });
 
@@ -218,7 +218,7 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Update baggage error:', error);
+    console.error('Update baggage by reference error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -226,60 +226,16 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete a baggage by ID
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-
-    // Check if baggage exists
-    const baggage = await db.baggage.findUnique({
-      where: { id },
-    });
-
-    if (!baggage) {
-      return NextResponse.json(
-        { error: 'Baggage not found' },
-        { status: 404 }
-      );
-    }
-
-    // Delete related scan logs first
-    await db.scanLog.deleteMany({
-      where: { baggageId: id },
-    });
-
-    // Delete the baggage
-    await db.baggage.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Baggage deleted successfully'
-    });
-
-  } catch (error) {
-    console.error('Delete baggage error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-// GET - Get a single baggage by ID
+// GET - Get a single baggage by reference
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ reference: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { reference } = await params;
 
     const baggage = await db.baggage.findUnique({
-      where: { id },
+      where: { reference },
       include: { agency: true },
     });
 
@@ -328,7 +284,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Get baggage error:', error);
+    console.error('Get baggage by reference error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

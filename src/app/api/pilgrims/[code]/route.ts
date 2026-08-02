@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+// URL validation helper
+function isValidUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 // CORS headers for scan page access
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -140,6 +150,7 @@ export async function PUT(
     // Prepare update data — only allow specific fields
     const updateData: Record<string, unknown> = {};
 
+    // --- Previously editable fields ---
     if (body.hotelMecca !== undefined) updateData.hotelMecca = body.hotelMecca || null;
     if (body.roomMecca !== undefined) updateData.roomMecca = body.roomMecca || null;
     if (body.hotelMedina !== undefined) updateData.hotelMedina = body.hotelMedina || null;
@@ -150,6 +161,49 @@ export async function PUT(
     if (body.familyContact !== undefined) updateData.familyContact = body.familyContact || null;
     if (body.medicalInfo !== undefined) updateData.medicalInfo = body.medicalInfo || null;
     if (body.bloodType !== undefined) updateData.bloodType = body.bloodType || null;
+
+    // --- Newly editable fields ---
+    if (body.fullName !== undefined) {
+      if (typeof body.fullName !== 'string' || body.fullName.trim().length < 2) {
+        return NextResponse.json(
+          { error: 'fullName must be a string with at least 2 characters' },
+          { status: 400 }
+        );
+      }
+      updateData.fullName = body.fullName.trim();
+    }
+
+    if (body.nationality !== undefined) {
+      if (typeof body.nationality !== 'string' || body.nationality.trim().length < 2) {
+        return NextResponse.json(
+          { error: 'nationality must be a string with at least 2 characters' },
+          { status: 400 }
+        );
+      }
+      updateData.nationality = body.nationality.trim();
+    }
+
+    if (body.photoUrl !== undefined) {
+      const photoUrl = body.photoUrl ? String(body.photoUrl).trim() : null;
+      if (photoUrl !== null && !isValidUrl(photoUrl)) {
+        return NextResponse.json(
+          { error: 'photoUrl must be a valid URL or null' },
+          { status: 400 }
+        );
+      }
+      updateData.photoUrl = photoUrl;
+    }
+
+    if (body.alNusukDocUrl !== undefined) {
+      const alNusukDocUrl = body.alNusukDocUrl ? String(body.alNusukDocUrl).trim() : null;
+      if (alNusukDocUrl !== null && !isValidUrl(alNusukDocUrl)) {
+        return NextResponse.json(
+          { error: 'alNusukDocUrl must be a valid URL or null' },
+          { status: 400 }
+        );
+      }
+      updateData.alNusukDocUrl = alNusukDocUrl;
+    }
 
     // Update the pilgrim
     const updated = await db.pilgrim.update({

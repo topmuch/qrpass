@@ -58,6 +58,8 @@ interface BaggageData {
     reference: string;
     type: string;
     travelerName: string;
+    travelerFirstName?: string;
+    travelerLastName?: string;
     baggageIndex: number;
     baggageType: string;
     status: string;
@@ -326,6 +328,26 @@ export default function ScanPage() {
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [editWhatsapp, setEditWhatsapp] = useState('');
+  const [editTransportMode, setEditTransportMode] = useState<TransportMode>('flight');
+  const [editAirlineName, setEditAirlineName] = useState('');
+  const [editFlightNumber, setEditFlightNumber] = useState('');
+  const [editTrainCompany, setEditTrainCompany] = useState('');
+  const [editTrainNumber, setEditTrainNumber] = useState('');
+  const [editShipName, setEditShipName] = useState('');
+  const [editShipCabin, setEditShipCabin] = useState('');
+  const [editBusCompany, setEditBusCompany] = useState('');
+  const [editBusLineNumber, setEditBusLineNumber] = useState('');
+  const [editDestination, setEditDestination] = useState('');
+  const [editDepartureDate, setEditDepartureDate] = useState('');
+  const [editDepartureTime, setEditDepartureTime] = useState('');
+  const [editPhoneCountry, setEditPhoneCountry] = useState(countryCode);
+
   // Finder form state
   const [finderName, setFinderName] = useState('');
   const [finderPhone, setFinderPhone] = useState('');
@@ -363,6 +385,99 @@ export default function ScanPage() {
       setScanConfirmed(true);
     }
   }, [baggageData?.baggage?.reference]);
+
+  // Pre-fill edit state when baggage data loads
+  useEffect(() => {
+    const b = baggageData?.baggage;
+    if (b) {
+      setEditFirstName(b.travelerFirstName || '');
+      setEditLastName(b.travelerLastName || '');
+      setEditWhatsapp(b.whatsappOwner || '');
+      setEditTransportMode(safeTransportMode(b.transportMode) as TransportMode);
+      setEditAirlineName(b.airlineName || '');
+      setEditFlightNumber(b.flightNumber || '');
+      setEditTrainCompany(b.trainCompany || '');
+      setEditTrainNumber(b.trainNumber || '');
+      setEditShipName(b.shipName || '');
+      setEditShipCabin(b.shipCabin || '');
+      setEditBusCompany(b.busCompany || '');
+      setEditBusLineNumber(b.busLineNumber || '');
+      setEditDestination(b.destination || '');
+      // Format departureDate to YYYY-MM-DD for the date input
+      if (b.departureDate) {
+        try {
+          const d = new Date(b.departureDate);
+          setEditDepartureDate(d.toISOString().split('T')[0]);
+        } catch {
+          setEditDepartureDate('');
+        }
+      } else {
+        setEditDepartureDate('');
+      }
+      setEditDepartureTime(b.departureTime || '');
+    }
+  }, [baggageData?.baggage?.reference]); // only re-run when baggage reference changes
+
+  // Handle save edit
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/baggage/reference/${reference}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          travelerFirstName: editFirstName.trim() || null,
+          travelerLastName: editLastName.trim() || null,
+          whatsappOwner: editWhatsapp.trim() || null,
+          transportMode: editTransportMode,
+          airlineName: editAirlineName.trim() || null,
+          flightNumber: editFlightNumber.trim() || null,
+          trainCompany: editTrainCompany.trim() || null,
+          trainNumber: editTrainNumber.trim() || null,
+          shipName: editShipName.trim() || null,
+          shipCabin: editShipCabin.trim() || null,
+          busCompany: editBusCompany.trim() || null,
+          busLineNumber: editBusLineNumber.trim() || null,
+          destination: editDestination.trim() || null,
+          departureDate: editDepartureDate || null,
+          departureTime: editDepartureTime.trim() || null,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      const data = await res.json();
+      // Update local state with the updated baggage data
+      setBaggageData({
+        ...baggageData!,
+        status: baggageData!.status,
+        baggage: {
+          ...baggageData!.baggage!,
+          travelerFirstName: data.baggage.travelerFirstName,
+          travelerLastName: data.baggage.travelerLastName,
+          travelerName: `${data.baggage.travelerFirstName || ''} ${data.baggage.travelerLastName || ''}`.trim(),
+          whatsappOwner: data.baggage.whatsappOwner,
+          transportMode: data.baggage.transportMode,
+          airlineName: data.baggage.airlineName,
+          flightNumber: data.baggage.flightNumber,
+          trainCompany: data.baggage.trainCompany,
+          trainNumber: data.baggage.trainNumber,
+          shipName: data.baggage.shipName,
+          shipCabin: data.baggage.shipCabin,
+          busCompany: data.baggage.busCompany,
+          busLineNumber: data.baggage.busLineNumber,
+          destination: data.baggage.destination,
+          departureDate: data.baggage.departureDate,
+          departureTime: data.baggage.departureTime,
+        },
+      });
+      setIsEditing(false);
+      toast({ title: t('finder.edit_success') });
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({ title: t('finder.edit_error'), variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // NOTE: GPS sharing now happens inline inside handleWhatsApp (silent fallback to manual location).
   // The dedicated "Partager ma position GPS" button was removed per refonte-6 brief.
@@ -591,7 +706,22 @@ export default function ScanPage() {
       dir={dir}
     >
       {/* ─── Header ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-end pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#0047d6]">
+      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#0047d6]">
+        {/* ✏️ Modifier button — visible only for active/lost baggage */}
+        {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-[#fcd616] border-2 border-[#1a1a1a] rounded-full text-[#1a1a1a] hover:bg-[#fcd616]/80 transition-colors text-xs sm:text-sm md:text-base font-bold shadow-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+          >
+            <span>{t('finder.edit_btn')}</span>
+          </button>
+        )}
+        {isEditing && (
+          <div className="text-white font-bold text-sm sm:text-base">
+            {t('finder.edit_title')}
+          </div>
+        )}
+        {(!baggage || (baggageData?.status !== 'active' && baggageData?.status !== 'lost')) && <div />}
         <LanguageSelector lang={lang} setLang={setLang} />
       </header>
 
@@ -629,7 +759,7 @@ export default function ScanPage() {
         </div>
 
         {/* ═══ 🟦 BLOC 1 : IDENTITÉ PROPRIÉTAIRE (white + dashed black) ═══ */}
-        {baggage && (
+        {baggage && !isEditing && (
           <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4">
             <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
               <span>👤</span> {t('finder.owner_section')}
@@ -662,8 +792,54 @@ export default function ScanPage() {
           </div>
         )}
 
+        {/* ═══ 🟦 EDIT MODE: BLOC 1 — Owner Info (white + dashed black) ═══ */}
+        {baggage && isEditing && (
+          <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+              <span>👤</span> {t('finder.owner_section')}
+            </h2>
+
+            {/* First Name */}
+            <div className="mb-3">
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_first_name')}</label>
+              <input
+                type="text"
+                value={editFirstName}
+                onChange={(e) => setEditFirstName(e.target.value)}
+                placeholder={t('inscrire.first_name_placeholder')}
+                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+              />
+            </div>
+
+            {/* Last Name */}
+            <div className="mb-3">
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_last_name')}</label>
+              <input
+                type="text"
+                value={editLastName}
+                onChange={(e) => setEditLastName(e.target.value)}
+                placeholder={t('inscrire.last_name_placeholder')}
+                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+              />
+            </div>
+
+            {/* WhatsApp Number */}
+            <div>
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_whatsapp')}</label>
+              <PhoneInput
+                countryCode={editPhoneCountry}
+                onCountryChange={setEditPhoneCountry}
+                value={editWhatsapp}
+                onChange={setEditWhatsapp}
+                placeholder="6 12 34 56 78"
+                className="min-h-[48px]"
+              />
+            </div>
+          </div>
+        )}
+
         {/* ═══ 🟦 BLOC 2 : DÉTAILS DU VOYAGE (white + dashed black, transport images) ═══ */}
-        {baggage && (() => {
+        {baggage && !isEditing && (() => {
           const mode = safeTransportMode(baggage.transportMode) as TransportMode;
           const transportImg = getTransportImage(mode);
           const blockHeader = getTransportBlockHeader(mode, lang);
@@ -835,6 +1011,198 @@ export default function ScanPage() {
             </div>
           );
         })()}
+
+        {/* ═══ 🟦 EDIT MODE: BLOC 2 — Transport Details (white + dashed black) ═══ */}
+        {baggage && isEditing && (
+          <div className="w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+              <span>✈️</span> {t('finder.edit_transport_mode')}
+            </h2>
+
+            {/* Transport Mode Selector */}
+            <div className="mb-4">
+              <TransportModeSelector
+                selectedMode={editTransportMode}
+                onSelect={setEditTransportMode}
+                t={t}
+                lang={lang}
+              />
+            </div>
+
+            {/* Flight-specific fields */}
+            {editTransportMode === 'flight' && (
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.airline')}</label>
+                  <input
+                    type="text"
+                    value={editAirlineName}
+                    onChange={(e) => setEditAirlineName(e.target.value)}
+                    placeholder={t('transport.airline_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.flight_number')}</label>
+                  <input
+                    type="text"
+                    value={editFlightNumber}
+                    onChange={(e) => setEditFlightNumber(e.target.value)}
+                    placeholder={t('transport.flight_number_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Train-specific fields */}
+            {editTransportMode === 'train' && (
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.train_company')}</label>
+                  <input
+                    type="text"
+                    value={editTrainCompany}
+                    onChange={(e) => setEditTrainCompany(e.target.value)}
+                    placeholder={t('transport.train_company_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.train_number')}</label>
+                  <input
+                    type="text"
+                    value={editTrainNumber}
+                    onChange={(e) => setEditTrainNumber(e.target.value)}
+                    placeholder={t('transport.train_number_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Boat-specific fields */}
+            {editTransportMode === 'boat' && (
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.ship_name')}</label>
+                  <input
+                    type="text"
+                    value={editShipName}
+                    onChange={(e) => setEditShipName(e.target.value)}
+                    placeholder={t('transport.ship_name_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.ship_cabin')}</label>
+                  <input
+                    type="text"
+                    value={editShipCabin}
+                    onChange={(e) => setEditShipCabin(e.target.value)}
+                    placeholder={t('transport.ship_cabin_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Bus-specific fields */}
+            {editTransportMode === 'bus' && (
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.bus_company')}</label>
+                  <input
+                    type="text"
+                    value={editBusCompany}
+                    onChange={(e) => setEditBusCompany(e.target.value)}
+                    placeholder={t('transport.bus_company_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('transport.bus_line')}</label>
+                  <input
+                    type="text"
+                    value={editBusLineNumber}
+                    onChange={(e) => setEditBusLineNumber(e.target.value)}
+                    placeholder={t('transport.bus_line_placeholder')}
+                    className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Destination — common to all modes */}
+            <div className="mb-3">
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_destination')}</label>
+              <input
+                type="text"
+                value={editDestination}
+                onChange={(e) => setEditDestination(e.target.value)}
+                placeholder={t('transport.common_destination_placeholder')}
+                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+              />
+            </div>
+
+            {/* Departure Date */}
+            <div className="mb-3">
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_departure_date')}</label>
+              <input
+                type="date"
+                value={editDepartureDate}
+                onChange={(e) => setEditDepartureDate(e.target.value)}
+                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+              />
+            </div>
+
+            {/* Departure Time */}
+            <div>
+              <label className="text-xs text-[#1a1a1a]/60 font-medium mb-1 block">{t('finder.edit_departure_time')}</label>
+              <input
+                type="time"
+                value={editDepartureTime}
+                onChange={(e) => setEditDepartureTime(e.target.value)}
+                className="w-full px-4 py-3 bg-white border-2 border-[#1a1a1a] rounded-xl text-[#1a1a1a] text-base placeholder:text-[#1a1a1a]/40 focus:outline-none focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all min-h-[48px]"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ═══ 🟦 EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
+        {isEditing && (
+          <div className="flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            {/* Save Button — yellow #fcd616 accent */}
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex-1 py-4 px-6 bg-[#fcd616] hover:bg-[#fcd616]/80 disabled:opacity-70 text-[#1a1a1a] border-2 border-[#1a1a1a] rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px] shadow-md"
+            >
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-[#1a1a1a] inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{t('finder.edit_saving')}</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  <span>{t('finder.edit_save')}</span>
+                </>
+              )}
+            </button>
+            {/* Cancel Button — white outline */}
+            <button
+              onClick={() => setIsEditing(false)}
+              disabled={isSaving}
+              className="flex-1 py-4 px-6 bg-white hover:bg-gray-50 disabled:opacity-70 text-[#1a1a1a] border-2 border-[#1a1a1a] rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px]"
+            >
+              <span>{t('finder.edit_cancel')}</span>
+            </button>
+          </div>
+        )}
 
         {/* ═══ 🟡 BLOC 3 : ENCART FINDER (yellow #fcd616 + solid black border) ═══ */}
         <div className="w-full bg-[#fcd616] border-2 border-solid border-[#1a1a1a] rounded-2xl p-5 md:p-6 mb-4 shadow-lg">

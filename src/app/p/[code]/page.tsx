@@ -21,13 +21,21 @@ import {
   Cross,
   Locate,
   X,
+  Pencil,
+  Check,
+  RotateCcw,
+  Droplets,
+  FileText,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from '@/hooks/useTranslation';
+import { toast } from '@/hooks/use-toast';
 
 // ─── Brand constants ───
 const BRAND_IDENTITY = '#059669';
@@ -126,6 +134,94 @@ export default function PilgrimScanPage() {
   const [reportError, setReportError] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
   const [showReport, setShowReport] = useState(false);
+
+  // ─── Edit mode state ───
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editFullName, setEditFullName] = useState('');
+  const [editNationality, setEditNationality] = useState('');
+  const [editBloodType, setEditBloodType] = useState('');
+  const [editMedicalInfo, setEditMedicalInfo] = useState('');
+  const [editHotelMecca, setEditHotelMecca] = useState('');
+  const [editRoomMecca, setEditRoomMecca] = useState('');
+  const [editHotelMedina, setEditHotelMedina] = useState('');
+  const [editRoomMedina, setEditRoomMedina] = useState('');
+  const [editGroupLeaderPhone, setEditGroupLeaderPhone] = useState('');
+  const [editAgencyPhone, setEditAgencyPhone] = useState('');
+  const [editFamilyContact, setEditFamilyContact] = useState('');
+  const [editAlNusukDocUrl, setEditAlNusukDocUrl] = useState('');
+
+  // ─── Pre-fill edit state when pilgrim data loads ───
+  useEffect(() => {
+    if (pilgrim) {
+      setEditFullName(pilgrim.fullName || '');
+      setEditNationality(pilgrim.nationality || '');
+      setEditBloodType(pilgrim.bloodType || '');
+      setEditMedicalInfo(pilgrim.medicalInfo || '');
+      setEditHotelMecca(pilgrim.hotelMecca || '');
+      setEditRoomMecca(pilgrim.roomMecca || '');
+      setEditHotelMedina(pilgrim.hotelMedina || '');
+      setEditRoomMedina(pilgrim.roomMedina || '');
+      setEditGroupLeaderPhone(pilgrim.groupLeaderPhone || '');
+      setEditAgencyPhone(pilgrim.agencyPhone || '');
+      setEditFamilyContact(pilgrim.familyContact || '');
+      setEditAlNusukDocUrl(pilgrim.alNusukDocUrl || '');
+    }
+  }, [pilgrim]);
+
+  // ─── Save handler ───
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${code}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: editFullName.trim(),
+          nationality: editNationality.trim(),
+          bloodType: editBloodType || null,
+          medicalInfo: editMedicalInfo || null,
+          hotelMecca: editHotelMecca || null,
+          roomMecca: editRoomMecca || null,
+          hotelMedina: editHotelMedina || null,
+          roomMedina: editRoomMedina || null,
+          groupLeaderPhone: editGroupLeaderPhone || null,
+          agencyPhone: editAgencyPhone || null,
+          familyContact: editFamilyContact || null,
+          alNusukDocUrl: editAlNusukDocUrl || null,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      const data = await res.json();
+      setPilgrim(data.pilgrim);
+      setIsEditing(false);
+      toast({ title: 'Informations mises à jour !' });
+    } catch {
+      toast({ title: 'Erreur lors de la sauvegarde', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // ─── Cancel edit ───
+  const handleCancelEdit = () => {
+    // Reset edit state to current pilgrim data
+    if (pilgrim) {
+      setEditFullName(pilgrim.fullName || '');
+      setEditNationality(pilgrim.nationality || '');
+      setEditBloodType(pilgrim.bloodType || '');
+      setEditMedicalInfo(pilgrim.medicalInfo || '');
+      setEditHotelMecca(pilgrim.hotelMecca || '');
+      setEditRoomMecca(pilgrim.roomMecca || '');
+      setEditHotelMedina(pilgrim.hotelMedina || '');
+      setEditRoomMedina(pilgrim.roomMedina || '');
+      setEditGroupLeaderPhone(pilgrim.groupLeaderPhone || '');
+      setEditAgencyPhone(pilgrim.agencyPhone || '');
+      setEditFamilyContact(pilgrim.familyContact || '');
+      setEditAlNusukDocUrl(pilgrim.alNusukDocUrl || '');
+    }
+    setIsEditing(false);
+  };
 
   // ─── Fetch pilgrim data ───
   useEffect(() => {
@@ -284,20 +380,152 @@ export default function PilgrimScanPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center max-w-sm mx-auto"
+            className="flex-1 flex flex-col items-center gap-4 p-6 max-w-md mx-auto w-full"
           >
+            {/* Header */}
             <div className="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center">
               <Shield className="w-10 h-10 text-amber-500" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">
-              {t('pilgrim.identity.notActivated') || 'Bracelet not activated'}
-            </h2>
-            <p className="text-gray-500 text-sm">
-              {t('pilgrim.identity.notActivatedDesc') || 'This bracelet has not yet been activated by its owner.'}
-            </p>
-            <div className="mt-4 p-4 bg-gray-100 rounded-xl w-full">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-gray-900">
+                {t('pilgrim.identity.notActivated') || 'Bracelet not activated'}
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                {t('pilgrim.identity.notActivatedDesc') || 'This bracelet has not yet been activated by its owner.'}
+              </p>
+            </div>
+            <div className="p-4 bg-gray-100 rounded-xl w-full">
               <p className="text-xs text-gray-400 font-mono break-all">{code}</p>
             </div>
+
+            {/* Activation form */}
+            <Card className="border-0 shadow-md overflow-hidden w-full">
+              <CardHeader className="pb-2 pt-4 px-4" style={{ backgroundColor: BRAND_IDENTITY + '10' }}>
+                <CardTitle className="flex items-center gap-2 text-base" style={{ color: BRAND_IDENTITY }}>
+                  <Pencil className="w-5 h-5" />
+                  {t('pilgrim.identity.activate') || 'Activer ce bracelet'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4 pt-3 space-y-3">
+                <p className="text-sm text-gray-500">
+                  {t('pilgrim.identity.activateDesc') || 'Fill in the required fields to activate your bracelet.'}
+                </p>
+
+                {/* Full name - required */}
+                <div>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    {t('pilgrim.edit.fullName') || 'Full name'} *
+                  </label>
+                  <Input
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    placeholder={lang === 'ar' ? 'الاسم الكامل' : 'Full name'}
+                    className="min-h-[44px]"
+                  />
+                </div>
+
+                {/* Nationality - required */}
+                <div>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    {t('pilgrim.edit.nationality') || 'Nationality'} *
+                  </label>
+                  <Input
+                    value={editNationality}
+                    onChange={(e) => setEditNationality(e.target.value)}
+                    placeholder={lang === 'ar' ? 'الجنسية' : 'Nationality'}
+                    className="min-h-[44px]"
+                  />
+                </div>
+
+                {/* Group leader phone - required */}
+                <div>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    {t('pilgrim.contacts.groupLeader') || 'Group leader phone'} *
+                  </label>
+                  <Input
+                    value={editGroupLeaderPhone}
+                    onChange={(e) => setEditGroupLeaderPhone(e.target.value)}
+                    placeholder="+212 6 12 34 56 78"
+                    type="tel"
+                    className="min-h-[44px]"
+                  />
+                </div>
+
+                {/* Blood type - optional */}
+                <div>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    {t('pilgrim.edit.bloodType') || 'Blood type'}
+                  </label>
+                  <Select value={editBloodType} onValueChange={setEditBloodType}>
+                    <SelectTrigger className="w-full min-h-[44px]">
+                      <SelectValue placeholder={lang === 'ar' ? 'فصيلة الدم' : 'Select blood type'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="A+">A+</SelectItem>
+                      <SelectItem value="A-">A-</SelectItem>
+                      <SelectItem value="B+">B+</SelectItem>
+                      <SelectItem value="B-">B-</SelectItem>
+                      <SelectItem value="AB+">AB+</SelectItem>
+                      <SelectItem value="AB-">AB-</SelectItem>
+                      <SelectItem value="O+">O+</SelectItem>
+                      <SelectItem value="O-">O-</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Activate button */}
+                <Button
+                  onClick={async () => {
+                    setIsSaving(true);
+                    try {
+                      const res = await fetch(`/api/pilgrims/activate/${code}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          fullName: editFullName.trim(),
+                          nationality: editNationality.trim(),
+                          groupLeaderPhone: editGroupLeaderPhone.trim(),
+                          bloodType: editBloodType || undefined,
+                          medicalInfo: editMedicalInfo || undefined,
+                          hotelMecca: editHotelMecca || undefined,
+                          roomMecca: editRoomMecca || undefined,
+                          hotelMedina: editHotelMedina || undefined,
+                          roomMedina: editRoomMedina || undefined,
+                          agencyPhone: editAgencyPhone || undefined,
+                          familyContact: editFamilyContact || undefined,
+                          alNusukDocUrl: editAlNusukDocUrl || undefined,
+                        }),
+                      });
+                      if (!res.ok) {
+                        const errData = await res.json();
+                        throw new Error(errData.message || 'Activation failed');
+                      }
+                      const data = await res.json();
+                      if (data.pilgrim) {
+                        setPilgrim(data.pilgrim);
+                        setState('active');
+                        setIsEditing(true);
+                        toast({ title: 'Bracelet activé ! Remplissez vos informations.' });
+                      }
+                    } catch (err) {
+                      toast({ title: err instanceof Error ? err.message : 'Erreur lors de l\'activation', variant: 'destructive' });
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }}
+                  disabled={isSaving || !editFullName.trim() || !editNationality.trim() || !editGroupLeaderPhone.trim()}
+                  className="w-full min-h-[48px] text-base font-semibold"
+                  style={{ backgroundColor: BRAND_IDENTITY }}
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Shield className="w-5 h-5 mr-2" />
+                  )}
+                  {t('pilgrim.identity.activate') || 'Activer ce bracelet'}
+                </Button>
+              </CardContent>
+            </Card>
           </motion.div>
         )}
 
@@ -363,15 +591,49 @@ export default function PilgrimScanPage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="px-4 py-5 text-white text-center"
-              style={{ backgroundColor: BRAND_EMERGENCY }}
+              className="px-4 py-5 text-white text-center relative"
+              style={{ backgroundColor: isEditing ? BRAND_IDENTITY : BRAND_EMERGENCY }}
             >
-              <p className="text-lg font-bold leading-tight">
-                {t('pilgrim.identity.emergencyTitle') || '🚨 EMERGENCY — Pilgrim in distress'}
-              </p>
-              <p className="text-sm mt-1 opacity-90">
-                {t('pilgrim.identity.emergencySubtitle') || 'This pilgrim is wearing a Pass Identity bracelet. Here are their vital information.'}
-              </p>
+              {isEditing ? (
+                <>
+                  <p className="text-lg font-bold leading-tight">
+                    ✏️ {t('pilgrim.identity.editTitle') || 'Modifier les informations'}
+                  </p>
+                  <p className="text-sm mt-1 opacity-90">
+                    {t('pilgrim.identity.editSubtitle') || 'Update your personal information below.'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-bold leading-tight">
+                    {t('pilgrim.identity.emergencyTitle') || '🚨 EMERGENCY — Pilgrim in distress'}
+                  </p>
+                  <p className="text-sm mt-1 opacity-90">
+                    {t('pilgrim.identity.emergencySubtitle') || 'This pilgrim is wearing a Pass Identity bracelet. Here are their vital information.'}
+                  </p>
+                </>
+              )}
+              {/* ─── Modifier / Cancel button ─── */}
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-lg bg-white/20 hover:bg-white/30 transition-colors backdrop-blur-sm min-h-[44px]"
+                  aria-label="Modifier"
+                >
+                  <Pencil className="w-4 h-4" />
+                  {t('pilgrim.identity.edit') || 'Modifier'}
+                </button>
+              )}
+              {isEditing && (
+                <button
+                  onClick={handleCancelEdit}
+                  className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-lg bg-white/20 hover:bg-white/30 transition-colors backdrop-blur-sm min-h-[44px]"
+                  aria-label="Annuler"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  {t('pilgrim.identity.cancel') || 'Annuler'}
+                </button>
+              )}
             </motion.div>
 
             {/* ─── Scrollable content area ─── */}
@@ -392,52 +654,121 @@ export default function PilgrimScanPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-2">
-                      {/* Full name */}
-                      <p className="text-2xl font-bold text-gray-900 leading-tight">
-                        {pilgrim.fullName || (t('pilgrim.identity.unknownPilgrim') || 'Unknown pilgrim')}
-                      </p>
+                      {isEditing ? (
+                        /* ─── EDIT MODE: Identity ─── */
+                        <div className="space-y-3">
+                          {/* Full name */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.edit.fullName') || 'Full name'} *
+                            </label>
+                            <Input
+                              value={editFullName}
+                              onChange={(e) => setEditFullName(e.target.value)}
+                              placeholder={lang === 'ar' ? 'الاسم الكامل' : 'Full name'}
+                              className="min-h-[44px]"
+                            />
+                          </div>
 
-                      {/* Nationality */}
-                      {pilgrim.nationality && (
-                        <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
-                          <Globe className="w-4 h-4 shrink-0" />
-                          {pilgrim.nationality}
-                        </p>
-                      )}
+                          {/* Nationality */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.edit.nationality') || 'Nationality'} *
+                            </label>
+                            <Input
+                              value={editNationality}
+                              onChange={(e) => setEditNationality(e.target.value)}
+                              placeholder={lang === 'ar' ? 'الجنسية' : 'Nationality'}
+                              className="min-h-[44px]"
+                            />
+                          </div>
 
-                      {/* Photo */}
-                      {pilgrim.photoUrl && (
-                        <div className="mt-3">
-                          <img
-                            src={pilgrim.photoUrl}
-                            alt={pilgrim.fullName}
-                            className="w-20 h-20 rounded-xl object-cover border-2 border-gray-200"
-                          />
+                          {/* Blood type */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.edit.bloodType') || 'Blood type'}
+                            </label>
+                            <Select value={editBloodType} onValueChange={setEditBloodType}>
+                              <SelectTrigger className="w-full min-h-[44px]">
+                                <SelectValue placeholder={lang === 'ar' ? 'فصيلة الدم' : 'Select blood type'} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="A+">A+</SelectItem>
+                                <SelectItem value="A-">A-</SelectItem>
+                                <SelectItem value="B+">B+</SelectItem>
+                                <SelectItem value="B-">B-</SelectItem>
+                                <SelectItem value="AB+">AB+</SelectItem>
+                                <SelectItem value="AB-">AB-</SelectItem>
+                                <SelectItem value="O+">O+</SelectItem>
+                                <SelectItem value="O-">O-</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Medical info */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.edit.medicalInfo') || 'Medical information'}
+                            </label>
+                            <Textarea
+                              value={editMedicalInfo}
+                              onChange={(e) => setEditMedicalInfo(e.target.value)}
+                              placeholder={lang === 'ar' ? 'معلومات طبية...' : 'Allergies, medications, conditions...'}
+                              className="min-h-[80px]"
+                            />
+                          </div>
                         </div>
-                      )}
-
-                      {/* Blood type — prominent */}
-                      {pilgrim.bloodType && (
-                        <div className="mt-3 flex items-center gap-2">
-                          <Badge
-                            className="text-sm font-bold px-3 py-1"
-                            style={{ backgroundColor: BRAND_EMERGENCY, color: 'white', border: 'none' }}
-                          >
-                            🩸 {pilgrim.bloodType}
-                          </Badge>
-                        </div>
-                      )}
-
-                      {/* Medical info */}
-                      {pilgrim.medicalInfo && (
-                        <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                          <p className="text-xs font-semibold text-amber-800 mb-1">
-                            {t('pilgrim.personal.medicalInfo') || 'Medical information'}
+                      ) : (
+                        /* ─── READ MODE: Identity ─── */
+                        <>
+                          {/* Full name */}
+                          <p className="text-2xl font-bold text-gray-900 leading-tight">
+                            {pilgrim.fullName || (t('pilgrim.identity.unknownPilgrim') || 'Unknown pilgrim')}
                           </p>
-                          <p className="text-sm text-amber-900 whitespace-pre-line">
-                            {pilgrim.medicalInfo}
-                          </p>
-                        </div>
+
+                          {/* Nationality */}
+                          {pilgrim.nationality && (
+                            <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
+                              <Globe className="w-4 h-4 shrink-0" />
+                              {pilgrim.nationality}
+                            </p>
+                          )}
+
+                          {/* Photo */}
+                          {pilgrim.photoUrl && (
+                            <div className="mt-3">
+                              <img
+                                src={pilgrim.photoUrl}
+                                alt={pilgrim.fullName}
+                                className="w-20 h-20 rounded-xl object-cover border-2 border-gray-200"
+                              />
+                            </div>
+                          )}
+
+                          {/* Blood type — prominent */}
+                          {pilgrim.bloodType && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <Badge
+                                className="text-sm font-bold px-3 py-1"
+                                style={{ backgroundColor: BRAND_EMERGENCY, color: 'white', border: 'none' }}
+                              >
+                                🩸 {pilgrim.bloodType}
+                              </Badge>
+                            </div>
+                          )}
+
+                          {/* Medical info */}
+                          {pilgrim.medicalInfo && (
+                            <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                              <p className="text-xs font-semibold text-amber-800 mb-1">
+                                {t('pilgrim.personal.medicalInfo') || 'Medical information'}
+                              </p>
+                              <p className="text-sm text-amber-900 whitespace-pre-line">
+                                {pilgrim.medicalInfo}
+                              </p>
+                            </div>
+                          )}
+                        </>
                       )}
                     </CardContent>
                   </Card>
@@ -453,51 +784,117 @@ export default function PilgrimScanPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-2 space-y-3">
-                      {/* Mecca */}
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-xs font-semibold text-gray-500 mb-1">
-                          {t('pilgrim.hotel.mecca') || 'Mecca'}
-                        </p>
-                        <p className="text-sm font-medium text-gray-900">
-                          {t('pilgrim.hotel.hotel')}: {pilgrim.hotelMecca || (t('pilgrim.hotel.notSpecified') || 'Not specified')}
-                        </p>
-                        {pilgrim.roomMecca && (
-                          <p className="text-sm text-gray-600">
-                            {t('pilgrim.hotel.room')}: {pilgrim.roomMecca}
-                          </p>
-                        )}
-                      </div>
+                      {isEditing ? (
+                        /* ─── EDIT MODE: Hotel ─── */
+                        <div className="space-y-3">
+                          {/* Mecca */}
+                          <div className="p-3 bg-gray-50 rounded-xl space-y-2">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">
+                              {t('pilgrim.hotel.mecca') || 'Mecca'}
+                            </p>
+                            <div>
+                              <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                {t('pilgrim.edit.hotelName') || 'Hotel name'}
+                              </label>
+                              <Input
+                                value={editHotelMecca}
+                                onChange={(e) => setEditHotelMecca(e.target.value)}
+                                placeholder={lang === 'ar' ? 'اسم الفندق' : 'Hotel name'}
+                                className="min-h-[44px]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                {t('pilgrim.edit.roomNumber') || 'Room number'}
+                              </label>
+                              <Input
+                                value={editRoomMecca}
+                                onChange={(e) => setEditRoomMecca(e.target.value)}
+                                placeholder={lang === 'ar' ? 'رقم الغرفة' : 'Room number'}
+                                className="min-h-[44px]"
+                              />
+                            </div>
+                          </div>
 
-                      {/* Medina */}
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-xs font-semibold text-gray-500 mb-1">
-                          {t('pilgrim.hotel.medina') || 'Medina'}
-                        </p>
-                        <p className="text-sm font-medium text-gray-900">
-                          {t('pilgrim.hotel.hotel')}: {pilgrim.hotelMedina || (t('pilgrim.hotel.notSpecified') || 'Not specified')}
-                        </p>
-                        {pilgrim.roomMedina && (
-                          <p className="text-sm text-gray-600">
-                            {t('pilgrim.hotel.room')}: {pilgrim.roomMedina}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Action buttons for hotel */}
-                      {(hotelMapsUrl || pilgrim.hotelMecca) && (
-                        <div className="flex flex-wrap gap-2">
-                          {hotelMapsUrl && (
-                            <a
-                              href={hotelMapsUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors min-h-[44px]"
-                            >
-                              <MapPin className="w-4 h-4" />
-                              {t('pilgrim.hotel.showOnMap') || 'Show on map'}
-                            </a>
-                          )}
+                          {/* Medina */}
+                          <div className="p-3 bg-gray-50 rounded-xl space-y-2">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">
+                              {t('pilgrim.hotel.medina') || 'Medina'}
+                            </p>
+                            <div>
+                              <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                {t('pilgrim.edit.hotelName') || 'Hotel name'}
+                              </label>
+                              <Input
+                                value={editHotelMedina}
+                                onChange={(e) => setEditHotelMedina(e.target.value)}
+                                placeholder={lang === 'ar' ? 'اسم الفندق' : 'Hotel name'}
+                                className="min-h-[44px]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                {t('pilgrim.edit.roomNumber') || 'Room number'}
+                              </label>
+                              <Input
+                                value={editRoomMedina}
+                                onChange={(e) => setEditRoomMedina(e.target.value)}
+                                placeholder={lang === 'ar' ? 'رقم الغرفة' : 'Room number'}
+                                className="min-h-[44px]"
+                              />
+                            </div>
+                          </div>
                         </div>
+                      ) : (
+                        /* ─── READ MODE: Hotel ─── */
+                        <>
+                          {/* Mecca */}
+                          <div className="p-3 bg-gray-50 rounded-xl">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">
+                              {t('pilgrim.hotel.mecca') || 'Mecca'}
+                            </p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {t('pilgrim.hotel.hotel')}: {pilgrim.hotelMecca || (t('pilgrim.hotel.notSpecified') || 'Not specified')}
+                            </p>
+                            {pilgrim.roomMecca && (
+                              <p className="text-sm text-gray-600">
+                                {t('pilgrim.hotel.room')}: {pilgrim.roomMecca}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Medina */}
+                          <div className="p-3 bg-gray-50 rounded-xl">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">
+                              {t('pilgrim.hotel.medina') || 'Medina'}
+                            </p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {t('pilgrim.hotel.hotel')}: {pilgrim.hotelMedina || (t('pilgrim.hotel.notSpecified') || 'Not specified')}
+                            </p>
+                            {pilgrim.roomMedina && (
+                              <p className="text-sm text-gray-600">
+                                {t('pilgrim.hotel.room')}: {pilgrim.roomMedina}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Action buttons for hotel */}
+                          {(hotelMapsUrl || pilgrim.hotelMecca) && (
+                            <div className="flex flex-wrap gap-2">
+                              {hotelMapsUrl && (
+                                <a
+                                  href={hotelMapsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors min-h-[44px]"
+                                >
+                                  <MapPin className="w-4 h-4" />
+                                  {t('pilgrim.hotel.showOnMap') || 'Show on map'}
+                                </a>
+                              )}
+                            </div>
+                          )}
+                        </>
                       )}
                     </CardContent>
                   </Card>
@@ -506,89 +903,211 @@ export default function PilgrimScanPage() {
                 {/* ─── 4. EMERGENCY CONTACTS SECTION ─── */}
                 <motion.div variants={itemVariants}>
                   <Card className="border-0 shadow-md overflow-hidden">
-                    <CardHeader className="pb-2 pt-4 px-4" style={{ backgroundColor: BRAND_EMERGENCY + '10' }}>
-                      <CardTitle className="flex items-center gap-2 text-base" style={{ color: BRAND_EMERGENCY }}>
+                    <CardHeader className="pb-2 pt-4 px-4" style={{ backgroundColor: (isEditing ? BRAND_IDENTITY : BRAND_EMERGENCY) + '10' }}>
+                      <CardTitle className="flex items-center gap-2 text-base" style={{ color: isEditing ? BRAND_IDENTITY : BRAND_EMERGENCY }}>
                         <Phone className="w-5 h-5" />
                         {t('pilgrim.contacts.sectionTitle') || 'Emergency contacts'}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-2 space-y-3">
-                      {/* Group Leader */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500">
-                            {t('pilgrim.contacts.groupLeader') || 'Group leader'}
-                          </p>
-                          <p className="text-sm font-medium text-gray-900">
-                            {pilgrim.groupLeaderPhone || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
-                          </p>
-                        </div>
-                        {pilgrim.groupLeaderPhone && (
-                          <div className="flex gap-2">
-                            <a
-                              href={`https://wa.me/${cleanPhone(pilgrim.groupLeaderPhone)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
-                              aria-label="WhatsApp"
-                            >
-                              <MessageCircle className="w-5 h-5" />
-                            </a>
-                            <a
-                              href={`tel:${pilgrim.groupLeaderPhone}`}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                              aria-label="Call"
-                            >
-                              <Phone className="w-5 h-5" />
-                            </a>
+                      {isEditing ? (
+                        /* ─── EDIT MODE: Contacts ─── */
+                        <div className="space-y-3">
+                          {/* Group Leader Phone */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.contacts.groupLeader') || 'Group leader phone'}
+                            </label>
+                            <Input
+                              value={editGroupLeaderPhone}
+                              onChange={(e) => setEditGroupLeaderPhone(e.target.value)}
+                              placeholder="+212 6 12 34 56 78"
+                              type="tel"
+                              className="min-h-[44px]"
+                            />
                           </div>
-                        )}
-                      </div>
 
-                      {/* Agency */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500">
-                            {t('pilgrim.contacts.agency') || 'Agency'}
-                          </p>
-                          <p className="text-sm font-medium text-gray-900">
-                            {pilgrim.agencyPhone || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
-                          </p>
-                        </div>
-                        {pilgrim.agencyPhone && (
-                          <a
-                            href={`tel:${pilgrim.agencyPhone}`}
-                            className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                            aria-label="Call"
-                          >
-                            <Phone className="w-5 h-5" />
-                          </a>
-                        )}
-                      </div>
+                          {/* Agency Phone */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.contacts.agency') || 'Agency phone'}
+                            </label>
+                            <Input
+                              value={editAgencyPhone}
+                              onChange={(e) => setEditAgencyPhone(e.target.value)}
+                              placeholder="+212 6 12 34 56 78"
+                              type="tel"
+                              className="min-h-[44px]"
+                            />
+                          </div>
 
-                      {/* Family */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500">
-                            {t('pilgrim.contacts.family') || 'Family'}
-                          </p>
-                          <p className="text-sm font-medium text-gray-900">
-                            {pilgrim.familyContact || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
-                          </p>
+                          {/* Family Contact */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.contacts.family') || 'Family contact'}
+                            </label>
+                            <Input
+                              value={editFamilyContact}
+                              onChange={(e) => setEditFamilyContact(e.target.value)}
+                              placeholder="+212 6 12 34 56 78"
+                              type="tel"
+                              className="min-h-[44px]"
+                            />
+                          </div>
+
+                          {/* AlNusuk Doc URL */}
+                          <div>
+                            <label className="text-xs font-medium text-gray-700 mb-1 block">
+                              {t('pilgrim.edit.alNusukDocUrl') || 'AlNusuk document URL'}
+                            </label>
+                            <Input
+                              value={editAlNusukDocUrl}
+                              onChange={(e) => setEditAlNusukDocUrl(e.target.value)}
+                              placeholder="https://"
+                              type="url"
+                              className="min-h-[44px]"
+                            />
+                          </div>
                         </div>
-                        {pilgrim.familyContact && (
-                          <a
-                            href={`tel:${pilgrim.familyContact}`}
-                            className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                            aria-label="Call"
-                          >
-                            <Phone className="w-5 h-5" />
-                          </a>
-                        )}
-                      </div>
+                      ) : (
+                        /* ─── READ MODE: Contacts ─── */
+                        <>
+                          {/* Group Leader */}
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('pilgrim.contacts.groupLeader') || 'Group leader'}
+                              </p>
+                              <p className="text-sm font-medium text-gray-900">
+                                {pilgrim.groupLeaderPhone || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
+                              </p>
+                            </div>
+                            {pilgrim.groupLeaderPhone && (
+                              <div className="flex gap-2">
+                                <a
+                                  href={`https://wa.me/${cleanPhone(pilgrim.groupLeaderPhone)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                                  aria-label="WhatsApp"
+                                >
+                                  <MessageCircle className="w-5 h-5" />
+                                </a>
+                                <a
+                                  href={`tel:${pilgrim.groupLeaderPhone}`}
+                                  className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                  aria-label="Call"
+                                >
+                                  <Phone className="w-5 h-5" />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Agency */}
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('pilgrim.contacts.agency') || 'Agency'}
+                              </p>
+                              <p className="text-sm font-medium text-gray-900">
+                                {pilgrim.agencyPhone || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
+                              </p>
+                            </div>
+                            {pilgrim.agencyPhone && (
+                              <a
+                                href={`tel:${pilgrim.agencyPhone}`}
+                                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                aria-label="Call"
+                              >
+                                <Phone className="w-5 h-5" />
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Family */}
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('pilgrim.contacts.family') || 'Family'}
+                              </p>
+                              <p className="text-sm font-medium text-gray-900">
+                                {pilgrim.familyContact || (t('pilgrim.contacts.notSpecified') || 'Not specified')}
+                              </p>
+                            </div>
+                            {pilgrim.familyContact && (
+                              <a
+                                href={`tel:${pilgrim.familyContact}`}
+                                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                aria-label="Call"
+                              >
+                                <Phone className="w-5 h-5" />
+                              </a>
+                            )}
+                          </div>
+
+                          {/* AlNusuk Doc URL */}
+                          {pilgrim.alNusukDocUrl && (
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                              <div>
+                                <p className="text-xs font-semibold text-gray-500">
+                                  {t('pilgrim.edit.alNusukDocUrl') || 'AlNusuk document'}
+                                </p>
+                                <a
+                                  href={pilgrim.alNusukDocUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-medium text-emerald-700 hover:underline break-all"
+                                >
+                                  {t('pilgrim.edit.viewDocument') || 'View document'}
+                                </a>
+                              </div>
+                              <Link2 className="w-5 h-5 text-gray-400" />
+                            </div>
+                          )}
+                        </>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
+
+                {/* ─── EDIT MODE: Save/Cancel action bar ─── */}
+                {isEditing && (
+                  <motion.div variants={itemVariants}>
+                    <Card className="border-0 shadow-md overflow-hidden" style={{ borderColor: BRAND_IDENTITY }}>
+                      <CardContent className="px-4 py-4 space-y-3">
+                        <div className="flex gap-3">
+                          {/* Save button */}
+                          <Button
+                            onClick={handleSave}
+                            disabled={isSaving || !editFullName.trim() || !editNationality.trim()}
+                            className="flex-1 min-h-[48px] text-base font-semibold"
+                            style={{ backgroundColor: BRAND_IDENTITY }}
+                          >
+                            {isSaving ? (
+                              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                            ) : (
+                              <Check className="w-5 h-5 mr-2" />
+                            )}
+                            {t('pilgrim.edit.save') || 'Enregistrer'}
+                          </Button>
+
+                          {/* Cancel button */}
+                          <Button
+                            onClick={handleCancelEdit}
+                            variant="outline"
+                            disabled={isSaving}
+                            className="flex-1 min-h-[48px] text-base font-semibold border-2"
+                            style={{ borderColor: BRAND_IDENTITY, color: BRAND_IDENTITY }}
+                          >
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            {t('pilgrim.edit.cancel') || 'Annuler'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
 
                 {/* ─── 6. REPORT FORM (collapsible) ─── */}
                 <motion.div variants={itemVariants}>

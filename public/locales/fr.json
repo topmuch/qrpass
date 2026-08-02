@@ -92,7 +92,21 @@
     "finder_form_help": "Remplissez vos coordonnées pour prévenir le propriétaire.",
     "contact_choice": "Choisissez comment contacter le propriétaire",
     "owner_section": "PROPRIÉTAIRE",
-    "travel_section": "VOYAGE"
+    "travel_section": "VOYAGE",
+    "edit_btn": "✏️ Modifier",
+    "edit_title": "Modifier les informations",
+    "edit_first_name": "Prénom",
+    "edit_last_name": "Nom",
+    "edit_whatsapp": "Numéro WhatsApp",
+    "edit_transport_mode": "Mode de transport",
+    "edit_destination": "Destination",
+    "edit_departure_date": "Date de départ",
+    "edit_departure_time": "Heure de départ",
+    "edit_save": "Enregistrer",
+    "edit_cancel": "Annuler",
+    "edit_saving": "Enregistrement...",
+    "edit_success": "Informations mises à jour !",
+    "edit_error": "Erreur lors de la sauvegarde"
   },
   "whatsapp": {
     "found_message": "🎉 Bonne nouvelle {firstName} !\n\nQuelqu'un a trouvé ton bagage {type} à {location} !\n📍 Il est actuellement à {address}\n👤 La personne qui l'a trouvé s'appelle {name}\n📞 Appelle-le vite au {phone}\n💬 Ou écris-lui sur WhatsApp\nTu peux aussi voir tous les détails ici :\n👉 {url}\nNe panique pas, tout va bien se passer ! 💪\nL'équipe QRPass",

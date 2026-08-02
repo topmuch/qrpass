@@ -98,6 +98,8 @@ export async function GET(
         reference: baggage.reference,
         type: baggage.type,
         travelerName: `${baggage.travelerFirstName} ${baggage.travelerLastName}`,
+        travelerFirstName: baggage.travelerFirstName || '',
+        travelerLastName: baggage.travelerLastName || '',
         baggageIndex: baggage.baggageIndex,
         baggageType: baggage.baggageType,
         status: baggage.status,
