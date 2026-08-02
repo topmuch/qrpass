@@ -88,8 +88,8 @@ const translations = {
     medTitle: 'Infos Médicales',
     medNote: 'Ces informations sont vitales en cas d\'urgence.',
     hotelTitle: 'Hébergement Actuel',
-    mapBtn: 'Ouvrir dans Maps',
-    waBtn: 'Contacter Chef (WhatsApp)',
+    mapBtn: 'Itinéraire vers l\'hôtel',
+    waBtn: 'Contacter le chef de groupe',
     callHotel: 'Appeler Hôtel',
     callFamily: 'Appeler Famille',
     gpsBtn: 'Partager ma position GPS',
@@ -110,7 +110,7 @@ const translations = {
     edit: 'Modifier mes infos',
     cancel: 'Annuler',
     save: 'Enregistrer',
-    report: 'Signaler ce pèlerin',
+    report: 'Ce pèlerin est perdu — Cliquez ici',
     reportBtn: 'Envoyer le signalement',
     reportName: 'Votre nom',
     reportPhone: 'Votre WhatsApp',
@@ -137,8 +137,8 @@ const translations = {
     medTitle: 'Medical Info',
     medNote: 'This information is vital in case of emergency.',
     hotelTitle: 'Current Accommodation',
-    mapBtn: 'Open in Maps',
-    waBtn: 'Contact Leader (WhatsApp)',
+    mapBtn: 'Route to hotel',
+    waBtn: 'Contact the group leader',
     callHotel: 'Call Hotel',
     callFamily: 'Call Family',
     gpsBtn: 'Share My GPS Location',
@@ -159,7 +159,7 @@ const translations = {
     edit: 'Edit my info',
     cancel: 'Cancel',
     save: 'Save',
-    report: 'Report this pilgrim',
+    report: 'This pilgrim is lost — Click here',
     reportBtn: 'Send report',
     reportName: 'Your name',
     reportPhone: 'Your WhatsApp',
@@ -186,8 +186,8 @@ const translations = {
     medTitle: 'معلومات طبية',
     medNote: 'هذه المعلومات حيوية في حالات الطوارئ.',
     hotelTitle: 'الإقامة الحالية',
-    mapBtn: 'فتح في الخرائط',
-    waBtn: 'اتصال بالقائد (واتساب)',
+    mapBtn: 'اتجاهات إلى الفندق',
+    waBtn: 'اتصل بقائد المجموعة',
     callHotel: 'اتصال بالفندق',
     callFamily: 'اتصال بالعائلة',
     gpsBtn: 'مشاركة موقعي GPS',
@@ -208,7 +208,7 @@ const translations = {
     edit: 'تعديل معلوماتي',
     cancel: 'إلغاء',
     save: 'حفظ',
-    report: 'الإبلاغ عن هذا الحاج',
+    report: 'هذا الحاج ضائع — انقر هنا',
     reportBtn: 'إرسال البلاغ',
     reportName: 'اسمك',
     reportPhone: 'الواتساب الخاص بك',
@@ -701,16 +701,16 @@ export default function PilgrimScanPage() {
 
           {/* ─── STATUS BANNER ─── */}
           <div
-            className="w-full max-w-[440px] text-white py-3.5 px-4 rounded-[14px] flex items-center gap-2.5 font-bold text-[15px] mb-5"
+            className="w-full max-w-[440px] text-white py-4 px-5 rounded-[14px] flex items-center gap-3 font-extrabold text-[18px] mb-5"
             style={{
               background: isEditing ? '#059669' : SUCCESS,
               boxShadow: `0 4px 12px rgba(16, 185, 129, 0.3)`,
             }}
           >
             {isEditing ? (
-              <Pencil className="w-5 h-5" />
+              <Pencil className="w-6 h-6" />
             ) : (
-              <ShieldCheck className="w-5 h-5" />
+              <ShieldCheck className="w-6 h-6" />
             )}
             {isEditing ? '✏️ Mode Édition' : `✅ ${t('banner')}`}
           </div>
@@ -867,47 +867,48 @@ export default function PilgrimScanPage() {
               >
                 {/* Photo with upload overlay */}
                 <div className="relative inline-block mx-auto mb-3">
-                  {pilgrim.photoUrl ? (
-                    <img
-                      src={pilgrim.photoUrl}
-                      alt={pilgrim.fullName}
-                      className="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white"
-                      style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
-                      onError={(e) => {
-                        // If the image fails to load, replace with initials
-                        const target = e.currentTarget;
-                        target.style.display = 'none';
-                        const fallback = target.nextElementSibling as HTMLElement;
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  {/* Fallback initials avatar - always rendered, hidden when photo loads */}
-                  <div
-                    className="w-[90px] h-[90px] rounded-full border-[3px] border-white items-center justify-center text-2xl font-bold"
-                    style={{
-                      background: '#e5e7eb',
-                      color: TEXT,
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-                      display: pilgrim.photoUrl ? 'none' : 'flex',
-                      margin: pilgrim.photoUrl ? undefined : '0 auto',
-                    }}
-                  >
-                    {getInitials(pilgrim.fullName)}
-                  </div>
-
-                  {/* Photo upload overlay */}
+                  {/* Clickable avatar area — triggers photo upload */}
                   <button
                     onClick={() => photoInputRef.current?.click()}
                     disabled={isUploadingPhoto}
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-                    title={t('editPhoto')}
+                    className="relative group cursor-pointer disabled:opacity-50"
+                    type="button"
                   >
-                    {isUploadingPhoto ? (
-                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: MUTED }} />
-                    ) : (
-                      <Upload className="w-3.5 h-3.5" style={{ color: MUTED }} />
-                    )}
+                    {pilgrim.photoUrl ? (
+                      <img
+                        src={pilgrim.photoUrl}
+                        alt={pilgrim.fullName}
+                        className="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white"
+                        style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    {/* Fallback initials avatar */}
+                    <div
+                      className="w-[90px] h-[90px] rounded-full border-[3px] border-white items-center justify-center text-2xl font-bold"
+                      style={{
+                        background: '#e5e7eb',
+                        color: TEXT,
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                        display: pilgrim.photoUrl ? 'none' : 'flex',
+                        margin: pilgrim.photoUrl ? undefined : '0 auto',
+                      }}
+                    >
+                      {getInitials(pilgrim.fullName)}
+                    </div>
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      {isUploadingPhoto ? (
+                        <Loader2 className="w-6 h-6 animate-spin text-white" />
+                      ) : (
+                        <Upload className="w-5 h-5 text-white" />
+                      )}
+                    </div>
                   </button>
                   <input
                     ref={photoInputRef}
@@ -917,6 +918,10 @@ export default function PilgrimScanPage() {
                     className="hidden"
                   />
                 </div>
+                {/* Photo upload label */}
+                <p className="text-xs font-medium mb-3" style={{ color: MUTED }}>
+                  {isUploadingPhoto ? t('uploading') : t('editPhoto')}
+                </p>
 
                 {/* Name */}
                 <h1 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h1>
@@ -949,48 +954,54 @@ export default function PilgrimScanPage() {
 
               {/* ─── INFO GRID ─── */}
               <div className="w-full max-w-[440px] grid grid-cols-2 gap-3 mb-4">
-                {/* Medical Info Card */}
+                {/* Medical Info Card — MISE EN ÉVIDENCE */}
                 <div
-                  className="col-span-2 rounded-[16px] p-4"
+                  className="col-span-2 rounded-[16px] p-5"
                   style={{
-                    background: CARD_BG,
+                    background: '#fef2f2',
                     boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '4px solid #dc2626',
-                    borderRight: lang === 'ar' ? '4px solid #dc2626' : 'none',
+                    borderLeft: lang === 'ar' ? 'none' : '5px solid #dc2626',
+                    borderRight: lang === 'ar' ? '5px solid #dc2626' : 'none',
                   }}
                 >
-                  <span className="text-xs font-medium block mb-1" style={{ color: MUTED }}>
-                    {t('medTitle')}
-                  </span>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="w-5 h-5" style={{ color: DANGER }} />
+                    <span className="text-sm font-bold" style={{ color: TEXT }}>
+                      {t('medTitle')}
+                    </span>
+                  </div>
                   {pilgrim.medicalInfo ? (
-                    <div className="font-bold text-sm" style={{ color: DANGER }}>
+                    <div className="font-extrabold text-base" style={{ color: DANGER }}>
                       {pilgrim.medicalInfo}
                     </div>
                   ) : (
                     <p className="text-sm" style={{ color: MUTED }}>{t('noMedical')}</p>
                   )}
-                  <p className="text-xs mt-1.5" style={{ color: MUTED }}>
-                    {t('medNote')}
+                  <p className="text-xs mt-2 font-medium" style={{ color: '#991b1b' }}>
+                    ⚠️ {t('medNote')}
                   </p>
                 </div>
 
-                {/* Hotel Info Card */}
+                {/* Hotel Info Card — MISE EN ÉVIDENCE */}
                 <div
-                  className="col-span-2 rounded-[16px] p-4"
+                  className="col-span-2 rounded-[16px] p-5"
                   style={{
-                    background: CARD_BG,
+                    background: '#eff6ff',
                     boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '4px solid #3b82f6',
-                    borderRight: lang === 'ar' ? '4px solid #3b82f6' : 'none',
+                    borderLeft: lang === 'ar' ? 'none' : '5px solid #3b82f6',
+                    borderRight: lang === 'ar' ? '5px solid #3b82f6' : 'none',
                   }}
                 >
-                  <span className="text-xs font-medium block mb-1" style={{ color: MUTED }}>
-                    🏨 {t('hotelTitle')}
-                  </span>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building2 className="w-5 h-5" style={{ color: BLUE }} />
+                    <span className="text-sm font-bold" style={{ color: TEXT }}>
+                      {t('hotelTitle')}
+                    </span>
+                  </div>
                   {activeHotel ? (
                     <>
-                      <div className="font-bold text-sm">{activeHotel}</div>
-                      <div className="text-xs mt-1" style={{ color: MUTED }}>
+                      <div className="font-extrabold text-base" style={{ color: TEXT }}>{activeHotel}</div>
+                      <div className="text-sm mt-1 font-medium" style={{ color: TEXT }}>
                         {activeRoom ? `${t('room')} ${activeRoom} • ` : ''}{activeCity}
                       </div>
                     </>
@@ -1001,10 +1012,10 @@ export default function PilgrimScanPage() {
                     href={hotelMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-[10px] text-white font-semibold text-xs transition-all hover:opacity-90"
+                    className="mt-3 inline-flex items-center justify-center gap-2 w-full py-3 rounded-[12px] text-white font-bold text-sm transition-all hover:opacity-90"
                     style={{ background: BLUE }}
                   >
-                    <MapPin className="w-3.5 h-3.5" />
+                    <Navigation className="w-4 h-4" />
                     {t('mapBtn')}
                   </a>
                 </div>
@@ -1012,14 +1023,14 @@ export default function PilgrimScanPage() {
 
               {/* ─── REASSURANCE SECTION ─── */}
               <div
-                className="w-full max-w-[440px] rounded-[16px] p-4 mb-4"
+                className="w-full max-w-[440px] rounded-[16px] p-5 mb-4"
                 style={{ background: 'rgba(255,255,255,0.5)' }}
               >
-                <h3 className="text-[15px] font-bold mb-2.5 flex items-center gap-2">
+                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
                   <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
                   {t('reassuranceTitle')}
                 </h3>
-                <ul className="space-y-1.5 text-[13px]" style={{ color: MUTED }}>
+                <ul className="space-y-2 text-[14px]" style={{ color: TEXT }}>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
                     {t('reassurance1')}
@@ -1098,9 +1109,10 @@ export default function PilgrimScanPage() {
               <div className="w-full max-w-[440px] mb-4">
                 <button
                   onClick={() => setShowReport(!showReport)}
-                  className="w-full py-3 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-colors"
+                  className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  style={{ boxShadow: '0 4px 12px rgba(220,38,38,0.2)' }}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
                   {t('report')}
                 </button>
 
@@ -1167,17 +1179,30 @@ export default function PilgrimScanPage() {
                 )}
               </div>
 
-              {/* ─── EMERGENCY NUMBERS ─── */}
+              {/* ─── EMERGENCY NUMBERS ─── — MISE EN ÉVIDENCE */}
               <div
-                className="w-full max-w-[440px] rounded-xl p-3 flex justify-center gap-6 font-bold text-base mb-6"
-                style={{ background: CARD_BG }}
+                className="w-full max-w-[440px] rounded-[16px] p-5 mb-6"
+                style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
-                <a href="tel:997" className="text-red-600 no-underline flex items-center gap-1.5 hover:underline">
-                  🚑 997
-                </a>
-                <a href="tel:911" className="text-red-600 no-underline flex items-center gap-1.5 hover:underline">
-                  👮 911
-                </a>
+                <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
+                  {t('emerTitle')}
+                </h3>
+                <div className="flex justify-center gap-4">
+                  <a
+                    href="tel:997"
+                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+                  >
+                    🚑 997
+                  </a>
+                  <a
+                    href="tel:911"
+                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+                  >
+                    👮 911
+                  </a>
+                </div>
               </div>
             </>
           )}
