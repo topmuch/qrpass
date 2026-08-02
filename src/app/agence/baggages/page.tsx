@@ -903,7 +903,7 @@ export default function BaggagesPage() {
                 )}
 
                 <Link
-                  href={`/scan/${selectedBaggage.reference}`}
+                  href={`/found/${selectedBaggage.reference}`}
                   className="block w-full text-center py-3 bg-blue-600 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium"
                 >
                   Tester le scan

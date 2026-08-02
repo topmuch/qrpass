@@ -223,7 +223,7 @@ export default function EtiquettesPage() {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(x, y, qrSize, qrSize);
 
-        const qrUrl = `${window.location.origin}/scan/${set.references[i]}`;
+        const qrUrl = `${window.location.origin}/found/${set.references[i]}`;
         const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         const qrSvg = <QRCodeSVG value={qrUrl} size={qrSize - 40} level="H" fgColor={set.type === 'hajj' ? '#1D4ED8' : '#f59e0b'} />;
 
@@ -283,7 +283,7 @@ export default function EtiquettesPage() {
   };
 
   const handleShareSet = async (set: QRSet) => {
-    const shareUrl = `${window.location.origin}/scan/${set.references[0]}`;
+    const shareUrl = `${window.location.origin}/found/${set.references[0]}`;
     if (navigator.share) {
       try {
         await navigator.share({
@@ -566,7 +566,7 @@ export default function EtiquettesPage() {
                     className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 text-center"
                   >
                     <QRCodeSVG
-                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${ref}`}
+                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/found/${ref}`}
                       size={120}
                       level="H"
                       includeMargin={true}

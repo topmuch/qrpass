@@ -19,7 +19,7 @@ interface LookupResult {
   pilgrim: boolean;
 }
 
-type PageState = 'loading' | 'redirecting' | 'selector' | 'not_found' | 'error';
+type PageState = 'loading' | 'selector' | 'not_found' | 'error';
 
 export default function FoundSelectorPage() {
   const { code } = useParams<{ code: string }>();
@@ -27,7 +27,6 @@ export default function FoundSelectorPage() {
 
   const { t, dir } = useTranslation();
   const [state, setState] = useState<PageState>('loading');
-  const [redirectTarget, setRedirectTarget] = useState<string>('');
   const [lookupData, setLookupData] = useState<LookupResult | null>(null);
 
   // Lookup the code
@@ -50,23 +49,7 @@ export default function FoundSelectorPage() {
           return;
         }
 
-        // Only baggage → redirect to /scan
-        if (data.baggage && !data.pilgrim) {
-          setRedirectTarget('/scan/' + code);
-          setState('redirecting');
-          setTimeout(() => router.replace('/scan/' + code), 800);
-          return;
-        }
-
-        // Only pilgrim → redirect to /p
-        if (data.pilgrim && !data.baggage) {
-          setRedirectTarget('/p/' + code);
-          setState('redirecting');
-          setTimeout(() => router.replace('/p/' + code), 800);
-          return;
-        }
-
-        // Both → show selector
+        // Always show selector — user chooses between Pass Bagage and Pass Identity
         setState('selector');
       } catch {
         setState('error');
@@ -74,7 +57,7 @@ export default function FoundSelectorPage() {
     };
 
     lookup();
-  }, [code, router]);
+  }, [code]);
 
   return (
     <div dir={dir} className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col items-center justify-center p-4">
@@ -89,23 +72,7 @@ export default function FoundSelectorPage() {
             className="flex flex-col items-center gap-4"
           >
             <Loader2 className="w-12 h-12 animate-spin text-gray-400" />
-            <p className="text-gray-500 text-sm">PassHajj…</p>
-          </motion.div>
-        )}
-
-        {/* ─── Redirecting State ─── */}
-        {state === 'redirecting' && (
-          <motion.div
-            key="redirecting"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-center gap-4"
-          >
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: BRAND_IDENTITY }} />
-            <p className="text-gray-600 text-base font-medium">
-              {t('pilgrim.selector.redirecting')}
-            </p>
+            <p className="text-gray-500 text-sm">QRPass…</p>
           </motion.div>
         )}
 
@@ -122,10 +89,10 @@ export default function FoundSelectorPage() {
               <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
             <h2 className="text-xl font-bold text-gray-900">
-              {t('pilgrim.identity.notFound')}
+              Code non reconnu
             </h2>
             <p className="text-gray-500 text-sm">
-              {t('pilgrim.identity.notFoundDesc')}
+              Ce code QR n&apos;est pas valide ou n&apos;existe pas dans notre système.
             </p>
           </motion.div>
         )}
@@ -169,11 +136,16 @@ export default function FoundSelectorPage() {
                 <span className="text-3xl">🕋</span>
               </motion.div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {t('pilgrim.selector.title')}
+                QRPass
               </h1>
               <p className="text-gray-500 text-sm mt-1">
-                {t('pilgrim.selector.subtitle')}
+                Choisissez le type de pass
               </p>
+            </div>
+
+            {/* Code display */}
+            <div className="bg-gray-100 rounded-lg px-4 py-2">
+              <p className="text-sm font-mono text-gray-600">{code}</p>
             </div>
 
             {/* Two large selector cards */}
@@ -189,39 +161,33 @@ export default function FoundSelectorPage() {
                   onClick={() => router.push('/scan/' + code)}
                 >
                   <CardContent className="p-6">
-                    <Button
-                      variant="ghost"
-                      className="w-full h-auto p-0 hover:bg-transparent flex items-center gap-4"
-                      asChild
-                    >
-                      <div className="flex items-center gap-4 w-full">
-                        <div
-                          className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: BRAND_BAGGAGE }}
-                        >
-                          <Luggage className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="flex-1 text-left">
-                          <h3 className="text-lg font-bold text-gray-900">
-                            {t('pilgrim.selector.bagage')}
-                          </h3>
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {t('pilgrim.selector.bagageDesc')}
-                          </p>
-                        </div>
-                        <div className="shrink-0">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
+                    <div className="flex items-center gap-4 w-full">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: BRAND_BAGGAGE }}
+                      >
+                        <Luggage className="w-8 h-8 text-white" />
                       </div>
-                    </Button>
+                      <div className="flex-1 text-left">
+                        <h3 className="text-lg font-bold text-gray-900">
+                          Pass Bagage
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          Protéger et retrouver vos bagages
+                        </p>
+                      </div>
+                      <div className="shrink-0">
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -237,39 +203,33 @@ export default function FoundSelectorPage() {
                   onClick={() => router.push('/p/' + code)}
                 >
                   <CardContent className="p-6">
-                    <Button
-                      variant="ghost"
-                      className="w-full h-auto p-0 hover:bg-transparent flex items-center gap-4"
-                      asChild
-                    >
-                      <div className="flex items-center gap-4 w-full">
-                        <div
-                          className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: BRAND_IDENTITY }}
-                        >
-                          <UserCircle className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="flex-1 text-left">
-                          <h3 className="text-lg font-bold text-gray-900">
-                            {t('pilgrim.selector.identity')}
-                          </h3>
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {t('pilgrim.selector.identityDesc')}
-                          </p>
-                        </div>
-                        <div className="shrink-0">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
+                    <div className="flex items-center gap-4 w-full">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: BRAND_IDENTITY }}
+                      >
+                        <UserCircle className="w-8 h-8 text-white" />
                       </div>
-                    </Button>
+                      <div className="flex-1 text-left">
+                        <h3 className="text-lg font-bold text-gray-900">
+                          Pass Identity
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          Identité et informations médicales
+                        </p>
+                      </div>
+                      <div className="shrink-0">
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -277,7 +237,7 @@ export default function FoundSelectorPage() {
 
             {/* Footer hint */}
             <p className="text-xs text-gray-400 text-center">
-              PassHajj — {t('pilgrim.selector.subtitle')}
+              QRPass — Protection intelligente Hajj & Omrah
             </p>
           </motion.div>
         )}

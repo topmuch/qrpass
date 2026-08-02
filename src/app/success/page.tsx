@@ -53,7 +53,7 @@ function SuccessContent() {
   const reference = activationData?.reference || '';
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const trackingUrl = `${origin}/suivi/${reference}`;
-  const qrUrl = `${origin}/scan/${reference}`;
+  const qrUrl = `${origin}/found/${reference}`;
 
   // Format date (avec heure)
   const formatDate = (dateString: string) => {

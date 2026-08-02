@@ -354,7 +354,7 @@ export default function AdminBaggageDetailPage() {
             </button>
           )}
           <Link
-            href={`/scan/${baggage.reference}`}
+            href={`/found/${baggage.reference}`}
             className="flex-1 py-3 bg-[#b8860b] text-white rounded-lg font-medium hover:bg-[#3b82f6] transition-colors flex items-center justify-center gap-2"
           >
             <QrCode className="w-5 h-5" />

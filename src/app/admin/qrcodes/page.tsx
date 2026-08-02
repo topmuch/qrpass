@@ -865,7 +865,7 @@ export default function QRCodesPage() {
                     className="bg-white rounded-xl p-4 text-center"
                   >
                     <QRCodeSVG
-                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/scan/${ref}`}
+                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/found/${ref}`}
                       size={140}
                       level="H"
                       includeMargin={true}

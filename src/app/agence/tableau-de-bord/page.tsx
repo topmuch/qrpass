@@ -1308,7 +1308,7 @@ export default function AgencyDashboardPage() {
 
               <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
                 <Link
-                  href={`/scan/${selectedBaggage.reference}`}
+                  href={`/found/${selectedBaggage.reference}`}
                   className="block w-full text-center py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors font-medium"
                 >
                   Tester le scan
