@@ -490,26 +490,73 @@ export default function PilgrimScanPage() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════
-          NOT ACTIVATED STATE
+          NOT ACTIVATED STATE — QRTAGS Design
       ═══════════════════════════════════════════════════════════ */}
       {state === 'not_activated' && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
-          <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center">
-            <Shield className="w-10 h-10 text-amber-500" />
+        <div className="flex-1 flex flex-col items-center justify-center w-full">
+          {/* Logo */}
+          <div className="text-[28px] font-extrabold tracking-tight text-black mb-8">
+            <span className="text-white bg-black px-2.5 py-1 rounded-lg mr-1.5">Pass</span>Hajj
           </div>
-          <h2 className="text-xl font-bold">{t('notActivated')}</h2>
-          <p className="text-sm" style={{ color: MUTED }}>{t('notActivatedDesc')}</p>
-          <div className="p-4 bg-black/5 rounded-xl w-full mt-2">
-            <p className="text-xs font-mono break-all" style={{ color: MUTED }}>{code}</p>
+
+          {/* Card */}
+          <div className="w-full max-w-[400px] text-center">
+            <div
+              className="rounded-[24px] p-8 mb-6"
+              style={{ background: CARD_BG, boxShadow: SHADOW }}
+            >
+              {/* Icon circle */}
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ background: '#fff3cd' }}
+              >
+                <AlertCircle className="w-10 h-10" style={{ color: '#f4b400' }} />
+              </div>
+
+              {/* Title */}
+              <h1 className="text-[22px] font-extrabold leading-tight mb-3">
+                {t('notActivated')}
+              </h1>
+
+              {/* Description */}
+              <p className="text-[15px] leading-relaxed mb-6" style={{ color: MUTED }}>
+                {t('notActivatedDesc')}
+              </p>
+
+              {/* QR Code display */}
+              <div
+                className="py-3 px-4 rounded-xl mb-6 font-mono font-bold text-base tracking-wider border border-dashed"
+                style={{ background: '#f3f4f6', color: '#333', borderColor: '#d1d5db' }}
+              >
+                ID: {code}
+              </div>
+
+              {/* Activate button */}
+              <Link
+                href={`/activate/identity?code=${encodeURIComponent(code)}`}
+                className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                style={{ background: '#111827', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+              >
+                <Shield className="w-5 h-5" />
+                {t('activateNow')}
+              </Link>
+
+              {/* Help button */}
+              <Link
+                href="/contact"
+                className="w-full py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 mt-3 border-2 border-gray-200 bg-transparent hover:border-black hover:text-black transition-colors"
+                style={{ color: '#666' }}
+              >
+                ? Besoin d&apos;aide ?
+              </Link>
+            </div>
+
+            {/* Footer */}
+            <div className="text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+              Propulsé par <strong>PassHajj</strong> ·{' '}
+              <Link href="/confidentialite" className="text-black font-semibold">Confidentialité</Link>
+            </div>
           </div>
-          <Link
-            href={`/activate/identity?code=${encodeURIComponent(code)}`}
-            className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5"
-            style={{ background: '#111827' }}
-          >
-            <Shield className="w-5 h-5" />
-            {t('activateNow')}
-          </Link>
         </div>
       )}
 
