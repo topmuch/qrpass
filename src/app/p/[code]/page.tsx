@@ -16,16 +16,12 @@ import {
   Building2,
   Globe,
   Pencil,
-  X,
   Check,
   RotateCcw,
   Droplets,
   Upload,
-  Share2,
-  Download,
-  LayoutDashboard,
-  Plus,
   ShieldCheck,
+  HelpCircle,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -39,7 +35,7 @@ const SUCCESS = '#10b981';
 const BLUE = '#3b82f6';
 const WA_GREEN = '#25D366';
 const RADIUS = '20px';
-const SHADOW = '0 6px 16px rgba(0,0,0,0.08)';
+const SHADOW = '0 8px 24px rgba(0,0,0,0.12)';
 const INPUT_BG = '#f3f4f6';
 const INPUT_BORDER = '#d1d5db';
 
@@ -80,77 +76,96 @@ interface ReportData {
 }
 
 type PageState = 'loading' | 'active' | 'not_found' | 'not_activated' | 'expired' | 'error';
+type GpsStatus = 'idle' | 'locating' | 'success' | 'error';
 
 // ─── i18n translations ───
 const translations = {
   fr: {
-    banner: 'Protection Active • Bracelet lié',
-    medTitle: 'Infos Médicales',
-    medNote: 'Ces informations sont vitales en cas d\'urgence.',
-    hotelTitle: 'Hébergement Actuel',
-    mapBtn: 'Itinéraire vers l\'hôtel',
+    // Header
+    helpLink: 'Aide ?',
+    // GPS bar
+    gpsLocating: '📍 Localisation en cours...',
+    gpsSuccess: '📍 Position partagée avec succès',
+    gpsError: '❌ Position refusée (Activez GPS)',
+    gpsNotSupported: '⚠️ GPS non supporté',
+    // Profile card
+    identityTag: 'Pass Identity – Hajj 2026',
+    // Info grid
+    healthLabel: 'Santé',
+    hotelLabel: 'Hôtel',
+    noMedical: 'Aucune info',
+    noHotel: 'Non renseigné',
+    mecca: 'La Mecque',
+    medina: 'Médine',
+    room: 'Ch.',
+    // Actions
     waBtn: 'Contacter le chef de groupe',
-    callHotel: 'Appeler Hôtel',
-    callFamily: 'Appeler Famille',
-    gpsBtn: 'Partager ma position GPS',
-    gpsLocating: 'Localisation...',
-    gpsSent: 'Envoyé !',
+    callBtn: 'Appeler le chef de groupe',
+    callFamily: 'Appeler la famille',
+    routeToHotel: 'Itinéraire vers l\'hôtel',
+    // Report
+    reportBtn: 'Ce pèlerin est perdu — Cliquez ici',
+    reportSubmit: 'Envoyer le signalement',
+    reportName: 'Votre nom',
+    reportPhone: 'Votre WhatsApp',
+    reportMsg: 'Message (optionnel)',
+    reportSuccess: 'Signalement envoyé !',
+    // Emergency
     emerTitle: 'Numéros d\'Urgence Saoudiens',
-    footer: '© 2026 PassHajj • Données accessibles uniquement en cas d\'urgence',
+    // Footer
+    footer: 'PassHajj — Protection intelligente Hajj & Omrah',
+    // States
     notFound: 'Code QR non reconnu',
     notFoundDesc: 'Ce code ne correspond à aucun bracelet Pass Identity enregistré.',
     notActivated: 'Bracelet non activé',
     notActivatedDesc: 'Ce bracelet n\'a pas encore été activé par son propriétaire.',
-    activate: 'Activer ce bracelet',
     activateNow: 'Activer maintenant',
     expired: 'Bracelet expiré',
     expiredDesc: 'La période de validité de ce bracelet est terminée.',
     error: 'Erreur',
     errorDesc: 'Une erreur est survenue. Veuillez réessayer.',
+    // Edit
     edit: 'Modifier mes infos',
     cancel: 'Annuler',
     save: 'Enregistrer',
-    report: 'Ce pèlerin est perdu — Cliquez ici',
-    reportBtn: 'Envoyer le signalement',
-    reportName: 'Votre nom',
-    reportPhone: 'Votre WhatsApp',
-    reportMsg: 'Message (optionnel)',
-    reportSuccess: 'Signalement envoyé !',
-    noMedical: 'Aucune information médicale renseignée',
-    mecca: 'La Mecque',
-    medina: 'Médine',
-    room: 'Chambre',
-    noHotel: 'Non renseigné',
+    editPhoto: 'Changer la photo',
+    uploading: 'Envoi...',
+    // Reassurance
     reassuranceTitle: 'Vous êtes protégé',
     reassurance1: 'Votre chef de groupe reçoit une alerte si ce QR est scanné',
     reassurance2: 'Vos infos médicales sont accessibles aux secours en 1 clic',
     reassurance3: 'Vous pouvez modifier votre hôtel à tout moment',
-    shareProfile: 'Partager mon profil',
-    downloadCard: 'Carte hors-ligne',
-    dashboard: 'Mon tableau de bord',
-    activateAnother: 'Activer un autre',
-    editPhoto: 'Changer la photo',
-    uploading: 'Envoi...',
   },
   en: {
-    banner: 'Active Protection • Bracelet linked',
-    medTitle: 'Medical Info',
-    medNote: 'This information is vital in case of emergency.',
-    hotelTitle: 'Current Accommodation',
-    mapBtn: 'Route to hotel',
+    helpLink: 'Help?',
+    gpsLocating: '📍 Locating...',
+    gpsSuccess: '📍 Position shared successfully',
+    gpsError: '❌ Location denied (Enable GPS)',
+    gpsNotSupported: '⚠️ GPS not supported',
+    identityTag: 'Pass Identity – Hajj 2026',
+    healthLabel: 'Health',
+    hotelLabel: 'Hotel',
+    noMedical: 'No info',
+    noHotel: 'Not specified',
+    mecca: 'Mecca',
+    medina: 'Medina',
+    room: 'Rm.',
     waBtn: 'Contact the group leader',
-    callHotel: 'Call Hotel',
-    callFamily: 'Call Family',
-    gpsBtn: 'Share My GPS Location',
-    gpsLocating: 'Locating...',
-    gpsSent: 'Sent!',
+    callBtn: 'Call the group leader',
+    callFamily: 'Call family',
+    routeToHotel: 'Route to hotel',
+    reportBtn: 'This pilgrim is lost — Click here',
+    reportSubmit: 'Send report',
+    reportName: 'Your name',
+    reportPhone: 'Your WhatsApp',
+    reportMsg: 'Message (optional)',
+    reportSuccess: 'Report sent!',
     emerTitle: 'Saudi Emergency Numbers',
-    footer: '© 2026 PassHajj • Data accessible only in emergencies',
+    footer: 'PassHajj — Smart Hajj & Umrah Protection',
     notFound: 'QR code not recognized',
     notFoundDesc: 'This code does not match any registered Pass Identity bracelet.',
     notActivated: 'Bracelet not activated',
     notActivatedDesc: 'This bracelet has not yet been activated by its owner.',
-    activate: 'Activate this bracelet',
     activateNow: 'Activate now',
     expired: 'Bracelet expired',
     expiredDesc: 'The validity period of this bracelet has ended.',
@@ -159,47 +174,43 @@ const translations = {
     edit: 'Edit my info',
     cancel: 'Cancel',
     save: 'Save',
-    report: 'This pilgrim is lost — Click here',
-    reportBtn: 'Send report',
-    reportName: 'Your name',
-    reportPhone: 'Your WhatsApp',
-    reportMsg: 'Message (optional)',
-    reportSuccess: 'Report sent!',
-    noMedical: 'No medical information provided',
-    mecca: 'Mecca',
-    medina: 'Medina',
-    room: 'Room',
-    noHotel: 'Not specified',
+    editPhoto: 'Change photo',
+    uploading: 'Uploading...',
     reassuranceTitle: 'You are protected',
     reassurance1: 'Your group leader receives an alert if this QR is scanned',
     reassurance2: 'Your medical info is accessible to emergency services in 1 click',
     reassurance3: 'You can change your hotel at any time',
-    shareProfile: 'Share my profile',
-    downloadCard: 'Offline card',
-    dashboard: 'My dashboard',
-    activateAnother: 'Activate another',
-    editPhoto: 'Change photo',
-    uploading: 'Uploading...',
   },
   ar: {
-    banner: 'الحماية نشطة • السوار مربوط',
-    medTitle: 'معلومات طبية',
-    medNote: 'هذه المعلومات حيوية في حالات الطوارئ.',
-    hotelTitle: 'الإقامة الحالية',
-    mapBtn: 'اتجاهات إلى الفندق',
+    helpLink: 'مساعدة؟',
+    gpsLocating: '📍 جاري التحديد...',
+    gpsSuccess: '📍 تم مشاركة الموقع بنجاح',
+    gpsError: '❌ تم رفض الموقع (فعّل GPS)',
+    gpsNotSupported: '⚠️ GPS غير مدعوم',
+    identityTag: 'Pass Identity – حج 2026',
+    healthLabel: 'الصحة',
+    hotelLabel: 'الفندق',
+    noMedical: 'لا معلومات',
+    noHotel: 'غير محدد',
+    mecca: 'مكة المكرمة',
+    medina: 'المدينة المنورة',
+    room: 'غرفة',
     waBtn: 'اتصل بقائد المجموعة',
-    callHotel: 'اتصال بالفندق',
-    callFamily: 'اتصال بالعائلة',
-    gpsBtn: 'مشاركة موقعي GPS',
-    gpsLocating: 'جاري التحديد...',
-    gpsSent: 'تم الإرسال!',
+    callBtn: 'اتصل بقائد المجموعة',
+    callFamily: 'اتصل بالعائلة',
+    routeToHotel: 'اتجاهات إلى الفندق',
+    reportBtn: 'هذا الحاج ضائع — انقر هنا',
+    reportSubmit: 'إرسال البلاغ',
+    reportName: 'اسمك',
+    reportPhone: 'الواتساب الخاص بك',
+    reportMsg: 'رسالة (اختياري)',
+    reportSuccess: 'تم إرسال البلاغ!',
     emerTitle: 'أرقام الطوارئ السعودية',
-    footer: '© 2026 PassHajj • البيانات متاحة فقط في حالات الطوارئ',
+    footer: 'PassHajj — حماية ذكية للحج والعمرة',
     notFound: 'رمز QR غير معروف',
     notFoundDesc: 'هذا الرمز لا يتطابق مع أي سوار Pass Identity مسجل.',
     notActivated: 'السوار غير مفعّل',
     notActivatedDesc: 'لم يتم تفعيل هذا السوار بعد من قبل مالكه.',
-    activate: 'تفعيل هذا السوار',
     activateNow: 'تفعيل الآن',
     expired: 'السوار منتهي الصلاحية',
     expiredDesc: 'انتهت فترة صلاحية هذا السوار.',
@@ -208,27 +219,12 @@ const translations = {
     edit: 'تعديل معلوماتي',
     cancel: 'إلغاء',
     save: 'حفظ',
-    report: 'هذا الحاج ضائع — انقر هنا',
-    reportBtn: 'إرسال البلاغ',
-    reportName: 'اسمك',
-    reportPhone: 'الواتساب الخاص بك',
-    reportMsg: 'رسالة (اختياري)',
-    reportSuccess: 'تم إرسال البلاغ!',
-    noMedical: 'لا توجد معلومات طبية',
-    mecca: 'مكة المكرمة',
-    medina: 'المدينة المنورة',
-    room: 'غرفة',
-    noHotel: 'غير محدد',
+    editPhoto: 'تغيير الصورة',
+    uploading: 'جاري الرفع...',
     reassuranceTitle: 'أنت محمي',
     reassurance1: 'يتلقى قائد مجموعتك تنبيهًا عند مسح هذا الرمز',
     reassurance2: 'معلوماتك الطبية متاحة لخدمات الطوارئ بنقرة واحدة',
     reassurance3: 'يمكنك تغيير فندقك في أي وقت',
-    shareProfile: 'مشاركة ملفي',
-    downloadCard: 'بطاقة بدون اتصال',
-    dashboard: 'لوحة التحكم',
-    activateAnother: 'تفعيل آخر',
-    editPhoto: 'تغيير الصورة',
-    uploading: 'جاري الرفع...',
   },
 };
 
@@ -273,13 +269,16 @@ export default function PilgrimScanPage() {
   const [pilgrim, setPilgrim] = useState<PilgrimData | null>(null);
   const [lang, setLang] = useState<Lang>('fr');
 
+  // ─── GPS state (auto-detect on load) ───
+  const [gpsStatus, setGpsStatus] = useState<GpsStatus>('idle');
+  const [finderLat, setFinderLat] = useState<number | null>(null);
+  const [finderLng, setFinderLng] = useState<number | null>(null);
+
   // ─── Report state ───
   const [showReport, setShowReport] = useState(false);
   const [reportName, setReportName] = useState('');
   const [reportPhone, setReportPhone] = useState('');
   const [reportMessage, setReportMessage] = useState('');
-  const [reportLat, setReportLat] = useState<number | null>(null);
-  const [reportLng, setReportLng] = useState<number | null>(null);
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
 
@@ -300,9 +299,6 @@ export default function PilgrimScanPage() {
   // ─── Photo upload state ───
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
-
-  // ─── GPS state ───
-  const [gpsStatus, setGpsStatus] = useState<'idle' | 'locating' | 'sent' | 'error'>('idle');
 
   // ─── i18n helper ───
   const t = (key: string): string => {
@@ -326,25 +322,13 @@ export default function PilgrimScanPage() {
         const res = await fetch(`/api/pilgrims/${code}`);
         const data = await res.json();
 
-        if (data.status === 'not_found') {
-          setState('not_found');
-          return;
-        }
-
-        if (data.status === 'not_activated') {
-          setState('not_activated');
-          return;
-        }
-
-        if (data.status === 'expired') {
-          setState('expired');
-          return;
-        }
+        if (data.status === 'not_found') { setState('not_found'); return; }
+        if (data.status === 'not_activated') { setState('not_activated'); return; }
+        if (data.status === 'expired') { setState('expired'); return; }
 
         if (data.pilgrim) {
           setPilgrim(data.pilgrim);
           setState('active');
-          // Pre-fill edit state
           const p = data.pilgrim;
           setEditFullName(p.fullName || '');
           setEditNationality(p.nationality || '');
@@ -367,6 +351,28 @@ export default function PilgrimScanPage() {
 
     fetchPilgrim();
   }, [code]);
+
+  // ─── Auto GPS detection on page load ───
+  useEffect(() => {
+    if (state !== 'active') return;
+    if (!navigator.geolocation) {
+      setGpsStatus('error');
+      return;
+    }
+
+    setGpsStatus('locating');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFinderLat(pos.coords.latitude);
+        setFinderLng(pos.coords.longitude);
+        setGpsStatus('success');
+      },
+      () => {
+        setGpsStatus('error');
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }, [state]);
 
   // ─── Save handler ───
   const handleSave = async () => {
@@ -434,7 +440,6 @@ export default function PilgrimScanPage() {
       const uploadData = await uploadRes.json();
       const photoUrl = uploadData.photoUrl;
 
-      // Now update the pilgrim with the new photo URL
       const updateRes = await fetch(`/api/pilgrims/${code}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -449,36 +454,9 @@ export default function PilgrimScanPage() {
       toast({ title: 'Erreur lors du téléchargement de la photo', variant: 'destructive' });
     } finally {
       setIsUploadingPhoto(false);
-      // Reset the input so the same file can be re-selected
       if (photoInputRef.current) photoInputRef.current.value = '';
     }
   };
-
-  // ─── GPS sharing ───
-  const handleShareGPS = useCallback(() => {
-    if (!navigator.geolocation) return;
-    setGpsStatus('locating');
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setReportLat(pos.coords.latitude);
-        setReportLng(pos.coords.longitude);
-        const leaderPhone = pilgrim?.groupLeaderPhone;
-        if (leaderPhone) {
-          const msg = encodeURIComponent(
-            `📍 Position Pèlerin: https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`
-          );
-          window.open(`https://wa.me/${cleanPhone(leaderPhone)}?text=${msg}`, '_blank');
-        }
-        setGpsStatus('sent');
-        setTimeout(() => setGpsStatus('idle'), 2000);
-      },
-      () => {
-        setGpsStatus('error');
-        setTimeout(() => setGpsStatus('idle'), 2000);
-      }
-    );
-  }, [pilgrim]);
 
   // ─── Submit report ───
   const handleSubmitReport = useCallback(async () => {
@@ -493,8 +471,8 @@ export default function PilgrimScanPage() {
           pilgrimQrCode: code,
           finderName: reportName.trim(),
           finderPhone: reportPhone.trim(),
-          latitude: reportLat,
-          longitude: reportLng,
+          latitude: finderLat,
+          longitude: finderLng,
           message: reportMessage.trim() || null,
         }),
       });
@@ -511,43 +489,35 @@ export default function PilgrimScanPage() {
     } finally {
       setReportSubmitting(false);
     }
-  }, [code, reportName, reportPhone, reportMessage, reportLat, reportLng]);
-
-  // ─── Share profile ───
-  const handleShareProfile = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Mon PassHajj',
-        text: `Bracelet de sécurité Hajj — ${pilgrim?.fullName}`,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({ title: 'Lien copié !' });
-    }
-  };
+  }, [code, reportName, reportPhone, reportMessage, finderLat, finderLng]);
 
   // ─── Computed values ───
   const coords = parseCoords(pilgrim?.hotelCoords ?? null);
   const hotelLat = coords?.lat ?? DEFAULT_LAT;
   const hotelLng = coords?.lng ?? DEFAULT_LNG;
 
+  // WhatsApp link with auto GPS
   const whatsappLeaderUrl = pilgrim?.groupLeaderPhone
-    ? `https://wa.me/${cleanPhone(pilgrim.groupLeaderPhone)}?text=${encodeURIComponent(
-        `🆘 Pass Identity — ${pilgrim.fullName}\nCode: ${pilgrim.qrCode}`
-      )}`
+    ? (() => {
+        let message = `🚨 Bonjour, j'ai trouvé un pèlerin PassHajj.\nNom: ${pilgrim.fullName}\n`;
+        if (finderLat && finderLng) {
+          message += `📍 Localisation: https://maps.google.com/?q=${finderLat},${finderLng}`;
+        } else {
+          message += `📍 Localisation: Inconnue`;
+        }
+        return `https://wa.me/${cleanPhone(pilgrim.groupLeaderPhone)}?text=${encodeURIComponent(message)}`;
+      })()
     : null;
 
   const hotelMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hotelLat},${hotelLng}&travelmode=walking`;
 
-  // Determine which hotel to show (Mecca first, then Medina)
+  // Determine which hotel to show
   const activeHotel = pilgrim?.hotelMecca || pilgrim?.hotelMedina;
   const activeRoom = pilgrim?.hotelMecca ? pilgrim.roomMecca : pilgrim?.roomMedina;
   const activeCity = pilgrim?.hotelMecca ? t('mecca') : pilgrim?.hotelMedina ? t('medina') : null;
 
   // ─── Common input styles ───
-  const inputClass =
-    'w-full h-12 px-4 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border';
+  const inputClass = 'w-full h-12 px-4 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border';
   const inputStyle = { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER };
 
   // ─── Build initials for avatar fallback ───
@@ -557,10 +527,15 @@ export default function PilgrimScanPage() {
     return name.substring(0, 2).toUpperCase();
   };
 
+  // ─── Hotel display text ───
+  const hotelDisplay = activeHotel
+    ? `${activeHotel}${activeRoom ? ` (${t('room')} ${activeRoom})` : ''}`
+    : t('noHotel');
+
   return (
     <main
       dir={dir}
-      className="min-h-screen flex flex-col items-center px-4 py-6"
+      className="min-h-screen flex flex-col items-center px-4 py-4"
       style={{ background: BG, color: TEXT }}
     >
       {/* ═══════════════════════════════════════════════════════════
@@ -594,44 +569,19 @@ export default function PilgrimScanPage() {
       ═══════════════════════════════════════════════════════════ */}
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
-          {/* Logo */}
           <div className="text-[28px] font-extrabold tracking-tight text-black mb-8">
             <span className="text-white bg-black px-2.5 py-1 rounded-lg mr-1.5">Pass</span>Hajj
           </div>
-
-          {/* Card */}
           <div className="w-full max-w-[400px] text-center">
-            <div
-              className="rounded-[24px] p-8 mb-6"
-              style={{ background: CARD_BG, boxShadow: SHADOW }}
-            >
-              {/* Icon circle */}
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{ background: '#fff3cd' }}
-              >
+            <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#fff3cd' }}>
                 <AlertCircle className="w-10 h-10" style={{ color: '#f4b400' }} />
               </div>
-
-              {/* Title */}
-              <h1 className="text-[22px] font-extrabold leading-tight mb-3">
-                {t('notActivated')}
-              </h1>
-
-              {/* Description */}
-              <p className="text-[15px] leading-relaxed mb-6" style={{ color: MUTED }}>
-                {t('notActivatedDesc')}
-              </p>
-
-              {/* QR Code display */}
-              <div
-                className="py-3 px-4 rounded-xl mb-6 font-mono font-bold text-base tracking-wider"
-                style={{ background: INPUT_BG, color: '#333', border: `1px solid ${INPUT_BORDER}` }}
-              >
+              <h1 className="text-[22px] font-extrabold leading-tight mb-3">{t('notActivated')}</h1>
+              <p className="text-[15px] leading-relaxed mb-6" style={{ color: MUTED }}>{t('notActivatedDesc')}</p>
+              <div className="py-3 px-4 rounded-xl mb-6 font-mono font-bold text-base tracking-wider" style={{ background: INPUT_BG, color: '#333', border: `1px solid ${INPUT_BORDER}` }}>
                 ID: {code}
               </div>
-
-              {/* Activate button */}
               <Link
                 href={`/activate/identity?code=${encodeURIComponent(code)}`}
                 className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
@@ -641,8 +591,6 @@ export default function PilgrimScanPage() {
                 {t('activateNow')}
               </Link>
             </div>
-
-            {/* Footer */}
             <div className="text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
               Propulsé par <strong>PassHajj</strong>
             </div>
@@ -680,104 +628,76 @@ export default function PilgrimScanPage() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════
-          ACTIVE STATE — New Profile Design
+          ACTIVE STATE — TROUVEUR Design
       ═══════════════════════════════════════════════════════════ */}
       {state === 'active' && pilgrim && (
         <>
-          {/* ─── TOP BAR ─── */}
-          <div className="w-full max-w-[440px] flex justify-between items-center mb-5">
+          {/* ─── HEADER ─── */}
+          <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
             <div className="text-[22px] font-extrabold tracking-tight text-black">
-              <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+              <span className="text-white bg-black px-1.5 py-0.5 rounded-md mr-1">Pass</span>Hajj
             </div>
-            <button
-              onClick={toggleLang}
-              className="bg-white/40 border-none px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer flex items-center gap-1 hover:bg-white/60 transition-colors"
-              style={{ color: TEXT }}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              {lang.toUpperCase()}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleLang}
+                className="bg-white/30 border-none px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer hover:bg-white/50 transition-colors"
+                style={{ color: TEXT }}
+              >
+                {lang.toUpperCase()}
+              </button>
+            </div>
           </div>
 
-          {/* ─── STATUS BANNER ─── */}
-          <div
-            className="w-full max-w-[440px] text-white py-4 px-5 rounded-[14px] flex items-center gap-3 font-extrabold text-[18px] mb-5"
-            style={{
-              background: isEditing ? '#059669' : SUCCESS,
-              boxShadow: `0 4px 12px rgba(16, 185, 129, 0.3)`,
-            }}
-          >
-            {isEditing ? (
-              <Pencil className="w-6 h-6" />
-            ) : (
-              <ShieldCheck className="w-6 h-6" />
-            )}
-            {isEditing ? '✏️ Mode Édition' : `✅ ${t('banner')}`}
-          </div>
+          {/* ─── GPS STATUS BAR ─── */}
+          {gpsStatus !== 'idle' && (
+            <div
+              className="w-full max-w-[420px] py-3 px-4 rounded-xl flex items-center gap-2 text-[13px] font-semibold mb-5"
+              style={{
+                background: gpsStatus === 'locating' ? 'rgba(255,255,255,0.4)' : gpsStatus === 'success' ? '#d1fae5' : '#fee2e2',
+                color: gpsStatus === 'locating' ? '#000' : gpsStatus === 'success' ? '#065f46' : '#991b1b',
+                animation: 'slideDown 0.4s ease',
+              }}
+            >
+              {gpsStatus === 'locating' && <Loader2 className="w-4 h-4 animate-spin" />}
+              {gpsStatus === 'success' && <Check className="w-4 h-4" />}
+              {gpsStatus === 'error' && <AlertCircle className="w-4 h-4" />}
+              {gpsStatus === 'locating' ? t('gpsLocating') : gpsStatus === 'success' ? t('gpsSuccess') : t('gpsError')}
+            </div>
+          )}
 
           {/* ═══════════════════════════════════════════════════════════
               EDIT MODE
           ═══════════════════════════════════════════════════════════ */}
           {isEditing ? (
-            <div className="w-full max-w-[440px] space-y-4">
-              {/* Edit Identity Card */}
-              <div
-                className="rounded-[20px] p-5"
-                style={{ background: CARD_BG, boxShadow: SHADOW }}
-              >
+            <div className="w-full max-w-[420px] space-y-4">
+              <div className="rounded-[20px] p-5" style={{ background: CARD_BG, boxShadow: SHADOW }}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold flex items-center gap-2">
                     <Pencil className="w-5 h-5" style={{ color: '#059669' }} />
                     Identité
                   </h3>
                   <div className="flex gap-2">
-                    <button
-                      onClick={handleCancelEdit}
-                      className="px-3 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 bg-white text-black hover:bg-gray-50 transition-colors"
-                    >
+                    <button onClick={handleCancelEdit} className="px-3 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 bg-white text-black hover:bg-gray-50 transition-colors">
                       <RotateCcw className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-1 disabled:opacity-50"
-                      style={{ background: '#059669' }}
-                    >
+                    <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-1 disabled:opacity-50" style={{ background: '#059669' }}>
                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       {t('save')}
                     </button>
                   </div>
                 </div>
-
                 <div className="space-y-3">
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Nom complet *</label>
-                    <input
-                      type="text"
-                      value={editFullName}
-                      onChange={(e) => setEditFullName(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Nationalité *</label>
-                    <input
-                      type="text"
-                      value={editNationality}
-                      onChange={(e) => setEditNationality(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editNationality} onChange={(e) => setEditNationality(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Groupe Sanguin</label>
-                    <select
-                      value={editBloodType}
-                      onChange={(e) => setEditBloodType(e.target.value)}
-                      className={inputClass}
-                      style={{ ...inputStyle, appearance: 'none' }}
-                    >
+                    <select value={editBloodType} onChange={(e) => setEditBloodType(e.target.value)} className={inputClass} style={{ ...inputStyle, appearance: 'none' }}>
                       <option value="">—</option>
                       {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bt) => (
                         <option key={bt} value={bt}>{bt}</option>
@@ -786,74 +706,31 @@ export default function PilgrimScanPage() {
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Infos Médicales</label>
-                    <textarea
-                      value={editMedicalInfo}
-                      onChange={(e) => setEditMedicalInfo(e.target.value)}
-                      placeholder="Allergies, maladies chroniques..."
-                      rows={3}
-                      className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
-                      style={inputStyle}
-                    />
+                    <textarea value={editMedicalInfo} onChange={(e) => setEditMedicalInfo(e.target.value)} placeholder="Allergies, maladies chroniques..." rows={3} className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none" style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Hôtel (La Mecque)</label>
-                    <input
-                      type="text"
-                      value={editHotelMecca}
-                      onChange={(e) => setEditHotelMecca(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editHotelMecca} onChange={(e) => setEditHotelMecca(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Chambre (La Mecque)</label>
-                    <input
-                      type="text"
-                      value={editRoomMecca}
-                      onChange={(e) => setEditRoomMecca(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editRoomMecca} onChange={(e) => setEditRoomMecca(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Hôtel (Médine)</label>
-                    <input
-                      type="text"
-                      value={editHotelMedina}
-                      onChange={(e) => setEditHotelMedina(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editHotelMedina} onChange={(e) => setEditHotelMedina(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Chambre (Médine)</label>
-                    <input
-                      type="text"
-                      value={editRoomMedina}
-                      onChange={(e) => setEditRoomMedina(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="text" value={editRoomMedina} onChange={(e) => setEditRoomMedina(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">WhatsApp Chef de Groupe</label>
-                    <input
-                      type="tel"
-                      value={editGroupLeaderPhone}
-                      onChange={(e) => setEditGroupLeaderPhone(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="tel" value={editGroupLeaderPhone} onChange={(e) => setEditGroupLeaderPhone(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                   <div>
                     <label className="text-sm font-semibold mb-1 block">Téléphone Famille</label>
-                    <input
-                      type="tel"
-                      value={editFamilyContact}
-                      onChange={(e) => setEditFamilyContact(e.target.value)}
-                      className={inputClass}
-                      style={inputStyle}
-                    />
+                    <input type="tel" value={editFamilyContact} onChange={(e) => setEditFamilyContact(e.target.value)} className={inputClass} style={inputStyle} />
                   </div>
                 </div>
               </div>
@@ -862,12 +739,11 @@ export default function PilgrimScanPage() {
             <>
               {/* ─── PROFILE CARD ─── */}
               <div
-                className="w-full max-w-[440px] rounded-[20px] p-6 text-center mb-4"
+                className="w-full max-w-[420px] rounded-[20px] p-6 text-center mb-4"
                 style={{ background: CARD_BG, boxShadow: SHADOW }}
               >
-                {/* Photo with upload overlay */}
-                <div className="relative inline-block mx-auto mb-3">
-                  {/* Clickable avatar area — triggers photo upload */}
+                {/* Photo — clickable for upload */}
+                <div className="relative inline-block mx-auto mb-4">
                   <button
                     onClick={() => photoInputRef.current?.click()}
                     disabled={isUploadingPhoto}
@@ -878,8 +754,8 @@ export default function PilgrimScanPage() {
                       <img
                         src={pilgrim.photoUrl}
                         alt={pilgrim.fullName}
-                        className="w-[90px] h-[90px] rounded-full object-cover border-[3px] border-white"
-                        style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
+                        className="w-[100px] h-[100px] rounded-full object-cover border-4 border-white"
+                        style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                         onError={(e) => {
                           const target = e.currentTarget;
                           target.style.display = 'none';
@@ -888,46 +764,38 @@ export default function PilgrimScanPage() {
                         }}
                       />
                     ) : null}
-                    {/* Fallback initials avatar */}
                     <div
-                      className="w-[90px] h-[90px] rounded-full border-[3px] border-white items-center justify-center text-2xl font-bold"
+                      className="w-[100px] h-[100px] rounded-full border-4 border-white items-center justify-center text-2xl font-bold"
                       style={{
-                        background: '#e5e7eb',
+                        background: '#eee',
                         color: TEXT,
-                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                         display: pilgrim.photoUrl ? 'none' : 'flex',
                         margin: pilgrim.photoUrl ? undefined : '0 auto',
                       }}
                     >
                       {getInitials(pilgrim.fullName)}
                     </div>
-                    {/* Hover overlay */}
                     <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      {isUploadingPhoto ? (
-                        <Loader2 className="w-6 h-6 animate-spin text-white" />
-                      ) : (
-                        <Upload className="w-5 h-5 text-white" />
-                      )}
+                      {isUploadingPhoto ? <Loader2 className="w-6 h-6 animate-spin text-white" /> : <Upload className="w-5 h-5 text-white" />}
                     </div>
                   </button>
-                  <input
-                    ref={photoInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                  />
+                  <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoChange} className="hidden" />
                 </div>
-                {/* Photo upload label */}
-                <p className="text-xs font-medium mb-3" style={{ color: MUTED }}>
-                  {isUploadingPhoto ? t('uploading') : t('editPhoto')}
-                </p>
 
                 {/* Name */}
                 <h1 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h1>
 
+                {/* Tag */}
+                <span
+                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                  style={{ background: '#f3f4f6', color: MUTED }}
+                >
+                  {t('identityTag')}
+                </span>
+
                 {/* Badges */}
-                <div className="flex justify-center gap-2 flex-wrap mb-4">
+                <div className="flex justify-center gap-2 flex-wrap mt-3">
                   {pilgrim.bloodType && (
                     <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <Droplets className="w-3 h-3" />
@@ -944,7 +812,7 @@ export default function PilgrimScanPage() {
                 {/* Edit button */}
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 hover:bg-gray-200 transition-colors"
                   style={{ color: TEXT }}
                 >
                   <Pencil className="w-4 h-4" />
@@ -952,85 +820,63 @@ export default function PilgrimScanPage() {
                 </button>
               </div>
 
-              {/* ─── INFO GRID ─── */}
-              <div className="w-full max-w-[440px] grid grid-cols-2 gap-3 mb-4">
-                {/* Medical Info Card — MISE EN ÉVIDENCE */}
+              {/* ─── INFO GRID (2 columns) ─── */}
+              <div className="w-full max-w-[420px] grid grid-cols-2 gap-3 mb-4">
+                {/* Health */}
                 <div
-                  className="col-span-2 rounded-[16px] p-5"
+                  className="rounded-[16px] p-4 text-center"
                   style={{
                     background: '#fef2f2',
                     boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '5px solid #dc2626',
-                    borderRight: lang === 'ar' ? '5px solid #dc2626' : 'none',
+                    borderLeft: lang === 'ar' ? 'none' : '4px solid #dc2626',
+                    borderRight: lang === 'ar' ? '4px solid #dc2626' : 'none',
                   }}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-5 h-5" style={{ color: DANGER }} />
-                    <span className="text-sm font-bold" style={{ color: TEXT }}>
-                      {t('medTitle')}
+                  <span className="text-xl block mb-2">🏥</span>
+                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('healthLabel')}</span>
+                  <span className="text-sm font-bold block" style={{ color: DANGER }}>
+                    {pilgrim.medicalInfo || t('noMedical')}
+                  </span>
+                  {pilgrim.bloodType && (
+                    <span className="text-xs font-bold block mt-1" style={{ color: DANGER }}>
+                      🩸 {pilgrim.bloodType}
                     </span>
-                  </div>
-                  {pilgrim.medicalInfo ? (
-                    <div className="font-extrabold text-base" style={{ color: DANGER }}>
-                      {pilgrim.medicalInfo}
-                    </div>
-                  ) : (
-                    <p className="text-sm" style={{ color: MUTED }}>{t('noMedical')}</p>
                   )}
-                  <p className="text-xs mt-2 font-medium" style={{ color: '#991b1b' }}>
-                    ⚠️ {t('medNote')}
-                  </p>
                 </div>
 
-                {/* Hotel Info Card — MISE EN ÉVIDENCE */}
+                {/* Hotel */}
                 <div
-                  className="col-span-2 rounded-[16px] p-5"
+                  className="rounded-[16px] p-4 text-center"
                   style={{
                     background: '#eff6ff',
                     boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '5px solid #3b82f6',
-                    borderRight: lang === 'ar' ? '5px solid #3b82f6' : 'none',
+                    borderLeft: lang === 'ar' ? 'none' : '4px solid #3b82f6',
+                    borderRight: lang === 'ar' ? '4px solid #3b82f6' : 'none',
                   }}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-5 h-5" style={{ color: BLUE }} />
-                    <span className="text-sm font-bold" style={{ color: TEXT }}>
-                      {t('hotelTitle')}
+                  <span className="text-xl block mb-2">🏨</span>
+                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('hotelLabel')}</span>
+                  <span className="text-sm font-bold block" style={{ color: TEXT }}>
+                    {activeHotel || t('noHotel')}
+                  </span>
+                  {activeRoom && activeCity && (
+                    <span className="text-xs block mt-1" style={{ color: MUTED }}>
+                      {t('room')} {activeRoom} • {activeCity}
                     </span>
-                  </div>
-                  {activeHotel ? (
-                    <>
-                      <div className="font-extrabold text-base" style={{ color: TEXT }}>{activeHotel}</div>
-                      <div className="text-sm mt-1 font-medium" style={{ color: TEXT }}>
-                        {activeRoom ? `${t('room')} ${activeRoom} • ` : ''}{activeCity}
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-sm" style={{ color: MUTED }}>{t('noHotel')}</p>
                   )}
-                  <a
-                    href={hotelMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center justify-center gap-2 w-full py-3 rounded-[12px] text-white font-bold text-sm transition-all hover:opacity-90"
-                    style={{ background: BLUE }}
-                  >
-                    <Navigation className="w-4 h-4" />
-                    {t('mapBtn')}
-                  </a>
                 </div>
               </div>
 
               {/* ─── REASSURANCE SECTION ─── */}
               <div
-                className="w-full max-w-[440px] rounded-[16px] p-5 mb-4"
+                className="w-full max-w-[420px] rounded-[16px] p-4 mb-4"
                 style={{ background: 'rgba(255,255,255,0.5)' }}
               >
-                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
+                <h3 className="text-[15px] font-extrabold mb-2.5 flex items-center gap-2" style={{ color: TEXT }}>
                   <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
                   {t('reassuranceTitle')}
                 </h3>
-                <ul className="space-y-2 text-[14px]" style={{ color: TEXT }}>
+                <ul className="space-y-1.5 text-[13px]" style={{ color: TEXT }}>
                   <li className="flex items-start gap-2">
                     <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
                     {t('reassurance1')}
@@ -1046,81 +892,73 @@ export default function PilgrimScanPage() {
                 </ul>
               </div>
 
-              {/* ─── ACTION BUTTONS GRID ─── */}
-              <div className="w-full max-w-[440px] grid grid-cols-2 gap-3 mb-4">
-                {/* WhatsApp Leader */}
+              {/* ─── ACTION BUTTONS ─── */}
+              <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4">
+                {/* WhatsApp — Contacter le chef */}
                 {whatsappLeaderUrl && (
                   <a
                     href={whatsappLeaderUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="col-span-2 py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: WA_GREEN }}
+                    className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: WA_GREEN, boxShadow: '0 4px 12px rgba(37,211,102,0.3)' }}
                   >
                     <MessageCircle className="w-5 h-5" />
                     {t('waBtn')}
                   </a>
                 )}
 
-                {/* Share Profile */}
-                <button
-                  onClick={handleShareProfile}
-                  className="rounded-[14px] p-3.5 flex flex-col items-center gap-1.5 text-[13px] font-semibold transition-all hover:-translate-y-0.5 hover:bg-gray-50"
-                  style={{ background: CARD_BG, boxShadow: SHADOW, color: TEXT }}
-                >
-                  <Share2 className="w-5 h-5" />
-                  {t('shareProfile')}
-                </button>
-
-                {/* Call Family */}
-                {pilgrim.familyContact ? (
+                {/* Call Chef */}
+                {pilgrim.groupLeaderPhone && (
                   <a
-                    href={`tel:+${cleanPhone(pilgrim.familyContact)}`}
-                    className="rounded-[14px] p-3.5 flex flex-col items-center gap-1.5 text-[13px] font-semibold transition-all hover:-translate-y-0.5 hover:bg-gray-50"
-                    style={{ background: CARD_BG, boxShadow: SHADOW, color: TEXT }}
+                    href={`tel:+${cleanPhone(pilgrim.groupLeaderPhone)}`}
+                    className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: BLUE, boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
                   >
                     <Phone className="w-5 h-5" />
-                    {t('callFamily')}
+                    {t('callBtn')}
                   </a>
-                ) : (
-                  <button
-                    onClick={() => toast({ title: 'Non renseigné' })}
-                    className="rounded-[14px] p-3.5 flex flex-col items-center gap-1.5 text-[13px] font-semibold"
-                    style={{ background: CARD_BG, boxShadow: SHADOW, color: TEXT }}
-                  >
-                    <Download className="w-5 h-5" />
-                    {t('downloadCard')}
-                  </button>
                 )}
 
-                {/* GPS Button */}
-                <button
-                  onClick={handleShareGPS}
-                  disabled={gpsStatus === 'locating'}
-                  className="col-span-2 py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
-                  style={{ background: '#f59e0b' }}
-                >
-                  <Navigation className="w-4 h-4" />
-                  {gpsStatus === 'locating' ? t('gpsLocating') : gpsStatus === 'sent' ? t('gpsSent') : t('gpsBtn')}
-                </button>
+                {/* Call Family */}
+                {pilgrim.familyContact && (
+                  <a
+                    href={`tel:+${cleanPhone(pilgrim.familyContact)}`}
+                    className="w-full py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: '#6366f1', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}
+                  >
+                    <Phone className="w-4 h-4" />
+                    {t('callFamily')}
+                  </a>
+                )}
+
+                {/* Itinéraire vers l'hôtel */}
+                {activeHotel && (
+                  <a
+                    href={hotelMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-all"
+                  >
+                    <Navigation className="w-4 h-4" />
+                    {t('routeToHotel')}
+                  </a>
+                )}
               </div>
 
               {/* ─── REPORT SECTION ─── */}
-              <div className="w-full max-w-[440px] mb-4">
+              <div className="w-full max-w-[420px] mb-4">
                 <button
                   onClick={() => setShowReport(!showReport)}
                   className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
                   style={{ boxShadow: '0 4px 12px rgba(220,38,38,0.2)' }}
                 >
                   <Send className="w-5 h-5" />
-                  {t('report')}
+                  {t('reportBtn')}
                 </button>
 
                 {showReport && (
-                  <div
-                    className="mt-3 rounded-[20px] p-5"
-                    style={{ background: CARD_BG, boxShadow: SHADOW }}
-                  >
+                  <div className="mt-3 rounded-[20px] p-5" style={{ background: CARD_BG, boxShadow: SHADOW }}>
                     {reportSuccess ? (
                       <div className="text-center py-4">
                         <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: '#dcfce7' }}>
@@ -1132,33 +970,15 @@ export default function PilgrimScanPage() {
                       <div className="space-y-3">
                         <div>
                           <label className="text-sm font-semibold mb-1 block">{t('reportName')} *</label>
-                          <input
-                            type="text"
-                            value={reportName}
-                            onChange={(e) => setReportName(e.target.value)}
-                            className={inputClass}
-                            style={inputStyle}
-                          />
+                          <input type="text" value={reportName} onChange={(e) => setReportName(e.target.value)} className={inputClass} style={inputStyle} />
                         </div>
                         <div>
                           <label className="text-sm font-semibold mb-1 block">{t('reportPhone')} *</label>
-                          <input
-                            type="tel"
-                            value={reportPhone}
-                            onChange={(e) => setReportPhone(e.target.value)}
-                            className={inputClass}
-                            style={inputStyle}
-                          />
+                          <input type="tel" value={reportPhone} onChange={(e) => setReportPhone(e.target.value)} className={inputClass} style={inputStyle} />
                         </div>
                         <div>
                           <label className="text-sm font-semibold mb-1 block">{t('reportMsg')}</label>
-                          <textarea
-                            value={reportMessage}
-                            onChange={(e) => setReportMessage(e.target.value)}
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
-                            style={inputStyle}
-                          />
+                          <textarea value={reportMessage} onChange={(e) => setReportMessage(e.target.value)} rows={3} className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none" style={inputStyle} />
                         </div>
                         <button
                           onClick={handleSubmitReport}
@@ -1166,12 +986,8 @@ export default function PilgrimScanPage() {
                           className="w-full py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:opacity-90"
                           style={{ background: DANGER }}
                         >
-                          {reportSubmitting ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                          ) : (
-                            <Send className="w-4 h-4" />
-                          )}
-                          {t('reportBtn')}
+                          {reportSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4" />}
+                          {t('reportSubmit')}
                         </button>
                       </div>
                     )}
@@ -1179,9 +995,9 @@ export default function PilgrimScanPage() {
                 )}
               </div>
 
-              {/* ─── EMERGENCY NUMBERS ─── — MISE EN ÉVIDENCE */}
+              {/* ─── EMERGENCY NUMBERS ─── */}
               <div
-                className="w-full max-w-[440px] rounded-[16px] p-5 mb-6"
+                className="w-full max-w-[420px] rounded-[16px] p-5 mb-6"
                 style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
                 <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
@@ -1211,6 +1027,14 @@ export default function PilgrimScanPage() {
           <footer className="mt-auto pt-4 pb-4 text-center text-xs" style={{ color: 'rgba(0,0,0,0.5)' }}>
             {t('footer')}
           </footer>
+
+          {/* ─── Animation ─── */}
+          <style jsx>{`
+            @keyframes slideDown {
+              from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `}</style>
         </>
       )}
     </main>
