@@ -14,15 +14,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "QRBag - Protection intelligente des bagages",
-    template: "%s | QRBag",
+    default: "PassHajj – Sécurité pour pèlerins Hajj & Omrah",
+    template: "%s | PassHajj",
   },
-  description: "Protégez vos bagages avec un autocollant QR intelligent. Sans application, sans batterie, sans GPS. Un seul scan pour la tranquillité d'esprit.",
-  keywords: ["QR", "bagage", "voyage", "hajj", "protection", "sticker", "luggage", "travel", "pèlerinage"],
-  authors: [{ name: "QRBag Team" }],
+  description: "Protégez vos bagages et votre identité avec PassHajj. Étiquette connectée pour valises et bracelet d'urgence pour pèlerins. Sans application, sans batterie, sans GPS.",
+  keywords: ["QR", "bagage", "voyage", "hajj", "omrah", "pèlerinage", "protection", "sticker", "luggage", "travel", "bracelet", "identité", "pèlerin"],
+  authors: [{ name: "PassHajj Team" }],
   creator: "MMASOLUTION",
-  publisher: "QRBag",
-  metadataBase: new URL("https://qrbag.com"),
+  publisher: "PassHajj",
+  metadataBase: new URL("https://passhajj.com"),
 
   // PWA Icons
   icons: {
@@ -42,10 +42,10 @@ export const metadata: Metadata = {
 
   // Open Graph
   openGraph: {
-    title: "QRBag - Protection intelligente des bagages",
-    description: "Un autocollant QR intelligent pour protéger vos effets personnels. Sans application. Sans batterie. Sans GPS.",
-    url: "https://qrbag.com",
-    siteName: "QRBag",
+    title: "PassHajj – Sécurité pour pèlerins Hajj & Omrah",
+    description: "Étiquette connectée pour valises et bracelet d'urgence pour pèlerins. Sans application. Sans batterie. Sans GPS.",
+    url: "https://passhajj.com",
+    siteName: "PassHajj",
     type: "website",
     locale: "fr_FR",
     images: [
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
         url: "/icons/icon-512x512.png",
         width: 512,
         height: 512,
-        alt: "QRBag Logo",
+        alt: "PassHajj Logo",
       },
     ],
   },
@@ -61,8 +61,8 @@ export const metadata: Metadata = {
   // Twitter
   twitter: {
     card: "summary_large_image",
-    title: "QRBag - Protection intelligente des bagages",
-    description: "Un autocollant QR intelligent pour protéger vos effets personnels.",
+    title: "PassHajj – Sécurité pour pèlerins Hajj & Omrah",
+    description: "Étiquette connectée pour valises et bracelet d'urgence pour pèlerins.",
     images: ["/icons/icon-512x512.png"],
   },
 
@@ -70,10 +70,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 
   // App info
-  applicationName: "QRBag",
+  applicationName: "PassHajj",
   appleWebApp: {
     capable: true,
-    title: "QRBag",
+    title: "PassHajj",
     statusBarStyle: "black-translucent",
     startupImage: [
       { url: "/icons/icon-512x512.png", media: "(device-width: 320px)" },
@@ -95,7 +95,7 @@ export const metadata: Metadata = {
 
   // Alternates
   alternates: {
-    canonical: "https://qrbag.com",
+    canonical: "https://passhajj.com",
   },
 };
 
@@ -140,8 +140,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="QRBag" />
-        <meta name="application-name" content="QRBag" />
+        <meta name="apple-mobile-web-app-title" content="PassHajj" />
+        <meta name="application-name" content="PassHajj" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 

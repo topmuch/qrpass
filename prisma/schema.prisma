@@ -25,6 +25,7 @@ model User {
   observations    Observation[]
   dailyReports    DailyReport[]
   blogPosts       BlogPost[]
+  pilgrims        Pilgrim[]     // Pass Identity — pilgrim bracelets owned by this user
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -536,4 +537,56 @@ model LossAlert {
   dismissed   Boolean  @default(false)
   dismissedAt DateTime?
   createdAt   DateTime @default(now())
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASS IDENTITY — Pilgrim bracelet models (NEW, isolated)
+// ═══════════════════════════════════════════════════════════════
+
+// Pilgrim model - Pass Identity bracelet wearer
+model Pilgrim {
+  id               String   @id @default(cuid())
+  qrCode           String   @unique // ex: "PH-P-3M8N5"
+  fullName         String
+  nationality      String
+  photoUrl         String?
+  bloodType        String?  // "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+  medicalInfo      String?  // Allergies, chronic conditions, medications
+  hotelMecca       String?  // Hotel name in Mecca
+  roomMecca        String?  // Room number in Mecca
+  hotelMedina      String?  // Hotel name in Medina
+  roomMedina       String?  // Room number in Medina
+  hotelCoords      Json?    // { lat: number, lng: number }
+  groupLeaderPhone String?  // WhatsApp number of group leader
+  agencyPhone      String?  // Agency contact number
+  familyContact    String?  // Family emergency contact
+  alNusukDocUrl    String?  // AlNusuk/Visa document link
+  isActive         Boolean  @default(false) // Activated by owner
+  duration         String   @default("30d") // "15d" | "30d" | "1y"
+  expiresAt        DateTime?
+  ownerId          String?
+  owner            User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  reports          PilgrimReport[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([qrCode])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+// PilgrimReport model - someone found/reported a pilgrim in need
+model PilgrimReport {
+  id          String   @id @default(cuid())
+  pilgrimId   String
+  pilgrim     Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  finderName  String
+  finderPhone String
+  latitude    Float?
+  longitude   Float?
+  message     String?
+  createdAt   DateTime @default(now())
+
+  @@index([pilgrimId])
+  @@index([createdAt])
 }

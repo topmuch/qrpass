@@ -258,6 +258,81 @@
     "tracking_error": "Format invalide. Vérifiez votre référence QR.",
     "tracking_empty": "Veuillez entrer une référence."
   },
+  "homepage": {
+    "nav": {
+      "login": "Connexion",
+      "register": "S'inscrire"
+    },
+    "hero": {
+      "title": "PASSHAJJ",
+      "subtitle": "Votre sécurité, notre prière.",
+      "cta": "Activer mon QR",
+      "login": "Déjà un compte ? Se connecter"
+    },
+    "products": {
+      "badge": "Nos Produits",
+      "title": "Deux produits, une mission",
+      "subtitle": "Protéger chaque pèlerin, du bagage à la personne.",
+      "learn_more": "En savoir plus",
+      "activate_now": "Activer maintenant",
+      "bagage": {
+        "title": "PassHajj Bagage",
+        "description": "Étiquette connectée pour vos valises et sacs de pèlerinage.",
+        "feature1": "Scan si perdu → alerte WhatsApp",
+        "feature2": "Géolocalisation incluse",
+        "feature3": "Activation flexible",
+        "feature4": "Dashboard de suivi"
+      },
+      "identity": {
+        "title": "PassHajj Identity",
+        "description": "Bracelet d'urgence pour pèlerins âgés ou vulnérables.",
+        "feature1": "Infos médicales + contacts accessibles en 1 scan",
+        "feature2": "Multilingue auto (FR/EN/AR)",
+        "feature3": "Boutons d'action : WhatsApp, GPS, 997/911",
+        "feature4": "Hôtel modifiable à distance"
+      }
+    },
+    "steps": {
+      "badge": "Comment ça marche",
+      "title": "Comment ça marche",
+      "step1": {
+        "title": "Scannez votre QR",
+        "description": "Activez votre produit en 30 secondes"
+      },
+      "step2": {
+        "title": "Portez-le sereinement",
+        "description": "Collez l'étiquette ou portez le bracelet"
+      },
+      "step3": {
+        "title": "Soyez retrouvé instantanément",
+        "description": "Un scan suffit pour alerter vos proches"
+      }
+    },
+    "stats": {
+      "pilgrims": "Pèlerins protégés",
+      "recovery": "Taux de récupération",
+      "countries": "Pays couverts",
+      "support": "Support disponible"
+    },
+    "agencies": {
+      "badge": "B2B",
+      "title": "Vous êtes une agence de voyage ?",
+      "description": "Proposez PassHajj à vos pèlerins et offrez-leur une protection complète. Gérez vos groupes, centralisez les informations et bénéficiez d'un support prioritaire.",
+      "cta": "Devenir partenaire",
+      "feature1_title": "Dashboard groupe personnalisé",
+      "feature1_desc": "Gérez tous vos pèlerins depuis un tableau de bord centralisé.",
+      "feature2_title": "Gestion centralisée des hôtels",
+      "feature2_desc": "Modifiez les infos hôtel à distance pour chaque pèlerin.",
+      "feature3_title": "Support prioritaire WhatsApp",
+      "feature3_desc": "Une équipe dédiée pour répondre à vos besoins en temps réel."
+    },
+    "footer": {
+      "copyright": "© 2026 PassHajj – Sécurité pour pèlerins Hajj & Omrah",
+      "legal": "Mentions légales",
+      "privacy": "Confidentialité",
+      "contact": "Contact"
+    }
+  },
   "transport": {
     "select_mode": "Choisissez votre mode de transport",
     "select_mode_desc": "Sélectionnez comment vous voyagez pour adapter le formulaire",
@@ -364,5 +439,200 @@
     "item_brand": "Marque",
     "item_qty": "Qté",
     "items_in_category": "{count} articles"
+  },
+  "pilgrim": {
+    "identity": {
+      "title": "Pass Identity — Pèlerin",
+      "emergencyTitle": "🚨 URGENCE — Pèlerin en difficulté",
+      "emergencySubtitle": "Ce pèlerin porte un bracelet Pass Identity. Voici ses informations vitales.",
+      "notFound": "Code QR non reconnu",
+      "notFoundDesc": "Ce code ne correspond à aucun bracelet Pass Identity enregistré.",
+      "notActivated": "Bracelet non activé",
+      "notActivatedDesc": "Ce bracelet n'a pas encore été activé par son propriétaire.",
+      "expired": "Bracelet expiré",
+      "expiredDesc": "La période de validité de ce bracelet est terminée.",
+      "unknownPilgrim": "Pèlerin inconnu"
+    },
+    "personal": {
+      "sectionTitle": "Identité",
+      "fullName": "Nom complet",
+      "nationality": "Nationalité",
+      "bloodType": "Groupe sanguin",
+      "medicalInfo": "Informations médicales",
+      "noMedicalInfo": "Aucune information médicale renseignée"
+    },
+    "hotel": {
+      "sectionTitle": "Hébergement",
+      "mecca": "La Mecque",
+      "medina": "Médine",
+      "hotel": "Hôtel",
+      "room": "Chambre",
+      "notSpecified": "Non renseigné",
+      "showOnMap": "Voir sur la carte",
+      "callHotel": "Appeler l'hôtel"
+    },
+    "contacts": {
+      "sectionTitle": "Contacts d'urgence",
+      "groupLeader": "Chef de groupe",
+      "agency": "Agence",
+      "family": "Famille",
+      "whatsapp": "WhatsApp",
+      "call": "Appeler",
+      "notSpecified": "Non renseigné"
+    },
+    "actions": {
+      "whatsappLeader": "Contacter le chef",
+      "callHotel": "Appeler l'hôtel",
+      "openMap": "Itinéraire GPS",
+      "shareLocation": "Partager ma position",
+      "callEmergency": "Appeler les secours (997)",
+      "shareInfo": "Signaler ce pèlerin",
+      "reportTitle": "Signaler ce pèlerin",
+      "reportSubtitle": "Vous avez trouvé ce pèlerin en difficulté ? Partagez des informations pour l'aider.",
+      "yourName": "Votre nom",
+      "yourPhone": "Votre téléphone",
+      "message": "Message (optionnel)",
+      "submit": "Envoyer le signalement",
+      "reportSuccess": "Signalement envoyé avec succès !",
+      "reportError": "Erreur lors de l'envoi du signalement."
+    },
+    "selector": {
+      "title": "Quel produit avez-vous ?",
+      "subtitle": "Scannez le QR code correspondant à votre produit PassHajj",
+      "bagage": "🧳 Pass Bagage",
+      "bagageDesc": "Protection de bagages avec QR code",
+      "identity": "👤 Pass Identity",
+      "identityDesc": "Bracelet pèlerin avec informations médicales",
+      "redirecting": "Redirection en cours…"
+    },
+    "activate": {
+      "title": "Activer votre bracelet Pass Identity",
+      "subtitle": "Remplissez vos informations pour activer votre bracelet de pèlerin",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Mohammed Al-Fassi",
+      "nationality": "Nationalité",
+      "nationalityPlaceholder": "Marocaine",
+      "bloodType": "Groupe sanguin",
+      "bloodTypePlaceholder": "Sélectionnez",
+      "medicalInfo": "Informations médicales",
+      "medicalInfoPlaceholder": "Allergies, maladies chroniques, médicaments…",
+      "hotelMecca": "Hôtel à La Mecque",
+      "hotelMeccaPlaceholder": "Hôtel Al Safa",
+      "roomMecca": "Chambre (Mecque)",
+      "roomMeccaPlaceholder": "204",
+      "hotelMedina": "Hôtel à Médine",
+      "hotelMedinaPlaceholder": "Hôtel Al Ansar",
+      "roomMedina": "Chambre (Médine)",
+      "roomMedinaPlaceholder": "310",
+      "groupLeaderPhone": "Téléphone chef de groupe (WhatsApp)",
+      "groupLeaderPhonePlaceholder": "+212 6 12 34 56 78",
+      "agencyPhone": "Téléphone agence",
+      "agencyPhonePlaceholder": "+212 5 22 33 44 55",
+      "familyContact": "Contact famille",
+      "familyContactPlaceholder": "+212 6 66 77 88 99",
+      "duration": "Durée de validité",
+      "duration15d": "15 jours",
+      "duration30d": "30 jours",
+      "duration1y": "1 an",
+      "submit": "Activer mon bracelet",
+      "success": "Bracelet activé avec succès !",
+      "successDesc": "Votre bracelet Pass Identity est maintenant actif. En cas de besoin, les secours pourront accéder à vos informations vitales."
+    },
+    "dashboard": {
+      "title": "Mon bracelet Pass Identity",
+      "subtitle": "Gérez les informations de votre bracelet de pèlerin",
+      "editInfo": "Modifier mes informations",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "qrCode": "Code QR",
+      "status": "Statut",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "expired": "Expiré",
+      "expiresAt": "Expire le",
+      "lastUpdated": "Dernière mise à jour",
+      "updateSuccess": "Informations mises à jour avec succès !",
+      "updateError": "Erreur lors de la mise à jour"
+    },
+    "offline": {
+      "emergencyNumber": "Numéro d'urgence",
+      "code": "Code unique",
+      "callEmergency": "Appeler les secours"
+    }
+  },
+  "homepage": {
+    "nav": {
+      "login": "Connexion",
+      "register": "S'inscrire"
+    },
+    "hero": {
+      "title": "PASSHAJJ",
+      "subtitle": "Votre sécurité, notre prière.",
+      "cta": "Activer mon QR",
+      "login": "Déjà un compte ? Se connecter"
+    },
+    "products": {
+      "badge": "Nos Produits",
+      "title": "Deux solutions pour protéger ce qui compte",
+      "subtitle": "Que vous voyagez avec des bagages ou que vous êtes un pèlerin, PassHajj veille sur vous.",
+      "learn_more": "En savoir plus",
+      "activate_now": "Activer maintenant",
+      "bagage": {
+        "title": "PassHajj Bagage",
+        "description": "Étiquette connectée pour vos valises et sacs de pèlerinage.",
+        "feature1": "Scan si perdu → alerte WhatsApp immédiate",
+        "feature2": "Géolocalisation incluse",
+        "feature3": "Activation flexible : 15j / 30j / 1 an",
+        "feature4": "Dashboard de suivi"
+      },
+      "identity": {
+        "title": "PassHajj Identity",
+        "description": "Bracelet d'urgence pour pèlerins âgés ou vulnérables.",
+        "feature1": "Infos médicales + contacts accessibles en 1 scan",
+        "feature2": "Multilingue auto (FR/EN/AR)",
+        "feature3": "Boutons d'action : WhatsApp, GPS, 997/911",
+        "feature4": "Hôtel modifiable à distance"
+      }
+    },
+    "steps": {
+      "badge": "Comment ça marche",
+      "title": "Simple comme 1-2-3",
+      "step1": {
+        "title": "Scannez votre QR",
+        "description": "Activez votre produit en 30 secondes via votre téléphone."
+      },
+      "step2": {
+        "title": "Portez-le sereinement",
+        "description": "Collez l'étiquette sur votre valise ou portez le bracelet."
+      },
+      "step3": {
+        "title": "Soyez retrouvé instantanément",
+        "description": "Si perdu, un scan suffit pour alerter vos proches."
+      }
+    },
+    "stats": {
+      "pilgrims": "Pèlerins protégés",
+      "recovery": "Taux de récupération",
+      "countries": "Pays couverts",
+      "support": "Support disponible"
+    },
+    "agencies": {
+      "badge": "B2B",
+      "title": "Vous êtes une agence de voyage ?",
+      "description": "Proposez PassHajj à vos pèlerins et offrez-leur une sécurité premium durant leur Hajj ou Omrah.",
+      "feature1_title": "Dashboard groupe personnalisé",
+      "feature1_desc": "Gérez tous vos pèlerins depuis un tableau de bord centralisé.",
+      "feature2_title": "Gestion centralisée des hôtels",
+      "feature2_desc": "Mettez à jour les infos d'hébergement de vos pèlerins en temps réel.",
+      "feature3_title": "Support prioritaire WhatsApp",
+      "feature3_desc": "Une ligne dédiée pour une assistance rapide et efficace.",
+      "cta": "Devenir partenaire"
+    },
+    "footer": {
+      "copyright": "© 2026 PassHajj – Sécurité pour pèlerins Hajj & Omrah",
+      "legal": "Mentions légales",
+      "privacy": "Confidentialité",
+      "contact": "Contact"
+    }
   }
 }

@@ -258,6 +258,81 @@
     "tracking_error": "صيغة غير صالحة. تحقق من مرجع QR الخاص بك.",
     "tracking_empty": "يرجى إدخال مرجع."
   },
+  "homepage": {
+    "nav": {
+      "login": "تسجيل الدخول",
+      "register": "إنشاء حساب"
+    },
+    "hero": {
+      "title": "باشحج",
+      "subtitle": "أمانك، صلاتنا.",
+      "cta": "تفعيل رمز QR",
+      "login": "لديك حساب؟ سجّل الدخول"
+    },
+    "products": {
+      "badge": "منتجاتنا",
+      "title": "منتجان، رسالة واحدة",
+      "subtitle": "حماية كل حاج، من الحقيبة إلى الشخص.",
+      "learn_more": "اعرف المزيد",
+      "activate_now": "فعّل الآن",
+      "bagage": {
+        "title": "باشحج أمتعة",
+        "description": "ملصق ذكي لحقائبك وأمتعة الحج.",
+        "feature1": "مسح عند الفقدان → تنبيه واتساب",
+        "feature2": "تحديد الموقع الجغرافي مشمول",
+        "feature3": "تفعيل مرن",
+        "feature4": "لوحة متابعة"
+      },
+      "identity": {
+        "title": "باشحج هوية",
+        "description": "سوار طوارئ للحجاج كبار السن أو الضعفاء.",
+        "feature1": "معلومات طبية + جهات اتصال في مسح واحد",
+        "feature2": "تعدد اللغات تلقائي (FR/EN/AR)",
+        "feature3": "أزرار إجراء: واتساب، GPS، 997/911",
+        "feature4": "تعديل الفندق عن بُعد"
+      }
+    },
+    "steps": {
+      "badge": "كيف يعمل",
+      "title": "كيف يعمل",
+      "step1": {
+        "title": "امسح رمز QR",
+        "description": "فعّل منتجك في 30 ثانية"
+      },
+      "step2": {
+        "title": "ارتده بطمأنينة",
+        "description": "الصق الملصق أو ارتدِ السوار"
+      },
+      "step3": {
+        "title": "يتم العثور عليك فوراً",
+        "description": "مسح واحد يكفي لتنبيه أحبائك"
+      }
+    },
+    "stats": {
+      "pilgrims": "حجاج محميون",
+      "recovery": "نسبة الاسترجاع",
+      "countries": "دول مشمولة",
+      "support": "دعم متاح"
+    },
+    "agencies": {
+      "badge": "B2B",
+      "title": "هل أنت وكالة سفر؟",
+      "description": "قدّم باشحج لحجاجك ووفّر لهم حماية شاملة. أدر مجموعاتك، ركّز المعلومات واستفد من دعم أولوي.",
+      "cta": "كن شريكاً",
+      "feature1_title": "لوحة مجموعة مخصصة",
+      "feature1_desc": "أدر جميع حجاجك من لوحة مركزية.",
+      "feature2_title": "إدارة فنادق مركزية",
+      "feature2_desc": "عدّل معلومات الفندق عن بُعد لكل حاج.",
+      "feature3_title": "دعم واتساب أولوي",
+      "feature3_desc": "فريق مخصص للرد على احتياجاتك في الوقت الفعلي."
+    },
+    "footer": {
+      "copyright": "© 2026 باشحج – أمان حجاج الحج والعمرة",
+      "legal": "إشعار قانوني",
+      "privacy": "الخصوصية",
+      "contact": "اتصل بنا"
+    }
+  },
   "transport": {
     "select_mode": "اختر وضع النقل الخاص بك",
     "select_mode_desc": "حدد كيف تسافر لتخصيص النموذج",
@@ -364,5 +439,200 @@
     "item_brand": "العلامة التجارية",
     "item_qty": "الكمية",
     "items_in_category": "{count} عناصر"
+  },
+  "pilgrim": {
+    "identity": {
+      "title": "باس الهوية — حاج",
+      "emergencyTitle": "🚨 طوارئ — حاج في حالة طوارئ",
+      "emergencySubtitle": "هذا الحاج يرتدي سوار باس الهوية. إليك معلوماته الحيوية.",
+      "notFound": "رمز QR غير معروف",
+      "notFoundDesc": "هذا الرمز لا يتطابق مع أي سوار باس هوية مسجّل.",
+      "notActivated": "السوار غير مفعّل",
+      "notActivatedDesc": "لم يتم تفعيل هذا السوار بعد من قبل مالكه.",
+      "expired": "السوار منتهي الصلاحية",
+      "expiredDesc": "انتهت فترة صلاحية هذا السوار.",
+      "unknownPilgrim": "حاج مجهول"
+    },
+    "personal": {
+      "sectionTitle": "الهوية",
+      "fullName": "الاسم الكامل",
+      "nationality": "الجنسية",
+      "bloodType": "فصيلة الدم",
+      "medicalInfo": "المعلومات الطبية",
+      "noMedicalInfo": "لا توجد معلومات طبية مسجّلة"
+    },
+    "hotel": {
+      "sectionTitle": "الإقامة",
+      "mecca": "مكة المكرمة",
+      "medina": "المدينة المنورة",
+      "hotel": "الفندق",
+      "room": "الغرفة",
+      "notSpecified": "غير محدد",
+      "showOnMap": "عرض على الخريطة",
+      "callHotel": "الاتصال بالفندق"
+    },
+    "contacts": {
+      "sectionTitle": "جهات اتصال الطوارئ",
+      "groupLeader": "رئيس المجموعة",
+      "agency": "الوكالة",
+      "family": "العائلة",
+      "whatsapp": "واتساب",
+      "call": "اتصال",
+      "notSpecified": "غير محدد"
+    },
+    "actions": {
+      "whatsappLeader": "تواصل مع الرئيس",
+      "callHotel": "اتصل بالفندق",
+      "openMap": "اتجاهات GPS",
+      "shareLocation": "مشاركة موقعي",
+      "callEmergency": "اتصل بالطوارئ (997)",
+      "shareInfo": "الإبلاغ عن هذا الحاج",
+      "reportTitle": "الإبلاغ عن هذا الحاج",
+      "reportSubtitle": "هل وجدت هذا الحاج في حالة طوارئ؟ شارك معلومات لمساعدته.",
+      "yourName": "اسمك",
+      "yourPhone": "رقم هاتفك",
+      "message": "رسالة (اختياري)",
+      "submit": "إرسال البلاغ",
+      "reportSuccess": "تم إرسال البلاغ بنجاح!",
+      "reportError": "حدث خطأ أثناء إرسال البلاغ."
+    },
+    "selector": {
+      "title": "ما المنتج الذي لديك؟",
+      "subtitle": "امسح رمز QR المقابل لمنتج باس حج",
+      "bagage": "🧳 باس الأمتعة",
+      "bagageDesc": "حماية الأمتعة برمز QR",
+      "identity": "👤 باس الهوية",
+      "identityDesc": "سوار الحاج مع المعلومات الطبية",
+      "redirecting": "جارٍ إعادة التوجيه…"
+    },
+    "activate": {
+      "title": "تفعيل سوار باس الهوية",
+      "subtitle": "أدخل معلوماتك لتفعيل سوار الحاج",
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "محمد الفاسي",
+      "nationality": "الجنسية",
+      "nationalityPlaceholder": "مغربية",
+      "bloodType": "فصيلة الدم",
+      "bloodTypePlaceholder": "اختر",
+      "medicalInfo": "المعلومات الطبية",
+      "medicalInfoPlaceholder": "الحساسية، الأمراض المزمنة، الأدوية…",
+      "hotelMecca": "فندق في مكة المكرمة",
+      "hotelMeccaPlaceholder": "فندق الصفا",
+      "roomMecca": "الغرفة (مكة)",
+      "roomMeccaPlaceholder": "204",
+      "hotelMedina": "فندق في المدينة المنورة",
+      "hotelMedinaPlaceholder": "فندق الأنصار",
+      "roomMedina": "الغرفة (المدينة)",
+      "roomMedinaPlaceholder": "310",
+      "groupLeaderPhone": "هاتف رئيس المجموعة (واتساب)",
+      "groupLeaderPhonePlaceholder": "+212 6 12 34 56 78",
+      "agencyPhone": "هاتف الوكالة",
+      "agencyPhonePlaceholder": "+212 5 22 33 44 55",
+      "familyContact": "جهة اتصال العائلة",
+      "familyContactPlaceholder": "+212 6 66 77 88 99",
+      "duration": "فترة الصلاحية",
+      "duration15d": "15 يوماً",
+      "duration30d": "30 يوماً",
+      "duration1y": "سنة واحدة",
+      "submit": "تفعيل سواري",
+      "success": "تم تفعيل السوار بنجاح!",
+      "successDesc": "سوار باس الهوية الخاص بك أصبح مفعّلاً الآن. في حالة الطوارئ، سيتمكن المسعفون من الوصول إلى معلوماتك الحيوية."
+    },
+    "dashboard": {
+      "title": "سوار باس الهوية الخاص بي",
+      "subtitle": "إدارة معلومات سوار الحاج",
+      "editInfo": "تعديل معلوماتي",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "qrCode": "رمز QR",
+      "status": "الحالة",
+      "active": "مفعّل",
+      "inactive": "غير مفعّل",
+      "expired": "منتهي الصلاحية",
+      "expiresAt": "تنتهي صلاحيته في",
+      "lastUpdated": "آخر تحديث",
+      "updateSuccess": "تم تحديث المعلومات بنجاح!",
+      "updateError": "حدث خطأ أثناء التحديث"
+    },
+    "offline": {
+      "emergencyNumber": "رقم الطوارئ",
+      "code": "الرمز الفريد",
+      "callEmergency": "اتصل بالطوارئ"
+    }
+  },
+  "homepage": {
+    "nav": {
+      "login": "تسجيل الدخول",
+      "register": "إنشاء حساب"
+    },
+    "hero": {
+      "title": "باس حج",
+      "subtitle": "سلامتكم، دعاؤنا.",
+      "cta": "تفعيل رمز QR",
+      "login": "لديك حساب؟ سجّل الدخول"
+    },
+    "products": {
+      "badge": "منتجاتنا",
+      "title": "حلّان لحماية ما يهمّك",
+      "subtitle": "سواء كنت مسافراً بأمتعة أو حاجاً، باس حج يحرسك.",
+      "learn_more": "اعرف المزيد",
+      "activate_now": "فعّل الآن",
+      "bagage": {
+        "title": "باس حج للأمتعة",
+        "description": "ملصق ذكي لأمتعتك وحقائب سفرك.",
+        "feature1": "مسح عند الفقدان → تنبيه واتساب فوري",
+        "feature2": "تحديد الموقع الجغرافي مضمّن",
+        "feature3": "تفعيل مرن: 15 يوماً / 30 يوماً / سنة",
+        "feature4": "لوحة متابعة"
+      },
+      "identity": {
+        "title": "باس حج للهوية",
+        "description": "سوار طوارئ للحجاج كبار السن أو الضعفاء.",
+        "feature1": "معلومات طبية + جهات اتصال بمسح واحد",
+        "feature2": "تعدد اللغات تلقائي (FR/EN/AR)",
+        "feature3": "أزرار إجراء: واتساب، GPS، 997/911",
+        "feature4": "معلومات الفندق قابلة للتحديث عن بُعد"
+      }
+    },
+    "steps": {
+      "badge": "كيف يعمل",
+      "title": "بسيط كـ 1-2-3",
+      "step1": {
+        "title": "امسح رمز QR",
+        "description": "فعّل منتجك في 30 ثانية من هاتفك."
+      },
+      "step2": {
+        "title": "ارتدِه بطمأنينة",
+        "description": "الصق الملصق على أمتعتك أو ارتدِ السوار."
+      },
+      "step3": {
+        "title": "تم العثور عليك فوراً",
+        "description": "في حالة الفقدان، مسح واحد يكفي لتنبيه أحبائك."
+      }
+    },
+    "stats": {
+      "pilgrims": "حجاج محميّون",
+      "recovery": "نسبة الاسترداد",
+      "countries": "دول مشمولة",
+      "support": "دعم متاح"
+    },
+    "agencies": {
+      "badge": "B2B",
+      "title": "هل أنت وكالة سفر؟",
+      "description": "قدّم باس حج لحجاجك ووفّر لهم أماناً متميزاً خلال حجهم أو عمرتهم.",
+      "feature1_title": "لوحة مجموعة مخصصة",
+      "feature1_desc": "أدِر جميع حجاجك من لوحة مركزية.",
+      "feature2_title": "إدارة مركزية للفنادق",
+      "feature2_desc": "حدّث معلومات إقامة حجاجك في الوقت الفعلي.",
+      "feature3_title": "دعم واتساب ذو أولوية",
+      "feature3_desc": "خط مخصص لمساعدة سريعة وفعّالة.",
+      "cta": "كن شريكاً"
+    },
+    "footer": {
+      "copyright": "© 2026 باس حج – أمان حجاج الحج والعمرة",
+      "legal": "الإشعار القانوني",
+      "privacy": "الخصوصية",
+      "contact": "اتصل بنا"
+    }
   }
 }
