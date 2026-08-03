@@ -532,16 +532,26 @@ export default function AgencyDashboardPage() {
   };
 
   const fetchPassIdentities = async () => {
-    if (!agencyId) return;
+    if (!agencyId) {
+      console.warn('[fetchPassIdentities] No agencyId available — skipping fetch');
+      return;
+    }
     setPassIdLoading(true);
     try {
+      console.log('[fetchPassIdentities] Fetching pilgrims for agencyId:', agencyId);
       const response = await fetch(`/api/agency/pilgrims?agencyId=${agencyId}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('[fetchPassIdentities] Received', data.pilgrims?.length ?? 0, 'pilgrims');
         setPassIdentities(data.pilgrims || []);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[fetchPassIdentities] API error:', response.status, errorData);
+        setPassIdentities([]);
       }
     } catch (error) {
       console.error('Error fetching Pass Identity data:', error);
+      setPassIdentities([]);
     } finally {
       setPassIdLoading(false);
     }

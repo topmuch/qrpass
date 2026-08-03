@@ -116,6 +116,7 @@ async function generateBaggagesBatch(options: {
     nationality: '', // Will be filled during activation
     isActive: false,
     duration: '60d', // Fixed 2 months
+    agencyId, // Link pilgrim to the same agency as the baggage
   }));
 
   // Batch insert pilgrims in chunks of 200

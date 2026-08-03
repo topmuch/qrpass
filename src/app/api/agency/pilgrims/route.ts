@@ -1,11 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 // GET - List all pilgrims (Pass Identity) for an agency
 export async function GET(request: NextRequest) {
   try {
+    // Authenticate: verify the user is logged in and is an agency user
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Non authentifié' },
+        { status: 401 }
+      );
+    }
+
+    if (session.role !== 'agency' && session.role !== 'superadmin' && session.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Accès non autorisé' },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const agencyId = searchParams.get('agencyId');
 
@@ -13,6 +30,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'Agency ID is required' },
         { status: 400 }
+      );
+    }
+
+    // Security: agency users can only access their own agency's pilgrims
+    if (session.role === 'agency' && session.agencyId !== agencyId) {
+      return NextResponse.json(
+        { error: 'Accès non autorisé pour cette agence' },
+        { status: 403 }
       );
     }
 
