@@ -1197,138 +1197,42 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* ═══ EDIT MODE: CARD 3 — Transport Details (white card) ═══ */}
+        {/* ═══ EDIT MODE: CARD 3 — Vol / Transport (white card, simplified — no mode selector) ═══ */}
         {baggage && isEditing && (
           <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
-              <span>✈️</span> {t('finder.edit_transport_mode')}
+              <span>✈️</span> {i18n('flightLabel', lang)}
             </h2>
 
-            {/* Transport Mode Selector */}
-            <div className="mb-4">
-              <TransportModeSelector
-                selectedMode={editTransportMode}
-                onSelect={setEditTransportMode}
-                t={t}
-                lang={lang}
+            {/* Airline */}
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('airlineLabel', lang)}</label>
+              <input
+                type="text"
+                value={editAirlineName}
+                onChange={(e) => setEditAirlineName(e.target.value)}
+                placeholder={t('transport.airline_placeholder')}
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
-            {/* Flight-specific fields */}
-            {editTransportMode === 'flight' && (
-              <div className="space-y-3 mb-4">
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.airline')}</label>
-                  <input
-                    type="text"
-                    value={editAirlineName}
-                    onChange={(e) => setEditAirlineName(e.target.value)}
-                    placeholder={t('transport.airline_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.flight_number')}</label>
-                  <input
-                    type="text"
-                    value={editFlightNumber}
-                    onChange={(e) => setEditFlightNumber(e.target.value)}
-                    placeholder={t('transport.flight_number_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Train-specific fields */}
-            {editTransportMode === 'train' && (
-              <div className="space-y-3 mb-4">
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_company')}</label>
-                  <input
-                    type="text"
-                    value={editTrainCompany}
-                    onChange={(e) => setEditTrainCompany(e.target.value)}
-                    placeholder={t('transport.train_company_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_number')}</label>
-                  <input
-                    type="text"
-                    value={editTrainNumber}
-                    onChange={(e) => setEditTrainNumber(e.target.value)}
-                    placeholder={t('transport.train_number_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Boat-specific fields */}
-            {editTransportMode === 'boat' && (
-              <div className="space-y-3 mb-4">
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_name')}</label>
-                  <input
-                    type="text"
-                    value={editShipName}
-                    onChange={(e) => setEditShipName(e.target.value)}
-                    placeholder={t('transport.ship_name_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_cabin')}</label>
-                  <input
-                    type="text"
-                    value={editShipCabin}
-                    onChange={(e) => setEditShipCabin(e.target.value)}
-                    placeholder={t('transport.ship_cabin_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Bus-specific fields */}
-            {editTransportMode === 'bus' && (
-              <div className="space-y-3 mb-4">
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_company')}</label>
-                  <input
-                    type="text"
-                    value={editBusCompany}
-                    onChange={(e) => setEditBusCompany(e.target.value)}
-                    placeholder={t('transport.bus_company_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_line')}</label>
-                  <input
-                    type="text"
-                    value={editBusLineNumber}
-                    onChange={(e) => setEditBusLineNumber(e.target.value)}
-                    placeholder={t('transport.bus_line_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Destination — common to all modes */}
+            {/* Flight Number */}
             <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_destination')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('flightNumLabel', lang)}</label>
+              <input
+                type="text"
+                value={editFlightNumber}
+                onChange={(e) => setEditFlightNumber(e.target.value)}
+                placeholder={t('transport.flight_number_placeholder')}
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+              />
+            </div>
+
+            {/* Destination */}
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('destLabel', lang)}</label>
               <input
                 type="text"
                 value={editDestination}
@@ -1341,7 +1245,7 @@ export default function ScanPage() {
 
             {/* Departure Date */}
             <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_date')}</label>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('dateLabel', lang)}</label>
               <input
                 type="date"
                 value={editDepartureDate}
