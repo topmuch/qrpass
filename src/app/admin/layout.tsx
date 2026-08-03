@@ -26,7 +26,8 @@ import {
   Megaphone,
   TrendingUp,
   Newspaper,
-  Activity
+  Activity,
+  MapPin
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -109,6 +110,9 @@ function Sidebar({
 
     // Analysis Category
     { label: "ANALYSE", icon: null, isCategory: true },
+
+    // Heatmap des Pertes
+    { label: "Heatmap Pertes", icon: <MapPin className="w-5 h-5" />, href: "/admin/heatmap", permission: PERMISSIONS.VIEW_REPORTS },
 
     // Marketing & Relances — SuperAdmin uniquement
     { label: "Marketing & Relances", icon: <TrendingUp className="w-5 h-5" />, href: "/admin/marketing", roles: ['superadmin'] },
