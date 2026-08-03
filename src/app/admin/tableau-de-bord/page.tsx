@@ -40,6 +40,7 @@ interface RecentActivity {
   time: string;
   details: string;
   status: 'success' | 'warning' | 'info';
+  passType?: 'bagage' | 'identity';
   agency?: string;
 }
 
@@ -171,9 +172,15 @@ function ActivationsChart({ data }: { data: DailyActivation[] }) {
           <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Activations par jour</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Total: {total} activations cette semaine</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-blue-600/10 rounded-lg">
-          <span className="w-3 h-3 rounded-full bg-blue-600"></span>
-          <span className="text-xs text-slate-600 dark:text-slate-300">Pèlerins</span>
+        <div className="flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-[#1e3a8a]"></span>
+            <span className="text-xs text-slate-600 dark:text-slate-300">🧳 Bagage</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-[#10b981]"></span>
+            <span className="text-xs text-slate-600 dark:text-slate-300">👤 Identity</span>
+          </span>
         </div>
       </div>
 
@@ -220,9 +227,9 @@ function ActivationsChart({ data }: { data: DailyActivation[] }) {
 // Activity Item Component
 function ActivityItem({ activity }: { activity: RecentActivity }) {
   const statusConfig = {
-    success: { bg: 'bg-emerald-100 dark:bg-blue-600/10', icon: <CheckCircle className="w-4 h-4 text-blue-600" /> },
-    warning: { bg: 'bg-amber-100 dark:bg-blue-600/10', icon: <Clock className="w-4 h-4 text-blue-600" /> },
-    info: { bg: 'bg-blue-100 dark:bg-blue-500/10', icon: <Package className="w-4 h-4 text-blue-500" /> }
+    success: { bg: 'bg-emerald-100 dark:bg-emerald-600/10', icon: <CheckCircle className="w-4 h-4 text-[#10b981]" /> },
+    warning: { bg: 'bg-[#fbbf24]/20 dark:bg-[#1e3a8a]/10', icon: <Clock className="w-4 h-4 text-[#1e3a8a] dark:text-blue-400" /> },
+    info: { bg: 'bg-[#1e3a8a]/10 dark:bg-[#1e3a8a]/20', icon: <Package className="w-4 h-4 text-[#1e3a8a] dark:text-blue-400" /> }
   };
 
   const config = statusConfig[activity.status];
@@ -234,7 +241,9 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <p className="font-medium text-slate-800 dark:text-white">{activity.name}</p>
+          <p className="font-medium text-slate-800 dark:text-white">
+            {activity.passType === 'bagage' ? '🧳 ' : activity.passType === 'identity' ? '👤 ' : ''}{activity.name}
+          </p>
           <ArrowUpRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{activity.details}</p>
@@ -243,6 +252,15 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
             <Clock className="w-3 h-3" />
             {activity.time}
           </span>
+          {activity.passType && (
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+              activity.passType === 'bagage'
+                ? 'bg-[#1e3a8a]/10 text-[#1e3a8a] dark:bg-[#1e3a8a]/20 dark:text-blue-300'
+                : 'bg-[#10b981]/10 text-[#10b981] dark:bg-[#10b981]/20 dark:text-emerald-300'
+            }`}>
+              {activity.passType === 'bagage' ? '🧳 Bagage' : '👤 Identity'}
+            </span>
+          )}
           {activity.agency && (
             <span className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">
               {activity.agency}
@@ -355,23 +373,23 @@ export default function DashboardPage() {
     { 
       title: 'Total QR Codes', 
       value: stats.totalQR, 
-      subtitle: `${stats.qrActivatedHajj} Hajj actifs`,
+      subtitle: `👤 ${stats.qrActivatedHajj} Identity + 🧳 ${stats.qrActivatedVoyageur} Bagage actifs`,
       icon: <QrCode className="w-6 h-6 text-white" />,
       colorVariant: 'green' as const
     },
     { 
-      title: 'QR Voyageurs', 
+      title: '🧳 Pass Bagage', 
       value: stats.qrActivatedVoyageur, 
       subtitle: 'Codes activés',
       icon: <Package className="w-6 h-6 text-white" />,
-      colorVariant: 'blue' as const
+      colorVariant: 'indigo' as const
     },
     { 
-      title: 'Utilisateurs', 
+      title: '👤 Pass Identity', 
       value: stats.totalPelerins + stats.totalVoyageurs, 
-      subtitle: `${stats.totalPelerins} Hajj + ${stats.totalVoyageurs} Voyageurs`,
+      subtitle: `${stats.totalPelerins} Pèlerins + ${stats.totalVoyageurs} Voyageurs`,
       icon: <Users className="w-6 h-6 text-white" />,
-      colorVariant: 'purple' as const
+      colorVariant: 'green' as const
     },
     { 
       title: 'Commandes', 

@@ -26,6 +26,8 @@ const PUBLIC_PAGES = new Set([
   '/agence/connexion',
   '/agence/login',
   '/login',
+  '/agences',
+  '/select',
 ]);
 
 // Préfixes de pages protégées
@@ -94,7 +96,7 @@ export function middleware(req: NextRequest) {
 
   // ─── 4. Pages protégées → vérifier session + redirect ───
   for (const { prefix, loginUrl } of PROTECTED_PAGE_PREFIXES) {
-    if (pathname.startsWith(prefix)) {
+    if (pathname.startsWith(prefix + '/') || pathname === prefix) {
       if (!hasSession) {
         // Pas de session → redirect vers login
         const loginUrlFull = new URL(loginUrl, req.url);

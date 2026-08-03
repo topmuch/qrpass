@@ -24,9 +24,11 @@ import {
   Loader2,
   Luggage,
   UserRound,
+  Lock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useAuth } from '@/contexts/AuthContext';
 
 // Types
 interface Agency {
@@ -42,6 +44,7 @@ interface Agency {
 type PassType = 'bagage' | 'identity';
 
 export default function GenererQRPage() {
+  const { isSuperAdmin } = useAuth();
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [loading, setLoading] = useState(false);
   const [qrGenerating, setQrGenerating] = useState(false);
@@ -50,7 +53,7 @@ export default function GenererQRPage() {
   const [lastGeneratedRefs, setLastGeneratedRefs] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Pass type selection
+  // Pass type selection — only superadmin can choose Identity
   const [passType, setPassType] = useState<PassType>('bagage');
 
   // Agency form — Hajj only
@@ -301,32 +304,43 @@ export default function GenererQRPage() {
             </div>
           </button>
           <button
-            onClick={() => setPassType('identity')}
+            onClick={() => isSuperAdmin && setPassType('identity')}
+            disabled={!isSuperAdmin}
             className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
               passType === 'identity'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10'
-                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-300'
-            }`}
+                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-emerald-300'
+            } ${!isSuperAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              passType === 'identity' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+              passType === 'identity' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
             }`}>
               <UserRound className="w-5 h-5" />
             </div>
             <div className="text-left">
-              <p className={`font-semibold text-sm ${passType === 'identity' ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
+              <p className={`font-semibold text-sm ${passType === 'identity' ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
                 Pass Identity
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">1 QR bracelet par pèlerin</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {isSuperAdmin ? '1 QR bracelet par pèlerin' : '🔒 Superadmin uniquement'}
+              </p>
             </div>
           </button>
         </div>
       </div>
 
+      {/* Superadmin-only notice for Identity */}
+      {passType === 'identity' && !isSuperAdmin && (
+        <div className="mb-6 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <Lock className="w-4 h-4" />
+          Pass Identity est réservé aux superadministrateurs. Les agences peuvent uniquement générer des Pass Bagage.
+        </div>
+      )}
+
       {/* Mode indicator */}
       <div className="mb-6">
         <div className={`flex items-center gap-3 p-4 rounded-xl text-white ${
-          passType === 'bagage' ? 'bg-amber-600' : 'bg-blue-600'
+          passType === 'bagage' ? 'bg-[#1e3a8a]' : 'bg-emerald-600'
         }`}>
           {passType === 'bagage' ? <Luggage className="w-5 h-5" /> : <UserRound className="w-5 h-5" />}
           <div>
@@ -407,7 +421,7 @@ export default function GenererQRPage() {
 
             <Button
               className={`w-full text-white rounded-xl ${
-                passType === 'bagage' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700'
+                passType === 'bagage' ? 'bg-[#1e3a8a] hover:bg-[#3b82f6]' : 'bg-emerald-600 hover:bg-emerald-700'
               }`}
               onClick={handleGenerateQR}
               disabled={qrGenerating}
@@ -472,7 +486,7 @@ export default function GenererQRPage() {
 
       {/* Info Cards */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6] rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <QrCode className="w-8 h-8" />
             <div>
@@ -481,7 +495,7 @@ export default function GenererQRPage() {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <Building2 className="w-8 h-8" />
             <div>
@@ -490,7 +504,7 @@ export default function GenererQRPage() {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-blue-600 to-amber-600 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#fbbf24] rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8" />
             <div>

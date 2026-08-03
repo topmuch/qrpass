@@ -349,62 +349,108 @@
   },
   "landing": {
     "nav": {
+      "products": "Produits",
+      "howItWorks": "Comment ça marche",
       "login": "Connexion",
-      "activate": "Activer"
+      "activate": "Activer mon Pass"
     },
     "hero": {
-      "title1": "Votre sécurité,",
-      "title2": "notre prière 🕋",
-      "subtitle": "PassHajj protège vos bagages et vos proches pendant le Hajj & l'Omrah. Un QR code. Une activation. Une tranquillité d'esprit totale.",
-      "cta_primary": "🛡️ Activer mon Pass",
-      "cta_secondary": " Espace Agences"
+      "title": "Protégez vos bagages et vos proches pendant le Hajj & l'Omrah",
+      "subtitle": "PassHajj est un système de sécurité intelligent qui utilise des QR codes pour retrouver instantanément vos bagages perdus et localiser les pèlerins vulnérables en cas de séparation.",
+      "ctaPrimary": "Activer mon Pass",
+      "ctaSecondary": "Découvrir les solutions"
     },
-    "benefits": {
-      "b1_icon": "⚡",
-      "b1_title": "Activation en 30s",
-      "b1_desc": "Scannez, remplissez, c'est activé. Aucune application à installer.",
-      "b2_icon": "📍",
-      "b2_title": "Localisation instantanée",
-      "b2_desc": "Si perdu, le trouveur partage sa position GPS et vos contacts sont alertés.",
-      "b3_icon": "🌍",
-      "b3_title": "100% Offline Ready",
-      "b3_desc": "Fonctionne même avec une connexion faible à La Mecque ou Médine."
+    "stats": {
+      "s1": "des pèlerins perdent un bagage",
+      "s2": "personnes se perdent chaque année",
+      "s3": "de nos utilisateurs retrouvent leurs affaires",
+      "s4": "temps moyen de récupération"
+    },
+    "problem": {
+      "tag": "Le Problème",
+      "title": "Pourquoi PassHajj est essentiel",
+      "subtitle": "Le Hajj et l'Omrah rassemblent des millions de personnes dans un espace restreint. Les risques de perte sont réels.",
+      "p1Title": "Bagages perdus ou égarés",
+      "p1Desc": "Les valises se perdent à l'aéroport, sont échangées par erreur, ou abandonnées dans la foule. Sans identification claire, les retrouver devient impossible.",
+      "p2Title": "Pèlerins âgés qui se perdent",
+      "p2Desc": "Les personnes âgées ou vulnérables peuvent se perdre dans la foule dense. Sans moyen d'identification rapide, les secours ne savent pas qui elles sont ni qui contacter.",
+      "p3Title": "Urgences médicales",
+      "p3Desc": "En cas de malaise, les secouristes n'ont pas accès aux informations médicales vitales (allergies, traitements, groupe sanguin), ce qui peut aggraver la situation."
     },
     "products": {
-      "title": "Deux solutions, un même objectif",
-      "bagage_title": "Pass Bagage",
-      "bagage_desc": "Étiquette connectée pour valises et sacs. Retrouvez vos effets en cas de perte ou d'erreur d'aiguillage.",
-      "bagage_f1": "Alerte WhatsApp automatique",
-      "bagage_f2": "Photo du bagage incluse",
-      "bagage_f3": "Activation flexible (15j/30j/1an)",
-      "bagage_cta": "Activer un Bagage",
-      "identity_badge": "Nouveau",
-      "identity_title": "Pass Identity",
-      "identity_desc": "Bracelet d'urgence pour pèlerins. Infos médicales, hôtel et contacts accessibles en 1 scan.",
-      "identity_f1": "Fiche médicale critique visible",
-      "identity_f2": "Hôtel modifiable à distance",
-      "identity_f3": "Partage GPS en temps réel",
-      "identity_cta": "Activer un Bracelet"
+      "tag": "Nos Solutions",
+      "title": "Deux produits pour une sécurité complète",
+      "subtitle": "Choisissez la solution adaptée à vos besoins, ou combinez-les pour une protection maximale.",
+      "bagageTitle": "Pass Bagage",
+      "bagageSub": "Étiquette connectée pour valises et sacs",
+      "bagageDesc": "Une étiquette QR code résistante à coller sur vos bagages. Si votre valise est perdue, n'importe qui peut scanner le code et vous alerter instantanément via WhatsApp.",
+      "howItWorks": "Comment ça marche ?",
+      "bagageStep1": "Scannez le QR et activez votre bagage en 30 secondes",
+      "bagageStep2": "Collez l'étiquette sur votre valise de façon visible",
+      "bagageStep3": "Si perdu, un scan suffit pour vous alerter avec la position GPS",
+      "useCase": "Exemple concret",
+      "bagageUseCase": "Votre valise reste à l'aéroport de Djeddah. Un employé scanne le QR → Vous recevez un WhatsApp : « Votre bagage a été trouvé à l'aéroport. Position : Terminal 1. »",
+      "bagageCta": "Activer un Bagage",
+      "identityTitle": "Pass Identity",
+      "identitySub": "Bracelet d'urgence pour pèlerins",
+      "identityDesc": "Un bracelet en silicone avec QR code pour les personnes âgées ou vulnérables. En cas de perte, les secours accèdent aux infos médicales et contactent le chef de groupe.",
+      "identityStep1": "Activez le bracelet avec les infos médicales et l'hôtel",
+      "identityStep2": "Le pèlerin porte le bracelet en permanence",
+      "identityStep3": "Si perdu, un scan révèle les infos vitales et la position GPS",
+      "identityUseCase": "Votre père de 75 ans se perd près de la Mosquée. Un passant scanne son bracelet → Le chef de groupe reçoit : « Mamadou Diop trouvé près de Bab Al-Salam. Diabétique. Position GPS partagée. »",
+      "identityCta": "Activer un Bracelet"
     },
-    "steps": {
+    "comparison": {
+      "tag": "Comparaison",
+      "title": "Quel produit choisir ?",
+      "feature": "Fonctionnalité",
+      "forWho": "Pour qui ?",
+      "bagageFor": "Voyageurs avec bagages",
+      "identityFor": "Personnes âgées/vulnérables",
+      "whatsapp": "Alerte WhatsApp",
+      "gps": "Position GPS",
+      "medical": "Infos médicales",
+      "photo": "Photo du bagage/pèlerin",
+      "remoteEdit": "Modification à distance",
+      "price": "Prix (à partir de)"
+    },
+    "how": {
+      "tag": "Fonctionnement",
       "title": "Comment ça marche ?",
-      "s1_title": "Scannez le QR",
-      "s1_desc": "Ouvrez votre caméra ou WhatsApp et scannez le code.",
-      "s2_title": "Remplissez vos infos",
-      "s2_desc": "Identité, contacts, hôtel ou détails du bagage.",
-      "s3_title": "Voyagez sereinement",
-      "s3_desc": "Si perdu, un scan suffit pour alerter vos proches."
+      "subtitle": "Un processus simple en 3 étapes pour une sécurité maximale",
+      "s1Title": "1. Activation",
+      "s1Desc": "Scannez le QR code et remplissez vos informations en 30 secondes. Aucune application à installer.",
+      "s2Title": "2. Protection",
+      "s2Desc": "Collez l'étiquette sur votre bagage ou portez le bracelet. Vos données sont sécurisées et cryptées.",
+      "s3Title": "3. Alerte",
+      "s3Desc": "Si perdu, un scan suffit pour alerter vos proches avec la position GPS exacte."
+    },
+    "testimonials": {
+      "tag": "Témoignages",
+      "title": "Ils ont retrouvé grâce à PassHajj",
+      "t1Text": "« Ma valise est restée à l'aéroport de Djeddah. Grâce au QR code, j'ai reçu un WhatsApp en 15 minutes avec la position exacte. Récupérée en 2h ! »",
+      "t1Name": "Amadou Fall",
+      "t1Info": "Hajj 2025 – Dakar",
+      "t2Text": "« Mon père de 78 ans s'est perdu dans la foule. Un bénévole a scanné son bracelet et le chef de groupe a reçu sa position immédiatement. Retrouvé en 20 minutes. »",
+      "t2Name": "Fatou Diop",
+      "t2Info": "Omrah 2025 – Abidjan",
+      "t3Text": "« En tant que chef de groupe, PassHajj m'a sauvé la vie. J'ai pu localiser 3 pèlerins perdus en une journée. Indispensable pour les agences ! »",
+      "t3Name": "Moussa Ndiaye",
+      "t3Info": "Chef de groupe – Agence Ndiaye Voyages"
     },
     "agencies": {
-      "title": "🏢 Vous gérez un groupe de pèlerins ?",
-      "desc": "Offrez à vos clients une sécurité premium. Dashboard groupe, alertes centralisées et support prioritaire inclus.",
+      "title": "Vous êtes une agence de voyage ?",
+      "desc": "Offrez à vos pèlerins une sécurité premium. Dashboard groupe, alertes centralisées, support prioritaire et tarifs préférentiels.",
       "cta": "Devenir partenaire agence"
     },
     "footer": {
-      "copyright": "© 2026 PassHajj · Protection intelligente Hajj & Omrah",
+      "tagline": "Sécurité intelligente pour le Hajj & l'Omrah",
       "privacy": "Confidentialité",
-      "terms": "CGU",
-      "support": "Support"
+      "terms": "Conditions d'utilisation",
+      "support": "Support",
+      "contact": "Contact",
+      "demo": "Mode Démo",
+      "rights": "Tous droits réservés. Protection intelligente Hajj & Omrah"
     }
   },
   "transport": {

@@ -9,7 +9,7 @@ const agencySchema = z.object({
   type: z.literal('hajj'),
   passType: z.enum(['bagage', 'identity']).optional(), // 'bagage' = 2 soute QR only
   agencyId: z.string().min(1),
-  count: z.number().min(1).max(3),
+  count: z.number().min(1).max(2),
   travelerCount: z.number().min(1).max(1000),
 });
 
@@ -56,7 +56,7 @@ async function generateBaggagesBatch(options: {
   type: 'hajj';
   agencyId: string;
   travelerCount: number;
-  count: 1 | 2 | 3;
+  count: 1 | 2;
 }): Promise<string[]> {
   const { type, agencyId, travelerCount, count } = options;
   const totalBaggages = travelerCount * count;

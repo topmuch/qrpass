@@ -1,24 +1,31 @@
 /**
  * PassHajj — Brand color tokens (shared across pages)
  *
- * Visual reference: Yellow background (#f4b400) + Dark text (#0f172a),
- * Green accent (#10b981). High-contrast, modern, mobile-first.
- * Unified PassHajj palette — replaces the old QRPass blue+yellow scheme.
+ * Visual reference: Blue Navy (#1e3a8a) + Gold (#fbbf24),
+ * with Dark ink (#0f172a). Premium, serious, professional.
+ * PassHajj 2026 palette — Bleu Marine + Doré.
  */
 
-export const BRAND   = '#f4b400';  // Jaune PassHajj — fonds principaux, headers, boutons primary
-export const ACCENT  = '#10b981';  // Vert émeraude — badges "Nouveau", checks, succès
-export const INK     = '#0f172a';  // Noir profond — texte principal, boutons primary, bordures
+export const BRAND      = '#1e3a8a';  // Bleu Marine — primary brand color
+export const BRAND_LIGHT = '#3b82f6'; // Bleu clair — hover, gradients
+export const ACCENT     = '#fbbf24';  // Doré — CTA, highlights, badges
+export const INK        = '#0f172a';  // Noir profond — texte principal
+export const SUCCESS    = '#10b981';  // Vert émeraude — succès, Identity product
+export const DANGER     = '#ef4444';  // Rouge — erreurs, problème section
 
 export const BRAND_COLORS = {
-  BRAND,           // #f4b400  Jaune principal
-  ACCENT,          // #10b981  Vert accent
-  INK,             // #0f172a  Noir profond
-  YELLOW: BRAND,   // #f4b400  (alias)
-  GREEN: ACCENT,   // #10b981  (alias)
-  BLACK: INK,      // #0f172a  (alias)
-  BLUE: '#1e40af', // Bleu secondaire (liens, info) — utilisation rare
-  MUTED: '#475569', // Gris texte secondaire
-  CARD: '#ffffff', // Blanc cartes
-  RADIUS: '20px',  // Border-radius standard
+  BRAND,            // #1e3a8a  Bleu Marine principal
+  BRAND_LIGHT,      // #3b82f6  Bleu clair
+  ACCENT,           // #fbbf24  Doré
+  INK,              // #0f172a  Noir profond
+  SUCCESS,          // #10b981  Vert succès
+  DANGER,           // #ef4444  Rouge erreur
+  NAVY: BRAND,      // #1e3a8a  (alias)
+  GOLD: ACCENT,     // #fbbf24  (alias)
+  BLACK: INK,       // #0f172a  (alias)
+  GREEN: SUCCESS,   // #10b981  (alias)
+  BLUE: BRAND,      // #1e3a8a  (alias)
+  MUTED: '#64748b', // Gris texte secondaire
+  CARD: '#ffffff',  // Blanc cartes
+  RADIUS: '16px',   // Border-radius standard
 } as const;

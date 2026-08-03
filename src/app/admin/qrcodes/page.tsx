@@ -528,20 +528,22 @@ export default function QRCodesPage() {
                       className="mt-1 w-4 h-4 rounded border-[#1a2238] bg-[#080c1a] text-[#b8860b] focus:ring-[#b8860b] accent-[#b8860b]"
                     />
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      set.type === 'hajj' ? 'bg-[#0d5e34]' : 'bg-[#7a3e00]'
+                      set.type === 'identity' ? 'bg-emerald-600' : 'bg-[#1e3a8a]'
                     }`}>
-                      {set.type === 'hajj' ? (
-                        <Plane className="h-5 w-5 text-white" />
+                      {set.type === 'identity' ? (
+                        <span className="text-lg">👤</span>
                       ) : (
-                        <Luggage className="h-5 w-5 text-white" />
+                        <span className="text-lg">🧳</span>
                       )}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-bold text-white">{set.setId}</h3>
-                        <span className="px-2 py-0.5 bg-[#0d5e34] text-[#e0e6f0] text-xs rounded">
-                          Nouveau
+                        <span className={`px-2 py-0.5 text-[#e0e6f0] text-xs rounded ${
+                          set.type === 'identity' ? 'bg-emerald-600' : 'bg-[#1e3a8a]'
+                        }`}>
+                          {set.type === 'identity' ? '👤 Identity' : '🧳 Bagage'}
                         </span>
                       </div>
                       <div className="text-[#a0a8b8] text-sm flex flex-wrap gap-3">
@@ -773,9 +775,8 @@ export default function QRCodesPage() {
                 <pre className="text-[#0d5e34] text-xs leading-5 font-mono">
 {`QRPass-export.zip
 ├── Passager-001-HAJJ-2026-ABCD/
-│   ├── bagage-1-cabine-HAJJ26-XXXXXX.png
+│   ├── bagage-1-soute-HAJJ26-XXXXXX.png
 │   ├── bagage-2-soute-HAJJ26-YYYYYY.png
-│   ├── bagage-3-soute-HAJJ26-ZZZZZZ.png
 │   └── README.txt
 ├── Passager-002-.../
 │   └── ...

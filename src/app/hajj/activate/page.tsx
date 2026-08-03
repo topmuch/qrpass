@@ -10,16 +10,17 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
 
 // ─── Brand constants (from user's design) ───
-const BG = '#f4b400';
+const BG = '#f8fafc';
 const CARD_BG = '#ffffff';
-const TEXT = '#1a1a1a';
-const MUTED = '#6b7280';
+const TEXT = '#0f172a';
+const MUTED = '#64748b';
 const INPUT_BG = '#f3f4f6';
 const INPUT_BORDER = '#d1d5db';
-const BTN_PRIMARY = '#111827';
-const BTN_PRIMARY_HOVER = '#374151';
+const BTN_PRIMARY = '#1e3a8a';
+const BTN_PRIMARY_HOVER = '#3b82f6';
 const SUCCESS = '#10b981';
-const RADIUS = '20px';
+const ACCENT = '#fbbf24';
+const RADIUS = '16px';
 
 // ─── Language Selector (light, minimal) ───
 function LangSelector({ lang, setLang }: { lang: Language; setLang: (l: Language) => void }) {

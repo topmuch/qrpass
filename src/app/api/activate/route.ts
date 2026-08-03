@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // If this is part of a group (Hajj has 3 bags), activate all related baggages
+    // If this is part of a group (Hajj has 2 bagage QR), activate all related baggages
     if (baggage.type === 'hajj' && baggage.agencyId) {
       // Find all baggages with same agency and same reference prefix (first 6 chars)
       const prefix = baggage.reference.substring(0, 6);

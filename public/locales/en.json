@@ -651,62 +651,108 @@
   },
   "landing": {
     "nav": {
+      "products": "Products",
+      "howItWorks": "How it works",
       "login": "Login",
-      "activate": "Activate"
+      "activate": "Activate my Pass"
     },
     "hero": {
-      "title1": "Your safety,",
-      "title2": "our prayer 🕋",
-      "subtitle": "PassHajj protects your luggage and your loved ones during Hajj & Umrah. One QR code. One activation. Total peace of mind.",
-      "cta_primary": "🛡️ Activate my Pass",
-      "cta_secondary": " Agency Portal"
+      "title": "Protect your luggage and loved ones during Hajj & Umrah",
+      "subtitle": "PassHajj is a smart security system that uses QR codes to instantly find your lost luggage and locate vulnerable pilgrims if they get separated.",
+      "ctaPrimary": "Activate my Pass",
+      "ctaSecondary": "Discover solutions"
     },
-    "benefits": {
-      "b1_icon": "⚡",
-      "b1_title": "Activation in 30s",
-      "b1_desc": "Scan, fill, it's activated. No app to install.",
-      "b2_icon": "📍",
-      "b2_title": "Instant location",
-      "b2_desc": "If lost, the finder shares their GPS position and your contacts are alerted.",
-      "b3_icon": "🌍",
-      "b3_title": "100% Offline Ready",
-      "b3_desc": "Works even with a weak connection in Mecca or Medina."
+    "stats": {
+      "s1": "of pilgrims lose a baggage",
+      "s2": "people get lost every year",
+      "s3": "of our users recover their belongings",
+      "s4": "average recovery time"
+    },
+    "problem": {
+      "tag": "The Problem",
+      "title": "Why PassHajj is essential",
+      "subtitle": "Hajj and Umrah bring millions of people together in a confined space. The risks of loss are real.",
+      "p1Title": "Lost or misplaced luggage",
+      "p1Desc": "Suitcases get lost at the airport, swapped by mistake, or abandoned in the crowd. Without clear identification, finding them becomes impossible.",
+      "p2Title": "Elderly pilgrims getting lost",
+      "p2Desc": "Elderly or vulnerable people can get lost in the dense crowd. Without a quick identification method, rescuers don't know who they are or who to contact.",
+      "p3Title": "Medical emergencies",
+      "p3Desc": "In case of distress, first responders don't have access to vital medical information (allergies, treatments, blood type), which can worsen the situation."
     },
     "products": {
-      "title": "Two solutions, one goal",
-      "bagage_title": "Pass Baggage",
-      "bagage_desc": "Connected tag for suitcases and bags. Find your belongings if lost or misrouted.",
-      "bagage_f1": "Automatic WhatsApp alert",
-      "bagage_f2": "Baggage photo included",
-      "bagage_f3": "Flexible activation (15d/30d/1yr)",
-      "bagage_cta": "Activate a Baggage",
-      "identity_badge": "New",
-      "identity_title": "Pass Identity",
-      "identity_desc": "Emergency bracelet for pilgrims. Medical info, hotel and contacts accessible in 1 scan.",
-      "identity_f1": "Critical medical record visible",
-      "identity_f2": "Hotel modifiable remotely",
-      "identity_f3": "Real-time GPS sharing",
-      "identity_cta": "Activate a Bracelet"
+      "tag": "Our Solutions",
+      "title": "Two products for complete security",
+      "subtitle": "Choose the solution that fits your needs, or combine them for maximum protection.",
+      "bagageTitle": "Pass Baggage",
+      "bagageSub": "Connected tag for suitcases and bags",
+      "bagageDesc": "A durable QR code tag to stick on your luggage. If your suitcase is lost, anyone can scan the code and alert you instantly via WhatsApp.",
+      "howItWorks": "How it works?",
+      "bagageStep1": "Scan the QR and activate your baggage in 30 seconds",
+      "bagageStep2": "Stick the tag visibly on your suitcase",
+      "bagageStep3": "If lost, one scan alerts you with the GPS position",
+      "useCase": "Real example",
+      "bagageUseCase": "Your suitcase stays at Jeddah airport. An employee scans the QR → You receive a WhatsApp: \"Your baggage was found at the airport. Location: Terminal 1.\"",
+      "bagageCta": "Activate a Baggage",
+      "identityTitle": "Pass Identity",
+      "identitySub": "Emergency bracelet for pilgrims",
+      "identityDesc": "A silicone bracelet with QR code for elderly or vulnerable people. If lost, rescuers access medical info and contact the group leader.",
+      "identityStep1": "Activate the bracelet with medical info and hotel",
+      "identityStep2": "The pilgrim wears the bracelet at all times",
+      "identityStep3": "If lost, one scan reveals vital info and GPS position",
+      "identityUseCase": "Your 75-year-old father gets lost near the Mosque. A passerby scans his bracelet → The group leader receives: \"Mamadou Diop found near Bab Al-Salam. Diabetic. GPS position shared.\"",
+      "identityCta": "Activate a Bracelet"
     },
-    "steps": {
+    "comparison": {
+      "tag": "Comparison",
+      "title": "Which product to choose?",
+      "feature": "Feature",
+      "forWho": "For whom?",
+      "bagageFor": "Travelers with luggage",
+      "identityFor": "Elderly/vulnerable people",
+      "whatsapp": "WhatsApp Alert",
+      "gps": "GPS Position",
+      "medical": "Medical Info",
+      "photo": "Baggage/pilgrim photo",
+      "remoteEdit": "Remote modification",
+      "price": "Price (starting from)"
+    },
+    "how": {
+      "tag": "How it works",
       "title": "How it works?",
-      "s1_title": "Scan the QR",
-      "s1_desc": "Open your camera or WhatsApp and scan the code.",
-      "s2_title": "Fill in your info",
-      "s2_desc": "Identity, contacts, hotel or baggage details.",
-      "s3_title": "Travel peacefully",
-      "s3_desc": "If lost, one scan alerts your loved ones."
+      "subtitle": "A simple 3-step process for maximum security",
+      "s1Title": "1. Activation",
+      "s1Desc": "Scan the QR code and fill in your information in 30 seconds. No app to install.",
+      "s2Title": "2. Protection",
+      "s2Desc": "Stick the tag on your luggage or wear the bracelet. Your data is secure and encrypted.",
+      "s3Title": "3. Alert",
+      "s3Desc": "If lost, one scan alerts your loved ones with the exact GPS position."
+    },
+    "testimonials": {
+      "tag": "Testimonials",
+      "title": "They found thanks to PassHajj",
+      "t1Text": "\"My suitcase was left at Jeddah airport. Thanks to the QR code, I received a WhatsApp in 15 minutes with the exact position. Recovered in 2h!\"",
+      "t1Name": "Amadou Fall",
+      "t1Info": "Hajj 2025 – Dakar",
+      "t2Text": "\"My 78-year-old father got lost in the crowd. A volunteer scanned his bracelet and the group leader received his position immediately. Found in 20 minutes.\"",
+      "t2Name": "Fatou Diop",
+      "t2Info": "Umrah 2025 – Abidjan",
+      "t3Text": "\"As a group leader, PassHajj saved my life. I was able to locate 3 lost pilgrims in one day. Essential for agencies!\"",
+      "t3Name": "Moussa Ndiaye",
+      "t3Info": "Group Leader – Ndiaye Voyages Agency"
     },
     "agencies": {
-      "title": "🏢 Managing a group of pilgrims?",
-      "desc": "Offer your clients premium safety. Group dashboard, centralized alerts and priority support included.",
+      "title": "Are you a travel agency?",
+      "desc": "Offer your pilgrims premium security. Group dashboard, centralized alerts, priority support and preferential rates.",
       "cta": "Become a partner agency"
     },
     "footer": {
-      "copyright": "© 2026 PassHajj · Smart protection for Hajj & Umrah",
+      "tagline": "Smart security for Hajj & Umrah",
       "privacy": "Privacy",
-      "terms": "Terms",
-      "support": "Support"
+      "terms": "Terms of Use",
+      "support": "Support",
+      "contact": "Contact",
+      "demo": "Demo Mode",
+      "rights": "All rights reserved. Smart protection for Hajj & Umrah"
     }
   }
 }
