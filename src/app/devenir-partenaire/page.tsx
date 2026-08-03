@@ -26,7 +26,7 @@ function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="QRPass" className="h-16 w-auto object-contain brightness-0 invert" />
+            <img src="/logo.png" alt="PassHajj" className="h-16 w-auto object-contain brightness-0 invert" />
           </Link>
 
           {/* Desktop Nav */}
@@ -108,7 +108,7 @@ function HeroSection() {
         </div>
         
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-          Devenez partenaire <span className="bg-gradient-to-r from-[#1E40AF] to-[#1D4ED8] bg-clip-text text-transparent">QRPass</span>
+          Devenez partenaire <span className="bg-gradient-to-r from-[#1E40AF] to-[#1D4ED8] bg-clip-text text-transparent">PassHajj</span>
         </h1>
         
         <p className="text-[#a0a8b8] max-w-2xl mx-auto mb-8 text-lg">
@@ -160,7 +160,7 @@ function WhyPartnerSection() {
             Pourquoi collaborer avec nous ?
           </h2>
           <p className="text-[#a0a8b8] text-lg">
-            Trois raisons de devenir partenaire QRPass
+            Trois raisons de devenir partenaire PassHajj
           </p>
         </div>
 
@@ -222,7 +222,7 @@ function TestimonialsSection() {
     {
       name: "Amadou Diallo",
       role: "Directeur, Pèlerins du Sénégal",
-      text: "QRPass a réduit de 90% les pertes de bagages lors du Hajj 2025. Un service révolutionnaire.",
+      text: "PassHajj a réduit de 90% les pertes de bagages lors du Hajj 2025. Un service révolutionnaire.",
       avatar: "AD"
     },
     {
@@ -379,7 +379,7 @@ function Footer() {
           {/* Logo */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="QRPass" className="h-16 w-auto object-contain brightness-0 invert" />
+              <img src="/logo.png" alt="PassHajj" className="h-16 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-[#a0a8b8] text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
@@ -437,7 +437,7 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-[#1a2238] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#a0a8b8] text-sm">
-            © {new Date().getFullYear()} QRPass by MMASOLUTION. Tous droits réservés.
+            © {new Date().getFullYear()} PassHajj by MMASOLUTION. Tous droits réservés.
           </p>
 
           {/* Social Icons */}

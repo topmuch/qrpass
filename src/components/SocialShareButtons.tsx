@@ -18,19 +18,19 @@ function getShareText(props: SocialShareProps): string {
   const loc = lastCity ? `${lastCity}${lastCountry ? `, ${lastCountry}` : ''}` : '';
 
   if (lang === 'ar') {
-    if (status === 'lost') return `🚨 أمتعتي ${reference} مفقودة! آخر موقع: ${loc}. ساعدوني #QRPass`;
-    if (scanCount > 0) return `✅ تم مسح أمتعتي ${reference} في ${loc} — ${scanCount} مسح. محمي بـ QRPass! #QRPass`;
-    return `🎒 أمتعتي ${reference} محمية بـ QRPass. تابعو موقعها! #QRPass`;
+    if (status === 'lost') return `🚨 أمتعتي ${reference} مفقودة! آخر موقع: ${loc}. ساعدوني #PassHajj`;
+    if (scanCount > 0) return `✅ تم مسح أمتعتي ${reference} في ${loc} — ${scanCount} مسح. محمي بـ PassHajj! #PassHajj`;
+    return `🎒 أمتعتي ${reference} محمية بـ PassHajj. تابعو موقعها! #PassHajj`;
   }
   if (lang === 'en') {
-    if (status === 'lost') return `🚨 My luggage ${reference} is lost! Last location: ${loc}. Help me find it #QRPass`;
-    if (scanCount > 0) return `✅ My luggage ${reference} was scanned in ${loc} — ${scanCount} scans. Protected by QRPass! #QRPass`;
-    return `🎒 My luggage ${reference} is protected by QRPass. Track it live! #QRPass`;
+    if (status === 'lost') return `🚨 My luggage ${reference} is lost! Last location: ${loc}. Help me find it #PassHajj`;
+    if (scanCount > 0) return `✅ My luggage ${reference} was scanned in ${loc} — ${scanCount} scans. Protected by PassHajj! #PassHajj`;
+    return `🎒 My luggage ${reference} is protected by PassHajj. Track it live! #PassHajj`;
   }
   // French (default)
-  if (status === 'lost') return `🚨 Mon bagage ${reference} est perdu ! Dernier lieu : ${loc}. Aidez-moi #QRPass`;
-  if (scanCount > 0) return `✅ Mon bagage ${reference} a été scanné à ${loc} — ${scanCount} scans. Protégé par QRPass ! #QRPass`;
-  return `🎒 Mon bagage ${reference} est protégé par QRPass. Suivez-le en direct ! #QRPass`;
+  if (status === 'lost') return `🚨 Mon bagage ${reference} est perdu ! Dernier lieu : ${loc}. Aidez-moi #PassHajj`;
+  if (scanCount > 0) return `✅ Mon bagage ${reference} a été scanné à ${loc} — ${scanCount} scans. Protégé par PassHajj ! #PassHajj`;
+  return `🎒 Mon bagage ${reference} est protégé par PassHajj. Suivez-le en direct ! #PassHajj`;
 }
 
 export function SocialShareButtons(props: SocialShareProps) {
@@ -42,7 +42,7 @@ export function SocialShareButtons(props: SocialShareProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `QRPass — ${props.reference}`,
+          title: `PassHajj — ${props.reference}`,
           text,
           url: `${QRPASS_URL}/suivi/${props.reference}`,
         });

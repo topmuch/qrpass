@@ -83,8 +83,8 @@ function SuccessContent() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Mon bagage QRPass',
-          text: 'Suivez mon bagage en temps réel avec QRPass.',
+          title: 'Mon bagage PassHajj',
+          text: 'Suivez mon bagage en temps réel avec PassHajj.',
           url: trackingUrl,
         });
       } catch (err) {

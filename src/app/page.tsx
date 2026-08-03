@@ -537,7 +537,7 @@ export default function HomePage() {
       <div className="hk">
         {/* ─── HEADER ─── */}
         <header className="hk-header">
-          <div className="hk-logo">HAK<span>K</span></div>
+          <Image src="/logo.png" alt="PassHajj" width={140} height={54} style={{ objectFit: 'contain' }} priority />
           <div className="hk-nav">
             <button className="hk-lang" onClick={cycleLang} title="Switch language">
               🌐 {langLabels[lang]}
@@ -880,7 +880,7 @@ export default function HomePage() {
         {/* ─── FOOTER ─── */}
         <footer className="hk-footer">
           <div className="hk-footer-inner">
-            <div className="hk-footer-logo">HAK<span>K</span></div>
+            <Image src="/logo.png" alt="PassHajj" width={160} height={61} style={{ objectFit: 'contain' }} />
             <p>{t('landing.footer.tagline')}</p>
             <div className="hk-footer-links">
               <Link href="/confidentialite">{t('landing.footer.privacy')}</Link>
@@ -890,7 +890,7 @@ export default function HomePage() {
               <Link href="/demo">{t('landing.footer.demo')}</Link>
             </div>
             <div className="hk-footer-bottom">
-              <p>&copy; 2025 HAKK. {t('landing.footer.rights')}</p>
+              <p>&copy; 2025 PassHajj. {t('landing.footer.rights')}</p>
             </div>
           </div>
         </footer>

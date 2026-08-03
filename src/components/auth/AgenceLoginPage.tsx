@@ -35,7 +35,7 @@ const TESTIMONIALS = [
   {
     name: 'Fatou Diallo',
     role: 'Agence Hajj Express',
-    text: 'QRPass a transformé notre gestion de bagages. Zéro perte depuis 2 ans.',
+    text: 'PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.',
   },
   {
     name: 'Moussa Koné',
@@ -277,7 +277,7 @@ export default function AgenceLoginPage() {
               >
                 <img
                   src="/logo.png"
-                  alt="QRPass"
+                  alt="PassHajj"
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
               </motion.div>
@@ -423,7 +423,7 @@ export default function AgenceLoginPage() {
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-700 to-emerald-900 p-2 flex items-center justify-center shadow-lg shadow-emerald-800/20">
               <img
                 src="/logo.png"
-                alt="QRPass"
+                alt="PassHajj"
                 className="w-full h-full object-contain"
               />
             </div>

@@ -36,7 +36,7 @@ const TESTIMONIALS = [
   {
     name: 'Fatou Diallo',
     role: 'Agence Hajj Express',
-    text: 'QRPass a transformé notre gestion de bagages. Zéro perte depuis 2 ans.',
+    text: 'PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.',
   },
   {
     name: 'Moussa Koné',
@@ -341,7 +341,7 @@ export default function AdminLoginPage() {
               <div className="relative w-20 h-20 rounded-2xl bg-white/[0.07] backdrop-blur-sm p-2 border border-blue-500/20 flex items-center justify-center group-hover:bg-white/[0.12] group-hover:border-blue-500/40 transition-all duration-300">
                 {/* Glow effect behind logo */}
                 <div className="absolute -inset-1 rounded-2xl bg-blue-500/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src="/logo.png" alt="QRPass" className="w-full h-full object-contain relative z-10" />
+                <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
               </div>
             </Link>
           </motion.div>
@@ -393,7 +393,7 @@ export default function AdminLoginPage() {
                 de la plateforme
               </span>
               <br />
-              QRPass.
+              PassHajj.
             </motion.h2>
 
             <motion.p
@@ -508,7 +508,7 @@ export default function AdminLoginPage() {
           >
             <div className="relative w-20 h-20 rounded-2xl bg-white/[0.07] backdrop-blur-sm p-2 border border-blue-500/20 flex items-center justify-center">
               <div className="absolute -inset-1 rounded-2xl bg-blue-500/10 blur-lg" />
-              <img src="/logo.png" alt="QRPass" className="w-full h-full object-contain relative z-10" />
+              <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
             </div>
           </motion.div>
 
@@ -524,7 +524,7 @@ export default function AdminLoginPage() {
           <motion.div className="mb-8" {...formChild} transition={{ delay: 0.2 }}>
             <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Administration</h1>
             <p className="text-white/40 text-sm leading-relaxed">
-              Accès réservé aux administrateurs de la plateforme QRPass
+              Accès réservé aux administrateurs de la plateforme PassHajj
             </p>
           </motion.div>
 

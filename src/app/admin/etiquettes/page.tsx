@@ -205,7 +205,7 @@ export default function EtiquettesPage() {
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 24px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('QRPass - Étiquettes', canvas.width / 2, 35);
+      ctx.fillText('PassHajj - Étiquettes', canvas.width / 2, 35);
 
       ctx.font = '16px Arial';
       ctx.fillText(`${set.setId} | Hajj 2026 | ${set.qrCount} QR`, canvas.width / 2, 65);
@@ -266,7 +266,7 @@ export default function EtiquettesPage() {
 
       // Download
       const link = document.createElement('a');
-      link.download = `QRPass-${set.setId}.png`;
+      link.download = `PassHajj-${set.setId}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
 
@@ -288,7 +288,7 @@ export default function EtiquettesPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `QRPass - ${set.setId}`,
+          title: `PassHajj - ${set.setId}`,
           text: `${set.qrCount} QR codes pour ${set.agencyName || 'agence'}`,
           url: shareUrl,
         });

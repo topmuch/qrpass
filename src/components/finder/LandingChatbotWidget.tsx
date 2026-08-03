@@ -225,7 +225,7 @@ export default function LandingChatbotWidget() {
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#6613e3] to-[#4b0082] border-b border-white/10">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-blue-300" />
-              <span className="text-white font-semibold text-sm">QRPass Assistant</span>
+              <span className="text-white font-semibold text-sm">PassHajj Assistant</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}

@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Mentions légales',
-  description: 'Mentions légales du site QRPass - Protection intelligente des bagages.',
+  description: 'Mentions légales du site PassHajj - Protection intelligente des bagages.',
 };
 
 export default function MentionsLegales() {
@@ -17,7 +17,7 @@ export default function MentionsLegales() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">1. Éditeur du site</h2>
               <p className="mb-4">
-                Le site QRPass est édité par la société MMASOLUTION, société [forme juridique] au capital de [montant] euros, immatriculée au Registre du Commerce et des Sociétés de [ville] sous le numéro [numéro SIRET].
+                Le site PassHajj est édité par la société MMASOLUTION, société [forme juridique] au capital de [montant] euros, immatriculée au Registre du Commerce et des Sociétés de [ville] sous le numéro [numéro SIRET].
               </p>
               <p>
                 <strong>Siège social :</strong> Poissy, France<br />
@@ -37,7 +37,7 @@ export default function MentionsLegales() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">3. Propriété intellectuelle</h2>
               <p className="mb-4">
-                L&apos;ensemble du contenu du site QRPass (textes, images, vidéos, logos, icônes, sons, logiciels, etc.) est la propriété exclusive de MMASOLUTION ou de ses partenaires et est protégé par les lois françaises et internationales relatives à la propriété intellectuelle.
+                L&apos;ensemble du contenu du site PassHajj (textes, images, vidéos, logos, icônes, sons, logiciels, etc.) est la propriété exclusive de MMASOLUTION ou de ses partenaires et est protégé par les lois françaises et internationales relatives à la propriété intellectuelle.
               </p>
               <p>
                 Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable de MMASOLUTION.
@@ -57,7 +57,7 @@ export default function MentionsLegales() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">5. Cookies</h2>
               <p className="mb-4">
-                Le site QRPass utilise des cookies pour améliorer l&apos;expérience utilisateur. Ces cookies sont soumis à votre consentement préalable, conformément à la réglementation applicable.
+                Le site PassHajj utilise des cookies pour améliorer l&apos;expérience utilisateur. Ces cookies sont soumis à votre consentement préalable, conformément à la réglementation applicable.
               </p>
               <p>
                 Pour en savoir plus sur l&apos;utilisation des cookies, veuillez consulter notre <a href="/confidentialite" className="text-[#b8860b] hover:underline">Politique de confidentialité</a>.

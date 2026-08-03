@@ -24,6 +24,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 // ─── Brand constants ───
 const BG = '#f4b400';
@@ -569,8 +570,8 @@ export default function PilgrimScanPage() {
       ═══════════════════════════════════════════════════════════ */}
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
-          <div className="text-[28px] font-extrabold tracking-tight text-black mb-8">
-            <span className="text-white bg-black px-2.5 py-1 rounded-lg mr-1.5">Pass</span>Hajj
+          <div className="flex items-center mb-8">
+            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
@@ -634,8 +635,8 @@ export default function PilgrimScanPage() {
         <>
           {/* ─── HEADER ─── */}
           <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
-            <div className="text-[22px] font-extrabold tracking-tight text-black">
-              <span className="text-white bg-black px-1.5 py-0.5 rounded-md mr-1">Pass</span>Hajj
+            <div className="flex items-center">
+              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
             </div>
             <div className="flex items-center gap-3">
               <button

@@ -98,7 +98,7 @@ function getMailtoUrl(email: string, subject: string, body: string): string {
 }
 
 function buildRenewalMessage(name: string, reference: string, expiryDate: string): string {
-  return `Bonjour ${name}, votre bagage QRPass (${reference}) arrive à expiration le ${expiryDate}. Souhaitez-vous le renouveler pour 7€ ?`;
+  return `Bonjour ${name}, votre bagage PassHajj (${reference}) arrive à expiration le ${expiryDate}. Souhaitez-vous le renouveler pour 7€ ?`;
 }
 
 function statusBadgeClass(status: string): string {
@@ -483,7 +483,7 @@ function TravelerRow({ traveler, onView }: { traveler: Traveler; onView: () => v
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRPass', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement PassHajj', emailBody)
     : null;
 
   return (
@@ -570,7 +570,7 @@ function TravelerCard({ traveler, onView }: { traveler: Traveler; onView: () => 
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRPass', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement PassHajj', emailBody)
     : null;
 
   return (
@@ -660,7 +660,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRPass', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement PassHajj', emailBody)
     : null;
 
   return (
@@ -769,7 +769,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
         ) : (
           <button
             onClick={() => {
-              window.location.href = getMailtoUrl('contact@qrpass.com', 'Renouvellement QRPass', emailBody);
+              window.location.href = getMailtoUrl('contact@qrpass.com', 'Renouvellement PassHajj', emailBody);
             }}
             className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-medium transition-colors"
           >

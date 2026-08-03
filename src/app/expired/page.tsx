@@ -50,7 +50,7 @@ function ExpiredContent() {
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
       `Bonjour,\n\n` +
-      `J'ai scanné un QR code QRPass qui a expiré.\n\n` +
+      `J'ai scanné un QR code PassHajj qui a expiré.\n\n` +
       `📦 Référence: ${reference}\n` +
       `📅 Expiré le: ${formatDate(expiredAt)}\n\n` +
       `Je souhaite renouveler la protection de ce bagage.`
@@ -140,7 +140,7 @@ function ExpiredContent() {
         {/* Footer */}
         <div className="mt-8 text-center text-[#a0a8b8]/70 text-xs">
           <Shield className="w-4 h-4 inline mr-1" />
-          QRPass – Protégez vos bagages, en toute sérénité
+          PassHajj – Protégez vos bagages, en toute sérénité
         </div>
       </div>
     </div>

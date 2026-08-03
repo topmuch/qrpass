@@ -1,0 +1,733 @@
+     1→'use client';
+     2→
+     3→import { useState, useRef, Suspense } from 'react';
+     4→import { useRouter, useSearchParams } from 'next/navigation';
+     5→import Link from 'next/link';
+     6→import { toast } from '@/hooks/use-toast';
+     7→import {
+     8→  ChevronRight,
+     9→  ChevronLeft,
+    10→  Upload,
+    11→  Heart,
+    12→  Building2,
+    13→  User,
+    14→  AlertTriangle,
+    15→  Loader2,
+    16→  CheckCircle,
+    17→} from 'lucide-react';
+    18→
+    19→// ─── Brand constants ───
+    20→const BG = '#f4b400';
+    21→const CARD_BG = '#ffffff';
+    22→const TEXT = '#1a1a1a';
+    23→const MUTED = '#6b7280';
+    24→const INPUT_BG = '#f3f4f6';
+    25→const INPUT_BORDER = '#d1d5db';
+    26→const BTN_PRIMARY = '#111827';
+    27→const BTN_PRIMARY_HOVER = '#374151';
+    28→const RADIUS = '20px';
+    29→
+    30→// ─── Blood type options ───
+    31→const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Inconnu'];
+    32→
+    33→// ─── City options ───
+    34→const CITIES = [
+    35→  { value: 'mecca', label: 'La Mecque' },
+    36→  { value: 'medina', label: 'Médine' },
+    37→];
+    38→
+    39→// ─── Inner component (needs useSearchParams inside Suspense) ───
+    40→function IdentityActivateContent() {
+    41→  const router = useRouter();
+    42→  const searchParams = useSearchParams();
+    43→  const qrCode = searchParams.get('code') || '';
+    44→
+    45→  // Step state
+    46→  const [step, setStep] = useState<1 | 2 | 3>(1);
+    47→  const [loading, setLoading] = useState(false);
+    48→
+    49→  // Step 1: Identité
+    50→  const [code, setCode] = useState(qrCode);
+    51→  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    52→  const [photoFile, setPhotoFile] = useState<File | null>(null);
+    53→  const [firstName, setFirstName] = useState('');
+    54→  const [lastName, setLastName] = useState('');
+    55→  const [age, setAge] = useState('');
+    56→
+    57→  // Step 2: Santé
+    58→  const [bloodType, setBloodType] = useState('');
+    59→  const [medicalInfo, setMedicalInfo] = useState('');
+    60→
+    61→  // Step 3: Logement & Contacts
+    62→  const [hotelName, setHotelName] = useState('');
+    63→  const [city, setCity] = useState('mecca');
+    64→  const [roomNumber, setRoomNumber] = useState('');
+    65→  const [leaderPhone, setLeaderPhone] = useState('');
+    66→  const [familyPhone, setFamilyPhone] = useState('');
+    67→
+    68→  // Validation errors
+    69→  const [errors, setErrors] = useState<Record<string, boolean>>({});
+    70→
+    71→  // Deferred activation
+    72→  const [deferredActivation, setDeferredActivation] = useState(false);
+    73→  const [activationDate, setActivationDate] = useState('');
+    74→
+    75→  // Photo input ref
+    76→  const photoInputRef = useRef<HTMLInputElement>(null);
+    77→
+    78→  // ─── Step labels ───
+    79→  const stepLabels: Record<1 | 2 | 3, string> = {
+    80→    1: 'ÉTAPE 1 SUR 3 — IDENTITÉ',
+    81→    2: 'ÉTAPE 2 SUR 3 — SANTÉ',
+    82→    3: 'ÉTAPE 3 SUR 3 — LOGEMENT',
+    83→  };
+    84→
+    85→  // ─── Progress widths ───
+    86→  const progressWidths: Record<1 | 2 | 3, string> = {
+    87→    1: '33%',
+    88→    2: '66%',
+    89→    3: '100%',
+    90→  };
+    91→
+    92→  // ─── Validate step 1 ───
+    93→  const validateStep1 = (): boolean => {
+    94→    const newErrors: Record<string, boolean> = {};
+    95→    if (!code.trim()) newErrors.code = true;
+    96→    if (!firstName.trim()) newErrors.firstName = true;
+    97→    if (!lastName.trim()) newErrors.lastName = true;
+    98→    setErrors(newErrors);
+    99→    if (Object.keys(newErrors).length > 0) {
+   100→      toast({ title: 'Veuillez remplir tous les champs obligatoires', variant: 'destructive' });
+   101→      return false;
+   102→    }
+   103→    return true;
+   104→  };
+   105→
+   106→  // ─── Validate step 2 ───
+   107→  const validateStep2 = (): boolean => {
+   108→    const newErrors: Record<string, boolean> = {};
+   109→    if (!bloodType) newErrors.bloodType = true;
+   110→    setErrors(newErrors);
+   111→    if (Object.keys(newErrors).length > 0) {
+   112→      toast({ title: 'Veuillez sélectionner votre groupe sanguin', variant: 'destructive' });
+   113→      return false;
+   114→    }
+   115→    return true;
+   116→  };
+   117→
+   118→  // ─── Validate step 3 ───
+   119→  const validateStep3 = (): boolean => {
+   120→    const newErrors: Record<string, boolean> = {};
+   121→    if (!hotelName.trim()) newErrors.hotelName = true;
+   122→    if (!roomNumber.trim()) newErrors.roomNumber = true;
+   123→    if (!leaderPhone.trim()) newErrors.leaderPhone = true;
+   124→    setErrors(newErrors);
+   125→    if (Object.keys(newErrors).length > 0) {
+   126→      toast({ title: 'Veuillez remplir tous les champs obligatoires', variant: 'destructive' });
+   127→      return false;
+   128→    }
+   129→    return true;
+   130→  };
+   131→
+   132→  // ─── Navigate to step ───
+   133→  const goToStep = (s: 1 | 2 | 3) => {
+   134→    if (s === 2 && !validateStep1()) return;
+   135→    if (s === 3 && !validateStep2()) return;
+   136→    setStep(s);
+   137→    window.scrollTo({ top: 0, behavior: 'smooth' });
+   138→  };
+   139→
+   140→  // ─── Photo change handler ───
+   141→  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   142→    const file = e.target.files?.[0];
+   143→    if (file) {
+   144→      setPhotoFile(file);
+   145→      const reader = new FileReader();
+   146→      reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
+   147→      reader.readAsDataURL(file);
+   148→    }
+   149→  };
+   150→
+   151→  // ─── Submit activation ───
+   152→  const handleSubmit = async (e: React.FormEvent) => {
+   153→    e.preventDefault();
+   154→
+   155→    if (!validateStep3()) return;
+   156→
+   157→    setLoading(true);
+   158→
+   159→    try {
+   160→      let photoUrl: string | null = null;
+   161→
+   162→      // Upload photo first if selected
+   163→      if (photoFile) {
+   164→        try {
+   165→          const photoFormData = new FormData();
+   166→          photoFormData.append('file', photoFile);
+   167→          const uploadRes = await fetch('/api/pilgrims/upload-photo', {
+   168→            method: 'POST',
+   169→            body: photoFormData,
+   170→          });
+   171→          if (uploadRes.ok) {
+   172→            const uploadData = await uploadRes.json();
+   173→            photoUrl = uploadData.photoUrl;
+   174→          }
+   175→        } catch (uploadErr) {
+   176→          console.error('Photo upload error (non-blocking):', uploadErr);
+   177→          // Continue without photo — non-blocking
+   178→        }
+   179→      }
+   180→
+   181→      // Build the API payload
+   182→      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+   183→      const payload: Record<string, unknown> = {
+   184→        fullName,
+   185→        nationality: 'Non spécifié', // Required by API but not in form
+   186→        groupLeaderPhone: leaderPhone.trim(),
+   187→        bloodType: bloodType === 'Inconnu' ? 'Unknown' : bloodType,
+   188→        medicalInfo: medicalInfo.trim() || undefined,
+   189→        familyContact: familyPhone.trim() || undefined,
+   190→      };
+   191→
+   192→      if (photoUrl) {
+   193→        payload.photoUrl = photoUrl;
+   194→      }
+   195→
+   196→      // Add deferred activation date if selected
+   197→      if (deferredActivation && activationDate) {
+   198→        payload.activationDate = activationDate;
+   199→      }
+   200→
+   201→      // Map hotel/room based on city
+   202→      if (city === 'mecca') {
+   203→        payload.hotelMecca = hotelName.trim();
+   204→        payload.roomMecca = roomNumber.trim();
+   205→      } else {
+   206→        payload.hotelMedina = hotelName.trim();
+   207→        payload.roomMedina = roomNumber.trim();
+   208→      }
+   209→
+   210→      const response = await fetch(`/api/pilgrims/activate/${encodeURIComponent(code.trim())}`, {
+   211→        method: 'POST',
+   212→        headers: { 'Content-Type': 'application/json' },
+   213→        body: JSON.stringify(payload),
+   214→      });
+   215→
+   216→      if (response.ok) {
+   217→        // Store activation data in sessionStorage for confirmation page (including base64 preview)
+   218→        sessionStorage.setItem('activationData', JSON.stringify({
+   219→          type: 'identity',
+   220→          reference: code.trim(),
+   221→          firstName: firstName.trim(),
+   222→          lastName: lastName.trim(),
+   223→          photoUrl: photoUrl || null,
+   224→          photoPreview: photoPreview || null,
+   225→          bloodType,
+   226→          hotel: hotelName,
+   227→          room: roomNumber,
+   228→          leaderPhone,
+   229→        }));
+   230→
+   231→        // Redirect to confirmation page
+   232→        const params = new URLSearchParams({
+   233→          type: 'identity',
+   234→          code: code.trim(),
+   235→          firstName: firstName.trim(),
+   236→          lastName: lastName.trim(),
+   237→        });
+   238→        if (photoUrl) {
+   239→          params.set('photo', photoUrl);
+   240→        }
+   241→        router.push(`/activate/confirmation?${params.toString()}`);
+   242→      } else {
+   243→        const errorData = await response.json();
+   244→        toast({
+   245→          title: errorData.message || "Erreur lors de l'activation",
+   246→          variant: 'destructive',
+   247→        });
+   248→      }
+   249→    } catch (error) {
+   250→      console.error('Activation error:', error);
+   251→      toast({ title: 'Erreur de connexion. Veuillez réessayer.', variant: 'destructive' });
+   252→    } finally {
+   253→      setLoading(false);
+   254→    }
+   255→  };
+   256→
+   257→  // ─── Common input styles ───
+   258→  const inputBaseClass =
+   259→    'w-full h-12 px-4 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20';
+   260→  const inputNormalClass = `${inputBaseClass} border`;
+   261→  const inputErrorClass = `${inputBaseClass} border-2 border-red-500`;
+   262→
+   263→  return (
+   264→    <main
+   265→      className="min-h-screen flex flex-col items-center px-4 py-6"
+   266→      style={{ background: BG, color: TEXT }}
+   267→    >
+   268→      {/* ─── Header / Logo ─── */}
+   269→      <div className="w-full max-w-[420px] mb-5">
+   270→        <div className="text-2xl font-extrabold tracking-tight text-black">
+   271→          <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+   272→        </div>
+   273→        <p className="text-sm mt-1" style={{ color: MUTED }}>
+   274→          Bracelet d&apos;Urgence &amp; Identification
+   275→        </p>
+   276→      </div>
+   277→
+   278→      {/* ─── Progress Bar ─── */}
+   279→      <div className="w-full max-w-[420px] mb-5">
+   280→        <div
+   281→          className="text-xs font-semibold uppercase tracking-wider text-center mb-2"
+   282→          style={{ color: TEXT }}
+   283→        >
+   284→          {stepLabels[step]}
+   285→        </div>
+   286→        <div className="h-1.5 bg-white/50 rounded-full overflow-hidden">
+   287→          <div
+   288→            className="h-full bg-black rounded-full transition-all duration-300 ease-out"
+   289→            style={{ width: progressWidths[step] }}
+   290→          />
+   291→        </div>
+   292→      </div>
+   293→
+   294→      {/* ─── Form ─── */}
+   295→      <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
+   296→        {/* ═══ STEP 1: Identité du Pèlerin ═══ */}
+   297→        {step === 1 && (
+   298→          <div
+   299→            className="rounded-[20px] p-6 shadow-lg mb-4"
+   300→            style={{ background: CARD_BG }}
+   301→          >
+   302→            <div className="text-lg font-bold mb-4 flex items-center gap-2">
+   303→              <User className="w-5 h-5" />
+   304→              Identité du Pèlerin
+   305→            </div>
+   306→
+   307→            {/* Alert info box */}
+   308→            <div
+   309→              className="rounded-xl p-3 mb-5 flex items-start gap-2"
+   310→              style={{ backgroundColor: '#fef9c3' }}
+   311→            >
+   312→              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#d97706' }} />
+   313→              <p className="text-sm font-medium" style={{ color: '#92400e' }}>
+   314→                Ces infos seront visibles en cas d&apos;urgence.
+   315→              </p>
+   316→            </div>
+   317→
+   318→            {/* QR Code field (readonly, auto-detected) */}
+   319→            <div className="mb-4">
+   320→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   321→                QR Code *
+   322→              </label>
+   323→              <input
+   324→                type="text"
+   325→                value={code}
+   326→                readOnly
+   327→                className={`${inputNormalClass} bg-gray-200 cursor-not-allowed text-gray-600`}
+   328→                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   329→              />
+   330→              {qrCode && (
+   331→                <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+   332→                  Code détecté automatiquement depuis l&apos;URL
+   333→                </p>
+   334→              )}
+   335→            </div>
+   336→
+   337→            {/* Photo upload (circular preview) */}
+   338→            <div className="mb-4">
+   339→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   340→                Photo
+   341→              </label>
+   342→              <div className="flex items-center gap-4">
+   343→                <button
+   344→                  type="button"
+   345→                  onClick={() => photoInputRef.current?.click()}
+   346→                  className="w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center shrink-0 transition-colors hover:border-black"
+   347→                  style={{
+   348→                    borderColor: photoPreview ? '#10b981' : INPUT_BORDER,
+   349→                    backgroundColor: photoPreview ? 'transparent' : INPUT_BG,
+   350→                    overflow: 'hidden',
+   351→                  }}
+   352→                >
+   353→                  {photoPreview ? (
+   354→                    <img
+   355→                      src={photoPreview}
+   356→                      alt="Photo du pèlerin"
+   357→                      className="w-full h-full object-cover"
+   358→                    />
+   359→                  ) : (
+   360→                    <Upload className="w-6 h-6" style={{ color: MUTED }} />
+   361→                  )}
+   362→                </button>
+   363→                <div>
+   364→                  <p className="text-sm font-medium" style={{ color: TEXT }}>
+   365→                    Cliquez pour ajouter
+   366→                  </p>
+   367→                  <p className="text-xs" style={{ color: MUTED }}>
+   368→                    JPG, PNG — max 10 Mo
+   369→                  </p>
+   370→                </div>
+   371→                <input
+   372→                  ref={photoInputRef}
+   373→                  type="file"
+   374→                  accept="image/*"
+   375→                  onChange={handlePhotoChange}
+   376→                  className="hidden"
+   377→                />
+   378→              </div>
+   379→            </div>
+   380→
+   381→            {/* Prénom */}
+   382→            <div className="mb-4">
+   383→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   384→                Prénom *
+   385→              </label>
+   386→              <input
+   387→                type="text"
+   388→                value={firstName}
+   389→                onChange={(e) => setFirstName(e.target.value)}
+   390→                placeholder="Ex: Ahmed"
+   391→                className={errors.firstName ? inputErrorClass : inputNormalClass}
+   392→                style={errors.firstName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   393→              />
+   394→            </div>
+   395→
+   396→            {/* Nom */}
+   397→            <div className="mb-4">
+   398→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   399→                Nom *
+   400→              </label>
+   401→              <input
+   402→                type="text"
+   403→                value={lastName}
+   404→                onChange={(e) => setLastName(e.target.value)}
+   405→                placeholder="Ex: Diop"
+   406→                className={errors.lastName ? inputErrorClass : inputNormalClass}
+   407→                style={errors.lastName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   408→              />
+   409→            </div>
+   410→
+   411→            {/* Âge */}
+   412→            <div className="mb-6">
+   413→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   414→                Âge
+   415→              </label>
+   416→              <input
+   417→                type="number"
+   418→                value={age}
+   419→                onChange={(e) => setAge(e.target.value)}
+   420→                placeholder="Ex: 65"
+   421→                min="0"
+   422→                max="150"
+   423→                className={inputNormalClass}
+   424→                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   425→              />
+   426→              <p className="text-xs mt-1" style={{ color: MUTED }}>
+   427→                Optionnel
+   428→              </p>
+   429→            </div>
+   430→
+   431→            {/* Suivant button */}
+   432→            <button
+   433→              type="button"
+   434→              onClick={() => goToStep(2)}
+   435→              className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   436→              style={{ background: BTN_PRIMARY }}
+   437→            >
+   438→              Suivant <ChevronRight className="w-5 h-5" />
+   439→            </button>
+   440→          </div>
+   441→        )}
+   442→
+   443→        {/* ═══ STEP 2: Informations Médicales ═══ */}
+   444→        {step === 2 && (
+   445→          <div
+   446→            className="rounded-[20px] p-6 shadow-lg mb-4"
+   447→            style={{ background: CARD_BG }}
+   448→          >
+   449→            <div className="text-lg font-bold mb-4 flex items-center gap-2">
+   450→              <Heart className="w-5 h-5" />
+   451→              Informations Médicales
+   452→            </div>
+   453→
+   454→            {/* Groupe Sanguin */}
+   455→            <div className="mb-4">
+   456→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   457→                Groupe Sanguin *
+   458→              </label>
+   459→              <select
+   460→                value={bloodType}
+   461→                onChange={(e) => setBloodType(e.target.value)}
+   462→                className={errors.bloodType ? inputErrorClass : inputNormalClass}
+   463→                style={
+   464→                  errors.bloodType
+   465→                    ? undefined
+   466→                    : {
+   467→                        backgroundColor: INPUT_BG,
+   468→                        borderColor: INPUT_BORDER,
+   469→                        appearance: 'none',
+   470→                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+   471→                        backgroundRepeat: 'no-repeat',
+   472→                        backgroundPosition: 'right 16px center',
+   473→                      }
+   474→                }
+   475→              >
+   476→                <option value="">Sélectionnez...</option>
+   477→                {BLOOD_TYPES.map((bt) => (
+   478→                  <option key={bt} value={bt}>
+   479→                    {bt}
+   480→                  </option>
+   481→                ))}
+   482→              </select>
+   483→            </div>
+   484→
+   485→            {/* Allergies & Maladies Chroniques */}
+   486→            <div className="mb-6">
+   487→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   488→                Allergies &amp; Maladies Chroniques
+   489→              </label>
+   490→              <textarea
+   491→                value={medicalInfo}
+   492→                onChange={(e) => setMedicalInfo(e.target.value)}
+   493→                placeholder="Ex: Allergie à la pénicilline, diabète type 2, hypertension..."
+   494→                rows={4}
+   495→                className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
+   496→                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   497→              />
+   498→              <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+   499→                Ces infos seront visibles par les secours.
+   500→              </p>
+   501→            </div>
+   502→
+   503→            {/* Action buttons */}
+   504→            <div className="flex gap-3">
+   505→              <button
+   506→                type="button"
+   507→                onClick={() => {
+   508→                  setStep(1);
+   509→                  window.scrollTo({ top: 0, behavior: 'smooth' });
+   510→                }}
+   511→                className="flex-1 py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors"
+   512→              >
+   513→                <ChevronLeft className="w-5 h-5" /> Précédent
+   514→              </button>
+   515→              <button
+   516→                type="button"
+   517→                onClick={() => goToStep(3)}
+   518→                className="flex-[2] py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   519→                style={{ background: BTN_PRIMARY }}
+   520→              >
+   521→                Suivant <ChevronRight className="w-5 h-5" />
+   522→              </button>
+   523→            </div>
+   524→          </div>
+   525→        )}
+   526→
+   527→        {/* ═══ STEP 3: Logement & Contacts ═══ */}
+   528→        {step === 3 && (
+   529→          <div
+   530→            className="rounded-[20px] p-6 shadow-lg mb-4"
+   531→            style={{ background: CARD_BG }}
+   532→          >
+   533→            <div className="text-lg font-bold mb-4 flex items-center gap-2">
+   534→              <Building2 className="w-5 h-5" />
+   535→              Logement &amp; Contacts
+   536→            </div>
+   537→
+   538→            {/* Nom de l'Hôtel */}
+   539→            <div className="mb-4">
+   540→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   541→                Nom de l&apos;Hôtel Actuel *
+   542→              </label>
+   543→              <input
+   544→                type="text"
+   545→                value={hotelName}
+   546→                onChange={(e) => setHotelName(e.target.value)}
+   547→                placeholder="Ex: Hilton Suites Makkah"
+   548→                className={errors.hotelName ? inputErrorClass : inputNormalClass}
+   549→                style={errors.hotelName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   550→              />
+   551→            </div>
+   552→
+   553→            {/* Ville */}
+   554→            <div className="mb-4">
+   555→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   556→                Ville *
+   557→              </label>
+   558→              <select
+   559→                value={city}
+   560→                onChange={(e) => setCity(e.target.value)}
+   561→                className={inputNormalClass}
+   562→                style={{
+   563→                  backgroundColor: INPUT_BG,
+   564→                  borderColor: INPUT_BORDER,
+   565→                  appearance: 'none',
+   566→                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+   567→                  backgroundRepeat: 'no-repeat',
+   568→                  backgroundPosition: 'right 16px center',
+   569→                }}
+   570→              >
+   571→                {CITIES.map((c) => (
+   572→                  <option key={c.value} value={c.value}>
+   573→                    {c.label}
+   574→                  </option>
+   575→                ))}
+   576→              </select>
+   577→            </div>
+   578→
+   579→            {/* N° Chambre */}
+   580→            <div className="mb-4">
+   581→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   582→                N° Chambre *
+   583→              </label>
+   584→              <input
+   585→                type="text"
+   586→                value={roomNumber}
+   587→                onChange={(e) => setRoomNumber(e.target.value)}
+   588→                placeholder="Ex: 412"
+   589→                className={errors.roomNumber ? inputErrorClass : inputNormalClass}
+   590→                style={errors.roomNumber ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   591→              />
+   592→            </div>
+   593→
+   594→            {/* WhatsApp Chef de Groupe */}
+   595→            <div className="mb-4">
+   596→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   597→                WhatsApp Chef de Groupe *
+   598→              </label>
+   599→              <input
+   600→                type="tel"
+   601→                value={leaderPhone}
+   602→                onChange={(e) => setLeaderPhone(e.target.value)}
+   603→                placeholder="+221 77 123 45 67"
+   604→                className={errors.leaderPhone ? inputErrorClass : inputNormalClass}
+   605→                style={errors.leaderPhone ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   606→              />
+   607→              <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+   608→                Ce numéro recevra les alertes d&apos;urgence
+   609→              </p>
+   610→            </div>
+   611→
+   612→            {/* Deferred Activation */}
+   613→            <div className="mb-4">
+   614→              <div className="flex items-center gap-3 mb-3">
+   615→                <label className="relative inline-flex items-center cursor-pointer">
+   616→                  <input
+   617→                    type="checkbox"
+   618→                    checked={deferredActivation}
+   619→                    onChange={(e) => setDeferredActivation(e.target.checked)}
+   620→                    className="sr-only peer"
+   621→                  />
+   622→                  <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-black/20 rounded-full peer peer-checked:bg-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+   623→                </label>
+   624→                <div>
+   625→                  <p className="text-sm font-semibold" style={{ color: TEXT }}>Activation différée</p>
+   626→                  <p className="text-xs" style={{ color: MUTED }}>Choisir une date d&apos;activation future</p>
+   627→                </div>
+   628→              </div>
+   629→              {deferredActivation && (
+   630→                <div>
+   631→                  <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   632→                    Date d&apos;activation *
+   633→                  </label>
+   634→                  <input
+   635→                    type="date"
+   636→                    value={activationDate}
+   637→                    onChange={(e) => setActivationDate(e.target.value)}
+   638→                    min={new Date().toISOString().split('T')[0]}
+   639→                    className={inputNormalClass}
+   640→                    style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   641→                  />
+   642→                  <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+   643→                    Les 60 jours commenceront à partir de cette date
+   644→                  </p>
+   645→                </div>
+   646→              )}
+   647→            </div>
+   648→
+   649→            {/* Téléphone Famille */}
+   650→            <div className="mb-6">
+   651→              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+   652→                Téléphone Famille (Pays)
+   653→              </label>
+   654→              <input
+   655→                type="tel"
+   656→                value={familyPhone}
+   657→                onChange={(e) => setFamilyPhone(e.target.value)}
+   658→                placeholder="+221 33 800 00 00"
+   659→                className={inputNormalClass}
+   660→                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+   661→              />
+   662→              <p className="text-xs mt-1" style={{ color: MUTED }}>
+   663→                Optionnel
+   664→              </p>
+   665→            </div>
+   666→
+   667→            {/* Action buttons */}
+   668→            <div className="flex gap-3">
+   669→              <button
+   670→                type="button"
+   671→                onClick={() => {
+   672→                  setStep(2);
+   673→                  window.scrollTo({ top: 0, behavior: 'smooth' });
+   674→                }}
+   675→                className="flex-1 py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors"
+   676→              >
+   677→                <ChevronLeft className="w-5 h-5" /> Précédent
+   678→              </button>
+   679→              <button
+   680→                type="submit"
+   681→                disabled={loading}
+   682→                className="flex-[2] py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+   683→                style={{ background: BTN_PRIMARY }}
+   684→              >
+   685→                {loading ? (
+   686→                  <>
+   687→                    <Loader2 className="w-5 h-5 animate-spin" />
+   688→                    Activation...
+   689→                  </>
+   690→                ) : (
+   691→                  <>
+   692→                    <CheckCircle className="w-5 h-5" />
+   693→                    Activer le Bracelet
+   694→                  </>
+   695→                )}
+   696→              </button>
+   697→            </div>
+   698→          </div>
+   699→        )}
+   700→      </form>
+   701→
+   702→      {/* ─── Sticky Footer ─── */}
+   703→      <footer className="mt-auto pt-8 pb-4 text-center text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+   704→        Propulsé par <strong>PassHajj</strong> ·{' '}
+   705→        <Link href="/select" className="text-black font-semibold underline">
+   706→          Changer de produit
+   707→        </Link>
+   708→      </footer>
+   709→    </main>
+   710→  );
+   711→}
+   712→
+   713→// ─── Page export (with Suspense boundary for useSearchParams) ───
+   714→export default function IdentityActivatePage() {
+   715→  return (
+   716→    <Suspense
+   717→      fallback={
+   718→        <main
+   719→          className="min-h-screen flex items-center justify-center"
+   720→          style={{ background: BG }}
+   721→        >
+   722→          <div className="text-center">
+   723→            <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full mx-auto mb-4" />
+   724→            <p className="text-black font-medium">Chargement...</p>
+   725→          </div>
+   726→        </main>
+   727→      }
+   728→    >
+   729→      <IdentityActivateContent />
+   730→    </Suspense>
+   731→  );
+   732→}
+   733→

@@ -150,7 +150,7 @@ export default function GenererQRPage() {
       }
 
       const contentDisposition = exportResponse.headers.get('Content-Disposition');
-      let filename = 'QRPass-export.zip';
+      let filename = 'PassHajj-export.zip';
       if (contentDisposition) {
         const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?([^;]+)/i) ||
                       contentDisposition.match(/filename="?([^"]+)"?/);

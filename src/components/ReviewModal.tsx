@@ -15,7 +15,7 @@ const LABELS: Record<string, { title: string; placeholder: string; submit: strin
   fr: {
     heading: 'Laisser un avis',
     title: 'Titre (optionnel)',
-    placeholder: 'Partagez votre expérience avec QRPass...',
+    placeholder: 'Partagez votre expérience avec PassHajj...',
     submit: 'Envoyer mon avis',
     success: 'Merci ! Votre avis sera publié après vérification.',
     error: 'Erreur lors de l\'envoi. Réessayez.',
@@ -25,7 +25,7 @@ const LABELS: Record<string, { title: string; placeholder: string; submit: strin
   en: {
     heading: 'Leave a review',
     title: 'Title (optional)',
-    placeholder: 'Share your experience with QRPass...',
+    placeholder: 'Share your experience with PassHajj...',
     submit: 'Submit review',
     success: 'Thank you! Your review will be published after verification.',
     error: 'Error submitting. Please try again.',
@@ -35,7 +35,7 @@ const LABELS: Record<string, { title: string; placeholder: string; submit: strin
   ar: {
     heading: 'اترك تقييم',
     title: 'العنوان (اختياري)',
-    placeholder: 'شارك تجربتك مع QRPass...',
+    placeholder: 'شارك تجربتك مع PassHajj...',
     submit: 'إرسال التقييم',
     success: 'شكراً! سيتم نشر تقييمك بعد التحقق.',
     error: 'خطأ في الإرسال. حاول مرة أخرى.',

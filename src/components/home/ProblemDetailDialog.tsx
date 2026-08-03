@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -279,6 +280,7 @@ export default function ProblemDetailDialog({ open, onOpenChange, type, lang: la
               background: `${BRAND}10`,
             }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
+              <Image src="/logo.png" alt="PassHajj" width={100} height={38} style={{ objectFit: 'contain', marginBottom: '10px' }} />
               <span style={{ fontSize: '44px', display: 'block', marginBottom: '10px' }}>{config.icon}</span>
               <h2 style={{
                 fontSize: '22px', fontWeight: 900, color: '#fff',

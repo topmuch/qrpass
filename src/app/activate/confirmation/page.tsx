@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CheckCircle, Info } from 'lucide-react';
 
 // ─── Brand constants ───
@@ -246,7 +247,7 @@ function ConfirmationContent() {
 
       {/* Logo */}
       <div className="text-2xl font-extrabold tracking-tight text-black mb-4">
-        <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+        <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
       </div>
 
       {/* Card */}

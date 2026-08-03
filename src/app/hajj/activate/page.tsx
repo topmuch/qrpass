@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PhoneInput from '@/components/ui/PhoneInput';
@@ -247,7 +248,7 @@ function HajjActivateContent() {
       <div className="w-full max-w-[420px] flex items-center justify-between mb-6">
         <div>
           <div className="text-2xl font-extrabold tracking-tight text-black">
-            <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
           </div>
           <div className="text-sm mt-1" style={{ color: MUTED }}>
             Activez votre bagage en 2 minutes

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import PhoneInput from '@/components/ui/PhoneInput';
 import { Camera, Globe, CheckCircle, Loader2, Luggage } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 // ─── Brand constants (original yellow) ───
 const BG = '#f4b400';
@@ -411,7 +412,7 @@ function BaggageActivateContent() {
       <div className="w-full max-w-[480px] flex items-center justify-between mb-6 animate-[fadeInDown_0.5s_ease]">
         <div>
           <div className="text-[28px] font-extrabold tracking-tight text-black">
-            <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
           </div>
           <div className="text-sm mt-1 text-black/60">{t.subtitle}</div>
         </div>

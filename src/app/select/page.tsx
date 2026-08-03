@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import Image from 'next/image';
 
 /* ─── Animation keyframes ─── */
 const animationStyles = `
@@ -121,9 +122,8 @@ function SelectPageInner() {
 
       {/* ─── Header ─── */}
       <header className="w-full px-4 pt-6 pb-2 anim-fade-in-down">
-        <div className="max-w-3xl mx-auto flex items-center justify-center gap-2">
-          <span className="font-bold text-xl tracking-tight" style={{ color: '#1e3a8a' }}>Pass</span>
-          <span className="font-bold text-xl tracking-tight" style={{ color: '#f4b400' }}>Hajj</span>
+        <div className="max-w-3xl mx-auto flex items-center justify-center">
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
         </div>
         <p className="text-center mt-2 text-sm font-medium anim-fade-in" style={{ color: '#64748b' }}>Activez votre protection</p>
       </header>

@@ -408,7 +408,7 @@ export default function AssistancePage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-slate-800 dark:text-white">Support QRPass</h3>
+                        <h3 className="font-semibold text-slate-800 dark:text-white">Support PassHajj</h3>
                         <span className="px-2 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-700">
                           Réponse
                         </span>

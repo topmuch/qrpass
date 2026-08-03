@@ -3,6 +3,7 @@
 import { useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { toast } from '@/hooks/use-toast';
 import {
   ChevronRight,
@@ -268,7 +269,7 @@ function IdentityActivateContent() {
       {/* ─── Header / Logo ─── */}
       <div className="w-full max-w-[420px] mb-5">
         <div className="text-2xl font-extrabold tracking-tight text-black">
-          <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
         </div>
         <p className="text-sm mt-1" style={{ color: MUTED }}>
           Bracelet d&apos;Urgence &amp; Identification

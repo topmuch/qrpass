@@ -73,14 +73,14 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
       { value: '99.9%', label: 'Disponibilité' },
     ],
     testimonials: [
-      { name: 'Fatou Diallo', role: 'Agence Hajj Express', text: 'QRPass a transformé notre gestion de bagages. Zéro perte depuis 2 ans.' },
+      { name: 'Fatou Diallo', role: 'Agence Hajj Express', text: 'PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.' },
       { name: 'Moussa Koné', role: 'Voyages Sahel', text: 'Le dashboard est simple et efficace. Nos clients sont rassurés.' },
     ],
   },
   superadmin: {
     type: 'superadmin',
     title: 'Administration',
-    subtitle: 'Accès réservé aux administrateurs de la plateforme QRPass',
+    subtitle: 'Accès réservé aux administrateurs de la plateforme PassHajj',
     demoEmail: 'admin@qrpass.com',
     demoPassword: 'admin123',
     demoLabel: 'SuperAdmin',
@@ -100,7 +100,7 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
       { value: '99.9%', label: 'Disponibilité' },
     ],
     testimonials: [
-      { name: 'Fatou Diallo', role: 'Agence Hajj Express', text: 'QRPass a transformé notre gestion de bagages. Zéro perte depuis 2 ans.' },
+      { name: 'Fatou Diallo', role: 'Agence Hajj Express', text: 'PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.' },
       { name: 'Moussa Koné', role: 'Voyages Sahel', text: 'Le dashboard est simple et efficace. Nos clients sont rassurés.' },
     ],
   },
@@ -203,7 +203,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           <div className="flex items-center justify-between">
             <Link href="/" className="group">
               <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm p-2 border border-white/10 flex items-center justify-center group-hover:bg-white/15 transition-all">
-                <img src="/logo.png" alt="QRPass" className="w-full h-full object-contain" />
+                <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain" />
               </div>
             </Link>
           </div>
@@ -285,7 +285,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center mb-10">
             <div className="w-20 h-20 rounded-2xl bg-slate-900 p-2.5 flex items-center justify-center">
-              <img src="/logo.png" alt="QRPass" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain" />
             </div>
           </div>
 

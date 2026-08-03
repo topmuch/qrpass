@@ -214,8 +214,8 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
         {/* ─── Header ─── */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <div className="text-2xl font-extrabold tracking-tight text-black">
-              <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+            <div className="flex items-center">
+              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
             </div>
             <div className="text-sm mt-1" style={{ color: MUTED }}>
               {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}

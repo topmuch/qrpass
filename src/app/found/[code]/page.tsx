@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Luggage, UserCircle, AlertCircle, Loader2, Globe, ChevronRight, Shield } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import Image from 'next/image';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
 
 // ─── Brand constants (PassHajj palette: yellow #f4b400 + white cards + black buttons) ───
@@ -123,10 +124,8 @@ export default function FoundSelectorPage() {
     <div dir={dir} className="min-h-screen flex flex-col" style={{ background: BRAND }}>
       {/* ─── Header ─── */}
       <div className="w-full flex items-center justify-between px-5 pt-4 pb-2">
-        <div>
-          <div className="text-2xl font-extrabold tracking-tight text-black">
-            <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
-          </div>
+        <div className="flex items-center">
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
         </div>
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
@@ -143,7 +142,7 @@ export default function FoundSelectorPage() {
               className="flex flex-col items-center gap-4"
             >
               <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full" />
-              <p className="text-lg font-medium text-black">QRPass…</p>
+              <p className="text-lg font-medium text-black">PassHajj…</p>
             </motion.div>
           )}
 

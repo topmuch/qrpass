@@ -423,7 +423,7 @@ export default function DashboardPage() {
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Tableau de bord</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Vue d'ensemble de votre activité QRPass</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Vue d'ensemble de votre activité PassHajj</p>
       </div>
 
       {/* Quick Actions */}
