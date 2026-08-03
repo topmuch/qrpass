@@ -559,7 +559,7 @@ export default function HomePage() {
           <div className="hk-hero-inner">
             <div className="hk-hero-text">
               <div className="hk-hero-badge">
-                🛡️ HAKK — {t('landing.hero.badge', { defaultValue: 'Sécurité Intelligente' })}
+                🛡️ Passeport pour la Mecque
               </div>
               <h1 dangerouslySetInnerHTML={{
                 __html: lang === 'ar'
@@ -571,7 +571,7 @@ export default function HomePage() {
               <p>{t('landing.hero.subtitle')}</p>
               <div className="hk-hero-actions">
                 <Link href="/select" className="hk-hero-btn hk-hero-btn-primary">
-                  🛡️ {t('landing.hero.ctaPrimary')}
+                  ✈️ {t('landing.hero.ctaPrimary')}
                 </Link>
                 <a href="#produits" className="hk-hero-btn hk-hero-btn-secondary">
                   {t('landing.hero.ctaSecondary')}
