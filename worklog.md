@@ -59,3 +59,46 @@ Stage Summary:
 - Finder page now shows hotel address, phone, and "Déposer à l'hôtel" Google Maps button
 - White thank-you text below "BAGAGE TROUVÉ" header
 - Activation pages include hotel address and phone input fields
+---
+Task ID: 3
+Agent: Main
+Task: Develop rich detail pages for 3 problem cards (Bagages perdus, Pèlerins âgés, Urgences médicales)
+
+Work Log:
+- Created `/src/components/home/ProblemDetailDialog.tsx` - reusable dialog component with:
+  - Hero banner with gradient navy background and decorative circles
+  - Stats section (grid of stat cards with value/label)
+  - Scenarios section (real-world situations with icons)
+  - Solution section (HAKK product solution with feature checklist)
+  - Steps section (numbered step-by-step process)
+  - Example section (real concrete example with highlighted border)
+  - CTA section (navy gradient with activation button)
+  - Custom scrollbar, scroll-to-top on open, RTL support
+  - `lang` prop for proper language sync with parent component
+- Added comprehensive i18n translations for all 3 detail pages in 3 languages:
+  - `public/locales/fr.json` - French translations (problemDetail.bagages, .personnes, .urgences)
+  - `public/locales/en.json` - English translations
+  - `public/locales/ar.json` - Arabic translations
+- Updated homepage `/src/app/page.tsx`:
+  - Added `problemDialog` state for managing which dialog is open
+  - Made all 3 problem cards clickable with `role="button"`, `tabIndex`, keyboard support
+  - Added "En savoir plus →" / "Learn more →" / "← المزيد" link on each card
+  - Added CSS for `.hk-problem--clickable` (cursor, hover border, focus-visible outline)
+  - Added CSS for `.hk-problem-more` (gold link with arrow animation on hover)
+  - Dynamically imported ProblemDetailDialog with `next/dynamic` (ssr: false)
+  - Passed `lang` prop to ensure correct language in CTA buttons
+- Verified with Agent Browser:
+  - All 3 dialogs open correctly with full content
+  - French: "En savoir plus →" on cards, full FR content in dialogs
+  - English: "Learn more →" on cards, full EN content in dialogs
+  - Arabic: "← المزيد" on cards, full AR content with RTL in dialogs
+  - Mobile (390x844): responsive layout, hamburger menu, dialogs work
+  - Desktop (1920x1080): all working correctly
+  - No runtime errors in dev.log
+
+Stage Summary:
+- 3 rich detail pages implemented as Dialog modals (Bagages perdus, Pèlerins âgés, Urgences médicales)
+- Each page includes: stats, scenarios, HAKK solution, step-by-step, example, and CTA
+- Full i18n support (FR/EN/AR with RTL)
+- Accessible (keyboard navigation, ARIA roles, focus-visible)
+- Responsive (mobile/tablet/desktop tested)

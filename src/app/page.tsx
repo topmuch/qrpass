@@ -5,11 +5,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { Language } from '@/lib/i18n';
+import dynamic from 'next/dynamic';
+
+const ProblemDetailDialog = dynamic(
+  () => import('@/components/home/ProblemDetailDialog'),
+  { ssr: false }
+);
 
 export default function HomePage() {
   const { t, lang, setLang, dir } = useTranslation();
   const mainRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [problemDialog, setProblemDialog] = useState<'bagages' | 'personnes' | 'urgences' | null>(null);
 
   const cycleLang = () => {
     const next: Record<Language, Language> = { fr: 'en', en: 'ar', ar: 'fr' };
@@ -283,6 +290,15 @@ export default function HomePage() {
         }
         .hk-problem h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
         .hk-problem p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+        .hk-problem--clickable { cursor: pointer; outline: none; }
+        .hk-problem--clickable:hover { border: 1px solid var(--brand); }
+        .hk-problem--clickable:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+        .hk-problem-more {
+          display: inline-flex; align-items: center; gap: 4px;
+          margin-top: 12px; font-size: 13px; font-weight: 700;
+          color: var(--brand-dark); transition: gap 0.2s;
+        }
+        .hk-problem--clickable:hover .hk-problem-more { gap: 8px; }
 
         /* ─── PRODUCTS ─── */
         .hk-products-grid {
@@ -622,22 +638,30 @@ export default function HomePage() {
               <p className="hk-subtitle reveal">{t('landing.problem.subtitle')}</p>
             </div>
             <div className="hk-problems-grid">
-              <div className="hk-problem reveal">
+              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('bagages')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('bagages'); }}>
                 <div className="hk-problem-icon">🧳</div>
                 <h3>{t('landing.problem.p1Title')}</h3>
                 <p>{t('landing.problem.p1Desc')}</p>
+                <span className="hk-problem-more">{lang === 'ar' ? '← المزيد' : lang === 'en' ? 'Learn more →' : 'En savoir plus →'}</span>
               </div>
-              <div className="hk-problem reveal">
+              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('personnes')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('personnes'); }}>
                 <div className="hk-problem-icon">👴</div>
                 <h3>{t('landing.problem.p2Title')}</h3>
                 <p>{t('landing.problem.p2Desc')}</p>
+                <span className="hk-problem-more">{lang === 'ar' ? '← المزيد' : lang === 'en' ? 'Learn more →' : 'En savoir plus →'}</span>
               </div>
-              <div className="hk-problem reveal">
+              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('urgences')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('urgences'); }}>
                 <div className="hk-problem-icon">🏥</div>
                 <h3>{t('landing.problem.p3Title')}</h3>
                 <p>{t('landing.problem.p3Desc')}</p>
+                <span className="hk-problem-more">{lang === 'ar' ? '← المزيد' : lang === 'en' ? 'Learn more →' : 'En savoir plus →'}</span>
               </div>
             </div>
+
+            {/* Problem Detail Dialogs */}
+            <ProblemDetailDialog open={problemDialog === 'bagages'} onOpenChange={(o) => setProblemDialog(o ? 'bagages' : null)} type="bagages" lang={lang} />
+            <ProblemDetailDialog open={problemDialog === 'personnes'} onOpenChange={(o) => setProblemDialog(o ? 'personnes' : null)} type="personnes" lang={lang} />
+            <ProblemDetailDialog open={problemDialog === 'urgences'} onOpenChange={(o) => setProblemDialog(o ? 'urgences' : null)} type="urgences" lang={lang} />
           </div>
         </section>
 

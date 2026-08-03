@@ -1,0 +1,877 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useRef, useState } from 'react';
+     4→import Image from 'next/image';
+     5→import Link from 'next/link';
+     6→import { useTranslation } from '@/hooks/useTranslation';
+     7→import type { Language } from '@/lib/i18n';
+     8→
+     9→export default function HomePage() {
+    10→  const { t, lang, setLang, dir } = useTranslation();
+    11→  const mainRef = useRef<HTMLDivElement>(null);
+    12→  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    13→
+    14→  const cycleLang = () => {
+    15→    const next: Record<Language, Language> = { fr: 'en', en: 'ar', ar: 'fr' };
+    16→    setLang(next[lang]);
+    17→  };
+    18→
+    19→  const langLabels: Record<Language, string> = { fr: 'FR', en: 'EN', ar: 'AR' };
+    20→
+    21→  /* Scroll-reveal animation */
+    22→  useEffect(() => {
+    23→    if (!mainRef.current) return;
+    24→    const els = mainRef.current.querySelectorAll<HTMLElement>('.reveal');
+    25→    els.forEach((el) => {
+    26→      el.style.opacity = '0';
+    27→      el.style.transform = 'translateY(30px)';
+    28→      el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    29→    });
+    30→
+    31→    const observer = new IntersectionObserver(
+    32→      (entries) => {
+    33→        entries.forEach((entry) => {
+    34→          if (entry.isIntersecting) {
+    35→            entry.target.style.opacity = '1';
+    36→            entry.target.style.transform = 'translateY(0)';
+    37→            observer.unobserve(entry.target);
+    38→          }
+    39→        });
+    40→      },
+    41→      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' },
+    42→    );
+    43→
+    44→    els.forEach((el) => observer.observe(el));
+    45→    return () => observer.disconnect();
+    46→  }, []);
+    47→
+    48→  return (
+    49→    <div lang={lang} dir={dir} ref={mainRef} className="min-h-screen flex flex-col">
+    50→      <style>{`
+    51→        :root {
+    52→          --brand: #f4b400;
+    53→          --brand-dark: #d49b00;
+    54→          --brand-light: #fff8e1;
+    55→          --navy: #0c1d3a;
+    56→          --navy-light: #1e3a5f;
+    57→          --ink: #0f172a;
+    58→          --muted: #64748b;
+    59→          --surface: #ffffff;
+    60→          --surface-alt: #f8fafc;
+    61→          --success: #10b981;
+    62→          --danger: #ef4444;
+    63→          --radius: 16px;
+    64→          --radius-sm: 10px;
+    65→          --shadow: 0 4px 16px rgba(0,0,0,0.06);
+    66→          --shadow-lg: 0 12px 40px rgba(12,29,58,0.12);
+    67→        }
+    68→        html { scroll-behavior: smooth; }
+    69→
+    70→        .hk * { box-sizing: border-box; margin: 0; padding: 0; }
+    71→        .hk {
+    72→          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Arabic", sans-serif;
+    73→          color: var(--ink);
+    74→          line-height: 1.6;
+    75→          overflow-x: hidden;
+    76→          background: var(--surface);
+    77→        }
+    78→
+    79→        /* ─── HEADER ─── */
+    80→        .hk-header {
+    81→          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    82→          background: rgba(255,255,255,0.97); backdrop-filter: blur(12px);
+    83→          padding: 0 24px; height: 64px;
+    84→          display: flex; justify-content: space-between; align-items: center;
+    85→          border-bottom: 1px solid rgba(0,0,0,0.06);
+    86→          box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    87→        }
+    88→        .hk-logo {
+    89→          font-size: 24px; font-weight: 900; letter-spacing: -0.5px;
+    90→          color: var(--navy);
+    91→        }
+    92→        .hk-logo span { color: var(--brand); }
+    93→        .hk-nav { display: flex; gap: 8px; align-items: center; }
+    94→        .hk-nav-link {
+    95→          background: transparent; border: none; padding: 8px 14px;
+    96→          border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+    97→          cursor: pointer; color: var(--ink); transition: all 0.2s;
+    98→          text-decoration: none;
+    99→        }
+   100→        .hk-nav-link:hover { background: var(--brand-light); color: var(--navy); }
+   101→        .hk-btn-cta {
+   102→          background: var(--brand); color: var(--ink); border: none;
+   103→          padding: 8px 18px; border-radius: var(--radius-sm);
+   104→          font-size: 14px; font-weight: 700; cursor: pointer;
+   105→          transition: all 0.25s; text-decoration: none;
+   106→          box-shadow: 0 2px 8px rgba(244,180,0,0.3);
+   107→        }
+   108→        .hk-btn-cta:hover {
+   109→          transform: translateY(-1px);
+   110→          box-shadow: 0 4px 16px rgba(244,180,0,0.4);
+   111→        }
+   112→        .hk-lang {
+   113→          background: rgba(12,29,58,0.06); border: none;
+   114→          padding: 6px 10px; border-radius: 20px;
+   115→          font-size: 12px; font-weight: 700; cursor: pointer;
+   116→          color: var(--navy); transition: 0.2s;
+   117→        }
+   118→        .hk-lang:hover { background: rgba(12,29,58,0.12); }
+   119→        .hk-hamburger {
+   120→          display: none; background: none; border: none;
+   121→          width: 36px; height: 36px; cursor: pointer;
+   122→          color: var(--ink); font-size: 22px;
+   123→        }
+   124→        .hk-mobile-menu {
+   125→          display: none; position: fixed; top: 64px; left: 0; right: 0;
+   126→          background: #fff; border-bottom: 1px solid #e2e8f0;
+   127→          padding: 16px 24px; z-index: 99;
+   128→          box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+   129→          flex-direction: column; gap: 8px;
+   130→        }
+   131→        .hk-mobile-menu.open { display: flex; }
+   132→
+   133→        /* ─── HERO ─── */
+   134→        .hk-hero {
+   135→          position: relative; margin-top: 64px;
+   136→          min-height: 540px; display: flex; align-items: center;
+   137→          overflow: hidden;
+   138→        }
+   139→        .hk-hero-bg {
+   140→          position: absolute; inset: 0; z-index: 0;
+   141→        }
+   142→        .hk-hero-bg img {
+   143→          width: 100%; height: 100%; object-fit: cover;
+   144→        }
+   145→        .hk-hero-overlay {
+   146→          position: absolute; inset: 0; z-index: 1;
+   147→          background: linear-gradient(135deg, rgba(12,29,58,0.88) 0%, rgba(12,29,58,0.7) 40%, rgba(12,29,58,0.4) 100%);
+   148→        }
+   149→        .hk-hero-inner {
+   150→          position: relative; z-index: 2;
+   151→          max-width: 1200px; margin: 0 auto;
+   152→          padding: 60px 24px 60px;
+   153→          display: grid; grid-template-columns: 1fr 1fr;
+   154→          gap: 48px; align-items: center;
+   155→        }
+   156→        .hk-hero-text h1 {
+   157→          font-size: clamp(28px, 4.5vw, 46px);
+   158→          font-weight: 900; color: #fff;
+   159→          line-height: 1.15; margin-bottom: 20px;
+   160→          letter-spacing: -0.5px;
+   161→        }
+   162→        .hk-hero-text h1 em {
+   163→          font-style: normal; color: var(--brand);
+   164→        }
+   165→        .hk-hero-text p {
+   166→          font-size: 17px; color: rgba(255,255,255,0.88);
+   167→          max-width: 520px; margin-bottom: 32px; line-height: 1.7;
+   168→        }
+   169→        .hk-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+   170→        .hk-hero-btn {
+   171→          padding: 14px 28px; border-radius: 12px;
+   172→          font-size: 15px; font-weight: 700; cursor: pointer;
+   173→          border: none; transition: all 0.3s;
+   174→          text-decoration: none; display: inline-flex;
+   175→          align-items: center; gap: 8px;
+   176→        }
+   177→        .hk-hero-btn-primary {
+   178→          background: var(--brand); color: var(--ink);
+   179→          box-shadow: 0 4px 20px rgba(244,180,0,0.4);
+   180→        }
+   181→        .hk-hero-btn-primary:hover {
+   182→          transform: translateY(-3px);
+   183→          box-shadow: 0 8px 28px rgba(244,180,0,0.5);
+   184→        }
+   185→        .hk-hero-btn-secondary {
+   186→          background: rgba(255,255,255,0.12); color: #fff;
+   187→          border: 2px solid rgba(255,255,255,0.25);
+   188→          backdrop-filter: blur(4px);
+   189→        }
+   190→        .hk-hero-btn-secondary:hover {
+   191→          background: rgba(255,255,255,0.2);
+   192→          border-color: #fff;
+   193→        }
+   194→        .hk-hero-visual {
+   195→          display: flex; justify-content: center; align-items: center;
+   196→        }
+   197→        .hk-hero-visual img {
+   198→          width: 100%; max-width: 480px; border-radius: 20px;
+   199→          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+   200→          border: 3px solid rgba(255,255,255,0.15);
+   201→        }
+   202→        .hk-hero-badge {
+   203→          display: inline-flex; align-items: center; gap: 6px;
+   204→          background: rgba(244,180,0,0.15); color: var(--brand);
+   205→          padding: 6px 14px; border-radius: 20px;
+   206→          font-size: 13px; font-weight: 700; margin-bottom: 16px;
+   207→          border: 1px solid rgba(244,180,0,0.3);
+   208→        }
+   209→
+   210→        /* ─── STATS BAR ─── */
+   211→        .hk-stats {
+   212→          background: var(--navy); padding: 40px 24px;
+   213→          position: relative; overflow: hidden;
+   214→        }
+   215→        .hk-stats::before {
+   216→          content: ''; position: absolute; inset: 0;
+   217→          background: repeating-linear-gradient(
+   218→            90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px
+   219→          );
+   220→        }
+   221→        .hk-stats-inner {
+   222→          max-width: 1200px; margin: 0 auto; position: relative;
+   223→          display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+   224→        }
+   225→        .hk-stat {
+   226→          text-align: center; padding: 16px;
+   227→          border-radius: var(--radius-sm);
+   228→          background: rgba(255,255,255,0.06);
+   229→          border: 1px solid rgba(255,255,255,0.08);
+   230→        }
+   231→        .hk-stat-number {
+   232→          font-size: clamp(28px, 3vw, 40px); font-weight: 900;
+   233→          color: var(--brand); display: block; margin-bottom: 4px;
+   234→        }
+   235→        .hk-stat-label {
+   236→          font-size: 13px; color: rgba(255,255,255,0.7);
+   237→          font-weight: 500; line-height: 1.4;
+   238→        }
+   239→
+   240→        /* ─── SECTION COMMON ─── */
+   241→        .hk-section {
+   242→          padding: 80px 24px; max-width: 1200px; margin: 0 auto;
+   243→        }
+   244→        .hk-section-alt { background: var(--surface-alt); padding: 80px 24px; }
+   245→        .hk-section-alt-inner { max-width: 1200px; margin: 0 auto; }
+   246→        .hk-section-header { text-align: center; margin-bottom: 56px; }
+   247→        .hk-tag {
+   248→          display: inline-block; background: var(--brand-light);
+   249→          color: var(--navy); padding: 6px 16px;
+   250→          border-radius: 20px; font-size: 12px; font-weight: 800;
+   251→          text-transform: uppercase; letter-spacing: 0.8px;
+   252→          margin-bottom: 14px; border: 1px solid rgba(244,180,0,0.2);
+   253→        }
+   254→        .hk-title {
+   255→          font-size: clamp(26px, 4vw, 38px); font-weight: 900;
+   256→          color: var(--ink); margin-bottom: 14px;
+   257→          letter-spacing: -0.5px; line-height: 1.2;
+   258→        }
+   259→        .hk-subtitle {
+   260→          font-size: 16px; color: var(--muted);
+   261→          max-width: 640px; margin: 0 auto; line-height: 1.7;
+   262→        }
+   263→
+   264→        /* ─── PROBLEM ─── */
+   265→        .hk-problems-grid {
+   266→          display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+   267→        }
+   268→        .hk-problem {
+   269→          background: #fff; padding: 28px; border-radius: var(--radius);
+   270→          box-shadow: var(--shadow); position: relative;
+   271→          overflow: hidden; transition: all 0.3s;
+   272→        }
+   273→        .hk-problem:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+   274→        .hk-problem::before {
+   275→          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+   276→          background: var(--danger);
+   277→        }
+   278→        .hk-problem-icon {
+   279→          width: 52px; height: 52px;
+   280→          background: rgba(239,68,68,0.08); border-radius: 14px;
+   281→          display: flex; align-items: center; justify-content: center;
+   282→          font-size: 26px; margin-bottom: 18px;
+   283→        }
+   284→        .hk-problem h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+   285→        .hk-problem p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+   286→
+   287→        /* ─── PRODUCTS ─── */
+   288→        .hk-products-grid {
+   289→          display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+   290→        }
+   291→        .hk-product {
+   292→          background: #fff; border-radius: var(--radius);
+   293→          overflow: hidden; box-shadow: var(--shadow-lg);
+   294→          border: 1px solid #e2e8f0; transition: all 0.3s;
+   295→        }
+   296→        .hk-product:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(12,29,58,0.14); }
+   297→        .hk-product-top {
+   298→          padding: 32px; text-align: center; color: #fff;
+   299→          position: relative; overflow: hidden;
+   300→        }
+   301→        .hk-product-top--bagage {
+   302→          background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+   303→        }
+   304→        .hk-product-top--identity {
+   305→          background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+   306→        }
+   307→        .hk-product-top-icon { font-size: 48px; margin-bottom: 10px; display: block; }
+   308→        .hk-product-top h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+   309→        .hk-product-top p { font-size: 14px; opacity: 0.9; }
+   310→        .hk-product-body { padding: 28px; }
+   311→        .hk-product-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.7; }
+   312→        .hk-how-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--ink); }
+   313→        .hk-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+   314→        .hk-step-num {
+   315→          width: 28px; height: 28px; background: var(--brand); color: var(--ink);
+   316→          border-radius: 50%; display: flex; align-items: center;
+   317→          justify-content: center; font-weight: 800; font-size: 13px;
+   318→          flex-shrink: 0;
+   319→        }
+   320→        .hk-step-text { font-size: 14px; color: var(--muted); padding-top: 4px; }
+   321→        .hk-use-case {
+   322→          background: var(--surface-alt); padding: 16px;
+   323→          border-radius: 12px; border-left: 3px solid var(--brand);
+   324→          margin-top: 20px;
+   325→        }
+   326→        .hk-use-case h5 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+   327→        .hk-use-case p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+   328→        .hk-product-footer {
+   329→          padding: 20px 28px; border-top: 1px solid #e2e8f0;
+   330→        }
+   331→        .hk-product-btn {
+   332→          width: 100%; padding: 14px; border-radius: 12px;
+   333→          font-size: 15px; font-weight: 700; cursor: pointer;
+   334→          border: none; transition: all 0.25s;
+   335→          text-decoration: none; display: flex;
+   336→          align-items: center; justify-content: center; gap: 8px;
+   337→        }
+   338→        .hk-product-btn--bagage { background: var(--navy); color: #fff; }
+   339→        .hk-product-btn--bagage:hover { background: var(--navy-light); }
+   340→        .hk-product-btn--identity { background: #059669; color: #fff; }
+   341→        .hk-product-btn--identity:hover { background: #047857; }
+   342→
+   343→        /* ─── COMPARISON ─── */
+   344→        .hk-comparison-table {
+   345→          background: #fff; border-radius: var(--radius);
+   346→          overflow: hidden; box-shadow: var(--shadow);
+   347→        }
+   348→        .hk-comp-row {
+   349→          display: grid; grid-template-columns: 1.5fr 1fr 1fr;
+   350→          padding: 16px 24px; border-bottom: 1px solid #e2e8f0;
+   351→          align-items: center;
+   352→        }
+   353→        .hk-comp-row--header { background: var(--navy); color: #fff; font-weight: 700; }
+   354→        .hk-comp-row:last-child { border-bottom: none; }
+   355→        .hk-comp-cell { font-size: 14px; }
+   356→        .hk-comp-cell--yes { color: var(--success); font-weight: 700; }
+   357→        .hk-comp-cell--no { color: var(--danger); }
+   358→
+   359→        /* ─── HOW IT WORKS ─── */
+   360→        .hk-steps-grid {
+   361→          display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+   362→        }
+   363→        .hk-step-card {
+   364→          text-align: center; background: #fff;
+   365→          padding: 32px 24px; border-radius: var(--radius);
+   366→          box-shadow: var(--shadow); position: relative;
+   367→          transition: all 0.3s; border: 1px solid #e2e8f0;
+   368→        }
+   369→        .hk-step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+   370→        .hk-step-icon {
+   371→          width: 72px; height: 72px; margin: 0 auto 20px;
+   372→          background: linear-gradient(135deg, var(--navy), var(--navy-light));
+   373→          color: #fff; border-radius: 50%;
+   374→          display: flex; align-items: center; justify-content: center;
+   375→          font-size: 32px;
+   376→          box-shadow: 0 8px 24px rgba(12,29,58,0.2);
+   377→        }
+   378→        .hk-step-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+   379→        .hk-step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+   380→        .hk-step-connector {
+   381→          position: absolute; top: 50%; right: -18px;
+   382→          width: 36px; height: 36px; background: var(--brand);
+   383→          border-radius: 50%; display: flex; align-items: center;
+   384→          justify-content: center; font-size: 14px; color: var(--ink);
+   385→          font-weight: 800; z-index: 2;
+   386→          box-shadow: 0 4px 12px rgba(244,180,0,0.3);
+   387→        }
+   388→
+   389→        /* ─── TESTIMONIALS ─── */
+   390→        .hk-testimonials-grid {
+   391→          display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+   392→        }
+   393→        .hk-testimonial {
+   394→          background: #fff; padding: 28px; border-radius: var(--radius);
+   395→          box-shadow: var(--shadow); position: relative;
+   396→          border-top: 4px solid var(--brand); transition: all 0.3s;
+   397→        }
+   398→        .hk-testimonial:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+   399→        .hk-testimonial::before {
+   400→          content: '"'; font-size: 64px; color: var(--brand);
+   401→          opacity: 0.15; position: absolute; top: 8px; left: 18px;
+   402→          font-family: Georgia, serif; line-height: 1;
+   403→        }
+   404→        .hk-testimonial-text {
+   405→          font-size: 15px; line-height: 1.8; margin-bottom: 20px;
+   406→          font-style: italic; color: var(--ink); position: relative; z-index: 1;
+   407→        }
+   408→        .hk-testimonial-author { display: flex; align-items: center; gap: 12px; }
+   409→        .hk-avatar {
+   410→          width: 48px; height: 48px; border-radius: 50%;
+   411→          background: linear-gradient(135deg, var(--navy), var(--navy-light));
+   412→          display: flex; align-items: center; justify-content: center;
+   413→          color: #fff; font-weight: 800; font-size: 16px;
+   414→        }
+   415→        .hk-author-info h4 { font-size: 15px; font-weight: 700; }
+   416→        .hk-author-info p { font-size: 13px; color: var(--muted); }
+   417→
+   418→        /* ─── AGENCIES CTA ─── */
+   419→        .hk-agencies {
+   420→          background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+   421→          color: #fff; text-align: center;
+   422→          border-radius: var(--radius); padding: 64px 40px;
+   423→          margin: 80px auto; max-width: 1200px;
+   424→          position: relative; overflow: hidden;
+   425→        }
+   426→        .hk-agencies::before {
+   427→          content: ''; position: absolute; inset: 0;
+   428→          background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+   429→        }
+   430→        .hk-agencies h2 { font-size: 28px; font-weight: 800; margin-bottom: 16px; position: relative; }
+   431→        .hk-agencies p { font-size: 16px; opacity: 0.92; max-width: 600px; margin: 0 auto 28px; position: relative; }
+   432→        .hk-agencies-btn {
+   433→          background: var(--brand); color: var(--ink);
+   434→          padding: 16px 32px; border-radius: 12px;
+   435→          font-size: 16px; font-weight: 700; cursor: pointer;
+   436→          border: none; transition: all 0.3s;
+   437→          display: inline-flex; align-items: center; gap: 10px;
+   438→          text-decoration: none; position: relative;
+   439→          box-shadow: 0 4px 20px rgba(244,180,0,0.4);
+   440→        }
+   441→        .hk-agencies-btn:hover {
+   442→          transform: translateY(-3px);
+   443→          box-shadow: 0 8px 28px rgba(244,180,0,0.5);
+   444→        }
+   445→
+   446→        /* ─── FOOTER ─── */
+   447→        .hk-footer {
+   448→          background: var(--navy); color: rgba(255,255,255,0.6);
+   449→          padding: 60px 24px 30px; text-align: center;
+   450→          margin-top: auto;
+   451→        }
+   452→        .hk-footer-inner { max-width: 800px; margin: 0 auto; }
+   453→        .hk-footer-logo {
+   454→          font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 14px;
+   455→        }
+   456→        .hk-footer-logo span { color: var(--brand); }
+   457→        .hk-footer-links {
+   458→          display: flex; justify-content: center; gap: 24px;
+   459→          margin: 20px 0; flex-wrap: wrap;
+   460→        }
+   461→        .hk-footer-links a {
+   462→          color: rgba(255,255,255,0.6); text-decoration: none;
+   463→          font-size: 14px; transition: 0.2s;
+   464→        }
+   465→        .hk-footer-links a:hover { color: var(--brand); }
+   466→        .hk-footer-bottom {
+   467→          border-top: 1px solid rgba(255,255,255,0.1);
+   468→          padding-top: 24px; margin-top: 32px; font-size: 13px;
+   469→        }
+   470→
+   471→        /* ─── RTL ─── */
+   472→        [dir="rtl"] .hk { font-family: "Noto Sans Arabic", Tahoma, Arial, sans-serif; }
+   473→        [dir="rtl"] .hk-problem::before { left: auto; right: 0; }
+   474→        [dir="rtl"] .hk-use-case { border-left: none; border-right: 3px solid var(--brand); }
+   475→        [dir="rtl"] .hk-step-connector { right: auto; left: -18px; }
+   476→        [dir="rtl"] .hk-hero-inner { direction: rtl; }
+   477→        [dir="rtl"] .hk-hero-visual { order: -1; }
+   478→
+   479→        /* ─── RESPONSIVE ─── */
+   480→        @media (max-width: 1024px) {
+   481→          .hk-hero-inner { grid-template-columns: 1fr; text-align: center; }
+   482→          .hk-hero-text p { margin: 0 auto 32px; }
+   483→          .hk-hero-actions { justify-content: center; }
+   484→          .hk-hero-visual { display: none; }
+   485→          .hk-products-grid { grid-template-columns: 1fr; }
+   486→          .hk-problems-grid { grid-template-columns: 1fr; }
+   487→          .hk-steps-grid { grid-template-columns: 1fr; }
+   488→          .hk-testimonials-grid { grid-template-columns: 1fr; }
+   489→          .hk-stats-inner { grid-template-columns: repeat(2, 1fr); }
+   490→          .hk-step-connector { display: none; }
+   491→        }
+   492→        @media (max-width: 768px) {
+   493→          .hk-nav .hk-nav-link:not(.hk-btn-cta) { display: none; }
+   494→          .hk-hamburger { display: block; }
+   495→          .hk-comp-row { grid-template-columns: 1fr; gap: 8px; }
+   496→          .hk-comp-row--header { display: none; }
+   497→          .hk-hero { min-height: 420px; }
+   498→          .hk-hero-inner { padding: 40px 20px; }
+   499→          .hk-section { padding: 60px 20px; }
+   500→          .hk-section-alt { padding: 60px 20px; }
+   501→          .hk-stats { padding: 32px 20px; }
+   502→        }
+   503→        @media (max-width: 480px) {
+   504→          .hk-hero-actions { flex-direction: column; width: 100%; }
+   505→          .hk-hero-btn { width: 100%; justify-content: center; }
+   506→          .hk-stats-inner { grid-template-columns: 1fr 1fr; gap: 12px; }
+   507→          .hk-agencies { padding: 40px 20px; margin: 40px 20px; }
+   508→          .hk-header { padding: 0 14px; }
+   509→        }
+   510→
+   511→        /* ─── ANIMATIONS ─── */
+   512→        @keyframes fadeInUp {
+   513→          from { opacity: 0; transform: translateY(30px); }
+   514→          to { opacity: 1; transform: translateY(0); }
+   515→        }
+   516→        .hk-hero-text h1 { animation: fadeInUp 0.8s ease both; }
+   517→        .hk-hero-text p { animation: fadeInUp 0.8s ease 0.15s both; }
+   518→        .hk-hero-actions { animation: fadeInUp 0.8s ease 0.3s both; }
+   519→      `}</style>
+   520→
+   521→      <div className="hk">
+   522→        {/* ─── HEADER ─── */}
+   523→        <header className="hk-header">
+   524→          <div className="hk-logo">HAK<span>K</span></div>
+   525→          <div className="hk-nav">
+   526→            <button className="hk-lang" onClick={cycleLang} title="Switch language">
+   527→              🌐 {langLabels[lang]}
+   528→            </button>
+   529→            <a href="#produits" className="hk-nav-link">{t('landing.nav.products')}</a>
+   530→            <a href="#comment-ca-marche" className="hk-nav-link">{t('landing.nav.howItWorks')}</a>
+   531→            <Link href="/login" className="hk-nav-link">{t('landing.nav.login')}</Link>
+   532→            <Link href="/select" className="hk-btn-cta">{t('landing.nav.activate')}</Link>
+   533→            <button className="hk-hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+   534→              {mobileMenuOpen ? '✕' : '☰'}
+   535→            </button>
+   536→          </div>
+   537→        </header>
+   538→
+   539→        {/* Mobile menu */}
+   540→        <div className={`hk-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+   541→          <a href="#produits" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.products')}</a>
+   542→          <a href="#comment-ca-marche" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.howItWorks')}</a>
+   543→          <Link href="/login" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.login')}</Link>
+   544→          <Link href="/select" className="hk-btn-cta" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.activate')}</Link>
+   545→        </div>
+   546→
+   547→        {/* ─── HERO ─── */}
+   548→        <section className="hk-hero">
+   549→          <div className="hk-hero-bg">
+   550→            <Image
+   551→              src="/images/hero-airport.png"
+   552→              alt="HAKK - Protection bagages Hajj & Omrah"
+   553→              fill
+   554→              priority
+   555→              style={{ objectFit: 'cover' }}
+   556→            />
+   557→          </div>
+   558→          <div className="hk-hero-overlay" />
+   559→          <div className="hk-hero-inner">
+   560→            <div className="hk-hero-text">
+   561→              <div className="hk-hero-badge">
+   562→                🛡️ Passeport pour la Mecque
+   563→              </div>
+   564→              <h1 dangerouslySetInnerHTML={{
+   565→                __html: lang === 'ar'
+   566→                  ? 'احمِ أمتعتك و<em>عائلتك</em> خلال الحج والعمرة'
+   567→                  : lang === 'en'
+   568→                    ? 'Protect your luggage & <em>loved ones</em> during Hajj & Umrah'
+   569→                    : 'Protégez vos bagages & vos <em>proches</em> pendant le Hajj & l\u2019Omrah'
+   570→              }} />
+   571→              <p>{t('landing.hero.subtitle')}</p>
+   572→              <div className="hk-hero-actions">
+   573→                <Link href="/select" className="hk-hero-btn hk-hero-btn-primary">
+   574→                  ✈️ {t('landing.hero.ctaPrimary')}
+   575→                </Link>
+   576→                <a href="#produits" className="hk-hero-btn hk-hero-btn-secondary">
+   577→                  {t('landing.hero.ctaSecondary')}
+   578→                </a>
+   579→              </div>
+   580→            </div>
+   581→            <div className="hk-hero-visual">
+   582→              <Image
+   583→                src="/images/hero-products.png"
+   584→                alt="Pass Bagage & Pass Identity"
+   585→                width={480}
+   586→                height={274}
+   587→                priority
+   588→                style={{ width: '100%', maxWidth: '480px', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', border: '3px solid rgba(255,255,255,0.15)' }}
+   589→              />
+   590→            </div>
+   591→          </div>
+   592→        </section>
+   593→
+   594→        {/* ─── STATS BAR ─── */}
+   595→        <section className="hk-stats">
+   596→          <div className="hk-stats-inner">
+   597→            <div className="hk-stat reveal">
+   598→              <span className="hk-stat-number">30%</span>
+   599→              <span className="hk-stat-label">{t('landing.stats.s1')}</span>
+   600→            </div>
+   601→            <div className="hk-stat reveal">
+   602→              <span className="hk-stat-number">15 000+</span>
+   603→              <span className="hk-stat-label">{t('landing.stats.s2')}</span>
+   604→            </div>
+   605→            <div className="hk-stat reveal">
+   606→              <span className="hk-stat-number">94%</span>
+   607→              <span className="hk-stat-label">{t('landing.stats.s3')}</span>
+   608→            </div>
+   609→            <div className="hk-stat reveal">
+   610→              <span className="hk-stat-number">&lt; 2h</span>
+   611→              <span className="hk-stat-label">{t('landing.stats.s4')}</span>
+   612→            </div>
+   613→          </div>
+   614→        </section>
+   615→
+   616→        {/* ─── PROBLEM ─── */}
+   617→        <section className="hk-section-alt">
+   618→          <div className="hk-section-alt-inner">
+   619→            <div className="hk-section-header">
+   620→              <span className="hk-tag reveal">{t('landing.problem.tag')}</span>
+   621→              <h2 className="hk-title reveal">{t('landing.problem.title')}</h2>
+   622→              <p className="hk-subtitle reveal">{t('landing.problem.subtitle')}</p>
+   623→            </div>
+   624→            <div className="hk-problems-grid">
+   625→              <div className="hk-problem reveal">
+   626→                <div className="hk-problem-icon">🧳</div>
+   627→                <h3>{t('landing.problem.p1Title')}</h3>
+   628→                <p>{t('landing.problem.p1Desc')}</p>
+   629→              </div>
+   630→              <div className="hk-problem reveal">
+   631→                <div className="hk-problem-icon">👴</div>
+   632→                <h3>{t('landing.problem.p2Title')}</h3>
+   633→                <p>{t('landing.problem.p2Desc')}</p>
+   634→              </div>
+   635→              <div className="hk-problem reveal">
+   636→                <div className="hk-problem-icon">🏥</div>
+   637→                <h3>{t('landing.problem.p3Title')}</h3>
+   638→                <p>{t('landing.problem.p3Desc')}</p>
+   639→              </div>
+   640→            </div>
+   641→          </div>
+   642→        </section>
+   643→
+   644→        {/* ─── PRODUCTS ─── */}
+   645→        <section className="hk-section" id="produits">
+   646→          <div className="hk-section-header">
+   647→            <span className="hk-tag reveal">{t('landing.products.tag')}</span>
+   648→            <h2 className="hk-title reveal">{t('landing.products.title')}</h2>
+   649→            <p className="hk-subtitle reveal">{t('landing.products.subtitle')}</p>
+   650→          </div>
+   651→
+   652→          <div className="hk-products-grid">
+   653→            {/* PASS BAGAGE */}
+   654→            <div className="hk-product reveal">
+   655→              <div className="hk-product-top hk-product-top--bagage">
+   656→                <span className="hk-product-top-icon">🧳</span>
+   657→                <h3>{t('landing.products.bagageTitle')}</h3>
+   658→                <p>{t('landing.products.bagageSub')}</p>
+   659→              </div>
+   660→              <div className="hk-product-body">
+   661→                <p className="hk-product-desc">{t('landing.products.bagageDesc')}</p>
+   662→                <div className="hk-how-title">{t('landing.products.howItWorks')}</div>
+   663→                <div className="hk-step">
+   664→                  <div className="hk-step-num">1</div>
+   665→                  <div className="hk-step-text">{t('landing.products.bagageStep1')}</div>
+   666→                </div>
+   667→                <div className="hk-step">
+   668→                  <div className="hk-step-num">2</div>
+   669→                  <div className="hk-step-text">{t('landing.products.bagageStep2')}</div>
+   670→                </div>
+   671→                <div className="hk-step">
+   672→                  <div className="hk-step-num">3</div>
+   673→                  <div className="hk-step-text">{t('landing.products.bagageStep3')}</div>
+   674→                </div>
+   675→                <div className="hk-use-case">
+   676→                  <h5>{t('landing.products.useCase')}</h5>
+   677→                  <p>{t('landing.products.bagageUseCase')}</p>
+   678→                </div>
+   679→              </div>
+   680→              <div className="hk-product-footer">
+   681→                <Link href="/activate/baggage" className="hk-product-btn hk-product-btn--bagage">
+   682→                  {t('landing.products.bagageCta')} →
+   683→                </Link>
+   684→              </div>
+   685→            </div>
+   686→
+   687→            {/* PASS IDENTITY */}
+   688→            <div className="hk-product reveal">
+   689→              <div className="hk-product-top hk-product-top--identity">
+   690→                <span className="hk-product-top-icon">👤</span>
+   691→                <h3>{t('landing.products.identityTitle')}</h3>
+   692→                <p>{t('landing.products.identitySub')}</p>
+   693→              </div>
+   694→              <div className="hk-product-body">
+   695→                <p className="hk-product-desc">{t('landing.products.identityDesc')}</p>
+   696→                <div className="hk-how-title">{t('landing.products.howItWorks')}</div>
+   697→                <div className="hk-step">
+   698→                  <div className="hk-step-num">1</div>
+   699→                  <div className="hk-step-text">{t('landing.products.identityStep1')}</div>
+   700→                </div>
+   701→                <div className="hk-step">
+   702→                  <div className="hk-step-num">2</div>
+   703→                  <div className="hk-step-text">{t('landing.products.identityStep2')}</div>
+   704→                </div>
+   705→                <div className="hk-step">
+   706→                  <div className="hk-step-num">3</div>
+   707→                  <div className="hk-step-text">{t('landing.products.identityStep3')}</div>
+   708→                </div>
+   709→                <div className="hk-use-case">
+   710→                  <h5>{t('landing.products.useCase')}</h5>
+   711→                  <p>{t('landing.products.identityUseCase')}</p>
+   712→                </div>
+   713→              </div>
+   714→              <div className="hk-product-footer">
+   715→                <Link href="/activate/identity" className="hk-product-btn hk-product-btn--identity">
+   716→                  {t('landing.products.identityCta')} →
+   717→                </Link>
+   718→              </div>
+   719→            </div>
+   720→          </div>
+   721→        </section>
+   722→
+   723→        {/* ─── COMPARISON ─── */}
+   724→        <section className="hk-section-alt">
+   725→          <div className="hk-section-alt-inner">
+   726→            <div className="hk-section-header">
+   727→              <span className="hk-tag reveal">{t('landing.comparison.tag')}</span>
+   728→              <h2 className="hk-title reveal">{t('landing.comparison.title')}</h2>
+   729→            </div>
+   730→            <div className="hk-comparison-table reveal">
+   731→              <div className="hk-comp-row hk-comp-row--header">
+   732→                <div className="hk-comp-cell">{t('landing.comparison.feature')}</div>
+   733→                <div className="hk-comp-cell">Pass Bagage</div>
+   734→                <div className="hk-comp-cell">Pass Identity</div>
+   735→              </div>
+   736→              <div className="hk-comp-row">
+   737→                <div className="hk-comp-cell">{t('landing.comparison.forWho')}</div>
+   738→                <div className="hk-comp-cell">{t('landing.comparison.bagageFor')}</div>
+   739→                <div className="hk-comp-cell">{t('landing.comparison.identityFor')}</div>
+   740→              </div>
+   741→              <div className="hk-comp-row">
+   742→                <div className="hk-comp-cell">{t('landing.comparison.whatsapp')}</div>
+   743→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   744→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   745→              </div>
+   746→              <div className="hk-comp-row">
+   747→                <div className="hk-comp-cell">{t('landing.comparison.gps')}</div>
+   748→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   749→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   750→              </div>
+   751→              <div className="hk-comp-row">
+   752→                <div className="hk-comp-cell">{t('landing.comparison.medical')}</div>
+   753→                <div className="hk-comp-cell hk-comp-cell--no">✗</div>
+   754→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   755→              </div>
+   756→              <div className="hk-comp-row">
+   757→                <div className="hk-comp-cell">{t('landing.comparison.photo')}</div>
+   758→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   759→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   760→              </div>
+   761→              <div className="hk-comp-row">
+   762→                <div className="hk-comp-cell">{t('landing.comparison.remoteEdit')}</div>
+   763→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   764→                <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
+   765→              </div>
+   766→              <div className="hk-comp-row">
+   767→                <div className="hk-comp-cell">{t('landing.comparison.price')}</div>
+   768→                <div className="hk-comp-cell">2 500 FCFA</div>
+   769→                <div className="hk-comp-cell">5 000 FCFA</div>
+   770→              </div>
+   771→            </div>
+   772→          </div>
+   773→        </section>
+   774→
+   775→        {/* ─── HOW IT WORKS ─── */}
+   776→        <section className="hk-section" id="comment-ca-marche">
+   777→          <div className="hk-section-header">
+   778→            <span className="hk-tag reveal">{t('landing.how.tag')}</span>
+   779→            <h2 className="hk-title reveal">{t('landing.how.title')}</h2>
+   780→            <p className="hk-subtitle reveal">{t('landing.how.subtitle')}</p>
+   781→          </div>
+   782→          <div className="hk-steps-grid">
+   783→            <div className="hk-step-card reveal">
+   784→              <div className="hk-step-icon">🔑</div>
+   785→              <h3>{t('landing.how.s1Title')}</h3>
+   786→              <p>{t('landing.how.s1Desc')}</p>
+   787→              <div className="hk-step-connector">→</div>
+   788→            </div>
+   789→            <div className="hk-step-card reveal">
+   790→              <div className="hk-step-icon">🛡️</div>
+   791→              <h3>{t('landing.how.s2Title')}</h3>
+   792→              <p>{t('landing.how.s2Desc')}</p>
+   793→              <div className="hk-step-connector">→</div>
+   794→            </div>
+   795→            <div className="hk-step-card reveal">
+   796→              <div className="hk-step-icon">🚨</div>
+   797→              <h3>{t('landing.how.s3Title')}</h3>
+   798→              <p>{t('landing.how.s3Desc')}</p>
+   799→            </div>
+   800→          </div>
+   801→        </section>
+   802→
+   803→        {/* ─── TESTIMONIALS ─── */}
+   804→        <section className="hk-section-alt">
+   805→          <div className="hk-section-alt-inner">
+   806→            <div className="hk-section-header">
+   807→              <span className="hk-tag reveal">{t('landing.testimonials.tag')}</span>
+   808→              <h2 className="hk-title reveal">{t('landing.testimonials.title')}</h2>
+   809→            </div>
+   810→            <div className="hk-testimonials-grid">
+   811→              <div className="hk-testimonial reveal">
+   812→                <p className="hk-testimonial-text">{t('landing.testimonials.t1Text')}</p>
+   813→                <div className="hk-testimonial-author">
+   814→                  <div className="hk-avatar">AF</div>
+   815→                  <div className="hk-author-info">
+   816→                    <h4>{t('landing.testimonials.t1Name')}</h4>
+   817→                    <p>{t('landing.testimonials.t1Info')}</p>
+   818→                  </div>
+   819→                </div>
+   820→              </div>
+   821→              <div className="hk-testimonial reveal">
+   822→                <p className="hk-testimonial-text">{t('landing.testimonials.t2Text')}</p>
+   823→                <div className="hk-testimonial-author">
+   824→                  <div className="hk-avatar">FD</div>
+   825→                  <div className="hk-author-info">
+   826→                    <h4>{t('landing.testimonials.t2Name')}</h4>
+   827→                    <p>{t('landing.testimonials.t2Info')}</p>
+   828→                  </div>
+   829→                </div>
+   830→              </div>
+   831→              <div className="hk-testimonial reveal">
+   832→                <p className="hk-testimonial-text">{t('landing.testimonials.t3Text')}</p>
+   833→                <div className="hk-testimonial-author">
+   834→                  <div className="hk-avatar">MN</div>
+   835→                  <div className="hk-author-info">
+   836→                    <h4>{t('landing.testimonials.t3Name')}</h4>
+   837→                    <p>{t('landing.testimonials.t3Info')}</p>
+   838→                  </div>
+   839→                </div>
+   840→              </div>
+   841→            </div>
+   842→          </div>
+   843→        </section>
+   844→
+   845→        {/* ─── AGENCIES CTA ─── */}
+   846→        <div style={{ padding: '0 24px' }}>
+   847→          <div className="hk-agencies reveal">
+   848→            <h2>🏢 {t('landing.agencies.title')}</h2>
+   849→            <p>{t('landing.agencies.desc')}</p>
+   850→            <Link href="/agencies" className="hk-agencies-btn">
+   851→              {t('landing.agencies.cta')} →
+   852→            </Link>
+   853→          </div>
+   854→        </div>
+   855→
+   856→        {/* ─── FOOTER ─── */}
+   857→        <footer className="hk-footer">
+   858→          <div className="hk-footer-inner">
+   859→            <div className="hk-footer-logo">HAK<span>K</span></div>
+   860→            <p>{t('landing.footer.tagline')}</p>
+   861→            <div className="hk-footer-links">
+   862→              <Link href="/confidentialite">{t('landing.footer.privacy')}</Link>
+   863→              <Link href="/cgu">{t('landing.footer.terms')}</Link>
+   864→              <Link href="/contact">{t('landing.footer.support')}</Link>
+   865→              <Link href="/contact">{t('landing.footer.contact')}</Link>
+   866→              <Link href="/demo">{t('landing.footer.demo')}</Link>
+   867→            </div>
+   868→            <div className="hk-footer-bottom">
+   869→              <p>&copy; 2025 HAKK. {t('landing.footer.rights')}</p>
+   870→            </div>
+   871→          </div>
+   872→        </footer>
+   873→      </div>
+   874→    </div>
+   875→  );
+   876→}
+   877→
