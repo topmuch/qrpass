@@ -77,6 +77,8 @@ function HajjActivateContent() {
   const [airline, setAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
   const [destination, setDestination] = useState('');
+  const [hotelName, setHotelName] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
@@ -175,6 +177,8 @@ function HajjActivateContent() {
           airlineName: airline.trim() || undefined,
           flightNumber: flightNumber.trim().toUpperCase() || undefined,
           destination: destination.trim() || undefined,
+          hotelName: hotelName.trim() || undefined,
+          roomNumber: roomNumber.trim() || undefined,
           transportMode: 'flight',
           photoUrl: photoUrl || undefined,
           activationDate: deferredActivation && activationDate ? activationDate : undefined,
@@ -192,6 +196,8 @@ function HajjActivateContent() {
           airlineName: airline,
           flightNumber,
           destination,
+          hotelName,
+          roomNumber,
           type: 'hajj',
           activatedAt: new Date().toISOString(),
           expiresAt: data.baggage?.expiresAt,
@@ -432,6 +438,28 @@ function HajjActivateContent() {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   placeholder="Djeddah / Médine"
+                  className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
+                />
+              </div>
+            </div>
+
+            {/* Hotel & Room */}
+            <div className="flex gap-3 mb-4">
+              <div className="flex-1">
+                <Label className="text-sm font-semibold mb-1.5 block">Hôtel à La Mecque *</Label>
+                <Input
+                  value={hotelName}
+                  onChange={(e) => setHotelName(e.target.value)}
+                  placeholder="Ex: Al Massa Grand Hotel"
+                  className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
+                />
+              </div>
+              <div className="w-28">
+                <Label className="text-sm font-semibold mb-1.5 block">Chambre</Label>
+                <Input
+                  value={roomNumber}
+                  onChange={(e) => setRoomNumber(e.target.value)}
+                  placeholder="412"
                   className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
                 />
               </div>

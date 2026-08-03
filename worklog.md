@@ -111,3 +111,38 @@ Stage Summary:
 - Middleware now correctly allows public access to QR-related APIs
 - Test data created: HAJJ26-TEST01 (active), HAJJ26-TEST02 (pending_activation)
 - Verified with Agent Browser: /found/HAJJ26-TEST01 → /scan/HAJJ26-TEST01 (auto-redirect ✅)
+---
+Task ID: 2
+Agent: Main Agent
+Task: Redesign finder/trouveur page and add hotel fields to activation
+
+Work Log:
+- Added hotelName and roomNumber fields to Prisma Baggage model
+- Ran db:push to update database schema
+- Completely redesigned /scan/[reference]/page.tsx to match user's HTML design:
+  - Clean card-based layout matching the provided HTML
+  - Green check header with "BAGAGE TROUVÉ" title
+  - Owner card with name, secured contact, photo
+  - NEW Hotel/Accommodation card (hotel name + room number)
+  - Transport details card (flight/train/boat/bus)
+  - Dark blue CTA button (#1e3a8a) "Contacter le propriétaire"
+  - Footer: "PassHajj — Service officiel de protection des bagages"
+  - i18n support (fr/en/ar) with RTL for Arabic
+  - Silent GPS auto-capture on load
+  - Fixed duplicate emoji in Modifier button
+- Updated scan API to return hotelName and roomNumber
+- Added hotel fields to both activation pages:
+  - /hajj/activate/page.tsx: Step 2 now has "Hôtel à La Mecque" and "Chambre" inputs
+  - /activate/baggage/page.tsx: Added hotel name + room number inputs
+- Updated /api/activate/route.ts: Added hotelName/roomNumber to validation schema and DB update
+- Tested complete E2E flow with Agent Browser:
+  1. Activation with hotel data (Hilton Suites Makkah, Room 503)
+  2. Re-scan QR code → auto-redirect to finder page
+  3. Finder page shows all data: owner, hotel, flight details
+
+Stage Summary:
+- Finder page redesigned to match user's HTML design
+- Hotel/accommodation card added to finder page
+- Hotel fields (hotelName, roomNumber) added to both activation forms
+- All data flows correctly: activation → database → API → finder page display
+- Screenshots captured at /tmp/finder-redesigned.png, /tmp/activation-step2-hotel.png, /tmp/finder-complete-e2e.png

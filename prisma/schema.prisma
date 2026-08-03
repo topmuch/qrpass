@@ -110,6 +110,11 @@ model Baggage {
   destination       String?
   departureDate     DateTime? // Date de départ saisie lors de l'activation
   departureTime     String?   // Heure de départ saisie lors de l'activation (ex: "08:30")
+
+  // Hotel/Accommodation (for Hajj — where to return the baggage)
+  hotelName         String?   // ex: "Al Massa Grand Hotel"
+  roomNumber        String?   // ex: "412"
+
   createdAt         DateTime  @default(now())
   expiresAt         DateTime?
   lastScanDate      DateTime?

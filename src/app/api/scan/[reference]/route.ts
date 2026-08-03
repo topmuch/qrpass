@@ -120,6 +120,8 @@ export async function GET(
         createdAt: baggage.createdAt?.toISOString() || null,
         departureDate: baggage.departureDate?.toISOString() || null,
         departureTime: baggage.departureTime || null,
+        hotelName: baggage.hotelName || null,
+        roomNumber: baggage.roomNumber || null,
         // Convert /uploads/... path to /api/serve-upload/... for reliable file serving
         photoUrl: baggage.photoUrl ? `/api/serve-upload/${baggage.photoUrl.replace(/^\/uploads\//, '')}` : null,
       }

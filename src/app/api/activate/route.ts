@@ -23,6 +23,9 @@ const activateSchema = z.object({
   busLineNumber: z.string().optional(),
   // Photo upload
   photoUrl: z.string().optional(),
+  // Hotel/Accommodation (for Hajj)
+  hotelName: z.string().optional(),
+  roomNumber: z.string().optional(),
   // Deferred activation
   activationDate: z.string().optional(), // ISO date string for deferred activation
 });
@@ -78,6 +81,9 @@ export async function POST(request: NextRequest) {
         shipCabin: validatedData.shipCabin || null,
         busCompany: validatedData.busCompany || null,
         busLineNumber: validatedData.busLineNumber || null,
+        // Hotel/Accommodation
+        hotelName: validatedData.hotelName || null,
+        roomNumber: validatedData.roomNumber || null,
         photoUrl: validatedData.photoUrl || null,
         status: 'active',
         expiresAt,

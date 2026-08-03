@@ -231,6 +231,8 @@ function BaggageActivateContent() {
   const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState('');
   const [departureTime, setDepartureTime] = useState('');
+  const [hotelName, setHotelName] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -342,6 +344,8 @@ function BaggageActivateContent() {
           airlineName: airline,
           flightNumber: flightNumber.trim().toUpperCase(),
           destination,
+          hotelName: hotelName.trim() || undefined,
+          roomNumber: roomNumber.trim() || undefined,
           departureDate,
           departureTime: departureTime || undefined,
           transportMode: 'flight',
@@ -360,6 +364,8 @@ function BaggageActivateContent() {
           airlineName: airline,
           flightNumber,
           destination,
+          hotelName,
+          roomNumber,
           type: 'hajj',
           activatedAt: new Date().toISOString(),
           expiresAt: data.baggage?.expiresAt,
@@ -518,6 +524,28 @@ function BaggageActivateContent() {
                 <option key={d.value} value={d.value}>{d.label}</option>
               ))}
             </select>
+          </div>
+
+          {/* Hotel & Room */}
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="col-span-2">
+              <Label className="text-[13px] font-semibold mb-1.5 block">Hôtel à La Mecque *</Label>
+              <Input
+                value={hotelName}
+                onChange={(e) => setHotelName(e.target.value)}
+                placeholder="Ex: Al Massa Grand Hotel"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <Label className="text-[13px] font-semibold mb-1.5 block">Chambre</Label>
+              <Input
+                value={roomNumber}
+                onChange={(e) => setRoomNumber(e.target.value)}
+                placeholder="412"
+                className={inputCls}
+              />
+            </div>
           </div>
 
           {/* Departure Date & Time */}

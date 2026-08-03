@@ -15,6 +15,9 @@ import {
   Globe,
   Phone,
   MessageCircle,
+  MapPin,
+  Building2,
+  BedDouble,
 } from "lucide-react";
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -39,15 +42,60 @@ const ChatbotWidget = dynamic(() => import('@/components/finder/ChatbotWidget'),
   loading: () => null,
 });
 
-// ─── Brand constants (PassHajj palette: yellow #f4b400 + white cards + black buttons) ───
-const BRAND = '#f4b400';   // jaune — fond principal
-const CARD_BG = '#ffffff'; // blanc — cartes
-const INK = '#1a1a1a';     // noir — texte, boutons
-const MUTED = '#6b7280';   // gris — texte secondaire
-const INPUT_BG = '#f3f4f6'; // gris clair — inputs
-const BTN_PRIMARY = '#111827'; // noir — boutons principaux
+// ─── Brand constants (PassHajj palette: yellow #f4b400 + white cards + dark blue CTA) ───
+const BRAND = '#f4b400';     // jaune — fond principal
+const CARD_BG = '#ffffff';   // blanc — cartes
+const INK = '#0f172a';       // dark text
+const MUTED = '#64748b';     // gris — texte secondaire
+const ACCENT = '#1e3a8a';    // dark blue — CTA button
+const INPUT_BG = '#f8fafc';  // light gray — info rows
+const BTN_PRIMARY = '#111827'; // noir — edit buttons
 
 const FALLBACK_PHONE = '33745349339';
+
+// ─── Inline i18n for the new card-based design ───
+const I18N: Record<string, Record<Language, string>> = {
+  title: { fr: 'BAGAGE TROUVÉ', en: 'BAGGAGE FOUND', ar: 'حقيبة وجدت' },
+  subtitle: {
+    fr: "Merci d'avoir trouvé ce bagage ! Le propriétaire sera contacté immédiatement.",
+    en: 'Thank you for finding this baggage! The owner will be contacted immediately.',
+    ar: 'شكرا على العثور على هذه الحقيبة! سيتم الاتصال بالمالك فورا.',
+  },
+  ownerLabel: { fr: 'PROPRIÉTAIRE', en: 'OWNER', ar: 'المالك' },
+  nameLabel: { fr: 'Nom complet', en: 'Full Name', ar: 'الاسم الكامل' },
+  contactLabel: { fr: 'Contact', en: 'Contact', ar: 'الاتصال' },
+  secureNote: {
+    fr: 'Le propriétaire sera notifié via WhatsApp. Son numéro reste confidentiel.',
+    en: "The owner will be notified via WhatsApp. Their number remains confidential.",
+    ar: 'سيتم إخطار المالك عبر واتساب. يظل رقمه سريا.',
+  },
+  photoLabel: { fr: 'Photo du bagage', en: 'Bag Photo', ar: 'صورة الحقيبة' },
+  hotelLabel: { fr: 'HÉBERGEMENT', en: 'ACCOMMODATION', ar: 'الإقامة' },
+  hotelNameLabel: { fr: 'Hôtel actuel', en: 'Current Hotel', ar: 'الفندق الحالي' },
+  roomLabel: { fr: 'Chambre', en: 'Room', ar: 'الغرفة' },
+  flightLabel: { fr: 'DÉTAILS DU VOL', en: 'FLIGHT DETAILS', ar: 'تفاصيل الرحلة' },
+  airlineLabel: { fr: 'Compagnie aérienne', en: 'Airline', ar: 'شركة الطيران' },
+  flightNumLabel: { fr: 'Numéro de vol', en: 'Flight Number', ar: 'رقم الرحلة' },
+  destLabel: { fr: 'Destination', en: 'Destination', ar: 'الوجهة' },
+  dateLabel: { fr: 'Date de départ', en: 'Departure Date', ar: 'تاريخ المغادرة' },
+  ctaText: { fr: 'Contacter le propriétaire', en: 'Contact Owner', ar: 'الاتصال بالمالك' },
+  footer: {
+    fr: 'PassHajj — Service officiel de protection des bagages',
+    en: 'PassHajj — Official baggage protection service',
+    ar: 'PassHajj — خدمة حماية الحقائب الرسمية',
+  },
+  lostTitle: { fr: 'BAGAGE PERDU', en: 'LOST BAGGAGE', ar: 'حقيبة مفقودة' },
+  lostSubtitle: {
+    fr: 'Ce bagage a été signalé perdu. Merci de le retourner à son propriétaire.',
+    en: 'This baggage has been reported lost. Please return it to its owner.',
+    ar: 'تم الإبلاغ عن فقدان هذه الحقيبة. يرجى إرجاعها إلى مالكها.',
+  },
+};
+
+/** Shorthand to get inline i18n string */
+function i18n(key: string, lang: Language): string {
+  return I18N[key]?.[lang] || I18N[key]?.fr || key;
+}
 
 interface BaggageData {
   status: string;
@@ -84,6 +132,9 @@ interface BaggageData {
     busCompany?: string | null;
     busLineNumber?: string | null;
     photoUrl?: string | null;
+    // HOTEL-FEATURE: Accommodation info
+    hotelName?: string | null;
+    roomNumber?: string | null;
   };
 }
 
@@ -168,7 +219,7 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
 
         {/* ─── White Card ─── */}
         <div
-          className="rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+          className="rounded-[18px] p-6 md:p-8 text-center shadow-lg"
           style={{ background: CARD_BG }}
         >
           {/* Icon */}
@@ -317,7 +368,7 @@ function ErrorScreen({
       </div>
 
       <div
-        className="max-w-md w-full rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+        className="max-w-md w-full rounded-[18px] p-6 md:p-8 text-center shadow-lg"
         style={{ background: CARD_BG }}
       >
         <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -337,11 +388,15 @@ function ErrorScreen({
   );
 }
 
-// ─── Info Encart Helper (light gray bg, for white cards) ───
-function InfoEncart({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+// ─── Info Row Helper (clean label+value rows inside white cards) ───
+function InfoRow({ icon, label, value, mono = false }: { icon: React.ReactNode; label: string; value: string; mono?: boolean }) {
   return (
-    <div className={`border border-gray-200 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`} style={{ background: INPUT_BG }}>
-      {children}
+    <div className="flex items-start gap-3 py-2">
+      <span className="text-lg flex-shrink-0 mt-0.5">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium" style={{ color: MUTED }}>{label}</p>
+        <p className={`text-base font-semibold break-words ${mono ? 'font-mono tracking-widest text-lg' : ''}`} style={{ color: INK }}>{value}</p>
+      </div>
     </div>
   );
 }
@@ -381,6 +436,9 @@ export default function ScanPage() {
   const [editDepartureDate, setEditDepartureDate] = useState('');
   const [editDepartureTime, setEditDepartureTime] = useState('');
   const [editPhoneCountry, setEditPhoneCountry] = useState(countryCode);
+  // Edit hotel fields
+  const [editHotelName, setEditHotelName] = useState('');
+  const [editRoomNumber, setEditRoomNumber] = useState('');
 
   // Finder form state
   const [finderName, setFinderName] = useState('');
@@ -394,6 +452,18 @@ export default function ScanPage() {
   // SuccessOverlay state
   const [scanConfirmed, setScanConfirmed] = useState(false);
   const hasConfirmedRef = useRef(false);
+
+  // Silent GPS auto-capture on page load
+  const [autoGps, setAutoGps] = useState<{ lat: number; lng: number } | null>(null);
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setAutoGps({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => { /* silent fail */ },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     const fetchBaggage = async () => {
@@ -437,6 +507,8 @@ export default function ScanPage() {
       setEditBusCompany(b.busCompany || '');
       setEditBusLineNumber(b.busLineNumber || '');
       setEditDestination(b.destination || '');
+      setEditHotelName(b.hotelName || '');
+      setEditRoomNumber(b.roomNumber || '');
       // Format departureDate to YYYY-MM-DD for the date input
       if (b.departureDate) {
         try {
@@ -475,6 +547,8 @@ export default function ScanPage() {
           destination: editDestination.trim() || null,
           departureDate: editDepartureDate || null,
           departureTime: editDepartureTime.trim() || null,
+          hotelName: editHotelName.trim() || null,
+          roomNumber: editRoomNumber.trim() || null,
         }),
       });
       if (!res.ok) throw new Error('Failed to save');
@@ -501,6 +575,8 @@ export default function ScanPage() {
           destination: data.baggage.destination,
           departureDate: data.baggage.departureDate,
           departureTime: data.baggage.departureTime,
+          hotelName: data.baggage.hotelName,
+          roomNumber: data.baggage.roomNumber,
         },
       });
       setIsEditing(false);
@@ -513,10 +589,7 @@ export default function ScanPage() {
     }
   };
 
-  // NOTE: GPS sharing now happens inline inside handleWhatsApp (silent fallback to manual location).
-  // The dedicated "Partager ma position GPS" button was removed per refonte-6 brief.
-
-  // Generate WhatsApp message — new template (refonte-7): friendly notification to the owner
+  // Generate WhatsApp message — friendly notification to the owner
   const generateWhatsAppMessage = useCallback((
     finderName: string,
     finderPhone: string,
@@ -543,7 +616,7 @@ export default function ScanPage() {
       ? mapLink
       : (locationText || t('whatsapp.location_not_shared'));
 
-    // Build message using the template (refonte-7)
+    // Build message using the template
     return encodeURIComponent(
       t('whatsapp.found_message', {
         firstName,
@@ -558,7 +631,6 @@ export default function ScanPage() {
   }, [reference, t]);
 
   // Log scan to API (shared by WhatsApp + Phone flows).
-  // sharedPos/locText are passed as params (no longer state) — GPS is captured inline in handleWhatsApp.
   const logScan = useCallback(async (
     sharedPos?: { lat: number; lng: number } | null,
     locText?: string
@@ -633,8 +705,7 @@ export default function ScanPage() {
         baggageData?.baggage?.type || 'voyageur'
       );
       const ownerNumber = baggageData?.baggage?.whatsappOwner?.replace(/\D/g, '') || FALLBACK_PHONE;
-      // Use api.whatsapp.com directly instead of wa.me — wa.me corrupts 4-byte UTF-8 emojis (🎉📍👤📞💬👉💪)
-      // during its redirect to api.whatsapp.com (replaces them with U+FFFD replacement character).
+      // Use api.whatsapp.com directly instead of wa.me — wa.me corrupts 4-byte UTF-8 emojis
       const url = `https://api.whatsapp.com/send/?phone=${ownerNumber}&text=${message}`;
 
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -684,9 +755,6 @@ export default function ScanPage() {
     });
   };
 
-  // NOTE: validateFinderForm was removed — validation is now inlined in handleWhatsApp/handlePhoneCall.
-  // Location is no longer required (GPS is auto-captured inside handleWhatsApp).
-
   // ─── Loading state ───
   if (loading) {
     return <LoadingScreen t={t} />;
@@ -732,7 +800,7 @@ export default function ScanPage() {
   const isDeclaredLost = baggage?.declaredLostAt && !baggage?.foundAt;
 
   // ═══════════════════════════════════════════════════════════════
-  // ─── MAIN RENDER — Yellow bg + White cards + Black accents (PassHajj design) ───
+  // ─── MAIN RENDER — Yellow bg + White cards + Dark blue CTA (PassHajj design) ───
   // ═══════════════════════════════════════════════════════════════
   return (
     <main
@@ -740,7 +808,7 @@ export default function ScanPage() {
       style={{ background: BRAND }}
       dir={dir}
     >
-      {/* ─── Header ─── */}
+      {/* ─── Top Bar: Edit button + Language toggle ─── */}
       <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4" style={{ background: BRAND }}>
         {/* ✏️ Modifier button — visible only for active/lost baggage */}
         {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
@@ -780,59 +848,56 @@ export default function ScanPage() {
       {/* ─── Container ─── */}
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
 
-        {/* ═══ 🏷️ TITRE : ✅ BAGAGE TROUVÉ ═══ */}
+        {/* ═══ HEADER: Green ✓ icon + "BAGAGE TROUVÉ" ═══ */}
         <div className="text-center mb-5 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500 mb-3 shadow-md">
+            <CheckCircle className="w-8 h-8 text-white" />
+          </div>
           <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: INK }}>
             {isDeclaredLost
-              ? `🚨 ${t('finder.lost_badge')}`
-              : `✅ ${t('finder.success_badge')}`}
+              ? `🚨 ${i18n('lostTitle', lang)}`
+              : i18n('title', lang)}
           </h1>
           <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto" style={{ color: MUTED }}>
             {isDeclaredLost
-              ? t('finder.lost_description')
-              : t('finder.bagage_trouve_desc')}
+              ? i18n('lostSubtitle', lang)
+              : i18n('subtitle', lang)}
           </p>
         </div>
 
-        {/* ═══ 🟦 BLOC 1 : IDENTITÉ PROPRIÉTAIRE (white card) ═══ */}
+        {/* ═══ CARD 1 : PROPRIÉTAIRE (white card) ═══ */}
         {baggage && !isEditing && (
-          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
-              <span>👤</span> {t('finder.owner_section')}
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
+              <span>👤</span> {i18n('ownerLabel', lang)}
             </h2>
 
-            {/* Full Name — kept */}
-            <InfoEncart>
-              <div className="flex items-center gap-3">
-                <span className="text-xl">👤</span>
-                <div>
-                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.fullName')}</p>
-                  <p className="text-base md:text-lg font-bold" style={{ color: INK }}>{baggage.travelerName || t('finder.notSet')}</p>
-                </div>
-              </div>
-            </InfoEncart>
+            {/* Full Name */}
+            <InfoRow
+              icon="👤"
+              label={i18n('nameLabel', lang)}
+              value={baggage.travelerName || t('finder.notSet')}
+            />
 
-            {/* NOTE: Agency + Baggage Type REMOVED per refonte-4 brief */}
+            <div className="border-t border-gray-100 my-2" />
 
             {/* Contact — Secured (NEVER show WhatsApp number) */}
-            <InfoEncart className="mb-0">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">🔒</span>
-                <div>
-                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.contact_label')}</p>
-                  <p className="text-base font-bold" style={{ color: INK }}>{t('finder.secure_contact')}</p>
-                  <p className="text-xs mt-0.5" style={{ color: MUTED }}>{t('finder.contact_reveal_note')}</p>
-                </div>
+            <div className="flex items-start gap-3 py-2">
+              <span className="text-lg flex-shrink-0 mt-0.5">🔒</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium" style={{ color: MUTED }}>{i18n('contactLabel', lang)}</p>
+                <p className="text-base font-semibold" style={{ color: INK }}>{t('finder.secure_contact')}</p>
+                <p className="text-xs mt-0.5 leading-relaxed" style={{ color: MUTED }}>{i18n('secureNote', lang)}</p>
               </div>
-            </InfoEncart>
+            </div>
 
             {/* Baggage Photo — helps finder identify the luggage */}
             {baggage.photoUrl && (
               <div className="mt-3 pt-3 border-t border-gray-100">
-                <p className="text-xs font-medium mb-2" style={{ color: MUTED }}>📸 Photo du bagage</p>
+                <p className="text-xs font-medium mb-2" style={{ color: MUTED }}>📸 {i18n('photoLabel', lang)}</p>
                 <img
                   src={baggage.photoUrl}
-                  alt="Photo du bagage"
+                  alt={i18n('photoLabel', lang)}
                   className="max-w-full max-h-40 object-cover rounded-lg"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -841,11 +906,139 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* ═══ 🟦 EDIT MODE: BLOC 1 — Owner Info (white card) ═══ */}
+        {/* ═══ CARD 2 : HÔTEL / HÉBERGEMENT (white card, NEW) ═══ */}
+        {baggage && !isEditing && baggage.hotelName && (
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
+              <Building2 className="w-4 h-4" style={{ color: INK }} />
+              {i18n('hotelLabel', lang)}
+            </h2>
+
+            {/* Hotel Name */}
+            <InfoRow
+              icon="🏨"
+              label={i18n('hotelNameLabel', lang)}
+              value={baggage.hotelName}
+            />
+
+            {/* Room Number */}
+            {baggage.roomNumber && (
+              <>
+                <div className="border-t border-gray-100 my-2" />
+                <InfoRow
+                  icon="🚪"
+                  label={i18n('roomLabel', lang)}
+                  value={baggage.roomNumber}
+                />
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ═══ CARD 3 : DÉTAILS DU VOYAGE / TRANSPORT (white card) ═══ */}
+        {baggage && !isEditing && (() => {
+          const mode = safeTransportMode(baggage.transportMode) as TransportMode;
+          const transportImg = getTransportImage(mode);
+          const blockHeader = getTransportBlockHeader(mode, lang);
+
+          // Determine mode-specific label keys
+          const companyLabelKey = mode === 'flight' ? 'airlineLabel'
+            : mode === 'train' ? 'transport.train_company' as string
+            : mode === 'boat' ? 'transport.ship_name' as string
+            : 'transport.bus_company' as string;
+          const numLabelKey = mode === 'flight' ? 'flightNumLabel'
+            : mode === 'train' ? 'transport.train_number' as string
+            : mode === 'boat' ? 'transport.ship_cabin' as string
+            : 'transport.bus_line' as string;
+
+          const companyValue = mode === 'flight' ? baggage.airlineName
+            : mode === 'train' ? baggage.trainCompany
+            : mode === 'boat' ? baggage.shipName
+            : baggage.busCompany;
+
+          const numValue = mode === 'flight' ? baggage.flightNumber
+            : mode === 'train' ? baggage.trainNumber
+            : mode === 'boat' ? baggage.shipCabin
+            : baggage.busLineNumber;
+
+          const hasTransportInfo = companyValue || numValue || baggage.destination || baggage.departureDate || baggage.createdAt;
+
+          if (!hasTransportInfo) return null;
+
+          // Get localized label: use inline i18n first, then fall back to t()
+          const getLabel = (key: string) => {
+            const inlineVal = i18n(key, lang);
+            if (inlineVal !== key) return inlineVal;
+            return t(key);
+          };
+
+          return (
+            <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+              <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
+                <Image
+                  src={transportImg}
+                  alt={mode}
+                  width={18}
+                  height={18}
+                  className="mix-blend-multiply"
+                />
+                <span>{blockHeader}</span>
+              </h2>
+
+              {/* Company/Airline name */}
+              {companyValue && (
+                <InfoRow
+                  icon={TRANSPORT_ICONS[mode]}
+                  label={getLabel(companyLabelKey)}
+                  value={companyValue}
+                />
+              )}
+
+              {/* Flight/Train/Boat/Bus number */}
+              {numValue && (
+                <>
+                  {companyValue && <div className="border-t border-gray-100 my-2" />}
+                  <InfoRow
+                    icon="🎫"
+                    label={getLabel(numLabelKey)}
+                    value={numValue}
+                    mono={mode === 'flight' || mode === 'train'}
+                  />
+                </>
+              )}
+
+              {/* Destination */}
+              {baggage.destination && (
+                <>
+                  {(companyValue || numValue) && <div className="border-t border-gray-100 my-2" />}
+                  <InfoRow
+                    icon="📍"
+                    label={i18n('destLabel', lang)}
+                    value={baggage.destination}
+                  />
+                </>
+              )}
+
+              {/* Departure Date */}
+              {(baggage.departureDate || baggage.createdAt) && (
+                <>
+                  {(companyValue || numValue || baggage.destination) && <div className="border-t border-gray-100 my-2" />}
+                  <InfoRow
+                    icon="📅"
+                    label={i18n('dateLabel', lang)}
+                    value={`${formatDate(baggage.departureDate || baggage.createdAt)}${baggage.departureTime ? ` — ${baggage.departureTime}` : ''}`}
+                  />
+                </>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* ═══ EDIT MODE: CARD 1 — Owner Info (white card) ═══ */}
         {baggage && isEditing && (
-          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
-              <span>👤</span> {t('finder.owner_section')}
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
+              <span>👤</span> {i18n('ownerLabel', lang)}
             </h2>
 
             {/* First Name */}
@@ -889,184 +1082,44 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* ═══ 🟦 BLOC 2 : DÉTAILS DU VOYAGE (white card, transport images) ═══ */}
-        {baggage && !isEditing && (() => {
-          const mode = safeTransportMode(baggage.transportMode) as TransportMode;
-          const transportImg = getTransportImage(mode);
-          const blockHeader = getTransportBlockHeader(mode, lang);
-
-          return (
-            <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
-              <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
-                <Image
-                  src={transportImg}
-                  alt={mode}
-                  width={18}
-                  height={18}
-                  className="mix-blend-multiply"
-                />
-                <span>{blockHeader}</span>
-              </h2>
-
-              {/* TRANSPORT-FEATURE: Flight info */}
-              {mode === 'flight' && (baggage.airlineName || baggage.flightNumber) && (
-                <InfoEncart>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      {baggage.airlineName && (
-                        <div className="mb-1.5">
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.airline')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.airlineName}</p>
-                        </div>
-                      )}
-                      {baggage.flightNumber && (
-                        <div>
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.flight_number')}</p>
-                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.flightNumber}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
-                      <Image
-                        src={transportImg}
-                        alt="flight"
-                        width={28}
-                        height={28}
-                        className="mix-blend-multiply"
-                      />
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-
-              {/* TRANSPORT-FEATURE: Train info */}
-              {mode === 'train' && (baggage.trainCompany || baggage.trainNumber) && (
-                <InfoEncart>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      {baggage.trainCompany && (
-                        <div className="mb-1.5">
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_company')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.trainCompany}</p>
-                        </div>
-                      )}
-                      {baggage.trainNumber && (
-                        <div>
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_number')}</p>
-                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.trainNumber}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
-                      <Image
-                        src={transportImg}
-                        alt="train"
-                        width={28}
-                        height={28}
-                        className="mix-blend-multiply"
-                      />
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-
-              {/* TRANSPORT-FEATURE: Boat info */}
-              {mode === 'boat' && (baggage.shipName || baggage.shipCabin) && (
-                <InfoEncart>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      {baggage.shipName && (
-                        <div className="mb-1.5">
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_name')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipName}</p>
-                        </div>
-                      )}
-                      {baggage.shipCabin && (
-                        <div>
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_cabin')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipCabin}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
-                      <Image
-                        src={transportImg}
-                        alt="boat"
-                        width={28}
-                        height={28}
-                        className="mix-blend-multiply"
-                      />
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-
-              {/* TRANSPORT-FEATURE: Bus info */}
-              {mode === 'bus' && (baggage.busCompany || baggage.busLineNumber) && (
-                <InfoEncart>
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      {baggage.busCompany && (
-                        <div className="mb-1.5">
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_company')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busCompany}</p>
-                        </div>
-                      )}
-                      {baggage.busLineNumber && (
-                        <div>
-                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_line')}</p>
-                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busLineNumber}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
-                      <Image
-                        src={transportImg}
-                        alt="bus"
-                        width={28}
-                        height={28}
-                        className="mix-blend-multiply"
-                      />
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-
-              {/* Destination */}
-              {baggage.destination && (
-                <InfoEncart>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">📍</span>
-                    <div>
-                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_destination')}</p>
-                      <p className="text-base font-bold" style={{ color: INK }}>{baggage.destination}</p>
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-
-              {/* Departure Date */}
-              {(baggage.departureDate || baggage.createdAt) && (
-                <InfoEncart className="mb-0">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">📅</span>
-                    <div>
-                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_departure_date')}</p>
-                      <p className="text-base font-bold" style={{ color: INK }}>
-                        {formatDate(baggage.departureDate || baggage.createdAt)}{baggage.departureTime ? ` — ${baggage.departureTime}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                </InfoEncart>
-              )}
-            </div>
-          );
-        })()}
-
-        {/* ═══ 🟦 EDIT MODE: BLOC 2 — Transport Details (white card) ═══ */}
+        {/* ═══ EDIT MODE: CARD 2 — Hotel Info (white card, NEW) ═══ */}
         {baggage && isEditing && (
-          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
+              <Building2 className="w-4 h-4" style={{ color: INK }} />
+              {i18n('hotelLabel', lang)}
+            </h2>
+
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelNameLabel', lang)}</label>
+              <input
+                type="text"
+                value={editHotelName}
+                onChange={(e) => setEditHotelName(e.target.value)}
+                placeholder="Hilton, Mövenpick..."
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('roomLabel', lang)}</label>
+              <input
+                type="text"
+                value={editRoomNumber}
+                onChange={(e) => setEditRoomNumber(e.target.value)}
+                placeholder="123"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ═══ EDIT MODE: CARD 3 — Transport Details (white card) ═══ */}
+        {baggage && isEditing && (
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
               <span>✈️</span> {t('finder.edit_transport_mode')}
             </h2>
 
@@ -1201,7 +1254,7 @@ export default function ScanPage() {
                 onChange={(e) => setEditDestination(e.target.value)}
                 placeholder={t('transport.common_destination_placeholder')}
                 className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
@@ -1213,7 +1266,7 @@ export default function ScanPage() {
                 value={editDepartureDate}
                 onChange={(e) => setEditDepartureDate(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
 
@@ -1225,21 +1278,21 @@ export default function ScanPage() {
                 value={editDepartureTime}
                 onChange={(e) => setEditDepartureTime(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
             </div>
           </div>
         )}
 
-        {/* ═══ 🟦 EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
+        {/* ═══ EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
         {isEditing && (
           <div className="flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            {/* Save Button — primary black */}
+            {/* Save Button — primary dark blue */}
             <button
               onClick={handleSave}
               disabled={isSaving}
               className="flex-1 py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
-              style={{ background: BTN_PRIMARY }}
+              style={{ background: ACCENT }}
             >
               {isSaving ? (
                 <>
@@ -1268,41 +1321,36 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* ═══ 🟡 BLOC 3 : ENCART FINDER (white card) ═══ */}
-        <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+        {/* ═══ CTA + FINDER FORM (white card) ═══ */}
+        <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
 
-          {/* ─── 1. BIG "📞 Contacter le propriétaire" CTA button (FIRST) ─── */}
+          {/* ─── BIG "📞 Contacter le propriétaire" CTA button ─── */}
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
               className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
-              style={{ background: BTN_PRIMARY }}
+              style={{ background: ACCENT }}
             >
               <Phone className="w-5 h-5" />
-              <span>{t('finder.contact_owner_cta')}</span>
+              <span>{i18n('ctaText', lang)}</span>
             </button>
           )}
 
-          {/* ─── 2 + 3. Form (revealed when CTA clicked): GPS button + form fields ─── */}
+          {/* ─── Finder Form (revealed when CTA clicked) ─── */}
           {showForm && (
             <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
 
-              {/* GPS Success/Error indicators + dedicated GPS button REMOVED per refonte-6 brief.
-                  GPS is now captured automatically inside the WhatsApp button click (silent fallback to manual location). */}
-
-              {/* ─── Form fields: prénom, téléphone, lieu ─── */}
-
-              {/* First name */}
+              {/* Finder First name */}
               <input
                 type="text"
                 placeholder={t('finder.first_name')}
                 value={finderName}
                 onChange={(e) => setFinderName(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />
 
-              {/* Phone (PhoneInput with dark=false but on yellow bg → white input) */}
+              {/* Finder Phone */}
               <PhoneInput
                 countryCode={finderPhoneCountry}
                 onCountryChange={setFinderPhoneCountry}
@@ -1313,7 +1361,7 @@ export default function ScanPage() {
                 className="min-h-[48px]"
               />
 
-              {/* Location */}
+              {/* Location (optional — GPS is auto-captured) */}
               <div>
                 <input
                   type="text"
@@ -1321,11 +1369,11 @@ export default function ScanPage() {
                   value={otherLocation}
                   onChange={(e) => setOtherLocation(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+                  style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
                 />
               </div>
 
-              {/* ─── Contact choice: WhatsApp (GREEN + GPS auto) + Phone (BLACK) ─── */}
+              {/* ─── Contact choice: WhatsApp (GREEN + GPS auto) + Phone (DARK BLUE) ─── */}
               <div className="pt-1">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-center mb-2.5" style={{ color: INK }}>
                   {t('finder.contact_choice')}
@@ -1360,12 +1408,12 @@ export default function ScanPage() {
                       </>
                     )}
                   </button>
-                  {/* Phone Button — BLACK + white text (consistent with primary CTA) */}
+                  {/* Phone Button — Dark blue ACCENT + white text */}
                   <button
                     onClick={handlePhoneCall}
                     disabled={isLocating || isSubmitting}
                     className="py-3.5 px-4 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[52px] disabled:opacity-70"
-                    style={{ background: BTN_PRIMARY }}
+                    style={{ background: ACCENT }}
                   >
                     <Phone className="w-5 h-5" />
                     {t('finder.by_phone')}
@@ -1385,6 +1433,11 @@ export default function ScanPage() {
           <span>{t('finder.trust_note')}</span>
         </div>
       </div>
+
+      {/* ─── Footer ─── */}
+      <footer className="mt-auto pb-[env(safe-area-inset-bottom,8px)] pt-4 text-center text-xs font-medium" style={{ color: 'rgba(0,0,0,0.65)' }}>
+        {i18n('footer', lang)}
+      </footer>
 
       {/* AI-FEATURE: Chatbot Widget (Feature #1) — only on active/lost baggage */}
       {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && (
