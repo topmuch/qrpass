@@ -1,0 +1,1043 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useState, useCallback, useRef } from 'react';
+     4→import { useParams } from 'next/navigation';
+     5→import Link from 'next/link';
+     6→import {
+     7→  Loader2,
+     8→  AlertCircle,
+     9→  Shield,
+    10→  Phone,
+    11→  MapPin,
+    12→  MessageCircle,
+    13→  Navigation,
+    14→  Send,
+    15→  Heart,
+    16→  Building2,
+    17→  Globe,
+    18→  Pencil,
+    19→  Check,
+    20→  RotateCcw,
+    21→  Droplets,
+    22→  Upload,
+    23→  ShieldCheck,
+    24→  HelpCircle,
+    25→} from 'lucide-react';
+    26→import { toast } from '@/hooks/use-toast';
+    27→
+    28→// ─── Brand constants ───
+    29→const BG = '#f4b400';
+    30→const CARD_BG = '#ffffff';
+    31→const TEXT = '#1a1a1a';
+    32→const MUTED = '#6b7280';
+    33→const DANGER = '#dc2626';
+    34→const SUCCESS = '#10b981';
+    35→const BLUE = '#3b82f6';
+    36→const WA_GREEN = '#25D366';
+    37→const RADIUS = '20px';
+    38→const SHADOW = '0 8px 24px rgba(0,0,0,0.12)';
+    39→const INPUT_BG = '#f3f4f6';
+    40→const INPUT_BORDER = '#d1d5db';
+    41→
+    42→// ─── Pilgrim data interface ───
+    43→interface PilgrimData {
+    44→  id: string;
+    45→  qrCode: string;
+    46→  fullName: string;
+    47→  nationality: string;
+    48→  photoUrl: string | null;
+    49→  bloodType: string | null;
+    50→  medicalInfo: string | null;
+    51→  hotelMecca: string | null;
+    52→  roomMecca: string | null;
+    53→  hotelMedina: string | null;
+    54→  roomMedina: string | null;
+    55→  hotelCoords: { lat: number; lng: number } | string | null;
+    56→  groupLeaderPhone: string | null;
+    57→  agencyPhone: string | null;
+    58→  familyContact: string | null;
+    59→  alNusukDocUrl: string | null;
+    60→  isActive: boolean;
+    61→  duration: string | null;
+    62→  expiresAt: string | null;
+    63→  createdAt: string;
+    64→  updatedAt: string;
+    65→  reports: ReportData[];
+    66→}
+    67→
+    68→interface ReportData {
+    69→  id: string;
+    70→  finderName: string;
+    71→  finderPhone: string;
+    72→  latitude: number | null;
+    73→  longitude: number | null;
+    74→  message: string | null;
+    75→  createdAt: string;
+    76→}
+    77→
+    78→type PageState = 'loading' | 'active' | 'not_found' | 'not_activated' | 'expired' | 'error';
+    79→type GpsStatus = 'idle' | 'locating' | 'success' | 'error';
+    80→
+    81→// ─── i18n translations ───
+    82→const translations = {
+    83→  fr: {
+    84→    // Header
+    85→    helpLink: 'Aide ?',
+    86→    // GPS bar
+    87→    gpsLocating: '📍 Localisation en cours...',
+    88→    gpsSuccess: '📍 Position partagée avec succès',
+    89→    gpsError: '❌ Position refusée (Activez GPS)',
+    90→    gpsNotSupported: '⚠️ GPS non supporté',
+    91→    // Profile card
+    92→    identityTag: 'Pass Identity – Hajj 2026',
+    93→    // Info grid
+    94→    healthLabel: 'Santé',
+    95→    hotelLabel: 'Hôtel',
+    96→    noMedical: 'Aucune info',
+    97→    noHotel: 'Non renseigné',
+    98→    mecca: 'La Mecque',
+    99→    medina: 'Médine',
+   100→    room: 'Ch.',
+   101→    // Actions
+   102→    waBtn: 'Contacter le chef de groupe',
+   103→    callBtn: 'Appeler le chef de groupe',
+   104→    callFamily: 'Appeler la famille',
+   105→    routeToHotel: 'Itinéraire vers l\'hôtel',
+   106→    // Report
+   107→    reportBtn: 'Ce pèlerin est perdu — Cliquez ici',
+   108→    reportSubmit: 'Envoyer le signalement',
+   109→    reportName: 'Votre nom',
+   110→    reportPhone: 'Votre WhatsApp',
+   111→    reportMsg: 'Message (optionnel)',
+   112→    reportSuccess: 'Signalement envoyé !',
+   113→    // Emergency
+   114→    emerTitle: 'Numéros d\'Urgence Saoudiens',
+   115→    // Footer
+   116→    footer: 'PassHajj — Protection intelligente Hajj & Omrah',
+   117→    // States
+   118→    notFound: 'Code QR non reconnu',
+   119→    notFoundDesc: 'Ce code ne correspond à aucun bracelet Pass Identity enregistré.',
+   120→    notActivated: 'Bracelet non activé',
+   121→    notActivatedDesc: 'Ce bracelet n\'a pas encore été activé par son propriétaire.',
+   122→    activateNow: 'Activer maintenant',
+   123→    expired: 'Bracelet expiré',
+   124→    expiredDesc: 'La période de validité de ce bracelet est terminée.',
+   125→    error: 'Erreur',
+   126→    errorDesc: 'Une erreur est survenue. Veuillez réessayer.',
+   127→    // Edit
+   128→    edit: 'Modifier mes infos',
+   129→    cancel: 'Annuler',
+   130→    save: 'Enregistrer',
+   131→    editPhoto: 'Changer la photo',
+   132→    uploading: 'Envoi...',
+   133→    // Reassurance
+   134→    reassuranceTitle: 'Vous êtes protégé',
+   135→    reassurance1: 'Votre chef de groupe reçoit une alerte si ce QR est scanné',
+   136→    reassurance2: 'Vos infos médicales sont accessibles aux secours en 1 clic',
+   137→    reassurance3: 'Vous pouvez modifier votre hôtel à tout moment',
+   138→  },
+   139→  en: {
+   140→    helpLink: 'Help?',
+   141→    gpsLocating: '📍 Locating...',
+   142→    gpsSuccess: '📍 Position shared successfully',
+   143→    gpsError: '❌ Location denied (Enable GPS)',
+   144→    gpsNotSupported: '⚠️ GPS not supported',
+   145→    identityTag: 'Pass Identity – Hajj 2026',
+   146→    healthLabel: 'Health',
+   147→    hotelLabel: 'Hotel',
+   148→    noMedical: 'No info',
+   149→    noHotel: 'Not specified',
+   150→    mecca: 'Mecca',
+   151→    medina: 'Medina',
+   152→    room: 'Rm.',
+   153→    waBtn: 'Contact the group leader',
+   154→    callBtn: 'Call the group leader',
+   155→    callFamily: 'Call family',
+   156→    routeToHotel: 'Route to hotel',
+   157→    reportBtn: 'This pilgrim is lost — Click here',
+   158→    reportSubmit: 'Send report',
+   159→    reportName: 'Your name',
+   160→    reportPhone: 'Your WhatsApp',
+   161→    reportMsg: 'Message (optional)',
+   162→    reportSuccess: 'Report sent!',
+   163→    emerTitle: 'Saudi Emergency Numbers',
+   164→    footer: 'PassHajj — Smart Hajj & Umrah Protection',
+   165→    notFound: 'QR code not recognized',
+   166→    notFoundDesc: 'This code does not match any registered Pass Identity bracelet.',
+   167→    notActivated: 'Bracelet not activated',
+   168→    notActivatedDesc: 'This bracelet has not yet been activated by its owner.',
+   169→    activateNow: 'Activate now',
+   170→    expired: 'Bracelet expired',
+   171→    expiredDesc: 'The validity period of this bracelet has ended.',
+   172→    error: 'Error',
+   173→    errorDesc: 'An error occurred. Please try again.',
+   174→    edit: 'Edit my info',
+   175→    cancel: 'Cancel',
+   176→    save: 'Save',
+   177→    editPhoto: 'Change photo',
+   178→    uploading: 'Uploading...',
+   179→    reassuranceTitle: 'You are protected',
+   180→    reassurance1: 'Your group leader receives an alert if this QR is scanned',
+   181→    reassurance2: 'Your medical info is accessible to emergency services in 1 click',
+   182→    reassurance3: 'You can change your hotel at any time',
+   183→  },
+   184→  ar: {
+   185→    helpLink: 'مساعدة؟',
+   186→    gpsLocating: '📍 جاري التحديد...',
+   187→    gpsSuccess: '📍 تم مشاركة الموقع بنجاح',
+   188→    gpsError: '❌ تم رفض الموقع (فعّل GPS)',
+   189→    gpsNotSupported: '⚠️ GPS غير مدعوم',
+   190→    identityTag: 'Pass Identity – حج 2026',
+   191→    healthLabel: 'الصحة',
+   192→    hotelLabel: 'الفندق',
+   193→    noMedical: 'لا معلومات',
+   194→    noHotel: 'غير محدد',
+   195→    mecca: 'مكة المكرمة',
+   196→    medina: 'المدينة المنورة',
+   197→    room: 'غرفة',
+   198→    waBtn: 'اتصل بقائد المجموعة',
+   199→    callBtn: 'اتصل بقائد المجموعة',
+   200→    callFamily: 'اتصل بالعائلة',
+   201→    routeToHotel: 'اتجاهات إلى الفندق',
+   202→    reportBtn: 'هذا الحاج ضائع — انقر هنا',
+   203→    reportSubmit: 'إرسال البلاغ',
+   204→    reportName: 'اسمك',
+   205→    reportPhone: 'الواتساب الخاص بك',
+   206→    reportMsg: 'رسالة (اختياري)',
+   207→    reportSuccess: 'تم إرسال البلاغ!',
+   208→    emerTitle: 'أرقام الطوارئ السعودية',
+   209→    footer: 'PassHajj — حماية ذكية للحج والعمرة',
+   210→    notFound: 'رمز QR غير معروف',
+   211→    notFoundDesc: 'هذا الرمز لا يتطابق مع أي سوار Pass Identity مسجل.',
+   212→    notActivated: 'السوار غير مفعّل',
+   213→    notActivatedDesc: 'لم يتم تفعيل هذا السوار بعد من قبل مالكه.',
+   214→    activateNow: 'تفعيل الآن',
+   215→    expired: 'السوار منتهي الصلاحية',
+   216→    expiredDesc: 'انتهت فترة صلاحية هذا السوار.',
+   217→    error: 'خطأ',
+   218→    errorDesc: 'حدث خطأ. يرجى المحاولة مرة أخرى.',
+   219→    edit: 'تعديل معلوماتي',
+   220→    cancel: 'إلغاء',
+   221→    save: 'حفظ',
+   222→    editPhoto: 'تغيير الصورة',
+   223→    uploading: 'جاري الرفع...',
+   224→    reassuranceTitle: 'أنت محمي',
+   225→    reassurance1: 'يتلقى قائد مجموعتك تنبيهًا عند مسح هذا الرمز',
+   226→    reassurance2: 'معلوماتك الطبية متاحة لخدمات الطوارئ بنقرة واحدة',
+   227→    reassurance3: 'يمكنك تغيير فندقك في أي وقت',
+   228→  },
+   229→};
+   230→
+   231→type Lang = 'fr' | 'en' | 'ar';
+   232→
+   233→// ─── Helper: Parse hotelCoords ───
+   234→function parseCoords(coords: { lat: number; lng: number } | string | null): { lat: number; lng: number } | null {
+   235→  if (!coords) return null;
+   236→  if (typeof coords === 'object' && 'lat' in coords && 'lng' in coords) {
+   237→    return { lat: coords.lat, lng: coords.lng };
+   238→  }
+   239→  if (typeof coords === 'string') {
+   240→    try {
+   241→      const parsed = JSON.parse(coords);
+   242→      if (parsed && typeof parsed === 'object' && 'lat' in parsed && 'lng' in parsed) {
+   243→        return { lat: parsed.lat, lng: parsed.lng };
+   244→      }
+   245→    } catch {
+   246→      const parts = coords.split(',').map((s) => parseFloat(s.trim()));
+   247→      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+   248→        return { lat: parts[0], lng: parts[1] };
+   249→      }
+   250→    }
+   251→  }
+   252→  return null;
+   253→}
+   254→
+   255→// ─── Helper: Clean phone for WhatsApp ───
+   256→function cleanPhone(phone: string): string {
+   257→  return phone.replace(/[^0-9+]/g, '').replace(/^\+/g, '');
+   258→}
+   259→
+   260→// ─── Default Mecca coords (Kaaba) ───
+   261→const DEFAULT_LAT = 21.4225;
+   262→const DEFAULT_LNG = 39.8262;
+   263→
+   264→export default function PilgrimScanPage() {
+   265→  const { code } = useParams<{ code: string }>();
+   266→
+   267→  // ─── State ───
+   268→  const [state, setState] = useState<PageState>('loading');
+   269→  const [pilgrim, setPilgrim] = useState<PilgrimData | null>(null);
+   270→  const [lang, setLang] = useState<Lang>('fr');
+   271→
+   272→  // ─── GPS state (auto-detect on load) ───
+   273→  const [gpsStatus, setGpsStatus] = useState<GpsStatus>('idle');
+   274→  const [finderLat, setFinderLat] = useState<number | null>(null);
+   275→  const [finderLng, setFinderLng] = useState<number | null>(null);
+   276→
+   277→  // ─── Report state ───
+   278→  const [showReport, setShowReport] = useState(false);
+   279→  const [reportName, setReportName] = useState('');
+   280→  const [reportPhone, setReportPhone] = useState('');
+   281→  const [reportMessage, setReportMessage] = useState('');
+   282→  const [reportSubmitting, setReportSubmitting] = useState(false);
+   283→  const [reportSuccess, setReportSuccess] = useState(false);
+   284→
+   285→  // ─── Edit state ───
+   286→  const [isEditing, setIsEditing] = useState(false);
+   287→  const [isSaving, setIsSaving] = useState(false);
+   288→  const [editFullName, setEditFullName] = useState('');
+   289→  const [editNationality, setEditNationality] = useState('');
+   290→  const [editBloodType, setEditBloodType] = useState('');
+   291→  const [editMedicalInfo, setEditMedicalInfo] = useState('');
+   292→  const [editHotelMecca, setEditHotelMecca] = useState('');
+   293→  const [editRoomMecca, setEditRoomMecca] = useState('');
+   294→  const [editHotelMedina, setEditHotelMedina] = useState('');
+   295→  const [editRoomMedina, setEditRoomMedina] = useState('');
+   296→  const [editGroupLeaderPhone, setEditGroupLeaderPhone] = useState('');
+   297→  const [editFamilyContact, setEditFamilyContact] = useState('');
+   298→
+   299→  // ─── Photo upload state ───
+   300→  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+   301→  const photoInputRef = useRef<HTMLInputElement>(null);
+   302→
+   303→  // ─── i18n helper ───
+   304→  const t = (key: string): string => {
+   305→    return (translations[lang] as Record<string, string>)[key] || key;
+   306→  };
+   307→
+   308→  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+   309→
+   310→  // ─── Toggle language ───
+   311→  const toggleLang = () => {
+   312→    const langs: Lang[] = ['fr', 'en', 'ar'];
+   313→    setLang(langs[(langs.indexOf(lang) + 1) % 3]);
+   314→  };
+   315→
+   316→  // ─── Fetch pilgrim data ───
+   317→  useEffect(() => {
+   318→    if (!code) return;
+   319→
+   320→    const fetchPilgrim = async () => {
+   321→      try {
+   322→        const res = await fetch(`/api/pilgrims/${code}`);
+   323→        const data = await res.json();
+   324→
+   325→        if (data.status === 'not_found') { setState('not_found'); return; }
+   326→        if (data.status === 'not_activated') { setState('not_activated'); return; }
+   327→        if (data.status === 'expired') { setState('expired'); return; }
+   328→
+   329→        if (data.pilgrim) {
+   330→          setPilgrim(data.pilgrim);
+   331→          setState('active');
+   332→          const p = data.pilgrim;
+   333→          setEditFullName(p.fullName || '');
+   334→          setEditNationality(p.nationality || '');
+   335→          setEditBloodType(p.bloodType || '');
+   336→          setEditMedicalInfo(p.medicalInfo || '');
+   337→          setEditHotelMecca(p.hotelMecca || '');
+   338→          setEditRoomMecca(p.roomMecca || '');
+   339→          setEditHotelMedina(p.hotelMedina || '');
+   340→          setEditRoomMedina(p.roomMedina || '');
+   341→          setEditGroupLeaderPhone(p.groupLeaderPhone || '');
+   342→          setEditFamilyContact(p.familyContact || '');
+   343→          return;
+   344→        }
+   345→
+   346→        setState('error');
+   347→      } catch {
+   348→        setState('error');
+   349→      }
+   350→    };
+   351→
+   352→    fetchPilgrim();
+   353→  }, [code]);
+   354→
+   355→  // ─── Auto GPS detection on page load ───
+   356→  useEffect(() => {
+   357→    if (state !== 'active') return;
+   358→    if (!navigator.geolocation) {
+   359→      setGpsStatus('error');
+   360→      return;
+   361→    }
+   362→
+   363→    setGpsStatus('locating');
+   364→    navigator.geolocation.getCurrentPosition(
+   365→      (pos) => {
+   366→        setFinderLat(pos.coords.latitude);
+   367→        setFinderLng(pos.coords.longitude);
+   368→        setGpsStatus('success');
+   369→      },
+   370→      () => {
+   371→        setGpsStatus('error');
+   372→      },
+   373→      { enableHighAccuracy: true, timeout: 8000 }
+   374→    );
+   375→  }, [state]);
+   376→
+   377→  // ─── Save handler ───
+   378→  const handleSave = async () => {
+   379→    setIsSaving(true);
+   380→    try {
+   381→      const res = await fetch(`/api/pilgrims/${code}`, {
+   382→        method: 'PUT',
+   383→        headers: { 'Content-Type': 'application/json' },
+   384→        body: JSON.stringify({
+   385→          fullName: editFullName.trim(),
+   386→          nationality: editNationality.trim(),
+   387→          bloodType: editBloodType || null,
+   388→          medicalInfo: editMedicalInfo || null,
+   389→          hotelMecca: editHotelMecca || null,
+   390→          roomMecca: editRoomMecca || null,
+   391→          hotelMedina: editHotelMedina || null,
+   392→          roomMedina: editRoomMedina || null,
+   393→          groupLeaderPhone: editGroupLeaderPhone || null,
+   394→          familyContact: editFamilyContact || null,
+   395→        }),
+   396→      });
+   397→      if (!res.ok) throw new Error('Failed to save');
+   398→      const data = await res.json();
+   399→      setPilgrim(data.pilgrim);
+   400→      setIsEditing(false);
+   401→      toast({ title: 'Informations mises à jour !' });
+   402→    } catch {
+   403→      toast({ title: 'Erreur lors de la sauvegarde', variant: 'destructive' });
+   404→    } finally {
+   405→      setIsSaving(false);
+   406→    }
+   407→  };
+   408→
+   409→  // ─── Cancel edit ───
+   410→  const handleCancelEdit = () => {
+   411→    if (pilgrim) {
+   412→      setEditFullName(pilgrim.fullName || '');
+   413→      setEditNationality(pilgrim.nationality || '');
+   414→      setEditBloodType(pilgrim.bloodType || '');
+   415→      setEditMedicalInfo(pilgrim.medicalInfo || '');
+   416→      setEditHotelMecca(pilgrim.hotelMecca || '');
+   417→      setEditRoomMecca(pilgrim.roomMecca || '');
+   418→      setEditHotelMedina(pilgrim.hotelMedina || '');
+   419→      setEditRoomMedina(pilgrim.roomMedina || '');
+   420→      setEditGroupLeaderPhone(pilgrim.groupLeaderPhone || '');
+   421→      setEditFamilyContact(pilgrim.familyContact || '');
+   422→    }
+   423→    setIsEditing(false);
+   424→  };
+   425→
+   426→  // ─── Photo upload handler ───
+   427→  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   428→    const file = e.target.files?.[0];
+   429→    if (!file || !code) return;
+   430→
+   431→    setIsUploadingPhoto(true);
+   432→    try {
+   433→      const formData = new FormData();
+   434→      formData.append('file', file);
+   435→      const uploadRes = await fetch('/api/pilgrims/upload-photo', {
+   436→        method: 'POST',
+   437→        body: formData,
+   438→      });
+   439→      if (!uploadRes.ok) throw new Error('Upload failed');
+   440→      const uploadData = await uploadRes.json();
+   441→      const photoUrl = uploadData.photoUrl;
+   442→
+   443→      const updateRes = await fetch(`/api/pilgrims/${code}`, {
+   444→        method: 'PUT',
+   445→        headers: { 'Content-Type': 'application/json' },
+   446→        body: JSON.stringify({ photoUrl }),
+   447→      });
+   448→      if (!updateRes.ok) throw new Error('Update failed');
+   449→      const updateData = await updateRes.json();
+   450→
+   451→      setPilgrim(updateData.pilgrim);
+   452→      toast({ title: 'Photo mise à jour !' });
+   453→    } catch {
+   454→      toast({ title: 'Erreur lors du téléchargement de la photo', variant: 'destructive' });
+   455→    } finally {
+   456→      setIsUploadingPhoto(false);
+   457→      if (photoInputRef.current) photoInputRef.current.value = '';
+   458→    }
+   459→  };
+   460→
+   461→  // ─── Submit report ───
+   462→  const handleSubmitReport = useCallback(async () => {
+   463→    if (!reportName.trim() || !reportPhone.trim()) return;
+   464→
+   465→    setReportSubmitting(true);
+   466→    try {
+   467→      const res = await fetch('/api/pilgrims/report', {
+   468→        method: 'POST',
+   469→        headers: { 'Content-Type': 'application/json' },
+   470→        body: JSON.stringify({
+   471→          pilgrimQrCode: code,
+   472→          finderName: reportName.trim(),
+   473→          finderPhone: reportPhone.trim(),
+   474→          latitude: finderLat,
+   475→          longitude: finderLng,
+   476→          message: reportMessage.trim() || null,
+   477→        }),
+   478→      });
+   479→
+   480→      if (!res.ok) throw new Error('Report failed');
+   481→      const data = await res.json();
+   482→      setReportSuccess(true);
+   483→
+   484→      if (data.whatsappUrl) {
+   485→        window.open(data.whatsappUrl, '_blank');
+   486→      }
+   487→    } catch {
+   488→      toast({ title: 'Erreur lors du signalement', variant: 'destructive' });
+   489→    } finally {
+   490→      setReportSubmitting(false);
+   491→    }
+   492→  }, [code, reportName, reportPhone, reportMessage, finderLat, finderLng]);
+   493→
+   494→  // ─── Computed values ───
+   495→  const coords = parseCoords(pilgrim?.hotelCoords ?? null);
+   496→  const hotelLat = coords?.lat ?? DEFAULT_LAT;
+   497→  const hotelLng = coords?.lng ?? DEFAULT_LNG;
+   498→
+   499→  // WhatsApp link with auto GPS
+   500→  const whatsappLeaderUrl = pilgrim?.groupLeaderPhone
+   501→    ? (() => {
+   502→        let message = `🚨 Bonjour, j'ai trouvé un pèlerin PassHajj.\nNom: ${pilgrim.fullName}\n`;
+   503→        if (finderLat && finderLng) {
+   504→          message += `📍 Localisation: https://maps.google.com/?q=${finderLat},${finderLng}`;
+   505→        } else {
+   506→          message += `📍 Localisation: Inconnue`;
+   507→        }
+   508→        return `https://wa.me/${cleanPhone(pilgrim.groupLeaderPhone)}?text=${encodeURIComponent(message)}`;
+   509→      })()
+   510→    : null;
+   511→
+   512→  const hotelMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hotelLat},${hotelLng}&travelmode=walking`;
+   513→
+   514→  // Determine which hotel to show
+   515→  const activeHotel = pilgrim?.hotelMecca || pilgrim?.hotelMedina;
+   516→  const activeRoom = pilgrim?.hotelMecca ? pilgrim.roomMecca : pilgrim?.roomMedina;
+   517→  const activeCity = pilgrim?.hotelMecca ? t('mecca') : pilgrim?.hotelMedina ? t('medina') : null;
+   518→
+   519→  // ─── Common input styles ───
+   520→  const inputClass = 'w-full h-12 px-4 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border';
+   521→  const inputStyle = { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER };
+   522→
+   523→  // ─── Build initials for avatar fallback ───
+   524→  const getInitials = (name: string) => {
+   525→    const parts = name.trim().split(/\s+/);
+   526→    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+   527→    return name.substring(0, 2).toUpperCase();
+   528→  };
+   529→
+   530→  // ─── Hotel display text ───
+   531→  const hotelDisplay = activeHotel
+   532→    ? `${activeHotel}${activeRoom ? ` (${t('room')} ${activeRoom})` : ''}`
+   533→    : t('noHotel');
+   534→
+   535→  return (
+   536→    <main
+   537→      dir={dir}
+   538→      className="min-h-screen flex flex-col items-center px-4 py-4"
+   539→      style={{ background: BG, color: TEXT }}
+   540→    >
+   541→      {/* ═══════════════════════════════════════════════════════════
+   542→          LOADING STATE
+   543→      ═══════════════════════════════════════════════════════════ */}
+   544→      {state === 'loading' && (
+   545→        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+   546→          <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full" />
+   547→          <p className="font-medium">PassHajj…</p>
+   548→        </div>
+   549→      )}
+   550→
+   551→      {/* ═══════════════════════════════════════════════════════════
+   552→          NOT FOUND STATE
+   553→      ═══════════════════════════════════════════════════════════ */}
+   554→      {state === 'not_found' && (
+   555→        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
+   556→          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
+   557→            <AlertCircle className="w-10 h-10 text-red-500" />
+   558→          </div>
+   559→          <h2 className="text-xl font-bold">{t('notFound')}</h2>
+   560→          <p className="text-sm" style={{ color: MUTED }}>{t('notFoundDesc')}</p>
+   561→          <div className="p-4 bg-black/5 rounded-xl w-full mt-2">
+   562→            <p className="text-xs font-mono break-all" style={{ color: MUTED }}>{code}</p>
+   563→          </div>
+   564→        </div>
+   565→      )}
+   566→
+   567→      {/* ═══════════════════════════════════════════════════════════
+   568→          NOT ACTIVATED STATE
+   569→      ═══════════════════════════════════════════════════════════ */}
+   570→      {state === 'not_activated' && (
+   571→        <div className="flex-1 flex flex-col items-center justify-center w-full">
+   572→          <div className="text-[28px] font-extrabold tracking-tight text-black mb-8">
+   573→            <span className="text-white bg-black px-2.5 py-1 rounded-lg mr-1.5">Pass</span>Hajj
+   574→          </div>
+   575→          <div className="w-full max-w-[400px] text-center">
+   576→            <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
+   577→              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#fff3cd' }}>
+   578→                <AlertCircle className="w-10 h-10" style={{ color: '#f4b400' }} />
+   579→              </div>
+   580→              <h1 className="text-[22px] font-extrabold leading-tight mb-3">{t('notActivated')}</h1>
+   581→              <p className="text-[15px] leading-relaxed mb-6" style={{ color: MUTED }}>{t('notActivatedDesc')}</p>
+   582→              <div className="py-3 px-4 rounded-xl mb-6 font-mono font-bold text-base tracking-wider" style={{ background: INPUT_BG, color: '#333', border: `1px solid ${INPUT_BORDER}` }}>
+   583→                ID: {code}
+   584→              </div>
+   585→              <Link
+   586→                href={`/activate/identity?code=${encodeURIComponent(code)}`}
+   587→                className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   588→                style={{ background: '#111827', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+   589→              >
+   590→                <Shield className="w-5 h-5" />
+   591→                {t('activateNow')}
+   592→              </Link>
+   593→            </div>
+   594→            <div className="text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+   595→              Propulsé par <strong>PassHajj</strong>
+   596→            </div>
+   597→          </div>
+   598→        </div>
+   599→      )}
+   600→
+   601→      {/* ═══════════════════════════════════════════════════════════
+   602→          EXPIRED STATE
+   603→      ═══════════════════════════════════════════════════════════ */}
+   604→      {state === 'expired' && (
+   605→        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
+   606→          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
+   607→            <AlertCircle className="w-10 h-10 text-gray-400" />
+   608→          </div>
+   609→          <h2 className="text-xl font-bold">{t('expired')}</h2>
+   610→          <p className="text-sm" style={{ color: MUTED }}>{t('expiredDesc')}</p>
+   611→          <div className="p-4 bg-black/5 rounded-xl w-full mt-2">
+   612→            <p className="text-xs font-mono break-all" style={{ color: MUTED }}>{code}</p>
+   613→          </div>
+   614→        </div>
+   615→      )}
+   616→
+   617→      {/* ═══════════════════════════════════════════════════════════
+   618→          ERROR STATE
+   619→      ═══════════════════════════════════════════════════════════ */}
+   620→      {state === 'error' && (
+   621→        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
+   622→          <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
+   623→            <AlertCircle className="w-10 h-10 text-red-500" />
+   624→          </div>
+   625→          <h2 className="text-xl font-bold">{t('error')}</h2>
+   626→          <p className="text-sm" style={{ color: MUTED }}>{t('errorDesc')}</p>
+   627→        </div>
+   628→      )}
+   629→
+   630→      {/* ═══════════════════════════════════════════════════════════
+   631→          ACTIVE STATE — TROUVEUR Design
+   632→      ═══════════════════════════════════════════════════════════ */}
+   633→      {state === 'active' && pilgrim && (
+   634→        <>
+   635→          {/* ─── HEADER ─── */}
+   636→          <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
+   637→            <div className="text-[22px] font-extrabold tracking-tight text-black">
+   638→              <span className="text-white bg-black px-1.5 py-0.5 rounded-md mr-1">Pass</span>Hajj
+   639→            </div>
+   640→            <div className="flex items-center gap-3">
+   641→              <button
+   642→                onClick={toggleLang}
+   643→                className="bg-white/30 border-none px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer hover:bg-white/50 transition-colors"
+   644→                style={{ color: TEXT }}
+   645→              >
+   646→                {lang.toUpperCase()}
+   647→              </button>
+   648→            </div>
+   649→          </div>
+   650→
+   651→          {/* ─── GPS STATUS BAR ─── */}
+   652→          {gpsStatus !== 'idle' && (
+   653→            <div
+   654→              className="w-full max-w-[420px] py-3 px-4 rounded-xl flex items-center gap-2 text-[13px] font-semibold mb-5"
+   655→              style={{
+   656→                background: gpsStatus === 'locating' ? 'rgba(255,255,255,0.4)' : gpsStatus === 'success' ? '#d1fae5' : '#fee2e2',
+   657→                color: gpsStatus === 'locating' ? '#000' : gpsStatus === 'success' ? '#065f46' : '#991b1b',
+   658→                animation: 'slideDown 0.4s ease',
+   659→              }}
+   660→            >
+   661→              {gpsStatus === 'locating' && <Loader2 className="w-4 h-4 animate-spin" />}
+   662→              {gpsStatus === 'success' && <Check className="w-4 h-4" />}
+   663→              {gpsStatus === 'error' && <AlertCircle className="w-4 h-4" />}
+   664→              {gpsStatus === 'locating' ? t('gpsLocating') : gpsStatus === 'success' ? t('gpsSuccess') : t('gpsError')}
+   665→            </div>
+   666→          )}
+   667→
+   668→          {/* ═══════════════════════════════════════════════════════════
+   669→              EDIT MODE
+   670→          ═══════════════════════════════════════════════════════════ */}
+   671→          {isEditing ? (
+   672→            <div className="w-full max-w-[420px] space-y-4">
+   673→              <div className="rounded-[20px] p-5" style={{ background: CARD_BG, boxShadow: SHADOW }}>
+   674→                <div className="flex items-center justify-between mb-4">
+   675→                  <h3 className="text-lg font-bold flex items-center gap-2">
+   676→                    <Pencil className="w-5 h-5" style={{ color: '#059669' }} />
+   677→                    Identité
+   678→                  </h3>
+   679→                  <div className="flex gap-2">
+   680→                    <button onClick={handleCancelEdit} className="px-3 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 bg-white text-black hover:bg-gray-50 transition-colors">
+   681→                      <RotateCcw className="w-4 h-4" />
+   682→                    </button>
+   683→                    <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-1 disabled:opacity-50" style={{ background: '#059669' }}>
+   684→                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+   685→                      {t('save')}
+   686→                    </button>
+   687→                  </div>
+   688→                </div>
+   689→                <div className="space-y-3">
+   690→                  <div>
+   691→                    <label className="text-sm font-semibold mb-1 block">Nom complet *</label>
+   692→                    <input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} className={inputClass} style={inputStyle} />
+   693→                  </div>
+   694→                  <div>
+   695→                    <label className="text-sm font-semibold mb-1 block">Nationalité *</label>
+   696→                    <input type="text" value={editNationality} onChange={(e) => setEditNationality(e.target.value)} className={inputClass} style={inputStyle} />
+   697→                  </div>
+   698→                  <div>
+   699→                    <label className="text-sm font-semibold mb-1 block">Groupe Sanguin</label>
+   700→                    <select value={editBloodType} onChange={(e) => setEditBloodType(e.target.value)} className={inputClass} style={{ ...inputStyle, appearance: 'none' }}>
+   701→                      <option value="">—</option>
+   702→                      {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bt) => (
+   703→                        <option key={bt} value={bt}>{bt}</option>
+   704→                      ))}
+   705→                    </select>
+   706→                  </div>
+   707→                  <div>
+   708→                    <label className="text-sm font-semibold mb-1 block">Infos Médicales</label>
+   709→                    <textarea value={editMedicalInfo} onChange={(e) => setEditMedicalInfo(e.target.value)} placeholder="Allergies, maladies chroniques..." rows={3} className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none" style={inputStyle} />
+   710→                  </div>
+   711→                  <div>
+   712→                    <label className="text-sm font-semibold mb-1 block">Hôtel (La Mecque)</label>
+   713→                    <input type="text" value={editHotelMecca} onChange={(e) => setEditHotelMecca(e.target.value)} className={inputClass} style={inputStyle} />
+   714→                  </div>
+   715→                  <div>
+   716→                    <label className="text-sm font-semibold mb-1 block">Chambre (La Mecque)</label>
+   717→                    <input type="text" value={editRoomMecca} onChange={(e) => setEditRoomMecca(e.target.value)} className={inputClass} style={inputStyle} />
+   718→                  </div>
+   719→                  <div>
+   720→                    <label className="text-sm font-semibold mb-1 block">Hôtel (Médine)</label>
+   721→                    <input type="text" value={editHotelMedina} onChange={(e) => setEditHotelMedina(e.target.value)} className={inputClass} style={inputStyle} />
+   722→                  </div>
+   723→                  <div>
+   724→                    <label className="text-sm font-semibold mb-1 block">Chambre (Médine)</label>
+   725→                    <input type="text" value={editRoomMedina} onChange={(e) => setEditRoomMedina(e.target.value)} className={inputClass} style={inputStyle} />
+   726→                  </div>
+   727→                  <div>
+   728→                    <label className="text-sm font-semibold mb-1 block">WhatsApp Chef de Groupe</label>
+   729→                    <input type="tel" value={editGroupLeaderPhone} onChange={(e) => setEditGroupLeaderPhone(e.target.value)} className={inputClass} style={inputStyle} />
+   730→                  </div>
+   731→                  <div>
+   732→                    <label className="text-sm font-semibold mb-1 block">Téléphone Famille</label>
+   733→                    <input type="tel" value={editFamilyContact} onChange={(e) => setEditFamilyContact(e.target.value)} className={inputClass} style={inputStyle} />
+   734→                  </div>
+   735→                </div>
+   736→              </div>
+   737→            </div>
+   738→          ) : (
+   739→            <>
+   740→              {/* ─── PROFILE CARD ─── */}
+   741→              <div
+   742→                className="w-full max-w-[420px] rounded-[20px] p-6 text-center mb-4"
+   743→                style={{ background: CARD_BG, boxShadow: SHADOW }}
+   744→              >
+   745→                {/* Photo — clickable for upload */}
+   746→                <div className="relative inline-block mx-auto mb-4">
+   747→                  <button
+   748→                    onClick={() => photoInputRef.current?.click()}
+   749→                    disabled={isUploadingPhoto}
+   750→                    className="relative group cursor-pointer disabled:opacity-50"
+   751→                    type="button"
+   752→                  >
+   753→                    {pilgrim.photoUrl ? (
+   754→                      <img
+   755→                        src={pilgrim.photoUrl}
+   756→                        alt={pilgrim.fullName}
+   757→                        className="w-[100px] h-[100px] rounded-full object-cover border-4 border-white"
+   758→                        style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+   759→                        onError={(e) => {
+   760→                          const target = e.currentTarget;
+   761→                          target.style.display = 'none';
+   762→                          const fallback = target.nextElementSibling as HTMLElement;
+   763→                          if (fallback) fallback.style.display = 'flex';
+   764→                        }}
+   765→                      />
+   766→                    ) : null}
+   767→                    <div
+   768→                      className="w-[100px] h-[100px] rounded-full border-4 border-white items-center justify-center text-2xl font-bold"
+   769→                      style={{
+   770→                        background: '#eee',
+   771→                        color: TEXT,
+   772→                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+   773→                        display: pilgrim.photoUrl ? 'none' : 'flex',
+   774→                        margin: pilgrim.photoUrl ? undefined : '0 auto',
+   775→                      }}
+   776→                    >
+   777→                      {getInitials(pilgrim.fullName)}
+   778→                    </div>
+   779→                    <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+   780→                      {isUploadingPhoto ? <Loader2 className="w-6 h-6 animate-spin text-white" /> : <Upload className="w-5 h-5 text-white" />}
+   781→                    </div>
+   782→                  </button>
+   783→                  <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoChange} className="hidden" />
+   784→                </div>
+   785→
+   786→                {/* Name */}
+   787→                <h1 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h1>
+   788→
+   789→                {/* Tag */}
+   790→                <span
+   791→                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+   792→                  style={{ background: '#f3f4f6', color: MUTED }}
+   793→                >
+   794→                  {t('identityTag')}
+   795→                </span>
+   796→
+   797→                {/* Badges */}
+   798→                <div className="flex justify-center gap-2 flex-wrap mt-3">
+   799→                  {pilgrim.bloodType && (
+   800→                    <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+   801→                      <Droplets className="w-3 h-3" />
+   802→                      {pilgrim.bloodType}
+   803→                    </span>
+   804→                  )}
+   805→                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
+   806→                    <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold" style={{ color: MUTED }}>
+   807→                      {pilgrim.nationality}
+   808→                    </span>
+   809→                  )}
+   810→                </div>
+   811→
+   812→                {/* Edit button */}
+   813→                <button
+   814→                  onClick={() => setIsEditing(true)}
+   815→                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 hover:bg-gray-200 transition-colors"
+   816→                  style={{ color: TEXT }}
+   817→                >
+   818→                  <Pencil className="w-4 h-4" />
+   819→                  {t('edit')}
+   820→                </button>
+   821→              </div>
+   822→
+   823→              {/* ─── INFO GRID (2 columns) ─── */}
+   824→              <div className="w-full max-w-[420px] grid grid-cols-2 gap-3 mb-4">
+   825→                {/* Health */}
+   826→                <div
+   827→                  className="rounded-[16px] p-4 text-center"
+   828→                  style={{
+   829→                    background: '#fef2f2',
+   830→                    boxShadow: SHADOW,
+   831→                    borderLeft: lang === 'ar' ? 'none' : '4px solid #dc2626',
+   832→                    borderRight: lang === 'ar' ? '4px solid #dc2626' : 'none',
+   833→                  }}
+   834→                >
+   835→                  <span className="text-xl block mb-2">🏥</span>
+   836→                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('healthLabel')}</span>
+   837→                  <span className="text-sm font-bold block" style={{ color: DANGER }}>
+   838→                    {pilgrim.medicalInfo || t('noMedical')}
+   839→                  </span>
+   840→                  {pilgrim.bloodType && (
+   841→                    <span className="text-xs font-bold block mt-1" style={{ color: DANGER }}>
+   842→                      🩸 {pilgrim.bloodType}
+   843→                    </span>
+   844→                  )}
+   845→                </div>
+   846→
+   847→                {/* Hotel */}
+   848→                <div
+   849→                  className="rounded-[16px] p-4 text-center"
+   850→                  style={{
+   851→                    background: '#eff6ff',
+   852→                    boxShadow: SHADOW,
+   853→                    borderLeft: lang === 'ar' ? 'none' : '4px solid #3b82f6',
+   854→                    borderRight: lang === 'ar' ? '4px solid #3b82f6' : 'none',
+   855→                  }}
+   856→                >
+   857→                  <span className="text-xl block mb-2">🏨</span>
+   858→                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('hotelLabel')}</span>
+   859→                  <span className="text-sm font-bold block" style={{ color: TEXT }}>
+   860→                    {activeHotel || t('noHotel')}
+   861→                  </span>
+   862→                  {activeRoom && activeCity && (
+   863→                    <span className="text-xs block mt-1" style={{ color: MUTED }}>
+   864→                      {t('room')} {activeRoom} • {activeCity}
+   865→                    </span>
+   866→                  )}
+   867→                </div>
+   868→              </div>
+   869→
+   870→              {/* ─── REASSURANCE SECTION ─── */}
+   871→              <div
+   872→                className="w-full max-w-[420px] rounded-[16px] p-4 mb-4"
+   873→                style={{ background: 'rgba(255,255,255,0.5)' }}
+   874→              >
+   875→                <h3 className="text-[15px] font-extrabold mb-2.5 flex items-center gap-2" style={{ color: TEXT }}>
+   876→                  <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
+   877→                  {t('reassuranceTitle')}
+   878→                </h3>
+   879→                <ul className="space-y-1.5 text-[13px]" style={{ color: TEXT }}>
+   880→                  <li className="flex items-start gap-2">
+   881→                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+   882→                    {t('reassurance1')}
+   883→                  </li>
+   884→                  <li className="flex items-start gap-2">
+   885→                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+   886→                    {t('reassurance2')}
+   887→                  </li>
+   888→                  <li className="flex items-start gap-2">
+   889→                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+   890→                    {t('reassurance3')}
+   891→                  </li>
+   892→                </ul>
+   893→              </div>
+   894→
+   895→              {/* ─── ACTION BUTTONS ─── */}
+   896→              <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4">
+   897→                {/* WhatsApp — Contacter le chef */}
+   898→                {whatsappLeaderUrl && (
+   899→                  <a
+   900→                    href={whatsappLeaderUrl}
+   901→                    target="_blank"
+   902→                    rel="noopener noreferrer"
+   903→                    className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   904→                    style={{ background: WA_GREEN, boxShadow: '0 4px 12px rgba(37,211,102,0.3)' }}
+   905→                  >
+   906→                    <MessageCircle className="w-5 h-5" />
+   907→                    {t('waBtn')}
+   908→                  </a>
+   909→                )}
+   910→
+   911→                {/* Call Chef */}
+   912→                {pilgrim.groupLeaderPhone && (
+   913→                  <a
+   914→                    href={`tel:+${cleanPhone(pilgrim.groupLeaderPhone)}`}
+   915→                    className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   916→                    style={{ background: BLUE, boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
+   917→                  >
+   918→                    <Phone className="w-5 h-5" />
+   919→                    {t('callBtn')}
+   920→                  </a>
+   921→                )}
+   922→
+   923→                {/* Call Family */}
+   924→                {pilgrim.familyContact && (
+   925→                  <a
+   926→                    href={`tel:+${cleanPhone(pilgrim.familyContact)}`}
+   927→                    className="w-full py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+   928→                    style={{ background: '#6366f1', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' }}
+   929→                  >
+   930→                    <Phone className="w-4 h-4" />
+   931→                    {t('callFamily')}
+   932→                  </a>
+   933→                )}
+   934→
+   935→                {/* Itinéraire vers l'hôtel */}
+   936→                {activeHotel && (
+   937→                  <a
+   938→                    href={hotelMapsUrl}
+   939→                    target="_blank"
+   940→                    rel="noopener noreferrer"
+   941→                    className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-all"
+   942→                  >
+   943→                    <Navigation className="w-4 h-4" />
+   944→                    {t('routeToHotel')}
+   945→                  </a>
+   946→                )}
+   947→              </div>
+   948→
+   949→              {/* ─── REPORT SECTION ─── */}
+   950→              <div className="w-full max-w-[420px] mb-4">
+   951→                <button
+   952→                  onClick={() => setShowReport(!showReport)}
+   953→                  className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
+   954→                  style={{ boxShadow: '0 4px 12px rgba(220,38,38,0.2)' }}
+   955→                >
+   956→                  <Send className="w-5 h-5" />
+   957→                  {t('reportBtn')}
+   958→                </button>
+   959→
+   960→                {showReport && (
+   961→                  <div className="mt-3 rounded-[20px] p-5" style={{ background: CARD_BG, boxShadow: SHADOW }}>
+   962→                    {reportSuccess ? (
+   963→                      <div className="text-center py-4">
+   964→                        <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: '#dcfce7' }}>
+   965→                          <Check className="w-8 h-8 text-green-600" />
+   966→                        </div>
+   967→                        <p className="font-bold text-green-700">{t('reportSuccess')}</p>
+   968→                      </div>
+   969→                    ) : (
+   970→                      <div className="space-y-3">
+   971→                        <div>
+   972→                          <label className="text-sm font-semibold mb-1 block">{t('reportName')} *</label>
+   973→                          <input type="text" value={reportName} onChange={(e) => setReportName(e.target.value)} className={inputClass} style={inputStyle} />
+   974→                        </div>
+   975→                        <div>
+   976→                          <label className="text-sm font-semibold mb-1 block">{t('reportPhone')} *</label>
+   977→                          <input type="tel" value={reportPhone} onChange={(e) => setReportPhone(e.target.value)} className={inputClass} style={inputStyle} />
+   978→                        </div>
+   979→                        <div>
+   980→                          <label className="text-sm font-semibold mb-1 block">{t('reportMsg')}</label>
+   981→                          <textarea value={reportMessage} onChange={(e) => setReportMessage(e.target.value)} rows={3} className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none" style={inputStyle} />
+   982→                        </div>
+   983→                        <button
+   984→                          onClick={handleSubmitReport}
+   985→                          disabled={reportSubmitting || !reportName.trim() || !reportPhone.trim()}
+   986→                          className="w-full py-3.5 rounded-[14px] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:opacity-90"
+   987→                          style={{ background: DANGER }}
+   988→                        >
+   989→                          {reportSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4" />}
+   990→                          {t('reportSubmit')}
+   991→                        </button>
+   992→                      </div>
+   993→                    )}
+   994→                  </div>
+   995→                )}
+   996→              </div>
+   997→
+   998→              {/* ─── EMERGENCY NUMBERS ─── */}
+   999→              <div
+  1000→                className="w-full max-w-[420px] rounded-[16px] p-5 mb-6"
+  1001→                style={{ background: '#fef2f2', boxShadow: SHADOW }}
+  1002→              >
+  1003→                <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
+  1004→                  {t('emerTitle')}
+  1005→                </h3>
+  1006→                <div className="flex justify-center gap-4">
+  1007→                  <a
+  1008→                    href="tel:997"
+  1009→                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+  1010→                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+  1011→                  >
+  1012→                    🚑 997
+  1013→                  </a>
+  1014→                  <a
+  1015→                    href="tel:911"
+  1016→                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+  1017→                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+  1018→                  >
+  1019→                    👮 911
+  1020→                  </a>
+  1021→                </div>
+  1022→              </div>
+  1023→            </>
+  1024→          )}
+  1025→
+  1026→          {/* ─── FOOTER ─── */}
+  1027→          <footer className="mt-auto pt-4 pb-4 text-center text-xs" style={{ color: 'rgba(0,0,0,0.5)' }}>
+  1028→            {t('footer')}
+  1029→          </footer>
+  1030→
+  1031→          {/* ─── Animation ─── */}
+  1032→          <style jsx>{`
+  1033→            @keyframes slideDown {
+  1034→              from { opacity: 0; transform: translateY(-10px); }
+  1035→              to { opacity: 1; transform: translateY(0); }
+  1036→            }
+  1037→          `}</style>
+  1038→        </>
+  1039→      )}
+  1040→    </main>
+  1041→  );
+  1042→}
+  1043→
