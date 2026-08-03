@@ -83,6 +83,7 @@ interface BaggageData {
     shipCabin?: string | null;
     busCompany?: string | null;
     busLineNumber?: string | null;
+    photoUrl?: string | null;
   };
 }
 
@@ -824,6 +825,19 @@ export default function ScanPage() {
                 </div>
               </div>
             </InfoEncart>
+
+            {/* Baggage Photo — helps finder identify the luggage */}
+            {baggage.photoUrl && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <p className="text-xs font-medium mb-2" style={{ color: MUTED }}>📸 Photo du bagage</p>
+                <img
+                  src={baggage.photoUrl}
+                  alt="Photo du bagage"
+                  className="max-w-full max-h-40 object-cover rounded-lg"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+            )}
           </div>
         )}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Info } from 'lucide-react';
@@ -124,60 +124,69 @@ function Confetti() {
 // ─── Main Content ───
 function ConfirmationContent() {
   const searchParams = useSearchParams();
+  const [photoError, setPhotoError] = useState(false);
 
-  // Compute data from URL params
-  const type = (searchParams.get('type') || 'baggage') as 'baggage' | 'identity';
-  const code = searchParams.get('code') || '';
-  const firstName = searchParams.get('firstName') || '';
-  const lastName = searchParams.get('lastName') || '';
-  const flight = searchParams.get('flight') || '';
-  const destination = searchParams.get('destination') || '';
-  const chefPhone = searchParams.get('chefPhone') || '';
-  const bloodType = searchParams.get('bloodType') || '';
-  const hotel = searchParams.get('hotel') || '';
-  const room = searchParams.get('room') || '';
-  const leaderPhone = searchParams.get('leaderPhone') || '';
-  const photo = searchParams.get('photo') || null;
-
-  // Fallback: try sessionStorage if no code from URL
+  // Resolve data: sessionStorage FIRST (more reliable for long photo URLs), then URL params as fallback
   let data: ConfirmationData | null = null;
-  if (code) {
-    data = {
-      type,
-      code,
-      firstName,
-      lastName,
-      flight,
-      destination,
-      chefPhone,
-      bloodType,
-      hotel,
-      room,
-      leaderPhone,
-      photo,
-    };
-  } else if (typeof window !== 'undefined') {
+
+  // 1️⃣ Try sessionStorage first
+  if (typeof window !== 'undefined') {
     try {
       const stored = sessionStorage.getItem('activationData');
       if (stored) {
         const parsed = JSON.parse(stored);
-        data = {
-          type: parsed.type || 'baggage',
-          code: parsed.reference || '',
-          firstName: parsed.firstName || '',
-          lastName: parsed.lastName || '',
-          flight: parsed.flightNumber || parsed.airlineName || '',
-          destination: parsed.destination || '',
-          chefPhone: parsed.whatsapp || parsed.chefPhone || '',
-          bloodType: parsed.bloodType || '',
-          hotel: parsed.hotel || '',
-          room: parsed.room || '',
-          leaderPhone: parsed.leaderPhone || '',
-          photo: parsed.photoUrl || null,
-        };
+        if (parsed.reference) {
+          data = {
+            type: parsed.type || 'baggage',
+            code: parsed.reference || '',
+            firstName: parsed.firstName || '',
+            lastName: parsed.lastName || '',
+            flight: parsed.flightNumber || parsed.airlineName || '',
+            destination: parsed.destination || '',
+            chefPhone: parsed.whatsapp || parsed.chefPhone || '',
+            bloodType: parsed.bloodType || '',
+            hotel: parsed.hotel || '',
+            room: parsed.room || '',
+            leaderPhone: parsed.leaderPhone || '',
+            photo: parsed.photoUrl || null,
+          };
+        }
       }
     } catch {
       // Silent — sessionStorage may be unavailable
+    }
+  }
+
+  // 2️⃣ Fallback: URL search params
+  if (!data) {
+    const type = (searchParams.get('type') || 'baggage') as 'baggage' | 'identity';
+    const code = searchParams.get('code') || '';
+    const firstName = searchParams.get('firstName') || '';
+    const lastName = searchParams.get('lastName') || '';
+    const flight = searchParams.get('flight') || '';
+    const destination = searchParams.get('destination') || '';
+    const chefPhone = searchParams.get('chefPhone') || '';
+    const bloodType = searchParams.get('bloodType') || '';
+    const hotel = searchParams.get('hotel') || '';
+    const room = searchParams.get('room') || '';
+    const leaderPhone = searchParams.get('leaderPhone') || '';
+    const photo = searchParams.get('photo') || null;
+
+    if (code) {
+      data = {
+        type,
+        code,
+        firstName,
+        lastName,
+        flight,
+        destination,
+        chefPhone,
+        bloodType,
+        hotel,
+        room,
+        leaderPhone,
+        photo,
+      };
     }
   }
 
@@ -317,20 +326,28 @@ function ConfirmationContent() {
             <span className="text-xs block mb-2" style={{ color: MUTED }}>
               {isIdentity ? '📸 Photo du Pèlerin' : '📸 Photo du bagage'}
             </span>
-            <img
-              src={data.photo}
-              alt={isIdentity ? 'Pèlerin' : 'Bagage'}
-              className={`max-w-full max-h-36 object-cover mx-auto ${
-                isIdentity ? 'rounded-full w-32 h-32' : 'rounded-lg'
-              }`}
-            />
+            {photoError ? (
+              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                <span className="text-3xl mb-1">📸</span>
+                <span className="text-sm">Photo non disponible</span>
+              </div>
+            ) : (
+              <img
+                src={data.photo}
+                alt={isIdentity ? 'Pèlerin' : 'Bagage'}
+                className={`max-w-full max-h-36 object-cover mx-auto ${
+                  isIdentity ? 'rounded-full w-32 h-32' : 'rounded-lg'
+                }`}
+                onError={() => setPhotoError(true)}
+              />
+            )}
           </div>
         )}
 
         {/* Tips */}
-        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg mb-6 text-left">
+        <div className="bg-[#fef3c7] border-l-4 border-[#f4b400] p-4 rounded-lg mb-6 text-left">
           <div className="flex items-center gap-2 font-bold mb-2">
-            <Info className="w-5 h-5 text-amber-600" />
+            <Info className="w-5 h-5 text-[#d97706]" />
             Conseils importants
           </div>
           {isIdentity ? (

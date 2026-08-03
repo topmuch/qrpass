@@ -123,7 +123,7 @@ function SelectPageInner() {
       <header className="w-full px-4 pt-6 pb-2 anim-fade-in-down">
         <div className="max-w-3xl mx-auto flex items-center justify-center gap-2">
           <span className="font-bold text-xl tracking-tight" style={{ color: '#1e3a8a' }}>Pass</span>
-          <span className="font-bold text-xl tracking-tight" style={{ color: '#fbbf24' }}>Hajj</span>
+          <span className="font-bold text-xl tracking-tight" style={{ color: '#f4b400' }}>Hajj</span>
         </div>
         <p className="text-center mt-2 text-sm font-medium anim-fade-in" style={{ color: '#64748b' }}>Activez votre protection</p>
       </header>

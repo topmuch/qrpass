@@ -1,0 +1,1394 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useState, useCallback, useRef } from 'react';
+     4→import { useParams, useRouter } from 'next/navigation';
+     5→import Image from 'next/image';
+     6→import { Badge } from "@/components/ui/badge";
+     7→import {
+     8→  Luggage,
+     9→  AlertCircle,
+    10→  Clock,
+    11→  Shield,
+    12→  CheckCircle,
+    13→  ArrowRight,
+    14→  Sparkles,
+    15→  Globe,
+    16→  Phone,
+    17→  MessageCircle,
+    18→} from "lucide-react";
+    19→import { useTranslation } from '@/hooks/useTranslation';
+    20→import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
+    21→import dynamic from 'next/dynamic';
+    22→import SuccessOverlay from '@/components/ui/SuccessOverlay';
+    23→import PhoneInput from '@/components/ui/PhoneInput';
+    24→import { toast } from '@/hooks/use-toast';
+    25→
+    26→// TRANSPORT-FEATURE: Multi-transport support (real images, emojis as fallback)
+    27→import {
+    28→  safeTransportMode,
+    29→  getTransportImage,
+    30→  getTransportBlockHeader,
+    31→  TRANSPORT_ICONS,
+    32→} from '@/lib/transport';
+    33→import type { TransportMode } from '@/lib/transport';
+    34→import TransportModeSelector from '@/components/inscrire/TransportModeSelector';
+    35→
+    36→// AI-FEATURE: Lazy-load ChatbotWidget (Feature #1) — doesn't block page render
+    37→const ChatbotWidget = dynamic(() => import('@/components/finder/ChatbotWidget'), {
+    38→  ssr: false,
+    39→  loading: () => null,
+    40→});
+    41→
+    42→// ─── Brand constants (PassHajj palette: yellow #f4b400 + white cards + black buttons) ───
+    43→const BRAND = '#f4b400';   // jaune — fond principal
+    44→const CARD_BG = '#ffffff'; // blanc — cartes
+    45→const INK = '#1a1a1a';     // noir — texte, boutons
+    46→const MUTED = '#6b7280';   // gris — texte secondaire
+    47→const INPUT_BG = '#f3f4f6'; // gris clair — inputs
+    48→const BTN_PRIMARY = '#111827'; // noir — boutons principaux
+    49→
+    50→const FALLBACK_PHONE = '33745349339';
+    51→
+    52→interface BaggageData {
+    53→  status: string;
+    54→  message?: string;
+    55→  theme?: string;
+    56→  type?: string;
+    57→  expiredAt?: string;
+    58→  agency?: string;
+    59→  baggage?: {
+    60→    reference: string;
+    61→    type: string;
+    62→    travelerName: string;
+    63→    travelerFirstName?: string;
+    64→    travelerLastName?: string;
+    65→    baggageIndex: number;
+    66→    baggageType: string;
+    67→    status: string;
+    68→    airlineName?: string;
+    69→    flightNumber?: string;
+    70→    destination?: string;
+    71→    agency?: string;
+    72→    whatsappOwner?: string;
+    73→    declaredLostAt?: string | null;
+    74→    foundAt?: string | null;
+    75→    createdAt?: string | null;
+    76→    departureDate?: string | null;
+    77→    departureTime?: string | null;
+    78→    // TRANSPORT-FEATURE: Transport mode + conditional fields
+    79→    transportMode?: string;
+    80→    trainCompany?: string | null;
+    81→    trainNumber?: string | null;
+    82→    shipName?: string | null;
+    83→    shipCabin?: string | null;
+    84→    busCompany?: string | null;
+    85→    busLineNumber?: string | null;
+    86→  };
+    87→}
+    88→
+    89→// ─── Language Selector Component (light theme, brand-aware) ───
+    90→function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Language) => void }) {
+    91→  const [isOpen, setIsOpen] = useState(false);
+    92→
+    93→  return (
+    94→    <div className="relative">
+    95→      <button
+    96→        onClick={() => setIsOpen(!isOpen)}
+    97→        aria-expanded={isOpen}
+    98→        aria-haspopup="listbox"
+    99→        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-black/10 rounded-full text-sm font-medium hover:bg-white transition-colors min-h-[36px]"
+   100→      >
+   101→        <Globe className="w-4 h-4" />
+   102→        <span>{LANGUAGE_NAMES[lang]}</span>
+   103→      </button>
+   104→
+   105→      {isOpen && (
+   106→        <div role="listbox" aria-label="Language" className="absolute top-full right-0 mt-1 bg-white border border-black/10 rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px]">
+   107→          {(['fr', 'en', 'ar'] as Language[]).map((l) => (
+   108→            <button
+   109→              key={l}
+   110→              role="option"
+   111→              aria-selected={lang === l}
+   112→              onClick={() => {
+   113→                setLang(l);
+   114→                setIsOpen(false);
+   115→              }}
+   116→              className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+   117→                lang === l
+   118→                  ? 'bg-[#f4b400] text-black'
+   119→                  : 'text-black hover:bg-[#f4b400]/30'
+   120→              }`}
+   121→            >
+   122→              {LANGUAGE_NAMES[l]}
+   123→            </button>
+   124→          ))}
+   125→        </div>
+   126→      )}
+   127→    </div>
+   128→  );
+   129→}
+   130→
+   131→// ─── Activation Redirect Component (harmonized with PassHajj design system) ───
+   132→// ACTIVATION-FLOW: User selects transport mode BEFORE being redirected to /inscrire?qr=REF&mode=XXX.
+   133→function ActivationRedirect({ type, reference, t, lang, setLang }: {
+   134→  type: string;
+   135→  reference: string;
+   136→  t: (key: string, params?: Record<string, string>) => string;
+   137→  lang: Language;
+   138→  setLang: (l: Language) => void;
+   139→}) {
+   140→  const router = useRouter();
+   141→  const [selectedMode, setSelectedMode] = useState<TransportMode | ''>('');
+   142→
+   143→  const isHajj = type === 'hajj';
+   144→
+   145→  const handleContinue = () => {
+   146→    const url = isHajj
+   147→      ? `/hajj/activate?qr=${reference}`
+   148→      : `/inscrire?qr=${reference}${selectedMode ? `&mode=${selectedMode}` : ''}`;
+   149→    router.push(url);
+   150→  };
+   151→
+   152→  return (
+   153→    <main dir={lang === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col items-center justify-center p-5 md:p-8" style={{ background: BRAND }}>
+   154→      <div className="relative max-w-[420px] w-full">
+   155→        {/* ─── Header ─── */}
+   156→        <div className="flex items-center justify-between mb-6">
+   157→          <div>
+   158→            <div className="text-2xl font-extrabold tracking-tight text-black">
+   159→              <span className="text-white bg-black px-2 py-0.5 rounded-md mr-1">Pass</span>Hajj
+   160→            </div>
+   161→            <div className="text-sm mt-1" style={{ color: MUTED }}>
+   162→              {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}
+   163→            </div>
+   164→          </div>
+   165→          <LanguageSelector lang={lang} setLang={setLang} />
+   166→        </div>
+   167→
+   168→        {/* ─── White Card ─── */}
+   169→        <div
+   170→          className="rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+   171→          style={{ background: CARD_BG }}
+   172→        >
+   173→          {/* Icon */}
+   174→          <div className="relative inline-block mb-5">
+   175→            <div className="w-16 h-16 bg-[#fef3c7] rounded-full flex items-center justify-center mx-auto">
+   176→              {selectedMode ? (
+   177→                <Image
+   178→                  src={getTransportImage(selectedMode)}
+   179→                  alt={selectedMode}
+   180→                  width={36}
+   181→                  height={36}
+   182→                  className="mix-blend-multiply"
+   183→                />
+   184→              ) : (
+   185→                <Luggage className="w-8 h-8 text-[#f4b400]" />
+   186→              )}
+   187→            </div>
+   188→            <div className="absolute -top-1 -right-1 w-7 h-7 bg-[#111827] rounded-full flex items-center justify-center">
+   189→              <Sparkles className="w-3.5 h-3.5 text-[#f4b400]" />
+   190→            </div>
+   191→          </div>
+   192→
+   193→          <h1 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: INK }}>
+   194→            {t('common.welcome')}
+   195→          </h1>
+   196→          <p className="text-sm md:text-base mb-5" style={{ color: MUTED }}>
+   197→            {t('inscrire.subtitle')}
+   198→          </p>
+   199→
+   200→          {isHajj && (
+   201→            <>
+   202→              {/* Baggage type box */}
+   203→              <div className="rounded-xl p-4 mb-5" style={{ background: INPUT_BG }}>
+   204→                <p className="text-sm mb-2" style={{ color: MUTED }}>{t('common.baggage_type')}</p>
+   205→                <Badge className="text-white text-base md:text-lg px-5 py-1.5" style={{ background: BTN_PRIMARY }}>
+   206→                  {t('common.hajj_label')}
+   207→                </Badge>
+   208→              </div>
+   209→              <button
+   210→                className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+   211→                style={{ background: BTN_PRIMARY }}
+   212→                onClick={handleContinue}
+   213→              >
+   214→                {t('common.start_activation')}
+   215→                <ArrowRight className="w-5 h-5" />
+   216→              </button>
+   217→            </>
+   218→          )}
+   219→
+   220→          {!isHajj && (
+   221→            <>
+   222→              {/* Baggage type box */}
+   223→              <div className="rounded-xl p-4 mb-5" style={{ background: INPUT_BG }}>
+   224→                <p className="text-sm mb-2" style={{ color: MUTED }}>{t('common.baggage_type')}</p>
+   225→                <Badge className="text-white text-base md:text-lg px-5 py-1.5" style={{ background: BTN_PRIMARY }}>
+   226→                  {t('common.voyageur_label')}
+   227→                </Badge>
+   228→              </div>
+   229→
+   230→              {/* Transport mode selector */}
+   231→              <div className="text-left mb-5">
+   232→                <p className="font-semibold text-sm mb-3 text-center" style={{ color: INK }}>
+   233→                  {t('transport.select_mode')}
+   234→                </p>
+   235→                <TransportModeSelector
+   236→                  selectedMode={selectedMode}
+   237→                  onSelect={setSelectedMode}
+   238→                  t={t}
+   239→                  lang={lang}
+   240→                />
+   241→              </div>
+   242→
+   243→              <button
+   244→                className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+   245→                style={{ background: BTN_PRIMARY }}
+   246→                onClick={handleContinue}
+   247→                disabled={!selectedMode}
+   248→              >
+   249→                {t('common.start_activation')}
+   250→                <ArrowRight className="w-5 h-5" />
+   251→              </button>
+   252→            </>
+   253→          )}
+   254→        </div>
+   255→
+   256→        {/* ─── Footer ─── */}
+   257→        <div className="mt-auto pt-6 text-center text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+   258→          Propulsé par <strong>PassHajj</strong> ·{' '}
+   259→          <a href="/support" className="text-black font-semibold underline">Aide</a>
+   260→        </div>
+   261→      </div>
+   262→    </main>
+   263→  );
+   264→}
+   265→
+   266→// ─── Loading Component (harmonized with PassHajj design) ───
+   267→function LoadingScreen({ t }: { t: (key: string) => string }) {
+   268→  return (
+   269→    <main className="min-h-screen flex items-center justify-center" style={{ background: BRAND }}>
+   270→      <div className="text-center">
+   271→        <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full mx-auto mb-4"></div>
+   272→        <p className="text-lg font-medium text-black">{t('common.loading')}</p>
+   273→      </div>
+   274→    </main>
+   275→  );
+   276→}
+   277→
+   278→// ─── Error Screen (harmonized with PassHajj design) ───
+   279→function ErrorScreen({
+   280→  type,
+   281→  t,
+   282→  lang,
+   283→  setLang
+   284→}: {
+   285→  type: string;
+   286→  t: (key: string) => string;
+   287→  lang: Language;
+   288→  setLang: (l: Language) => void;
+   289→}) {
+   290→  const router = useRouter();
+   291→
+   292→  const errorConfig = {
+   293→    not_found: {
+   294→      icon: <AlertCircle className="w-12 h-12 text-red-500" />,
+   295→      title: t('errors.qr_not_valid'),
+   296→      message: t('errors.qr_not_valid_desc')
+   297→    },
+   298→    blocked: {
+   299→      icon: <Shield className="w-12 h-12 text-gray-400" />,
+   300→      title: t('errors.baggage_blocked'),
+   301→      message: t('errors.baggage_blocked_desc')
+   302→    },
+   303→    expired: {
+   304→      icon: <Clock className="w-12 h-12 text-gray-400" />,
+   305→      title: t('errors.protection_expired'),
+   306→      message: t('errors.protection_expired_desc')
+   307→    }
+   308→  };
+   309→
+   310→  const config = errorConfig[type as keyof typeof errorConfig] || errorConfig.not_found;
+   311→
+   312→  return (
+   313→    <main className="min-h-screen flex items-center justify-center p-5 md:p-8" style={{ background: BRAND }}>
+   314→      <div className="absolute top-4 right-4">
+   315→        <LanguageSelector lang={lang} setLang={setLang} />
+   316→      </div>
+   317→
+   318→      <div
+   319→        className="max-w-md w-full rounded-[20px] p-6 md:p-8 text-center shadow-lg"
+   320→        style={{ background: CARD_BG }}
+   321→      >
+   322→        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+   323→          {config.icon}
+   324→        </div>
+   325→        <h1 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: INK }}>{config.title}</h1>
+   326→        <p className="text-base md:text-lg mb-6" style={{ color: MUTED }}>{config.message}</p>
+   327→        <button
+   328→          className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-base transition-all hover:-translate-y-0.5 active:scale-[0.98] min-h-[56px]"
+   329→          style={{ background: BTN_PRIMARY }}
+   330→          onClick={() => router.push('/')}
+   331→        >
+   332→          {t('common.back_home')}
+   333→        </button>
+   334→      </div>
+   335→    </main>
+   336→  );
+   337→}
+   338→
+   339→// ─── Info Encart Helper (light gray bg, for white cards) ───
+   340→function InfoEncart({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+   341→  return (
+   342→    <div className={`border border-gray-200 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`} style={{ background: INPUT_BG }}>
+   343→      {children}
+   344→    </div>
+   345→  );
+   346→}
+   347→
+   348→// ═══════════════════════════════════════════════════════════════
+   349→// ─── MAIN SCAN PAGE ───
+   350→// ═══════════════════════════════════════════════════════════════
+   351→export default function ScanPage() {
+   352→  const params = useParams();
+   353→  const reference = params.reference as string;
+   354→
+   355→  const { t, lang, setLang, dir, countryCode } = useTranslation();
+   356→
+   357→  const [baggageData, setBaggageData] = useState<BaggageData | null>(null);
+   358→  const [loading, setLoading] = useState(true);
+   359→
+   360→  // UI State
+   361→  const [showForm, setShowForm] = useState(false);
+   362→  const [showSuccess, setShowSuccess] = useState(false);
+   363→
+   364→  // Edit mode state
+   365→  const [isEditing, setIsEditing] = useState(false);
+   366→  const [isSaving, setIsSaving] = useState(false);
+   367→  const [editFirstName, setEditFirstName] = useState('');
+   368→  const [editLastName, setEditLastName] = useState('');
+   369→  const [editWhatsapp, setEditWhatsapp] = useState('');
+   370→  const [editTransportMode, setEditTransportMode] = useState<TransportMode>('flight');
+   371→  const [editAirlineName, setEditAirlineName] = useState('');
+   372→  const [editFlightNumber, setEditFlightNumber] = useState('');
+   373→  const [editTrainCompany, setEditTrainCompany] = useState('');
+   374→  const [editTrainNumber, setEditTrainNumber] = useState('');
+   375→  const [editShipName, setEditShipName] = useState('');
+   376→  const [editShipCabin, setEditShipCabin] = useState('');
+   377→  const [editBusCompany, setEditBusCompany] = useState('');
+   378→  const [editBusLineNumber, setEditBusLineNumber] = useState('');
+   379→  const [editDestination, setEditDestination] = useState('');
+   380→  const [editDepartureDate, setEditDepartureDate] = useState('');
+   381→  const [editDepartureTime, setEditDepartureTime] = useState('');
+   382→  const [editPhoneCountry, setEditPhoneCountry] = useState(countryCode);
+   383→
+   384→  // Finder form state
+   385→  const [finderName, setFinderName] = useState('');
+   386→  const [finderPhone, setFinderPhone] = useState('');
+   387→  const [finderPhoneCountry, setFinderPhoneCountry] = useState(countryCode);
+   388→  const [otherLocation, setOtherLocation] = useState('');
+   389→  // GPS is now captured INLINE inside handleWhatsApp (no separate button/state).
+   390→  const [isLocating, setIsLocating] = useState(false);
+   391→  const [isSubmitting, setIsSubmitting] = useState(false);
+   392→
+   393→  // SuccessOverlay state
+   394→  const [scanConfirmed, setScanConfirmed] = useState(false);
+   395→  const hasConfirmedRef = useRef(false);
+   396→
+   397→  useEffect(() => {
+   398→    const fetchBaggage = async () => {
+   399→      try {
+   400→        const response = await fetch(`/api/scan/${reference}`);
+   401→        const data = await response.json();
+   402→        setBaggageData(data);
+   403→      } catch (error) {
+   404→        console.error('Error fetching baggage:', error);
+   405→        setBaggageData({ status: 'error', message: 'Erreur serveur' });
+   406→      } finally {
+   407→        setLoading(false);
+   408→      }
+   409→    };
+   410→
+   411→    fetchBaggage();
+   412→  }, [reference]);
+   413→
+   414→  // Trigger SuccessOverlay once when baggage loads successfully
+   415→  useEffect(() => {
+   416→    if (baggageData?.baggage?.reference && !hasConfirmedRef.current) {
+   417→      hasConfirmedRef.current = true;
+   418→      setScanConfirmed(true);
+   419→    }
+   420→  }, [baggageData?.baggage?.reference]);
+   421→
+   422→  // Pre-fill edit state when baggage data loads
+   423→  useEffect(() => {
+   424→    const b = baggageData?.baggage;
+   425→    if (b) {
+   426→      setEditFirstName(b.travelerFirstName || '');
+   427→      setEditLastName(b.travelerLastName || '');
+   428→      setEditWhatsapp(b.whatsappOwner || '');
+   429→      setEditTransportMode(safeTransportMode(b.transportMode) as TransportMode);
+   430→      setEditAirlineName(b.airlineName || '');
+   431→      setEditFlightNumber(b.flightNumber || '');
+   432→      setEditTrainCompany(b.trainCompany || '');
+   433→      setEditTrainNumber(b.trainNumber || '');
+   434→      setEditShipName(b.shipName || '');
+   435→      setEditShipCabin(b.shipCabin || '');
+   436→      setEditBusCompany(b.busCompany || '');
+   437→      setEditBusLineNumber(b.busLineNumber || '');
+   438→      setEditDestination(b.destination || '');
+   439→      // Format departureDate to YYYY-MM-DD for the date input
+   440→      if (b.departureDate) {
+   441→        try {
+   442→          const d = new Date(b.departureDate);
+   443→          setEditDepartureDate(d.toISOString().split('T')[0]);
+   444→        } catch {
+   445→          setEditDepartureDate('');
+   446→        }
+   447→      } else {
+   448→        setEditDepartureDate('');
+   449→      }
+   450→      setEditDepartureTime(b.departureTime || '');
+   451→    }
+   452→  }, [baggageData?.baggage?.reference]); // only re-run when baggage reference changes
+   453→
+   454→  // Handle save edit
+   455→  const handleSave = async () => {
+   456→    setIsSaving(true);
+   457→    try {
+   458→      const res = await fetch(`/api/baggage/reference/${reference}`, {
+   459→        method: 'PUT',
+   460→        headers: { 'Content-Type': 'application/json' },
+   461→        body: JSON.stringify({
+   462→          travelerFirstName: editFirstName.trim() || null,
+   463→          travelerLastName: editLastName.trim() || null,
+   464→          whatsappOwner: editWhatsapp.trim() || null,
+   465→          transportMode: editTransportMode,
+   466→          airlineName: editAirlineName.trim() || null,
+   467→          flightNumber: editFlightNumber.trim() || null,
+   468→          trainCompany: editTrainCompany.trim() || null,
+   469→          trainNumber: editTrainNumber.trim() || null,
+   470→          shipName: editShipName.trim() || null,
+   471→          shipCabin: editShipCabin.trim() || null,
+   472→          busCompany: editBusCompany.trim() || null,
+   473→          busLineNumber: editBusLineNumber.trim() || null,
+   474→          destination: editDestination.trim() || null,
+   475→          departureDate: editDepartureDate || null,
+   476→          departureTime: editDepartureTime.trim() || null,
+   477→        }),
+   478→      });
+   479→      if (!res.ok) throw new Error('Failed to save');
+   480→      const data = await res.json();
+   481→      // Update local state with the updated baggage data
+   482→      setBaggageData({
+   483→        ...baggageData!,
+   484→        status: baggageData!.status,
+   485→        baggage: {
+   486→          ...baggageData!.baggage!,
+   487→          travelerFirstName: data.baggage.travelerFirstName,
+   488→          travelerLastName: data.baggage.travelerLastName,
+   489→          travelerName: `${data.baggage.travelerFirstName || ''} ${data.baggage.travelerLastName || ''}`.trim(),
+   490→          whatsappOwner: data.baggage.whatsappOwner,
+   491→          transportMode: data.baggage.transportMode,
+   492→          airlineName: data.baggage.airlineName,
+   493→          flightNumber: data.baggage.flightNumber,
+   494→          trainCompany: data.baggage.trainCompany,
+   495→          trainNumber: data.baggage.trainNumber,
+   496→          shipName: data.baggage.shipName,
+   497→          shipCabin: data.baggage.shipCabin,
+   498→          busCompany: data.baggage.busCompany,
+   499→          busLineNumber: data.baggage.busLineNumber,
+   500→          destination: data.baggage.destination,
+   501→          departureDate: data.baggage.departureDate,
+   502→          departureTime: data.baggage.departureTime,
+   503→        },
+   504→      });
+   505→      setIsEditing(false);
+   506→      toast({ title: t('finder.edit_success') });
+   507→    } catch (error) {
+   508→      console.error('Save error:', error);
+   509→      toast({ title: t('finder.edit_error'), variant: 'destructive' });
+   510→    } finally {
+   511→      setIsSaving(false);
+   512→    }
+   513→  };
+   514→
+   515→  // NOTE: GPS sharing now happens inline inside handleWhatsApp (silent fallback to manual location).
+   516→  // The dedicated "Partager ma position GPS" button was removed per refonte-6 brief.
+   517→
+   518→  // Generate WhatsApp message — new template (refonte-7): friendly notification to the owner
+   519→  const generateWhatsAppMessage = useCallback((
+   520→    finderName: string,
+   521→    finderPhone: string,
+   522→    locationText: string,
+   523→    mapLink: string,
+   524→    travelerName: string,
+   525→    baggageType: string
+   526→  ) => {
+   527→    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://qrpasss.com'}/suivi/${reference}`;
+   528→
+   529→    // Extract owner's first name from full name
+   530→    const firstName = travelerName.split(' ')[0] || travelerName || '';
+   531→
+   532→    // Baggage type label (voyageur/hajj) — i18n-aware
+   533→    const typeLabel = baggageType === 'hajj'
+   534→      ? t('common.hajj_label')
+   535→      : t('common.voyageur_label');
+   536→
+   537→    // [Lieu] = where the bag was found (manual text, GPS coords, or fallback label)
+   538→    const location = locationText || t('whatsapp.gps_shared_label');
+   539→
+   540→    // [Adresse] = current precise address (Google Maps link if GPS, else same as location, else fallback)
+   541→    const address = mapLink.startsWith('http')
+   542→      ? mapLink
+   543→      : (locationText || t('whatsapp.location_not_shared'));
+   544→
+   545→    // Build message using the template (refonte-7)
+   546→    return encodeURIComponent(
+   547→      t('whatsapp.found_message', {
+   548→        firstName,
+   549→        type: typeLabel,
+   550→        location,
+   551→        address,
+   552→        name: finderName,
+   553→        phone: finderPhone,
+   554→        url: trackingUrl,
+   555→      })
+   556→    );
+   557→  }, [reference, t]);
+   558→
+   559→  // Log scan to API (shared by WhatsApp + Phone flows).
+   560→  // sharedPos/locText are passed as params (no longer state) — GPS is captured inline in handleWhatsApp.
+   561→  const logScan = useCallback(async (
+   562→    sharedPos?: { lat: number; lng: number } | null,
+   563→    locText?: string
+   564→  ) => {
+   565→    try {
+   566→      await fetch(`/api/scan/${reference}`, {
+   567→        method: 'POST',
+   568→        headers: { 'Content-Type': 'application/json' },
+   569→        body: JSON.stringify({
+   570→          location: otherLocation.trim() || locText || t('finder.not_specified'),
+   571→          finderName: finderName.trim(),
+   572→          finderPhone: finderPhone.trim(),
+   573→          message: '',
+   574→          latitude: sharedPos?.lat,
+   575→          longitude: sharedPos?.lng,
+   576→        }),
+   577→      });
+   578→    } catch (e) {
+   579→      // Continue with contact even if logging fails
+   580→      console.error('Log scan failed:', e);
+   581→    }
+   582→  }, [reference, otherLocation, finderName, finderPhone, t]);
+   583→
+   584→  // Handle WhatsApp contact — GPS is captured INLINE with silent fallback to manual location.
+   585→  // Flow: validate name+phone → try GPS (10s timeout, silent fail) → log scan → open wa.me
+   586→  const handleWhatsApp = useCallback(async () => {
+   587→    // Inline validation (name + phone required; location optional since GPS is auto)
+   588→    if (!finderName.trim() || !finderPhone.trim()) {
+   589→      toast({ title: t('finder.fill_info'), variant: 'destructive' });
+   590→      return;
+   591→    }
+   592→
+   593→    // Step 1: try to get GPS automatically (silent fallback if it fails)
+   594→    setIsLocating(true);
+   595→    let sharedPos: { lat: number; lng: number } | null = null;
+   596→    let locText = '';
+   597→
+   598→    if (navigator.geolocation) {
+   599→      try {
+   600→        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+   601→          navigator.geolocation.getCurrentPosition(resolve, reject, {
+   602→            enableHighAccuracy: true,
+   603→            timeout: 10000,
+   604→            maximumAge: 0,
+   605→          });
+   606→        });
+   607→        sharedPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+   608→        locText = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+   609→      } catch {
+   610→        // Silent fallback — use manual location or "not specified"
+   611→        toast({ title: t('finder.gps_fallback_toast') });
+   612→      }
+   613→    }
+   614→
+   615→    setIsLocating(false);
+   616→    setIsSubmitting(true);
+   617→
+   618→    try {
+   619→      await logScan(sharedPos, locText);
+   620→
+   621→      const finalLocationText = locText || otherLocation.trim() || t('finder.not_specified');
+   622→      const mapLink = sharedPos
+   623→        ? `https://maps.app.goo.gl/?link=https://www.google.com/maps?q=${sharedPos.lat},${sharedPos.lng}`
+   624→        : t('whatsapp.location_not_shared');
+   625→
+   626→      const message = generateWhatsAppMessage(
+   627→        finderName,
+   628→        finderPhone,
+   629→        finalLocationText,
+   630→        mapLink,
+   631→        baggageData?.baggage?.travelerName || '',
+   632→        baggageData?.baggage?.type || 'voyageur'
+   633→      );
+   634→      const ownerNumber = baggageData?.baggage?.whatsappOwner?.replace(/\D/g, '') || FALLBACK_PHONE;
+   635→      // Use api.whatsapp.com directly instead of wa.me — wa.me corrupts 4-byte UTF-8 emojis (🎉📍👤📞💬👉💪)
+   636→      // during its redirect to api.whatsapp.com (replaces them with U+FFFD replacement character).
+   637→      const url = `https://api.whatsapp.com/send/?phone=${ownerNumber}&text=${message}`;
+   638→
+   639→      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+   640→
+   641→      if (isIOS) {
+   642→        window.location.href = url;
+   643→      } else {
+   644→        const newWindow = window.open(url, '_blank');
+   645→        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+   646→          window.location.href = url;
+   647→        }
+   648→      }
+   649→
+   650→      setShowSuccess(true);
+   651→      setTimeout(() => setShowSuccess(false), 4000);
+   652→      toast({ title: t('finder.success_title'), description: t('finder.message_sent') });
+   653→    } catch (error) {
+   654→      console.error('Error:', error);
+   655→      toast({ title: t('errors.error_occurred'), variant: 'destructive' });
+   656→    } finally {
+   657→      setIsSubmitting(false);
+   658→    }
+   659→  }, [finderName, finderPhone, t, logScan, otherLocation, baggageData, generateWhatsAppMessage]);
+   660→
+   661→  // Handle phone call — opens tel:${phone}. No GPS (no message to embed it in).
+   662→  const handlePhoneCall = useCallback(async () => {
+   663→    // Inline validation (same as WhatsApp: name + phone required)
+   664→    if (!finderName.trim() || !finderPhone.trim()) {
+   665→      toast({ title: t('finder.fill_info'), variant: 'destructive' });
+   666→      return;
+   667→    }
+   668→
+   669→    await logScan(null, '');
+   670→
+   671→    const phoneNumber = baggageData?.baggage?.whatsappOwner || FALLBACK_PHONE;
+   672→    window.location.href = `tel:${phoneNumber}`;
+   673→  }, [finderName, finderPhone, t, logScan, baggageData]);
+   674→
+   675→  // Format date for display
+   676→  const formatDate = (dateStr?: string | null) => {
+   677→    if (!dateStr) return null;
+   678→    const locale = lang === 'ar' ? 'ar-SA' : lang === 'en' ? 'en-US' : 'fr-FR';
+   679→    return new Date(dateStr).toLocaleDateString(locale, {
+   680→      day: 'numeric',
+   681→      month: 'long',
+   682→      year: 'numeric',
+   683→    });
+   684→  };
+   685→
+   686→  // NOTE: validateFinderForm was removed — validation is now inlined in handleWhatsApp/handlePhoneCall.
+   687→  // Location is no longer required (GPS is auto-captured inside handleWhatsApp).
+   688→
+   689→  // ─── Loading state ───
+   690→  if (loading) {
+   691→    return <LoadingScreen t={t} />;
+   692→  }
+   693→
+   694→  // ─── Redirect to activation if pending ───
+   695→  if (baggageData?.status === 'pending_activation' && baggageData?.type) {
+   696→    return (
+   697→      <ActivationRedirect
+   698→        type={baggageData.type}
+   699→        reference={reference}
+   700→        t={t}
+   701→        lang={lang}
+   702→        setLang={setLang}
+   703→      />
+   704→    );
+   705→  }
+   706→
+   707→  // ─── Error states ───
+   708→  if (baggageData?.status === 'not_found') {
+   709→    return <ErrorScreen type="not_found" t={t} lang={lang} setLang={setLang} />;
+   710→  }
+   711→
+   712→  if (baggageData?.status === 'blocked') {
+   713→    return <ErrorScreen type="blocked" t={t} lang={lang} setLang={setLang} />;
+   714→  }
+   715→
+   716→  if (baggageData?.status === 'expired') {
+   717→    const expiredAt = baggageData.expiredAt || '';
+   718→    const agencyName = baggageData.agency || '';
+   719→    const urlParams = new URLSearchParams({
+   720→      ref: reference,
+   721→      ...(expiredAt && { expired: expiredAt }),
+   722→      ...(agencyName && { agency: agencyName })
+   723→    });
+   724→    if (typeof window !== 'undefined') {
+   725→      window.location.href = `/expired?${urlParams.toString()}`;
+   726→    }
+   727→    return <LoadingScreen t={t} />;
+   728→  }
+   729→
+   730→  const baggage = baggageData?.baggage;
+   731→  const isDeclaredLost = baggage?.declaredLostAt && !baggage?.foundAt;
+   732→
+   733→  // ═══════════════════════════════════════════════════════════════
+   734→  // ─── MAIN RENDER — Yellow bg + White cards + Black accents (PassHajj design) ───
+   735→  // ═══════════════════════════════════════════════════════════════
+   736→  return (
+   737→    <main
+   738→      className="min-h-screen flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
+   739→      style={{ background: BRAND }}
+   740→      dir={dir}
+   741→    >
+   742→      {/* ─── Header ─── */}
+   743→      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4" style={{ background: BRAND }}>
+   744→        {/* ✏️ Modifier button — visible only for active/lost baggage */}
+   745→        {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
+   746→          <button
+   747→            onClick={() => setIsEditing(true)}
+   748→            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-black/10 rounded-full text-sm font-bold hover:bg-white/80 transition-colors min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+   749→            style={{ color: INK }}
+   750→          >
+   751→            <span>{t('finder.edit_btn')}</span>
+   752→          </button>
+   753→        )}
+   754→        {isEditing && (
+   755→          <div className="font-bold text-sm sm:text-base" style={{ color: INK }}>
+   756→            {t('finder.edit_title')}
+   757→          </div>
+   758→        )}
+   759→        {(!baggage || (baggageData?.status !== 'active' && baggageData?.status !== 'lost')) && <div />}
+   760→        <LanguageSelector lang={lang} setLang={setLang} />
+   761→      </header>
+   762→
+   763→      {/* SuccessOverlay — Premium scan confirmation */}
+   764→      <SuccessOverlay show={scanConfirmed} messageKey="scan.success" t={t} />
+   765→
+   766→      {/* Success Toast — inline confirmation */}
+   767→      {showSuccess && (
+   768→        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(4rem+env(safe-area-inset-top,0px))] right-3 sm:right-5 bg-[#111827] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-right duration-300 max-w-[calc(100vw-2rem)] sm:max-w-sm">
+   769→          <div className="flex items-center gap-3">
+   770→            <CheckCircle className="w-6 h-6 text-[#f4b400]" />
+   771→            <div>
+   772→              <div className="font-bold text-lg">{t('finder.success_title')} 🎉</div>
+   773→              <div className="text-base opacity-90">{t('finder.message_sent')}</div>
+   774→            </div>
+   775→          </div>
+   776→        </div>
+   777→      )}
+   778→
+   779→      {/* ─── Container ─── */}
+   780→      <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
+   781→
+   782→        {/* ═══ 🏷️ TITRE : ✅ BAGAGE TROUVÉ ═══ */}
+   783→        <div className="text-center mb-5 sm:mb-6">
+   784→          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: INK }}>
+   785→            {isDeclaredLost
+   786→              ? `🚨 ${t('finder.lost_badge')}`
+   787→              : `✅ ${t('finder.success_badge')}`}
+   788→          </h1>
+   789→          <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto" style={{ color: MUTED }}>
+   790→            {isDeclaredLost
+   791→              ? t('finder.lost_description')
+   792→              : t('finder.bagage_trouve_desc')}
+   793→          </p>
+   794→        </div>
+   795→
+   796→        {/* ═══ 🟦 BLOC 1 : IDENTITÉ PROPRIÉTAIRE (white card) ═══ */}
+   797→        {baggage && !isEditing && (
+   798→          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+   799→            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
+   800→              <span>👤</span> {t('finder.owner_section')}
+   801→            </h2>
+   802→
+   803→            {/* Full Name — kept */}
+   804→            <InfoEncart>
+   805→              <div className="flex items-center gap-3">
+   806→                <span className="text-xl">👤</span>
+   807→                <div>
+   808→                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.fullName')}</p>
+   809→                  <p className="text-base md:text-lg font-bold" style={{ color: INK }}>{baggage.travelerName || t('finder.notSet')}</p>
+   810→                </div>
+   811→              </div>
+   812→            </InfoEncart>
+   813→
+   814→            {/* NOTE: Agency + Baggage Type REMOVED per refonte-4 brief */}
+   815→
+   816→            {/* Contact — Secured (NEVER show WhatsApp number) */}
+   817→            <InfoEncart className="mb-0">
+   818→              <div className="flex items-center gap-3">
+   819→                <span className="text-xl">🔒</span>
+   820→                <div>
+   821→                  <p className="text-xs font-medium" style={{ color: MUTED }}>{t('finder.contact_label')}</p>
+   822→                  <p className="text-base font-bold" style={{ color: INK }}>{t('finder.secure_contact')}</p>
+   823→                  <p className="text-xs mt-0.5" style={{ color: MUTED }}>{t('finder.contact_reveal_note')}</p>
+   824→                </div>
+   825→              </div>
+   826→            </InfoEncart>
+   827→          </div>
+   828→        )}
+   829→
+   830→        {/* ═══ 🟦 EDIT MODE: BLOC 1 — Owner Info (white card) ═══ */}
+   831→        {baggage && isEditing && (
+   832→          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+   833→            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
+   834→              <span>👤</span> {t('finder.owner_section')}
+   835→            </h2>
+   836→
+   837→            {/* First Name */}
+   838→            <div className="mb-3">
+   839→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_first_name')}</label>
+   840→              <input
+   841→                type="text"
+   842→                value={editFirstName}
+   843→                onChange={(e) => setEditFirstName(e.target.value)}
+   844→                placeholder={t('inscrire.first_name_placeholder')}
+   845→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+   846→                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+   847→              />
+   848→            </div>
+   849→
+   850→            {/* Last Name */}
+   851→            <div className="mb-3">
+   852→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_last_name')}</label>
+   853→              <input
+   854→                type="text"
+   855→                value={editLastName}
+   856→                onChange={(e) => setEditLastName(e.target.value)}
+   857→                placeholder={t('inscrire.last_name_placeholder')}
+   858→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+   859→                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+   860→              />
+   861→            </div>
+   862→
+   863→            {/* WhatsApp Number */}
+   864→            <div>
+   865→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_whatsapp')}</label>
+   866→              <PhoneInput
+   867→                countryCode={editPhoneCountry}
+   868→                onCountryChange={setEditPhoneCountry}
+   869→                value={editWhatsapp}
+   870→                onChange={setEditWhatsapp}
+   871→                placeholder="6 12 34 56 78"
+   872→                className="min-h-[48px]"
+   873→              />
+   874→            </div>
+   875→          </div>
+   876→        )}
+   877→
+   878→        {/* ═══ 🟦 BLOC 2 : DÉTAILS DU VOYAGE (white card, transport images) ═══ */}
+   879→        {baggage && !isEditing && (() => {
+   880→          const mode = safeTransportMode(baggage.transportMode) as TransportMode;
+   881→          const transportImg = getTransportImage(mode);
+   882→          const blockHeader = getTransportBlockHeader(mode, lang);
+   883→
+   884→          return (
+   885→            <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+   886→              <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
+   887→                <Image
+   888→                  src={transportImg}
+   889→                  alt={mode}
+   890→                  width={18}
+   891→                  height={18}
+   892→                  className="mix-blend-multiply"
+   893→                />
+   894→                <span>{blockHeader}</span>
+   895→              </h2>
+   896→
+   897→              {/* TRANSPORT-FEATURE: Flight info */}
+   898→              {mode === 'flight' && (baggage.airlineName || baggage.flightNumber) && (
+   899→                <InfoEncart>
+   900→                  <div className="flex items-center justify-between">
+   901→                    <div className="flex-1">
+   902→                      {baggage.airlineName && (
+   903→                        <div className="mb-1.5">
+   904→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.airline')}</p>
+   905→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.airlineName}</p>
+   906→                        </div>
+   907→                      )}
+   908→                      {baggage.flightNumber && (
+   909→                        <div>
+   910→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.flight_number')}</p>
+   911→                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.flightNumber}</p>
+   912→                        </div>
+   913→                      )}
+   914→                    </div>
+   915→                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
+   916→                      <Image
+   917→                        src={transportImg}
+   918→                        alt="flight"
+   919→                        width={28}
+   920→                        height={28}
+   921→                        className="mix-blend-multiply"
+   922→                      />
+   923→                    </div>
+   924→                  </div>
+   925→                </InfoEncart>
+   926→              )}
+   927→
+   928→              {/* TRANSPORT-FEATURE: Train info */}
+   929→              {mode === 'train' && (baggage.trainCompany || baggage.trainNumber) && (
+   930→                <InfoEncart>
+   931→                  <div className="flex items-center justify-between">
+   932→                    <div className="flex-1">
+   933→                      {baggage.trainCompany && (
+   934→                        <div className="mb-1.5">
+   935→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_company')}</p>
+   936→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.trainCompany}</p>
+   937→                        </div>
+   938→                      )}
+   939→                      {baggage.trainNumber && (
+   940→                        <div>
+   941→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.train_number')}</p>
+   942→                          <p className="text-xl font-bold font-mono tracking-widest" style={{ color: INK }}>{baggage.trainNumber}</p>
+   943→                        </div>
+   944→                      )}
+   945→                    </div>
+   946→                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
+   947→                      <Image
+   948→                        src={transportImg}
+   949→                        alt="train"
+   950→                        width={28}
+   951→                        height={28}
+   952→                        className="mix-blend-multiply"
+   953→                      />
+   954→                    </div>
+   955→                  </div>
+   956→                </InfoEncart>
+   957→              )}
+   958→
+   959→              {/* TRANSPORT-FEATURE: Boat info */}
+   960→              {mode === 'boat' && (baggage.shipName || baggage.shipCabin) && (
+   961→                <InfoEncart>
+   962→                  <div className="flex items-center justify-between">
+   963→                    <div className="flex-1">
+   964→                      {baggage.shipName && (
+   965→                        <div className="mb-1.5">
+   966→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_name')}</p>
+   967→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipName}</p>
+   968→                        </div>
+   969→                      )}
+   970→                      {baggage.shipCabin && (
+   971→                        <div>
+   972→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.ship_cabin')}</p>
+   973→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.shipCabin}</p>
+   974→                        </div>
+   975→                      )}
+   976→                    </div>
+   977→                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
+   978→                      <Image
+   979→                        src={transportImg}
+   980→                        alt="boat"
+   981→                        width={28}
+   982→                        height={28}
+   983→                        className="mix-blend-multiply"
+   984→                      />
+   985→                    </div>
+   986→                  </div>
+   987→                </InfoEncart>
+   988→              )}
+   989→
+   990→              {/* TRANSPORT-FEATURE: Bus info */}
+   991→              {mode === 'bus' && (baggage.busCompany || baggage.busLineNumber) && (
+   992→                <InfoEncart>
+   993→                  <div className="flex items-center justify-between">
+   994→                    <div className="flex-1">
+   995→                      {baggage.busCompany && (
+   996→                        <div className="mb-1.5">
+   997→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_company')}</p>
+   998→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busCompany}</p>
+   999→                        </div>
+  1000→                      )}
+  1001→                      {baggage.busLineNumber && (
+  1002→                        <div>
+  1003→                          <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.bus_line')}</p>
+  1004→                          <p className="text-base font-bold" style={{ color: INK }}>{baggage.busLineNumber}</p>
+  1005→                        </div>
+  1006→                      )}
+  1007→                    </div>
+  1008→                    <div className="h-12 w-12 rounded-full bg-[#fef3c7] border border-[#f4b400]/20 flex items-center justify-center ml-4 flex-shrink-0">
+  1009→                      <Image
+  1010→                        src={transportImg}
+  1011→                        alt="bus"
+  1012→                        width={28}
+  1013→                        height={28}
+  1014→                        className="mix-blend-multiply"
+  1015→                      />
+  1016→                    </div>
+  1017→                  </div>
+  1018→                </InfoEncart>
+  1019→              )}
+  1020→
+  1021→              {/* Destination */}
+  1022→              {baggage.destination && (
+  1023→                <InfoEncart>
+  1024→                  <div className="flex items-center gap-3">
+  1025→                    <span className="text-xl">📍</span>
+  1026→                    <div>
+  1027→                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_destination')}</p>
+  1028→                      <p className="text-base font-bold" style={{ color: INK }}>{baggage.destination}</p>
+  1029→                    </div>
+  1030→                  </div>
+  1031→                </InfoEncart>
+  1032→              )}
+  1033→
+  1034→              {/* Departure Date */}
+  1035→              {(baggage.departureDate || baggage.createdAt) && (
+  1036→                <InfoEncart className="mb-0">
+  1037→                  <div className="flex items-center gap-3">
+  1038→                    <span className="text-xl">📅</span>
+  1039→                    <div>
+  1040→                      <p className="text-xs font-medium" style={{ color: MUTED }}>{t('transport.common_departure_date')}</p>
+  1041→                      <p className="text-base font-bold" style={{ color: INK }}>
+  1042→                        {formatDate(baggage.departureDate || baggage.createdAt)}{baggage.departureTime ? ` — ${baggage.departureTime}` : ''}
+  1043→                      </p>
+  1044→                    </div>
+  1045→                  </div>
+  1046→                </InfoEncart>
+  1047→              )}
+  1048→            </div>
+  1049→          );
+  1050→        })()}
+  1051→
+  1052→        {/* ═══ 🟦 EDIT MODE: BLOC 2 — Transport Details (white card) ═══ */}
+  1053→        {baggage && isEditing && (
+  1054→          <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
+  1055→            <h2 className="text-xs uppercase tracking-widest font-bold mb-3 flex items-center gap-2" style={{ color: INK }}>
+  1056→              <span>✈️</span> {t('finder.edit_transport_mode')}
+  1057→            </h2>
+  1058→
+  1059→            {/* Transport Mode Selector */}
+  1060→            <div className="mb-4">
+  1061→              <TransportModeSelector
+  1062→                selectedMode={editTransportMode}
+  1063→                onSelect={setEditTransportMode}
+  1064→                t={t}
+  1065→                lang={lang}
+  1066→              />
+  1067→            </div>
+  1068→
+  1069→            {/* Flight-specific fields */}
+  1070→            {editTransportMode === 'flight' && (
+  1071→              <div className="space-y-3 mb-4">
+  1072→                <div>
+  1073→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.airline')}</label>
+  1074→                  <input
+  1075→                    type="text"
+  1076→                    value={editAirlineName}
+  1077→                    onChange={(e) => setEditAirlineName(e.target.value)}
+  1078→                    placeholder={t('transport.airline_placeholder')}
+  1079→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1080→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1081→                  />
+  1082→                </div>
+  1083→                <div>
+  1084→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.flight_number')}</label>
+  1085→                  <input
+  1086→                    type="text"
+  1087→                    value={editFlightNumber}
+  1088→                    onChange={(e) => setEditFlightNumber(e.target.value)}
+  1089→                    placeholder={t('transport.flight_number_placeholder')}
+  1090→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1091→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1092→                  />
+  1093→                </div>
+  1094→              </div>
+  1095→            )}
+  1096→
+  1097→            {/* Train-specific fields */}
+  1098→            {editTransportMode === 'train' && (
+  1099→              <div className="space-y-3 mb-4">
+  1100→                <div>
+  1101→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_company')}</label>
+  1102→                  <input
+  1103→                    type="text"
+  1104→                    value={editTrainCompany}
+  1105→                    onChange={(e) => setEditTrainCompany(e.target.value)}
+  1106→                    placeholder={t('transport.train_company_placeholder')}
+  1107→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1108→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1109→                  />
+  1110→                </div>
+  1111→                <div>
+  1112→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.train_number')}</label>
+  1113→                  <input
+  1114→                    type="text"
+  1115→                    value={editTrainNumber}
+  1116→                    onChange={(e) => setEditTrainNumber(e.target.value)}
+  1117→                    placeholder={t('transport.train_number_placeholder')}
+  1118→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1119→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1120→                  />
+  1121→                </div>
+  1122→              </div>
+  1123→            )}
+  1124→
+  1125→            {/* Boat-specific fields */}
+  1126→            {editTransportMode === 'boat' && (
+  1127→              <div className="space-y-3 mb-4">
+  1128→                <div>
+  1129→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_name')}</label>
+  1130→                  <input
+  1131→                    type="text"
+  1132→                    value={editShipName}
+  1133→                    onChange={(e) => setEditShipName(e.target.value)}
+  1134→                    placeholder={t('transport.ship_name_placeholder')}
+  1135→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1136→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1137→                  />
+  1138→                </div>
+  1139→                <div>
+  1140→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.ship_cabin')}</label>
+  1141→                  <input
+  1142→                    type="text"
+  1143→                    value={editShipCabin}
+  1144→                    onChange={(e) => setEditShipCabin(e.target.value)}
+  1145→                    placeholder={t('transport.ship_cabin_placeholder')}
+  1146→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1147→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1148→                  />
+  1149→                </div>
+  1150→              </div>
+  1151→            )}
+  1152→
+  1153→            {/* Bus-specific fields */}
+  1154→            {editTransportMode === 'bus' && (
+  1155→              <div className="space-y-3 mb-4">
+  1156→                <div>
+  1157→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_company')}</label>
+  1158→                  <input
+  1159→                    type="text"
+  1160→                    value={editBusCompany}
+  1161→                    onChange={(e) => setEditBusCompany(e.target.value)}
+  1162→                    placeholder={t('transport.bus_company_placeholder')}
+  1163→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1164→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1165→                  />
+  1166→                </div>
+  1167→                <div>
+  1168→                  <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('transport.bus_line')}</label>
+  1169→                  <input
+  1170→                    type="text"
+  1171→                    value={editBusLineNumber}
+  1172→                    onChange={(e) => setEditBusLineNumber(e.target.value)}
+  1173→                    placeholder={t('transport.bus_line_placeholder')}
+  1174→                    className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1175→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1176→                  />
+  1177→                </div>
+  1178→              </div>
+  1179→            )}
+  1180→
+  1181→            {/* Destination — common to all modes */}
+  1182→            <div className="mb-3">
+  1183→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_destination')}</label>
+  1184→              <input
+  1185→                type="text"
+  1186→                value={editDestination}
+  1187→                onChange={(e) => setEditDestination(e.target.value)}
+  1188→                placeholder={t('transport.common_destination_placeholder')}
+  1189→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1190→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1191→              />
+  1192→            </div>
+  1193→
+  1194→            {/* Departure Date */}
+  1195→            <div className="mb-3">
+  1196→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_date')}</label>
+  1197→              <input
+  1198→                type="date"
+  1199→                value={editDepartureDate}
+  1200→                onChange={(e) => setEditDepartureDate(e.target.value)}
+  1201→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1202→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1203→              />
+  1204→            </div>
+  1205→
+  1206→            {/* Departure Time */}
+  1207→            <div>
+  1208→              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_time')}</label>
+  1209→              <input
+  1210→                type="time"
+  1211→                value={editDepartureTime}
+  1212→                onChange={(e) => setEditDepartureTime(e.target.value)}
+  1213→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1214→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1215→              />
+  1216→            </div>
+  1217→          </div>
+  1218→        )}
+  1219→
+  1220→        {/* ═══ 🟦 EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
+  1221→        {isEditing && (
+  1222→          <div className="flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+  1223→            {/* Save Button — primary black */}
+  1224→            <button
+  1225→              onClick={handleSave}
+  1226→              disabled={isSaving}
+  1227→              className="flex-1 py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+  1228→              style={{ background: BTN_PRIMARY }}
+  1229→            >
+  1230→              {isSaving ? (
+  1231→                <>
+  1232→                  <svg className="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  1233→                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+  1234→                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  1235→                  </svg>
+  1236→                  <span>{t('finder.edit_saving')}</span>
+  1237→                </>
+  1238→              ) : (
+  1239→                <>
+  1240→                  <CheckCircle className="w-5 h-5" />
+  1241→                  <span>{t('finder.edit_save')}</span>
+  1242→                </>
+  1243→              )}
+  1244→            </button>
+  1245→            {/* Cancel Button — white outline */}
+  1246→            <button
+  1247→              onClick={() => setIsEditing(false)}
+  1248→              disabled={isSaving}
+  1249→              className="flex-1 py-4 px-6 bg-white hover:bg-gray-50 disabled:opacity-50 border-2 border-black rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+  1250→              style={{ color: INK }}
+  1251→            >
+  1252→              <span>{t('finder.edit_cancel')}</span>
+  1253→            </button>
+  1254→          </div>
+  1255→        )}
+  1256→
+  1257→        {/* ═══ 🟡 BLOC 3 : ENCART FINDER (white card) ═══ */}
+  1258→        <div className="w-full rounded-[20px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+  1259→
+  1260→          {/* ─── 1. BIG "📞 Contacter le propriétaire" CTA button (FIRST) ─── */}
+  1261→          {!showForm && (
+  1262→            <button
+  1263→              onClick={() => setShowForm(true)}
+  1264→              className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+  1265→              style={{ background: BTN_PRIMARY }}
+  1266→            >
+  1267→              <Phone className="w-5 h-5" />
+  1268→              <span>{t('finder.contact_owner_cta')}</span>
+  1269→            </button>
+  1270→          )}
+  1271→
+  1272→          {/* ─── 2 + 3. Form (revealed when CTA clicked): GPS button + form fields ─── */}
+  1273→          {showForm && (
+  1274→            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+  1275→
+  1276→              {/* GPS Success/Error indicators + dedicated GPS button REMOVED per refonte-6 brief.
+  1277→                  GPS is now captured automatically inside the WhatsApp button click (silent fallback to manual location). */}
+  1278→
+  1279→              {/* ─── Form fields: prénom, téléphone, lieu ─── */}
+  1280→
+  1281→              {/* First name */}
+  1282→              <input
+  1283→                type="text"
+  1284→                placeholder={t('finder.first_name')}
+  1285→                value={finderName}
+  1286→                onChange={(e) => setFinderName(e.target.value)}
+  1287→                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1288→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1289→              />
+  1290→
+  1291→              {/* Phone (PhoneInput with dark=false but on yellow bg → white input) */}
+  1292→              <PhoneInput
+  1293→                countryCode={finderPhoneCountry}
+  1294→                onCountryChange={setFinderPhoneCountry}
+  1295→                value={finderPhone}
+  1296→                onChange={setFinderPhone}
+  1297→                placeholder="6 12 34 56 78"
+  1298→                required
+  1299→                className="min-h-[48px]"
+  1300→              />
+  1301→
+  1302→              {/* Location */}
+  1303→              <div>
+  1304→                <input
+  1305→                  type="text"
+  1306→                  placeholder={t('finder.location_placeholder')}
+  1307→                  value={otherLocation}
+  1308→                  onChange={(e) => setOtherLocation(e.target.value)}
+  1309→                  className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+  1310→                    style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+  1311→                />
+  1312→              </div>
+  1313→
+  1314→              {/* ─── Contact choice: WhatsApp (GREEN + GPS auto) + Phone (BLACK) ─── */}
+  1315→              <div className="pt-1">
+  1316→                <h3 className="text-xs font-bold uppercase tracking-widest text-center mb-2.5" style={{ color: INK }}>
+  1317→                  {t('finder.contact_choice')}
+  1318→                </h3>
+  1319→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+  1320→                  {/* WhatsApp Button — GREEN #25D366 + GPS auto-captured on click */}
+  1321→                  <button
+  1322→                    onClick={handleWhatsApp}
+  1323→                    disabled={isLocating || isSubmitting}
+  1324→                    className="py-3.5 px-4 bg-[#25D366] hover:bg-[#1ebe5d] disabled:opacity-70 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[52px]"
+  1325→                  >
+  1326→                    {isLocating ? (
+  1327→                      <>
+  1328→                        <svg className="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  1329→                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+  1330→                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  1331→                        </svg>
+  1332→                        <span>{t('finder.locating')}</span>
+  1333→                      </>
+  1334→                    ) : isSubmitting ? (
+  1335→                      <>
+  1336→                        <svg className="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  1337→                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+  1338→                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  1339→                        </svg>
+  1340→                        <span>{t('finder.sending')}</span>
+  1341→                      </>
+  1342→                    ) : (
+  1343→                      <>
+  1344→                        <MessageCircle className="w-5 h-5" />
+  1345→                        {t('finder.by_whatsapp')}
+  1346→                      </>
+  1347→                    )}
+  1348→                  </button>
+  1349→                  {/* Phone Button — BLACK + white text (consistent with primary CTA) */}
+  1350→                  <button
+  1351→                    onClick={handlePhoneCall}
+  1352→                    disabled={isLocating || isSubmitting}
+  1353→                    className="py-3.5 px-4 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[52px] disabled:opacity-70"
+  1354→                    style={{ background: BTN_PRIMARY }}
+  1355→                  >
+  1356→                    <Phone className="w-5 h-5" />
+  1357→                    {t('finder.by_phone')}
+  1358→                  </button>
+  1359→                </div>
+  1360→                <p className="text-xs text-center mt-2.5 leading-relaxed" style={{ color: MUTED }}>
+  1361→                  {t('finder.gps_auto_shared')}
+  1362→                </p>
+  1363→              </div>
+  1364→            </div>
+  1365→          )}
+  1366→        </div>
+  1367→
+  1368→        {/* ─── Trust Note ─── */}
+  1369→        <div className="mt-1 mb-4 text-center text-xs tracking-wide flex items-center justify-center gap-1.5" style={{ color: 'rgba(0,0,0,0.6)' }}>
+  1370→          <Shield className="w-4 h-4 inline" />
+  1371→          <span>{t('finder.trust_note')}</span>
+  1372→        </div>
+  1373→      </div>
+  1374→
+  1375→      {/* AI-FEATURE: Chatbot Widget (Feature #1) — only on active/lost baggage */}
+  1376→      {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && (
+  1377→        <ChatbotWidget
+  1378→          reference={reference}
+  1379→          baggageContext={{
+  1380→            destination: baggage.destination || undefined,
+  1381→            city: otherLocation || undefined,
+  1382→            agency: baggage.agency || undefined,
+  1383→            status: baggage.status,
+  1384→            transportMode: baggage.transportMode || undefined,
+  1385→          }}
+  1386→          locale={lang}
+  1387→          t={t}
+  1388→          dir={dir}
+  1389→        />
+  1390→      )}
+  1391→    </main>
+  1392→  );
+  1393→}
+  1394→

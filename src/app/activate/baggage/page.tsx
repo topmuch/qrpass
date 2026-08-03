@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import PhoneInput from '@/components/ui/PhoneInput';
 import { Camera, Globe, CheckCircle, Loader2, Luggage } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -223,6 +224,7 @@ function BaggageActivateContent() {
   const [reference, setReference] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneCountry, setPhoneCountry] = useState('SN'); // default Senegal
   const [email, setEmail] = useState('');
   const [airline, setAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
@@ -243,6 +245,16 @@ function BaggageActivateContent() {
       setReference(qrFromUrl.toUpperCase());
     }
   }, [qrFromUrl]);
+
+  // Detect country from IP for phone input
+  useEffect(() => {
+    fetch('/api/ip-country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) setPhoneCountry(data.country);
+      })
+      .catch(() => {}); // silent fallback to SN
+  }, []);
 
   // Photo preview
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -436,16 +448,16 @@ function BaggageActivateContent() {
             />
           </div>
 
-          {/* WhatsApp - SIMPLE phone input, no country code */}
+          {/* WhatsApp - PhoneInput with country flag & auto IP detection */}
           <div className="mb-5">
             <Label className="text-[13px] font-semibold mb-1.5 block">{t.whatsapp}</Label>
-            <Input
-              type="tel"
+            <PhoneInput
+              countryCode={phoneCountry}
+              onCountryChange={setPhoneCountry}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder={t.phonePlaceholder}
+              onChange={setPhone}
+              placeholder="77 123 45 67"
               required
-              className={inputCls}
             />
             <p className="text-xs mt-1.5 text-gray-500">{t.whatsappHint}</p>
           </div>

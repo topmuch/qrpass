@@ -9,7 +9,7 @@ export default function AgencesPage() {
       <header className="w-full px-4 pt-6 pb-2">
         <div className="max-w-4xl mx-auto flex items-center justify-center gap-2">
           <span className="font-bold text-xl tracking-tight" style={{ color: '#1e3a8a' }}>Pass</span>
-          <span className="font-bold text-xl tracking-tight" style={{ color: '#fbbf24' }}>Hajj</span>
+          <span className="font-bold text-xl tracking-tight" style={{ color: '#f4b400' }}>Hajj</span>
         </div>
         <p className="text-center mt-2 text-sm font-medium" style={{ color: '#64748b' }}>Espace Agences de Voyage</p>
       </header>
@@ -67,14 +67,14 @@ export default function AgencesPage() {
                   'Support dédié & formation incluse',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm" style={{ color: '#0f172a' }}>
-                    <span className="font-bold" style={{ color: '#fbbf24' }}>✓</span>{f}
+                    <span className="font-bold" style={{ color: '#f4b400' }}>✓</span>{f}
                   </li>
                 ))}
               </ul>
               <Link
                 href="/devenir-partenaire"
                 className="w-full py-3 px-6 rounded-xl font-semibold text-base text-center transition-all hover:opacity-90 block"
-                style={{ backgroundColor: '#fbbf24', color: '#0f172a' }}
+                style={{ backgroundColor: '#f4b400', color: '#0f172a' }}
               >
                 Devenir Partenaire
               </Link>

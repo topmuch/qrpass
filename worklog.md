@@ -1,35 +1,88 @@
 ---
 Task ID: 1
-Agent: main
-Task: Replace homepage with new premium landing page (Blue Navy + Gold palette) + implement all CODE TOUT changes
+Agent: Main
+Task: Explore project structure
 
 Work Log:
-- Replaced /src/app/page.tsx with comprehensive landing page featuring Blue Navy (#1e3a8a) + Gold (#fbbf24) palette
-- Updated all 3 locale files (fr.json, en.json, ar.json) with new comprehensive translation keys for: stats, problem section, product cards with how-it-works steps + use cases, comparison table, testimonials, agencies CTA
-- Updated /src/lib/brand.ts to new Blue Navy + Gold palette with SUCCESS, DANGER, BRAND_LIGHT exports
-- Created /src/app/agencies/page.tsx as redirect to /agences
-- Updated /src/app/agences/page.tsx with new brand colors, Identity QR superadmin-only note
-- Updated /src/app/select/page.tsx with new brand colors (navy blue, not yellow)
-- Activation form (/hajj/activate) already had 2-month duration, deferred activation, 2 bagage QR, no cabin
-- Updated /src/app/admin/generer/page.tsx: added useAuth() for isSuperAdmin check, disabled Identity QR for non-superadmins with lock icon and notice, updated colors to brand navy/gold
-- Updated /src/app/admin/qrcodes/page.tsx: changed QR set icons to 🧳/👤 emoji, added Pass type badges with navy/emerald colors, removed cabine from ZIP structure example
-- Updated /src/app/admin/tableau-de-bord/page.tsx: added passType distinction to stats cards, activity items, and chart legends
-- Updated /src/app/api/admin/baggages/generate/route.ts: changed count max from 3 to 2, count type from 1|2|3 to 1|2
-- Updated /src/app/api/activate/route.ts: fixed comment from "3 bags" to "2 bagage QR"
-- Fixed /src/middleware.ts: added /agences and /select to PUBLIC_PAGES, changed prefix matching to exact+slash to prevent /agences matching /agence prefix
+- Explored full project structure of PassHajj (QRPass)
+- Identified all routes, components, and API endpoints
+- Found 4 key issues to fix
 
 Stage Summary:
-- Complete landing page redesign with premium Blue Navy + Gold palette
-- All 10 "CODE TOUT" tasks implemented:
-  1. ✅ Landing page wider (max 1200px)
-  2. ✅ Fix Espace Agences 404
-  3. ✅ Fix activation flow (QR reference required)
-  4. ✅ QR generation: 2 bagage only, remove cabin
-  5. ✅ Generator redesign: choose type then quantity
-  6. ✅ Dashboard distinction: 🧳 Bagage vs 👤 Identity
-  7. ✅ Identity QR: superadmin only
-  8. ✅ Duration: fixed 2 months from activation
-  9. ✅ Deferred activation support
-  10. ✅ Remove cabin from forms
-- All pages verified in browser, no runtime errors
-- Lint: only pre-existing errors in create-admin.cjs
+- Project is Next.js 16 + TypeScript + Tailwind CSS 4 + Prisma
+- Yellow color inconsistency: #f4b400 vs #fbbf24
+- Phone input: baggage/hajj pages use plain Input instead of PhoneInput
+- Confirmation page: no onError fallback for broken images
+- Scan page: photoUrl not displayed despite API returning it
+
+---
+Task ID: 2
+Agent: Subagent (full-stack-developer)
+Task: Harmonize yellow color #f4b400 across all activation pages
+
+Work Log:
+- Changed hajj/activate BG from #f8fafc to #f4b400
+- Changed hajj/activate ACCENT from #fbbf24 to #f4b400
+- Changed hajj/activate BTN_PRIMARY from #1e3a8a to #111827
+- Changed select page #fbbf24 to #f4b400
+- Changed agences page #fbbf24 to #f4b400
+- Changed confirmation tips section from amber-50/amber-400 to #fef3c7/#f4b400
+
+Stage Summary:
+- All pages now use consistent #f4b400 yellow
+- No more #fbbf24 or amber-400 inconsistencies
+
+---
+Task ID: 3
+Agent: Subagent (full-stack-developer)
+Task: Add IP detection + PhoneInput with country flags
+
+Work Log:
+- Created /api/ip-country/route.ts with IP detection via ipapi.co
+- Added PhoneInput import to /activate/baggage/page.tsx
+- Added phoneCountry state + useEffect for IP detection
+- Replaced plain Input with PhoneInput component
+- Added PhoneInput import to /hajj/activate/page.tsx
+- Added chefPhoneCountry state + useEffect for IP detection
+- Replaced plain Input with PhoneInput component
+
+Stage Summary:
+- Both activation pages now show country flag + dial code selector
+- IP auto-detection defaults to Senegal (SN) for local dev
+- Users no longer need to type the country code manually
+
+---
+Task ID: 4+5
+Agent: Subagent (full-stack-developer)
+Task: Fix broken image on confirmation + add photo to finder page
+
+Work Log:
+- Added photoError state to ConfirmationContent
+- Reversed data resolution: sessionStorage first, URL params fallback
+- Added onError handler with "Photo non disponible" fallback
+- Added photoUrl to BaggageData interface in scan page
+- Added baggage photo display in BLOC 1 of finder page
+- Added onError handler that hides broken images
+
+Stage Summary:
+- Confirmation page no longer shows broken image icon
+- Finder page now displays the uploaded baggage photo
+- Both pages handle image errors gracefully
+
+---
+Task ID: 6
+Agent: Main
+Task: Test and verify all changes
+
+Work Log:
+- Ran lint: only pre-existing errors in create-admin.cjs
+- Build succeeds with no errors
+- Agent Browser verified:
+  - /activate/baggage: PhoneInput with 🇸🇳 +221 visible, country dropdown works
+  - /hajj/activate: Yellow #f4b400 background, PhoneInput with 🇸🇳 +221
+  - /select: Harmonized yellow color
+  - /activate/confirmation: Renders correctly with yellow bg
+
+Stage Summary:
+- All 4 issues fixed and verified
+- Screenshots saved to /tmp/

@@ -4,22 +4,23 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import PhoneInput from '@/components/ui/PhoneInput';
 import { Camera, User, Globe, ChevronRight, ChevronLeft, Luggage, Shield, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
 
 // ─── Brand constants (from user's design) ───
-const BG = '#f8fafc';
+const BG = '#f4b400';
 const CARD_BG = '#ffffff';
 const TEXT = '#0f172a';
 const MUTED = '#64748b';
 const INPUT_BG = '#f3f4f6';
 const INPUT_BORDER = '#d1d5db';
-const BTN_PRIMARY = '#1e3a8a';
-const BTN_PRIMARY_HOVER = '#3b82f6';
+const BTN_PRIMARY = '#111827';
+const BTN_PRIMARY_HOVER = '#374151';
 const SUCCESS = '#10b981';
-const ACCENT = '#fbbf24';
+const ACCENT = '#f4b400';
 const RADIUS = '16px';
 
 // ─── Language Selector (light, minimal) ───
@@ -69,6 +70,7 @@ function HajjActivateContent() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [chefPhone, setChefPhone] = useState('');
+  const [chefPhoneCountry, setChefPhoneCountry] = useState('SN');
   const [email, setEmail] = useState('');
 
   // Step 2: Travel
@@ -91,6 +93,16 @@ function HajjActivateContent() {
       setReference(qrFromUrl.toUpperCase());
     }
   }, [qrFromUrl]);
+
+  // Detect country from IP for phone input
+  useEffect(() => {
+    fetch('/api/ip-country')
+      .then(res => res.json())
+      .then(data => {
+        if (data.country) setChefPhoneCountry(data.country);
+      })
+      .catch(() => {}); // silent fallback to SN
+  }, []);
 
   // Validate step 1
   const validateStep1 = (): boolean => {
@@ -265,7 +277,7 @@ function HajjActivateContent() {
                 onChange={(e) => setReference(e.target.value.toUpperCase())}
                 placeholder="HAJJ26-H57N2C"
                 readOnly={!!qrFromUrl}
-                className={`h-12 rounded-xl text-base ${qrFromUrl ? 'bg-gray-200 cursor-not-allowed text-gray-600' : 'bg-gray-100'} ${errors.reference ? 'border-red-500' : 'border-gray-300'}`}
+                className={`h-12 rounded-xl text-base ${qrFromUrl ? 'bg-gray-200 cursor-not-allowed text-gray-600' : 'bg-[#f8fafc]'} ${errors.reference ? 'border-red-500' : 'border-gray-300'}`}
               />
               {qrFromUrl && (
                 <p className="text-xs mt-1.5" style={{ color: MUTED }}>
@@ -282,7 +294,7 @@ function HajjActivateContent() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Ex: Ahmed"
-                  className={`h-12 rounded-xl text-base bg-gray-100 ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`h-12 rounded-xl text-base bg-[#f8fafc] ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
                 />
               </div>
               <div className="flex-1">
@@ -291,7 +303,7 @@ function HajjActivateContent() {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Ex: Diop"
-                  className={`h-12 rounded-xl text-base bg-gray-100 ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`h-12 rounded-xl text-base bg-[#f8fafc] ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
                 />
               </div>
             </div>
@@ -299,12 +311,13 @@ function HajjActivateContent() {
             {/* WhatsApp */}
             <div className="mb-4">
               <Label className="text-sm font-semibold mb-1.5 block">WhatsApp Chef de Groupe *</Label>
-              <Input
-                type="tel"
+              <PhoneInput
+                countryCode={chefPhoneCountry}
+                onCountryChange={setChefPhoneCountry}
                 value={chefPhone}
-                onChange={(e) => setChefPhone(e.target.value)}
-                placeholder="+221 77 123 45 67"
-                className={`h-12 rounded-xl text-base bg-gray-100 ${errors.chefPhone ? 'border-red-500' : 'border-gray-300'}`}
+                onChange={setChefPhone}
+                placeholder="77 123 45 67"
+                required
               />
               <p className="text-xs mt-1.5" style={{ color: MUTED }}>
                 Ce numéro recevra les alertes si le bagage est trouvé
@@ -319,7 +332,7 @@ function HajjActivateContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@exemple.com"
-                className="h-12 rounded-xl text-base bg-gray-100 border-gray-300"
+                className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
               />
             </div>
 
@@ -357,7 +370,7 @@ function HajjActivateContent() {
                     value={activationDate}
                     onChange={(e) => setActivationDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className={`h-12 rounded-xl text-base bg-gray-100 ${errors.activationDate ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`h-12 rounded-xl text-base bg-[#f8fafc] ${errors.activationDate ? 'border-red-500' : 'border-gray-300'}`}
                   />
                   <p className="text-xs mt-1.5" style={{ color: MUTED }}>
                     Les 60 jours commenceront à partir de cette date
@@ -396,7 +409,7 @@ function HajjActivateContent() {
                 value={airline}
                 onChange={(e) => setAirline(e.target.value)}
                 placeholder="Ex: Saudia Airlines"
-                className="h-12 rounded-xl text-base bg-gray-100 border-gray-300"
+                className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
               />
             </div>
 
@@ -408,7 +421,7 @@ function HajjActivateContent() {
                   value={flightNumber}
                   onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                   placeholder="SV1234"
-                  className="h-12 rounded-xl text-base bg-gray-100 border-gray-300 font-mono tracking-wider"
+                  className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300 font-mono tracking-wider"
                 />
               </div>
               <div className="flex-1">
@@ -417,7 +430,7 @@ function HajjActivateContent() {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   placeholder="Djeddah / Médine"
-                  className="h-12 rounded-xl text-base bg-gray-100 border-gray-300"
+                  className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
                 />
               </div>
             </div>
