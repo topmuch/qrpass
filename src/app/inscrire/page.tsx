@@ -29,10 +29,10 @@ import {
   getTransportImage,
 } from '@/lib/transport';
 
-// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
-const BRAND = '#0047d6'; // bleu vif — fonds principaux, headers
-const ACCENT = '#fcd616'; // jaune vif — cards, badges, accents
-const INK = '#1a1a1a'; // noir — texte sur jaune, bordures dashed
+// ─── Brand constants (QRPass palette: blue #f4b400 + yellow #f4b400) ───
+const BRAND = '#f4b400'; // bleu vif — fonds principaux, headers
+const ACCENT = '#f4b400'; // jaune vif — cards, badges, accents
+const INK = '#0f172a'; // noir — texte sur jaune, bordures dashed
 
 // ─── Language Selector Component ───
 function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Language) => void }) {
@@ -66,7 +66,7 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
                 setIsOpen(false);
               }}
               className={`w-full px-4 py-2.5 sm:px-5 sm:py-3 text-left text-xs sm:text-sm md:text-base font-medium transition-colors ${
-                lang === l ? 'bg-[#fcd616] text-black' : 'text-black hover:bg-black/5'
+                lang === l ? 'bg-[#f4b400] text-black' : 'text-black hover:bg-black/5'
               }`}
             >
               {LANGUAGE_NAMES[l]}
@@ -218,14 +218,14 @@ function InscrireContent() {
 
   return (
     <main
-      className="min-h-[100dvh] min-h-screen bg-[#0047d6] flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
+      className="min-h-[100dvh] min-h-screen bg-[#f4b400] flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
       dir={dir}
     >
       {/* ─── Header ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#0047d6]">
+      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#f4b400]">
         <Link
           href="/"
-          className="flex items-center gap-2 text-white hover:text-[#fcd616] transition-colors min-h-[44px]"
+          className="flex items-center gap-2 text-white hover:text-[#f4b400] transition-colors min-h-[44px]"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
@@ -559,9 +559,9 @@ export default function InscrirePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#0047d6] flex items-center justify-center">
+        <main className="min-h-screen bg-[#f4b400] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-[#fcd616] rounded-full mx-auto mb-4" />
+            <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-[#f4b400] rounded-full mx-auto mb-4" />
             <p className="text-lg text-white">{t('common.loading')}</p>
           </div>
         </main>

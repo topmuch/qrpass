@@ -5,9 +5,9 @@
  * Chaque bouton affiche la VRAIE IMAGE du moyen de transport (PNG)
  * + label i18n + description.
  *
- * Style (palette QRPass — bleu #0047d6 + jaune #fcd616):
- *   - Non sélectionné: carte jaune #fcd616 + bordure noire dashed + image (mix-blend multiply).
- *   - Sélectionné: carte jaune #fcd616 + bordure noire solide + image (mix-blend multiply)
+ * Style (palette QRPass — bleu #f4b400 + jaune #f4b400):
+ *   - Non sélectionné: carte jaune #f4b400 + bordure noire dashed + image (mix-blend multiply).
+ *   - Sélectionné: carte jaune #f4b400 + bordure noire solide + image (mix-blend multiply)
  *     + checkmark jaune QRPass en haut à droite.
  *
  * Usage:
@@ -70,8 +70,8 @@ export default function TransportModeSelector({
               focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
               ${
                 isSelected
-                  ? 'border-black border-solid bg-[#fcd616] shadow-lg shadow-black/20 scale-[1.02]'
-                  : 'border-black border-dashed bg-[#fcd616] hover:bg-[#fcd616]/80'
+                  ? 'border-black border-solid bg-[#f4b400] shadow-lg shadow-black/20 scale-[1.02]'
+                  : 'border-black border-dashed bg-[#f4b400] hover:bg-[#f4b400]/80'
               }
             `}
           >
@@ -101,7 +101,7 @@ export default function TransportModeSelector({
             {/* Selected indicator — pastille noire avec checkmark jaune QRPass */}
             {isSelected && (
               <div className="absolute top-2 right-2 w-5 h-5 bg-black rounded-full flex items-center justify-center ring-2 ring-white">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#fcd616" strokeWidth={3}>
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#f4b400" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>

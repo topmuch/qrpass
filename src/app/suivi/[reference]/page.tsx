@@ -41,11 +41,11 @@ import { safeTransportMode, getTransportImage } from '@/lib/transport';
 import type { TransportMode } from '@/lib/transport';
 import { useAudioAlert, POLL_INTERVAL_MS } from '@/hooks/useAudioAlert';
 
-// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
-const BRAND = '#0047d6';   // bleu vif — fonds principaux
-const ACCENT = '#fcd616'; // jaune vif — cards, accents
-const INK = '#1a1a1a';    // noir — texte sur jaune, bordures dashed
-const CREAM = '#0047d6';  // (alias — désormais bleu QRPass)
+// ─── Brand constants (QRPass palette: blue #f4b400 + yellow #f4b400) ───
+const BRAND = '#f4b400';   // bleu vif — fonds principaux
+const ACCENT = '#f4b400'; // jaune vif — cards, accents
+const INK = '#0f172a';    // noir — texte sur jaune, bordures dashed
+const CREAM = '#f4b400';  // (alias — désormais bleu QRPass)
 const URGENT_RED = '#EF4444';
 const URGENT_BG = '#FEF2F2';
 const QRPASS_SUPPORT_PHONE = '+33745349339';
@@ -194,14 +194,14 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border-2 border-[#1a1a1a] rounded-full text-[#1a1a1a] hover:bg-[#fcd616] transition-colors text-xs sm:text-sm md:text-base font-medium shadow-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
+        className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border-2 border-[#0f172a] rounded-full text-[#0f172a] hover:bg-[#f4b400] transition-colors text-xs sm:text-sm md:text-base font-medium shadow-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
       >
         <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
         <span>{LANGUAGE_NAMES[lang]}</span>
       </button>
 
       {isOpen && (
-        <div role="listbox" aria-label="Language" className="absolute top-full right-0 mt-1 sm:mt-2 bg-white border-2 border-[#1a1a1a] rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px] sm:min-w-[160px]">
+        <div role="listbox" aria-label="Language" className="absolute top-full right-0 mt-1 sm:mt-2 bg-white border-2 border-[#0f172a] rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px] sm:min-w-[160px]">
           {(['fr', 'en', 'ar'] as Language[]).map((l) => (
             <button
               key={l}
@@ -213,8 +213,8 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
               }}
               className={`w-full px-4 py-2.5 sm:px-5 sm:py-3 text-left text-xs sm:text-sm md:text-base font-medium transition-colors ${
                 lang === l
-                  ? 'bg-[#fcd616] text-[#1a1a1a]'
-                  : 'text-[#1a1a1a] hover:bg-[#fcd616]/30'
+                  ? 'bg-[#f4b400] text-[#0f172a]'
+                  : 'text-[#0f172a] hover:bg-[#f4b400]/30'
               }`}
             >
               {LANGUAGE_NAMES[l]}
@@ -232,7 +232,7 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
 
 function DashedEncart({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`border-2 border-dashed border-[#1a1a1a]/60 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`}>
+    <div className={`border-2 border-dashed border-[#0f172a]/60 rounded-xl p-3 mb-2.5 last:mb-0 ${className}`}>
       {children}
     </div>
   );
@@ -244,10 +244,10 @@ function DashedEncart({ children, className = '' }: { children: React.ReactNode;
 
 function MapSkeleton() {
   return (
-    <div className="w-full h-full bg-[#fcd616]/10 rounded-xl flex items-center justify-center animate-pulse">
+    <div className="w-full h-full bg-[#f4b400]/10 rounded-xl flex items-center justify-center animate-pulse">
       <div className="text-center">
-        <MapPin className="w-8 h-8 text-[#fcd616]/40 mx-auto mb-2" />
-        <p className="text-sm text-[#1a1a1a]/40">Chargement de la carte...</p>
+        <MapPin className="w-8 h-8 text-[#f4b400]/40 mx-auto mb-2" />
+        <p className="text-sm text-[#0f172a]/40">Chargement de la carte...</p>
       </div>
     </div>
   );
@@ -259,9 +259,9 @@ function MapSkeleton() {
 
 function LoadingScreen({ t }: { t: (key: string) => string }) {
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center">
+    <main className="min-h-screen bg-[#f4b400] flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-[#fcd616] rounded-full mx-auto mb-4"></div>
+        <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-[#f4b400] rounded-full mx-auto mb-4"></div>
         <p className="text-lg text-white">{t('common.loading')}</p>
       </div>
     </main>
@@ -290,17 +290,17 @@ function ErrorScreen({
       message: t('tracking.baggage_not_found_desc'),
     },
     blocked: {
-      icon: <Shield className="w-12 h-12 text-[#1a1a1a]/40" />,
+      icon: <Shield className="w-12 h-12 text-[#0f172a]/40" />,
       title: t('errors.baggage_blocked'),
       message: t('tracking.baggage_blocked_desc'),
     },
     expired: {
-      icon: <Clock className="w-12 h-12 text-[#1a1a1a]/40" />,
+      icon: <Clock className="w-12 h-12 text-[#0f172a]/40" />,
       title: t('errors.protection_expired'),
       message: t('tracking.baggage_expired_desc'),
     },
     pending_activation: {
-      icon: <AlertCircle className="w-12 h-12 text-[#fcd616]" />,
+      icon: <AlertCircle className="w-12 h-12 text-[#f4b400]" />,
       title: t('tracking.baggage_not_found'),
       message: t('tracking.baggage_pending_desc'),
     },
@@ -309,18 +309,18 @@ function ErrorScreen({
   const config = errorConfig[type as keyof typeof errorConfig] || errorConfig.not_found;
 
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center p-5 md:p-8 relative">
+    <main className="min-h-screen bg-[#f4b400] flex items-center justify-center p-5 md:p-8 relative">
       <div className="absolute top-4 right-4">
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
 
-      <div className="max-w-md w-full bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-6 md:p-8 text-center shadow-xl">
-        <div className="w-20 h-20 bg-[#fcd616]/30 border-2 border-dashed border-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="max-w-md w-full bg-white border-2 border-dashed border-[#0f172a] rounded-2xl p-6 md:p-8 text-center shadow-xl">
+        <div className="w-20 h-20 bg-[#f4b400]/30 border-2 border-dashed border-[#0f172a] rounded-full flex items-center justify-center mx-auto mb-6">
           {config.icon}
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-3">{config.title}</h1>
-        <p className="text-[#1a1a1a] text-base md:text-lg mb-6">{config.message}</p>
-        <div className="w-full py-4 px-6 bg-[#fcd616]/20 border-2 border-dashed border-[#1a1a1a] text-[#1a1a1a] rounded-xl text-center text-base font-medium min-h-[56px]">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#0f172a] mb-3">{config.title}</h1>
+        <p className="text-[#0f172a] text-base md:text-lg mb-6">{config.message}</p>
+        <div className="w-full py-4 px-6 bg-[#f4b400]/20 border-2 border-dashed border-[#0f172a] text-[#0f172a] rounded-xl text-center text-base font-medium min-h-[56px]">
           {t('tracking.trust_note')}
         </div>
       </div>
@@ -353,16 +353,16 @@ function MapEmbed({
 
   if (!mapSrc) {
     return (
-      <div className="bg-[#fcd616]/20 border-2 border-dashed border-[#1a1a1a] rounded-xl p-4 text-center text-[#1a1a1a]">
+      <div className="bg-[#f4b400]/20 border-2 border-dashed border-[#0f172a] rounded-xl p-4 text-center text-[#0f172a]">
         <MapPin className="w-6 h-6 mx-auto mb-2" />
         <p className="text-base font-medium">{address || t('tracking.no_location')}</p>
-        <p className="text-sm text-[#1a1a1a]/70 mt-1">{t('tracking.map_unavailable')}</p>
+        <p className="text-sm text-[#0f172a]/70 mt-1">{t('tracking.map_unavailable')}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl overflow-hidden border-2 border-[#1a1a1a]">
+    <div className="rounded-xl overflow-hidden border-2 border-[#0f172a]">
       <iframe
         src={mapSrc}
         width="100%"
@@ -386,7 +386,7 @@ function ContextBadge({ context, t }: { context: string; t: (key: string) => str
   const scanContext = context as ScanContext;
   const icon = CONTEXT_ICONS[scanContext] || '📍';
   // Map original color classes to neutral brand-aware classes
-  const colorClass = CONTEXT_COLORS[scanContext] || 'bg-[#1a1a1a]';
+  const colorClass = CONTEXT_COLORS[scanContext] || 'bg-[#0f172a]';
 
   const contextKeyMap: Record<string, string> = {
     departure_airport_urgent: 'tracking.context_departure',
@@ -426,21 +426,21 @@ function IOSInstallModal({
       aria-modal="true"
     >
       <div
-        className="bg-white border-2 border-[#1a1a1a] rounded-2xl p-5 max-w-sm w-full shadow-2xl"
+        className="bg-white border-2 border-[#0f172a] rounded-2xl p-5 max-w-sm w-full shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-bold text-[#1a1a1a]">📱 {t('tracking.install_app_ios')}</h3>
+          <h3 className="text-lg font-bold text-[#0f172a]">📱 {t('tracking.install_app_ios')}</h3>
           <button
             onClick={onClose}
             aria-label={t('tracking.close')}
-            className="w-8 h-8 rounded-full hover:bg-[#fcd616]/30 flex items-center justify-center"
+            className="w-8 h-8 rounded-full hover:bg-[#f4b400]/30 flex items-center justify-center"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-        <ol className="space-y-2 text-sm text-[#1a1a1a]">
-          <li className="flex gap-2"><span>1.</span><span>{t('tracking.install_ios_step1')} <span className="inline-block px-1.5 py-0.5 bg-[#fcd616] rounded text-xs font-bold">⬆️</span></span></li>
+        <ol className="space-y-2 text-sm text-[#0f172a]">
+          <li className="flex gap-2"><span>1.</span><span>{t('tracking.install_ios_step1')} <span className="inline-block px-1.5 py-0.5 bg-[#f4b400] rounded text-xs font-bold">⬆️</span></span></li>
           <li className="flex gap-2"><span>2.</span><span>{t('tracking.install_ios_step2')}</span></li>
           <li className="flex gap-2"><span>3.</span><span>{t('tracking.install_ios_step3')}</span></li>
         </ol>
@@ -699,20 +699,20 @@ export default function SuiviPage() {
     if (isFound) {
       return {
         title: `✅ ${t('tracking.badge_found')}`,
-        badgeClass: 'bg-[#fcd616] text-[#1a1a1a]',
+        badgeClass: 'bg-[#f4b400] text-[#0f172a]',
         desc: t('tracking.found_description'),
       };
     }
     if (isScanned) {
       return {
         title: t('tracking.bagage_localise'),
-        badgeClass: 'bg-[#fcd616] text-[#1a1a1a]',
+        badgeClass: 'bg-[#f4b400] text-[#0f172a]',
         desc: t('tracking.found_description'),
       };
     }
     return {
       title: t('tracking.bagage_protege'),
-      badgeClass: 'bg-[#1a1a1a] text-[#fcd616]',
+      badgeClass: 'bg-[#0f172a] text-[#f4b400]',
       desc: t('tracking.active_description'),
     };
   })();
@@ -738,15 +738,15 @@ export default function SuiviPage() {
 
   return (
     <main
-      className="min-h-screen bg-[#0047d6] flex flex-col"
+      className="min-h-screen bg-[#f4b400] flex flex-col"
       dir={dir}
     >
       {/* ─── Sticky Header ─── */}
-      <header className="sticky top-0 z-40 bg-[#0047d6] border-b-2 border-[#fcd616]/30 pt-[env(safe-area-inset-top,0px)] px-4 sm:px-5 md:px-8 py-2 sm:py-3">
+      <header className="sticky top-0 z-40 bg-[#f4b400] border-b-2 border-[#f4b400]/30 pt-[env(safe-area-inset-top,0px)] px-4 sm:px-5 md:px-8 py-2 sm:py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-1 text-white hover:text-[#fcd616] transition-colors text-sm font-medium min-h-[40px] px-2"
+            className="flex items-center gap-1 text-white hover:text-[#f4b400] transition-colors text-sm font-medium min-h-[40px] px-2"
             aria-label={t('tracking.back_to_scan')}
           >
             <ArrowRight className="w-4 h-4 rtl:rotate-180" />
@@ -759,8 +759,8 @@ export default function SuiviPage() {
               onClick={toggleAudio}
               className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-colors min-h-[40px] ${
                 audioEnabled
-                  ? 'border-[#fcd616] bg-[#fcd616] text-[#1a1a1a]'
-                  : 'border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#fcd616]'
+                  ? 'border-[#f4b400] bg-[#f4b400] text-[#0f172a]'
+                  : 'border-[#0f172a] text-[#0f172a] hover:bg-[#f4b400]'
               }`}
               aria-label={t('tracking.audio_alert_toggle_aria')}
               title={audioEnabled ? t('tracking.audio_alert_enabled') : t('tracking.audio_alert_disabled')}
@@ -770,7 +770,7 @@ export default function SuiviPage() {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#fcd616] transition-colors disabled:opacity-50"
+              className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#f4b400] transition-colors disabled:opacity-50"
               aria-label={t('common.refresh')}
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -782,7 +782,7 @@ export default function SuiviPage() {
 
       {/* ─── Refresh Toast ─── */}
       {refreshToast && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(4rem+env(safe-area-inset-top,0px))] left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-[#fcd616] px-4 py-2 rounded-lg shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-300 text-sm font-medium flex items-center gap-1.5">
+        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(4rem+env(safe-area-inset-top,0px))] left-1/2 -translate-x-1/2 bg-[#0f172a] text-[#f4b400] px-4 py-2 rounded-lg shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-300 text-sm font-medium flex items-center gap-1.5">
           <CheckCircle className="w-4 h-4" />
           {t('tracking.refresh_success')}
         </div>
@@ -798,20 +798,20 @@ export default function SuiviPage() {
 
       {/* ─── Audio Alert Banner (show when not enabled AND baggage not yet scanned) ─── */}
       {!audioEnabled && data && data.scans.length === 0 && (
-        <div className="sticky top-[52px] sm:top-[56px] z-30 bg-[#0047d6] px-4 sm:px-5 md:px-8 py-2">
+        <div className="sticky top-[52px] sm:top-[56px] z-30 bg-[#f4b400] px-4 sm:px-5 md:px-8 py-2">
           <div className="max-w-md mx-auto">
-            <div className="bg-[#fcd616] border-2 border-[#1a1a1a] rounded-2xl p-4 text-center">
-              <p className="font-bold text-[#1a1a1a] text-base mb-2">
+            <div className="bg-[#f4b400] border-2 border-[#0f172a] rounded-2xl p-4 text-center">
+              <p className="font-bold text-[#0f172a] text-base mb-2">
                 🔔 {t('tracking.audio_alert_banner_title')}
               </p>
               <button
                 onClick={enableAudio}
-                className="bg-[#1a1a1a] hover:bg-black text-[#fcd616] py-2.5 px-6 rounded-xl font-bold transition-colors text-sm min-h-[44px] inline-flex items-center gap-2"
+                className="bg-[#0f172a] hover:bg-black text-[#f4b400] py-2.5 px-6 rounded-xl font-bold transition-colors text-sm min-h-[44px] inline-flex items-center gap-2"
               >
                 <Volume2 className="w-4 h-4" />
                 {t('tracking.audio_alert_activate_btn')}
               </button>
-              <p className="text-xs text-[#1a1a1a]/70 mt-2">
+              <p className="text-xs text-[#0f172a]/70 mt-2">
                 {t('tracking.audio_alert_keep_open')}
               </p>
             </div>
@@ -821,11 +821,11 @@ export default function SuiviPage() {
 
       {/* ─── Scanning indicator (show when audio is enabled AND no scans yet) ─── */}
       {audioEnabled && data && data.scans.length === 0 && (
-        <div className="sticky top-[52px] sm:top-[56px] z-30 bg-[#0047d6] px-4 sm:px-5 md:px-8 py-2">
+        <div className="sticky top-[52px] sm:top-[56px] z-30 bg-[#f4b400] px-4 sm:px-5 md:px-8 py-2">
           <div className="max-w-md mx-auto">
-            <div className="bg-[#fcd616]/20 border-2 border-dashed border-[#fcd616] rounded-xl px-4 py-2.5 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#fcd616] animate-pulse flex-shrink-0" />
-              <span className="text-sm font-medium text-[#1a1a1a]">{t('tracking.audio_alert_scanning')}</span>
+            <div className="bg-[#f4b400]/20 border-2 border-dashed border-[#f4b400] rounded-xl px-4 py-2.5 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#f4b400] animate-pulse flex-shrink-0" />
+              <span className="text-sm font-medium text-[#0f172a]">{t('tracking.audio_alert_scanning')}</span>
             </div>
           </div>
         </div>
@@ -833,20 +833,20 @@ export default function SuiviPage() {
 
       {/* ─── Interactive Map (Leaflet — trajectory + markers) ─── */}
       {data.lastPosition && (data.lastPosition.hasCoordinates || data.lastPosition.address) && (
-        <section className="sticky top-[52px] sm:top-[56px] z-30 bg-[#0047d6] px-4 sm:px-5 md:px-8 py-3">
+        <section className="sticky top-[52px] sm:top-[56px] z-30 bg-[#f4b400] px-4 sm:px-5 md:px-8 py-3">
           <div className="max-w-md mx-auto">
-            <div className="bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-2.5 shadow-sm">
+            <div className="bg-white border-2 border-dashed border-[#0f172a] rounded-2xl p-2.5 shadow-sm">
               <div className="flex items-center justify-between mb-2 px-1">
-                <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold flex items-center gap-1.5">
+                <h2 className="text-xs uppercase tracking-widest text-[#0f172a] font-bold flex items-center gap-1.5">
                   <span>🗺️</span> {showTrajectoryMap ? t('tracking.trajectory_map') || 'Trajectoire complète' : t('tracking.last_location')}
                 </h2>
                 <div className="flex items-center gap-2">
                   {/* WebSocket status indicator */}
-                  <span className="flex items-center gap-1 text-[10px] text-[#1a1a1a]/50" title={wsConnected ? 'Temps réel' : 'Polling'}>
+                  <span className="flex items-center gap-1 text-[10px] text-[#0f172a]/50" title={wsConnected ? 'Temps réel' : 'Polling'}>
                     {wsConnected ? <Wifi className="w-3 h-3 text-green-500" /> : <WifiOff className="w-3 h-3" />}
                   </span>
                   {baggage.lastScanDate && (
-                    <span className="text-[10px] text-[#1a1a1a]/60">
+                    <span className="text-[10px] text-[#0f172a]/60">
                       {formatDateTime(baggage.lastScanDate)}
                     </span>
                   )}
@@ -858,13 +858,13 @@ export default function SuiviPage() {
                 <div className="flex gap-2 mb-2 px-1">
                   <button
                     onClick={() => setShowTrajectoryMap(false)}
-                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors min-h-[28px] ${!showTrajectoryMap ? 'bg-[#1a1a1a] text-[#fcd616]' : 'bg-[#fcd616]/20 text-[#1a1a1a]/70 hover:bg-[#fcd616]/40'}`}
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors min-h-[28px] ${!showTrajectoryMap ? 'bg-[#0f172a] text-[#f4b400]' : 'bg-[#f4b400]/20 text-[#0f172a]/70 hover:bg-[#f4b400]/40'}`}
                   >
                     📍 Dernière position
                   </button>
                   <button
                     onClick={() => setShowTrajectoryMap(true)}
-                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors min-h-[28px] ${showTrajectoryMap ? 'bg-[#1a1a1a] text-[#fcd616]' : 'bg-[#fcd616]/20 text-[#1a1a1a]/70 hover:bg-[#fcd616]/40'}`}
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors min-h-[28px] ${showTrajectoryMap ? 'bg-[#0f172a] text-[#f4b400]' : 'bg-[#f4b400]/20 text-[#0f172a]/70 hover:bg-[#f4b400]/40'}`}
                   >
                     🛤️ Trajectoire ({data.scans.filter(s => s.latitude && s.longitude).length})
                   </button>
@@ -915,7 +915,7 @@ export default function SuiviPage() {
         {/* ═══ SOCIAL SHARE BAR ═══ */}
         {data.scans.length > 0 && (
           <div className="flex items-center justify-between">
-            <span className="text-xs text-[#1a1a1a]/60 font-medium">
+            <span className="text-xs text-[#0f172a]/60 font-medium">
               {lang === 'ar' ? 'مشاركة' : lang === 'en' ? 'Share' : 'Partager'}
             </span>
             <SocialShareButtons
@@ -969,13 +969,13 @@ export default function SuiviPage() {
             <ol className="space-y-3">
               <li className="flex gap-3 items-start">
                 <span className="flex-shrink-0 w-7 h-7 bg-[#EF4444] text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</span>
-                <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+                <p className="text-sm md:text-base text-[#0f172a] leading-relaxed">
                   {t('tracking.urgent_step1', { company: transportCompany })}
                 </p>
               </li>
               <li className="flex gap-3 items-start">
                 <span className="flex-shrink-0 w-7 h-7 bg-[#EF4444] text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</span>
-                <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+                <p className="text-sm md:text-base text-[#0f172a] leading-relaxed">
                   {t('tracking.urgent_step2')}
                 </p>
               </li>
@@ -1019,8 +1019,8 @@ export default function SuiviPage() {
 
         {/* ═══ CARTE TROUVEUR (white + dashed, lecture seule) ═══ */}
         {data.lastFinder && (data.lastFinder.name || data.lastFinder.phone) ? (
-          <div className="bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 shadow-sm">
-            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold mb-3 flex items-center gap-2">
+          <div className="bg-white border-2 border-dashed border-[#0f172a] rounded-2xl p-5 shadow-sm">
+            <h2 className="text-xs uppercase tracking-widest text-[#0f172a] font-bold mb-3 flex items-center gap-2">
               <span>🔍</span> {t('tracking.finder_info')}
             </h2>
 
@@ -1029,8 +1029,8 @@ export default function SuiviPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl">👤</span>
                   <div>
-                    <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('finder.fullName')}</p>
-                    <p className="text-base font-bold text-[#1a1a1a]">{data.lastFinder.name}</p>
+                    <p className="text-xs text-[#0f172a]/60 font-medium">{t('finder.fullName')}</p>
+                    <p className="text-base font-bold text-[#0f172a]">{data.lastFinder.name}</p>
                   </div>
                 </div>
               </DashedEncart>
@@ -1041,29 +1041,29 @@ export default function SuiviPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl">📱</span>
                   <div>
-                    <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('finder.whatsapp')}</p>
-                    <p className="text-base font-bold text-[#1a1a1a]" dir="ltr">{data.lastFinder.phone}</p>
+                    <p className="text-xs text-[#0f172a]/60 font-medium">{t('finder.whatsapp')}</p>
+                    <p className="text-base font-bold text-[#0f172a]" dir="ltr">{data.lastFinder.phone}</p>
                   </div>
                 </div>
               </DashedEncart>
             )}
           </div>
         ) : (
-          <div className="bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl p-5 shadow-sm text-center">
-            <div className="w-14 h-14 bg-[#fcd616]/20 border-2 border-dashed border-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-3">
-              <Clock className="w-7 h-7 text-[#1a1a1a]/60" />
+          <div className="bg-white border-2 border-dashed border-[#0f172a] rounded-2xl p-5 shadow-sm text-center">
+            <div className="w-14 h-14 bg-[#f4b400]/20 border-2 border-dashed border-[#0f172a] rounded-full flex items-center justify-center mx-auto mb-3">
+              <Clock className="w-7 h-7 text-[#0f172a]/60" />
             </div>
-            <p className="text-[#1a1a1a]/70 text-sm">{t('tracking.no_finder')}</p>
+            <p className="text-[#0f172a]/70 text-sm">{t('tracking.no_finder')}</p>
           </div>
         )}
 
-        {/* ═══ CTA CHECKLIST (jaune #fcd616 + dashed) ═══ */}
-        <div className="bg-[#fcd616] border-2 border-dashed border-[#1a1a1a] rounded-2xl p-4 shadow-sm">
-          <h3 className="text-base font-bold text-[#1a1a1a] mb-1">{t('tracking.checklist_title')}</h3>
-          <p className="text-sm text-[#1a1a1a]/80 mb-3 leading-relaxed">{t('tracking.checklist_desc')}</p>
+        {/* ═══ CTA CHECKLIST (jaune #f4b400 + dashed) ═══ */}
+        <div className="bg-[#f4b400] border-2 border-dashed border-[#0f172a] rounded-2xl p-4 shadow-sm">
+          <h3 className="text-base font-bold text-[#0f172a] mb-1">{t('tracking.checklist_title')}</h3>
+          <p className="text-sm text-[#0f172a]/80 mb-3 leading-relaxed">{t('tracking.checklist_desc')}</p>
           <a
             href={checklistHref}
-            className="block w-full text-center py-3 px-4 bg-[#1a1a1a] hover:bg-black text-[#fcd616] rounded-xl font-bold transition-colors min-h-[44px]"
+            className="block w-full text-center py-3 px-4 bg-[#0f172a] hover:bg-black text-[#f4b400] rounded-xl font-bold transition-colors min-h-[44px]"
           >
             {t('tracking.checklist_cta')}
           </a>
@@ -1071,17 +1071,17 @@ export default function SuiviPage() {
 
         {/* ═══ HISTORIQUE (ACCORDION) ═══ */}
         {data.scans.length > 0 && (
-          <div className="bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white border-2 border-dashed border-[#0f172a] rounded-2xl shadow-sm overflow-hidden">
             <button
               onClick={() => setHistoryOpen(!historyOpen)}
               className="w-full flex items-center justify-between px-5 py-4 text-left"
               aria-expanded={historyOpen}
             >
-              <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold flex items-center gap-2">
+              <h2 className="text-xs uppercase tracking-widest text-[#0f172a] font-bold flex items-center gap-2">
                 <span>📜</span>
                 {t('tracking.history_toggle', { count: String(data.scans.length) })}
               </h2>
-              <ChevronDown className={`w-4 h-4 text-[#1a1a1a] transition-transform ${historyOpen ? '' : '-rotate-90'}`} />
+              <ChevronDown className={`w-4 h-4 text-[#0f172a] transition-transform ${historyOpen ? '' : '-rotate-90'}`} />
             </button>
 
             {historyOpen && (
@@ -1091,24 +1091,24 @@ export default function SuiviPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-xs text-[#1a1a1a]/70">
+                          <span className="text-xs text-[#0f172a]/70">
                             {formatDateTime(scan.scannedAt)}
                           </span>
                           <ContextBadge context={scan.context} t={t} />
                         </div>
                         {scan.location && (
-                          <p className="text-[#1a1a1a] font-medium text-sm truncate">
+                          <p className="text-[#0f172a] font-medium text-sm truncate">
                             📍 {scan.location}
                           </p>
                         )}
                         {scan.finderName && (
-                          <p className="text-[#1a1a1a]/70 text-xs mt-1">
+                          <p className="text-[#0f172a]/70 text-xs mt-1">
                             👤 {scan.finderName}
                           </p>
                         )}
                       </div>
-                      <div className="w-7 h-7 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/40 flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-bold text-[#1a1a1a]">{index + 1}</span>
+                      <div className="w-7 h-7 rounded-full bg-[#f4b400]/20 border border-[#0f172a]/40 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-bold text-[#0f172a]">{index + 1}</span>
                       </div>
                     </div>
                   </DashedEncart>
@@ -1117,7 +1117,7 @@ export default function SuiviPage() {
                 {hiddenScansCount > 0 && !showAllScans && (
                   <button
                     onClick={() => setShowAllScans(true)}
-                    className="w-full py-2.5 text-center text-sm font-medium text-[#1a1a1a] hover:text-[#fcd616] border-2 border-dashed border-[#1a1a1a]/40 rounded-xl transition-colors min-h-[40px]"
+                    className="w-full py-2.5 text-center text-sm font-medium text-[#0f172a] hover:text-[#f4b400] border-2 border-dashed border-[#0f172a]/40 rounded-xl transition-colors min-h-[40px]"
                   >
                     {t('tracking.see_more', { count: String(hiddenScansCount) })} ▼
                   </button>
@@ -1125,7 +1125,7 @@ export default function SuiviPage() {
                 {showAllScans && hiddenScansCount > 0 && (
                   <button
                     onClick={() => setShowAllScans(false)}
-                    className="w-full py-2.5 text-center text-sm font-medium text-[#1a1a1a]/70 hover:text-[#fcd616] transition-colors min-h-[40px]"
+                    className="w-full py-2.5 text-center text-sm font-medium text-[#0f172a]/70 hover:text-[#f4b400] transition-colors min-h-[40px]"
                   >
                     ▲ Réduire
                   </button>
@@ -1136,16 +1136,16 @@ export default function SuiviPage() {
         )}
 
         {/* ═══ INFOS BAGAGE (COLLAPSIBLE, replié par défaut) ═══ */}
-        <div className="bg-white border-2 border-dashed border-[#1a1a1a] rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border-2 border-dashed border-[#0f172a] rounded-2xl shadow-sm overflow-hidden">
           <button
             onClick={() => setBaggageOpen(!baggageOpen)}
             className="w-full flex items-center justify-between px-5 py-4 text-left"
             aria-expanded={baggageOpen}
           >
-            <h2 className="text-xs uppercase tracking-widest text-[#1a1a1a] font-bold flex items-center gap-2">
+            <h2 className="text-xs uppercase tracking-widest text-[#0f172a] font-bold flex items-center gap-2">
               <span>📦</span> {t('tracking.baggage_info_toggle')}
             </h2>
-            <ChevronDown className={`w-4 h-4 text-[#1a1a1a] transition-transform ${baggageOpen ? '' : '-rotate-90'}`} />
+            <ChevronDown className={`w-4 h-4 text-[#0f172a] transition-transform ${baggageOpen ? '' : '-rotate-90'}`} />
           </button>
 
           {baggageOpen && (
@@ -1155,8 +1155,8 @@ export default function SuiviPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl">🏷️</span>
                   <div>
-                    <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('whatsapp.reference').replace(' :', '')}</p>
-                    <p className="text-base font-bold text-[#1a1a1a] font-mono tracking-widest">{baggage.reference}</p>
+                    <p className="text-xs text-[#0f172a]/60 font-medium">{t('whatsapp.reference').replace(' :', '')}</p>
+                    <p className="text-base font-bold text-[#0f172a] font-mono tracking-widest">{baggage.reference}</p>
                   </div>
                 </div>
               </DashedEncart>
@@ -1166,8 +1166,8 @@ export default function SuiviPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xl">👤</span>
                   <div>
-                    <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('finder.fullName')}</p>
-                    <p className="text-base font-bold text-[#1a1a1a]">{baggage.travelerName || t('finder.notSet')}</p>
+                    <p className="text-xs text-[#0f172a]/60 font-medium">{t('finder.fullName')}</p>
+                    <p className="text-base font-bold text-[#0f172a]">{baggage.travelerName || t('finder.notSet')}</p>
                   </div>
                 </div>
               </DashedEncart>
@@ -1184,18 +1184,18 @@ export default function SuiviPage() {
                         <div className="flex-1">
                           {baggage.airlineName && (
                             <div className="mb-1">
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.airline')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.airlineName}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.airline')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.airlineName}</p>
                             </div>
                           )}
                           {baggage.flightNumber && (
                             <div>
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.flight_number')}</p>
-                              <p className="text-xl font-bold text-[#1a1a1a] font-mono tracking-widest">{baggage.flightNumber}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.flight_number')}</p>
+                              <p className="text-xl font-bold text-[#0f172a] font-mono tracking-widest">{baggage.flightNumber}</p>
                             </div>
                           )}
                         </div>
-                        <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                        <div className="h-12 w-12 rounded-full bg-[#f4b400]/20 border border-[#0f172a]/20 flex items-center justify-center ml-4 flex-shrink-0">
                           <Image src={transportImg} alt="flight" width={28} height={28} className="mix-blend-multiply" />
                         </div>
                       </div>
@@ -1209,18 +1209,18 @@ export default function SuiviPage() {
                         <div className="flex-1">
                           {baggage.trainCompany && (
                             <div className="mb-1">
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.train_company')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.trainCompany}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.train_company')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.trainCompany}</p>
                             </div>
                           )}
                           {baggage.trainNumber && (
                             <div>
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.train_number')}</p>
-                              <p className="text-xl font-bold text-[#1a1a1a] font-mono tracking-widest">{baggage.trainNumber}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.train_number')}</p>
+                              <p className="text-xl font-bold text-[#0f172a] font-mono tracking-widest">{baggage.trainNumber}</p>
                             </div>
                           )}
                         </div>
-                        <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                        <div className="h-12 w-12 rounded-full bg-[#f4b400]/20 border border-[#0f172a]/20 flex items-center justify-center ml-4 flex-shrink-0">
                           <Image src={transportImg} alt="train" width={28} height={28} className="mix-blend-multiply" />
                         </div>
                       </div>
@@ -1234,18 +1234,18 @@ export default function SuiviPage() {
                         <div className="flex-1">
                           {baggage.shipName && (
                             <div className="mb-1">
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.ship_name')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.shipName}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.ship_name')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.shipName}</p>
                             </div>
                           )}
                           {baggage.shipCabin && (
                             <div>
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.ship_cabin')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.shipCabin}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.ship_cabin')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.shipCabin}</p>
                             </div>
                           )}
                         </div>
-                        <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                        <div className="h-12 w-12 rounded-full bg-[#f4b400]/20 border border-[#0f172a]/20 flex items-center justify-center ml-4 flex-shrink-0">
                           <Image src={transportImg} alt="boat" width={28} height={28} className="mix-blend-multiply" />
                         </div>
                       </div>
@@ -1259,18 +1259,18 @@ export default function SuiviPage() {
                         <div className="flex-1">
                           {baggage.busCompany && (
                             <div className="mb-1">
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.bus_company')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.busCompany}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.bus_company')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.busCompany}</p>
                             </div>
                           )}
                           {baggage.busLineNumber && (
                             <div>
-                              <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.bus_line')}</p>
-                              <p className="text-base font-bold text-[#1a1a1a]">{baggage.busLineNumber}</p>
+                              <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.bus_line')}</p>
+                              <p className="text-base font-bold text-[#0f172a]">{baggage.busLineNumber}</p>
                             </div>
                           )}
                         </div>
-                        <div className="h-12 w-12 rounded-full bg-[#fcd616]/20 border border-[#1a1a1a]/20 flex items-center justify-center ml-4 flex-shrink-0">
+                        <div className="h-12 w-12 rounded-full bg-[#f4b400]/20 border border-[#0f172a]/20 flex items-center justify-center ml-4 flex-shrink-0">
                           <Image src={transportImg} alt="bus" width={28} height={28} className="mix-blend-multiply" />
                         </div>
                       </div>
@@ -1286,8 +1286,8 @@ export default function SuiviPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-xl">📍</span>
                     <div>
-                      <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.common_destination')}</p>
-                      <p className="text-base font-bold text-[#1a1a1a]">{baggage.destination}</p>
+                      <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.common_destination')}</p>
+                      <p className="text-base font-bold text-[#0f172a]">{baggage.destination}</p>
                     </div>
                   </div>
                 </DashedEncart>
@@ -1299,8 +1299,8 @@ export default function SuiviPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-xl">📅</span>
                     <div>
-                      <p className="text-xs text-[#1a1a1a]/60 font-medium">{t('transport.common_departure_date')}</p>
-                      <p className="text-base font-bold text-[#1a1a1a]">
+                      <p className="text-xs text-[#0f172a]/60 font-medium">{t('transport.common_departure_date')}</p>
+                      <p className="text-base font-bold text-[#0f172a]">
                         {formatDate(baggage.departureDate || baggage.createdAt)}{baggage.departureTime ? ` — ${baggage.departureTime}` : ''}
                       </p>
                     </div>
@@ -1315,7 +1315,7 @@ export default function SuiviPage() {
         <div className="text-center py-2">
           <a
             href={supportHref}
-            className="text-sm text-[#fcd616] underline hover:text-[#1a1a1a] transition-colors"
+            className="text-sm text-[#f4b400] underline hover:text-[#0f172a] transition-colors"
           >
             {t('tracking.support_cta')}
           </a>
@@ -1325,7 +1325,7 @@ export default function SuiviPage() {
         {data.scans.length > 0 && (
           <button
             onClick={() => setShowReviewModal(true)}
-            className="w-full flex items-center justify-center gap-2 bg-[#fcd616] hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-[#fcd616] border-2 border-[#1a1a1a] py-3.5 px-4 rounded-xl font-bold transition-colors text-base min-h-[48px]"
+            className="w-full flex items-center justify-center gap-2 bg-[#f4b400] hover:bg-[#0f172a] text-[#0f172a] hover:text-[#f4b400] border-2 border-[#0f172a] py-3.5 px-4 rounded-xl font-bold transition-colors text-base min-h-[48px]"
           >
             <Star className="w-5 h-5" />
             {lang === 'ar' ? 'تقييم تجربتك' : lang === 'en' ? 'Rate your experience' : 'Laisser un avis'}
@@ -1343,7 +1343,7 @@ export default function SuiviPage() {
                   handleInstall();
                 }
               }}
-              className="inline-flex items-center gap-2 bg-[#fcd616] hover:bg-[#1a1a1a] text-[#1a1a1a] hover:text-[#fcd616] border-2 border-[#1a1a1a] py-2.5 px-5 rounded-lg text-sm font-bold transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-2 bg-[#f4b400] hover:bg-[#0f172a] text-[#0f172a] hover:text-[#f4b400] border-2 border-[#0f172a] py-2.5 px-5 rounded-lg text-sm font-bold transition-colors min-h-[44px]"
             >
               <span>{isIOS ? '📱' : '⬇️'}</span>
               <span>{isIOS ? t('tracking.install_app_ios') : t('tracking.install_app')}</span>
@@ -1376,11 +1376,11 @@ export default function SuiviPage() {
 
       {/* ═══ STICKY BOTTOM BAR (Appeler + WhatsApp) — only if finder phone AND NOT in lost mode ═══ */}
       {hasFinderPhone && !isDeclaredLost && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-[#1a1a1a] p-3 sm:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-[#0f172a] p-3 sm:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
           <div className="max-w-md mx-auto flex gap-3">
             <button
               onClick={handlePhoneCall}
-              className="flex-1 bg-[#1a1a1a] hover:bg-black text-[#fcd616] py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[48px]"
+              className="flex-1 bg-[#0f172a] hover:bg-black text-[#f4b400] py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[48px]"
               aria-label={t('tracking.by_phone')}
             >
               <Phone className="w-5 h-5" />

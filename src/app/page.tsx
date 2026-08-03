@@ -1,20 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { Language } from '@/lib/i18n';
 
 export default function HomePage() {
-  const [lang, setLang] = useState<'fr' | 'en' | 'ar'>('fr');
+  const { t, lang, setLang, dir } = useTranslation();
 
-  const toggleLang = () => {
-    setLang((prev) => {
-      if (prev === 'fr') return 'en';
-      if (prev === 'en') return 'ar';
-      return 'fr';
-    });
+  const cycleLang = () => {
+    const next: Record<Language, Language> = { fr: 'en', en: 'ar', ar: 'fr' };
+    setLang(next[lang]);
   };
-
-  const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
   return (
     <div lang={lang} dir={dir} style={{ fontFamily: 'inherit' }}>
@@ -113,105 +109,112 @@ export default function HomePage() {
       `}</style>
 
       <div className="ph-wrapper">
+        {/* ─── HEADER ─── */}
         <header className="ph-header">
           <div className="ph-logo"><span>Pass</span>Hajj</div>
           <div className="ph-nav-actions">
-            <button className="ph-lang-toggle" onClick={toggleLang}>🌐 {lang.toUpperCase()}</button>
-            <Link href="/login" className="ph-btn-ghost">Connexion</Link>
-            <Link href="/select" className="ph-btn-ghost" style={{ background: '#000', color: '#fff', border: 'none' }}>Activer</Link>
+            <button className="ph-lang-toggle" onClick={cycleLang}>🌐 {lang.toUpperCase()}</button>
+            <Link href="/login" className="ph-btn-ghost">{t('landing.nav.login')}</Link>
+            <Link href="/select" className="ph-btn-ghost" style={{ background: '#000', color: '#fff', border: 'none' }}>{t('landing.nav.activate')}</Link>
           </div>
         </header>
 
+        {/* ─── HERO ─── */}
         <section className="ph-hero">
-          <h1>Votre sécurité,<br/>notre prière 🕋</h1>
-          <p>PassHajj protège vos bagages et vos proches pendant le Hajj & l&apos;Omrah. Un QR code. Une activation. Une tranquillité d&apos;esprit totale.</p>
+          <h1>{t('landing.hero.title1')}<br/>{t('landing.hero.title2')}</h1>
+          <p>{t('landing.hero.subtitle')}</p>
           <div className="ph-cta-group">
-            <Link href="/select" className="ph-btn ph-btn-primary">🛡️ Activer mon Pass</Link>
-            <Link href="/agencies" className="ph-btn ph-btn-outline"> Espace Agences</Link>
+            <Link href="/select" className="ph-btn ph-btn-primary">{t('landing.hero.cta_primary')}</Link>
+            <Link href="/agencies" className="ph-btn ph-btn-outline">{t('landing.hero.cta_secondary')}</Link>
           </div>
         </section>
 
+        {/* ─── BENEFITS ─── */}
         <section className="ph-benefits">
           <div className="ph-benefit-card">
-            <span className="ph-icon">⚡</span>
-            <h3>Activation en 30s</h3>
-            <p>Scannez, remplissez, c&apos;est activé. Aucune application à installer.</p>
+            <span className="ph-icon">{t('landing.benefits.b1_icon')}</span>
+            <h3>{t('landing.benefits.b1_title')}</h3>
+            <p>{t('landing.benefits.b1_desc')}</p>
           </div>
           <div className="ph-benefit-card">
-            <span className="ph-icon">📍</span>
-            <h3>Localisation instantanée</h3>
-            <p>Si perdu, le trouveur partage sa position GPS et vos contacts sont alertés.</p>
+            <span className="ph-icon">{t('landing.benefits.b2_icon')}</span>
+            <h3>{t('landing.benefits.b2_title')}</h3>
+            <p>{t('landing.benefits.b2_desc')}</p>
           </div>
           <div className="ph-benefit-card">
-            <span className="ph-icon">🌍</span>
-            <h3>100% Offline Ready</h3>
-            <p>Fonctionne même avec une connexion faible à La Mecque ou Médine.</p>
+            <span className="ph-icon">{t('landing.benefits.b3_icon')}</span>
+            <h3>{t('landing.benefits.b3_title')}</h3>
+            <p>{t('landing.benefits.b3_desc')}</p>
           </div>
         </section>
 
+        {/* ─── PRODUCTS ─── */}
         <section className="ph-products">
-          <h2 className="ph-section-title">Deux solutions, un même objectif</h2>
+          <h2 className="ph-section-title">{t('landing.products.title')}</h2>
           <div className="ph-product-grid">
             <div className="ph-product-card">
               <div className="ph-product-icon">🧳</div>
-              <h3>Pass Bagage</h3>
-              <p>Étiquette connectée pour valises et sacs. Retrouvez vos effets en cas de perte ou d&apos;erreur d&apos;aiguillage.</p>
+              <h3>{t('landing.products.bagage_title')}</h3>
+              <p>{t('landing.products.bagage_desc')}</p>
               <ul className="ph-features">
-                <li>Alerte WhatsApp automatique</li>
-                <li>Photo du bagage incluse</li>
-                <li>Activation flexible (15j/30j/1an)</li>
+                <li>{t('landing.products.bagage_f1')}</li>
+                <li>{t('landing.products.bagage_f2')}</li>
+                <li>{t('landing.products.bagage_f3')}</li>
               </ul>
-              <Link href="/activate/baggage" className="ph-btn ph-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Activer un Bagage</Link>
+              <Link href="/activate/baggage" className="ph-btn ph-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>{t('landing.products.bagage_cta')}</Link>
             </div>
 
             <div className="ph-product-card">
-              <div className="ph-product-badge">Nouveau</div>
+              <div className="ph-product-badge">{t('landing.products.identity_badge')}</div>
               <div className="ph-product-icon">👤</div>
-              <h3>Pass Identity</h3>
-              <p>Bracelet d&apos;urgence pour pèlerins. Infos médicales, hôtel et contacts accessibles en 1 scan.</p>
+              <h3>{t('landing.products.identity_title')}</h3>
+              <p>{t('landing.products.identity_desc')}</p>
               <ul className="ph-features">
-                <li>Fiche médicale critique visible</li>
-                <li>Hôtel modifiable à distance</li>
-                <li>Partage GPS en temps réel</li>
+                <li>{t('landing.products.identity_f1')}</li>
+                <li>{t('landing.products.identity_f2')}</li>
+                <li>{t('landing.products.identity_f3')}</li>
               </ul>
-              <Link href="/activate/identity" className="ph-btn ph-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Activer un Bracelet</Link>
+              <Link href="/activate/identity" className="ph-btn ph-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>{t('landing.products.identity_cta')}</Link>
             </div>
           </div>
         </section>
 
+        {/* ─── STEPS ─── */}
         <section className="ph-steps">
-          <h2 className="ph-section-title">Comment ça marche ?</h2>
+          <h2 className="ph-section-title">{t('landing.steps.title')}</h2>
           <div className="ph-step-grid">
             <div className="ph-step">
               <div className="ph-step-num">1</div>
-              <h4>Scannez le QR</h4>
-              <p>Ouvrez votre caméra ou WhatsApp et scannez le code.</p>
+              <h4>{t('landing.steps.s1_title')}</h4>
+              <p>{t('landing.steps.s1_desc')}</p>
             </div>
             <div className="ph-step">
               <div className="ph-step-num">2</div>
-              <h4>Remplissez vos infos</h4>
-              <p>Identité, contacts, hôtel ou détails du bagage.</p>
+              <h4>{t('landing.steps.s2_title')}</h4>
+              <p>{t('landing.steps.s2_desc')}</p>
             </div>
             <div className="ph-step">
               <div className="ph-step-num">3</div>
-              <h4>Voyagez sereinement</h4>
-              <p>Si perdu, un scan suffit pour alerter vos proches.</p>
+              <h4>{t('landing.steps.s3_title')}</h4>
+              <p>{t('landing.steps.s3_desc')}</p>
             </div>
           </div>
         </section>
 
+        {/* ─── AGENCIES ─── */}
         <section className="ph-agencies">
-          <h2>🏢 Vous gérez un groupe de pèlerins ?</h2>
-          <p>Offrez à vos clients une sécurité premium. Dashboard groupe, alertes centralisées et support prioritaire inclus.</p>
-          <Link href="/agencies" className="ph-btn ph-btn-outline">Devenir partenaire agence</Link>
+          <h2>{t('landing.agencies.title')}</h2>
+          <p>{t('landing.agencies.desc')}</p>
+          <Link href="/agencies" className="ph-btn ph-btn-outline">{t('landing.agencies.cta')}</Link>
         </section>
 
+        {/* ─── FOOTER ─── */}
         <footer className="ph-footer">
-          <p>© 2026 PassHajj · Protection intelligente Hajj & Omrah</p>
+          <p>{t('landing.footer.copyright')}</p>
           <p style={{ marginTop: '8px' }}>
-            <Link href="/privacy">Confidentialité</Link> ·
-            <Link href="/terms">CGU</Link> ·
-            <Link href="/support">Support</Link>
+            <Link href="/privacy">{t('landing.footer.privacy')}</Link> ·
+            <Link href="/terms">{t('landing.footer.terms')}</Link> ·
+            <Link href="/support">{t('landing.footer.support')}</Link>
           </p>
         </footer>
       </div>

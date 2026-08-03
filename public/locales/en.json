@@ -648,5 +648,65 @@
       "privacy": "Privacy",
       "contact": "Contact"
     }
+  },
+  "landing": {
+    "nav": {
+      "login": "Login",
+      "activate": "Activate"
+    },
+    "hero": {
+      "title1": "Your safety,",
+      "title2": "our prayer 🕋",
+      "subtitle": "PassHajj protects your luggage and your loved ones during Hajj & Umrah. One QR code. One activation. Total peace of mind.",
+      "cta_primary": "🛡️ Activate my Pass",
+      "cta_secondary": " Agency Portal"
+    },
+    "benefits": {
+      "b1_icon": "⚡",
+      "b1_title": "Activation in 30s",
+      "b1_desc": "Scan, fill, it's activated. No app to install.",
+      "b2_icon": "📍",
+      "b2_title": "Instant location",
+      "b2_desc": "If lost, the finder shares their GPS position and your contacts are alerted.",
+      "b3_icon": "🌍",
+      "b3_title": "100% Offline Ready",
+      "b3_desc": "Works even with a weak connection in Mecca or Medina."
+    },
+    "products": {
+      "title": "Two solutions, one goal",
+      "bagage_title": "Pass Baggage",
+      "bagage_desc": "Connected tag for suitcases and bags. Find your belongings if lost or misrouted.",
+      "bagage_f1": "Automatic WhatsApp alert",
+      "bagage_f2": "Baggage photo included",
+      "bagage_f3": "Flexible activation (15d/30d/1yr)",
+      "bagage_cta": "Activate a Baggage",
+      "identity_badge": "New",
+      "identity_title": "Pass Identity",
+      "identity_desc": "Emergency bracelet for pilgrims. Medical info, hotel and contacts accessible in 1 scan.",
+      "identity_f1": "Critical medical record visible",
+      "identity_f2": "Hotel modifiable remotely",
+      "identity_f3": "Real-time GPS sharing",
+      "identity_cta": "Activate a Bracelet"
+    },
+    "steps": {
+      "title": "How it works?",
+      "s1_title": "Scan the QR",
+      "s1_desc": "Open your camera or WhatsApp and scan the code.",
+      "s2_title": "Fill in your info",
+      "s2_desc": "Identity, contacts, hotel or baggage details.",
+      "s3_title": "Travel peacefully",
+      "s3_desc": "If lost, one scan alerts your loved ones."
+    },
+    "agencies": {
+      "title": "🏢 Managing a group of pilgrims?",
+      "desc": "Offer your clients premium safety. Group dashboard, centralized alerts and priority support included.",
+      "cta": "Become a partner agency"
+    },
+    "footer": {
+      "copyright": "© 2026 PassHajj · Smart protection for Hajj & Umrah",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "support": "Support"
+    }
   }
 }

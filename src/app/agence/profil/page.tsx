@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import { useAgency } from '../layout';
 
-// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
-const BRAND = '#0047d6';   // bleu vif — boutons primaires
-const ACCENT = '#fcd616';  // jaune vif — cards
-const INK = '#1a1a1a';     // noir — texte sur jaune
+// ─── Brand constants (QRPass palette: blue #f4b400 + yellow #f4b400) ───
+const BRAND = '#f4b400';   // bleu vif — boutons primaires
+const ACCENT = '#f4b400';  // jaune vif — cards
+const INK = '#0f172a';     // noir — texte sur jaune
 
 export default function ProfilPage() {
   const { agencyData, userName, userEmail } = useAgency();

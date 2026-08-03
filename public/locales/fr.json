@@ -347,6 +347,66 @@
       "contact": "Contact"
     }
   },
+  "landing": {
+    "nav": {
+      "login": "Connexion",
+      "activate": "Activer"
+    },
+    "hero": {
+      "title1": "Votre sécurité,",
+      "title2": "notre prière 🕋",
+      "subtitle": "PassHajj protège vos bagages et vos proches pendant le Hajj & l'Omrah. Un QR code. Une activation. Une tranquillité d'esprit totale.",
+      "cta_primary": "🛡️ Activer mon Pass",
+      "cta_secondary": " Espace Agences"
+    },
+    "benefits": {
+      "b1_icon": "⚡",
+      "b1_title": "Activation en 30s",
+      "b1_desc": "Scannez, remplissez, c'est activé. Aucune application à installer.",
+      "b2_icon": "📍",
+      "b2_title": "Localisation instantanée",
+      "b2_desc": "Si perdu, le trouveur partage sa position GPS et vos contacts sont alertés.",
+      "b3_icon": "🌍",
+      "b3_title": "100% Offline Ready",
+      "b3_desc": "Fonctionne même avec une connexion faible à La Mecque ou Médine."
+    },
+    "products": {
+      "title": "Deux solutions, un même objectif",
+      "bagage_title": "Pass Bagage",
+      "bagage_desc": "Étiquette connectée pour valises et sacs. Retrouvez vos effets en cas de perte ou d'erreur d'aiguillage.",
+      "bagage_f1": "Alerte WhatsApp automatique",
+      "bagage_f2": "Photo du bagage incluse",
+      "bagage_f3": "Activation flexible (15j/30j/1an)",
+      "bagage_cta": "Activer un Bagage",
+      "identity_badge": "Nouveau",
+      "identity_title": "Pass Identity",
+      "identity_desc": "Bracelet d'urgence pour pèlerins. Infos médicales, hôtel et contacts accessibles en 1 scan.",
+      "identity_f1": "Fiche médicale critique visible",
+      "identity_f2": "Hôtel modifiable à distance",
+      "identity_f3": "Partage GPS en temps réel",
+      "identity_cta": "Activer un Bracelet"
+    },
+    "steps": {
+      "title": "Comment ça marche ?",
+      "s1_title": "Scannez le QR",
+      "s1_desc": "Ouvrez votre caméra ou WhatsApp et scannez le code.",
+      "s2_title": "Remplissez vos infos",
+      "s2_desc": "Identité, contacts, hôtel ou détails du bagage.",
+      "s3_title": "Voyagez sereinement",
+      "s3_desc": "Si perdu, un scan suffit pour alerter vos proches."
+    },
+    "agencies": {
+      "title": "🏢 Vous gérez un groupe de pèlerins ?",
+      "desc": "Offrez à vos clients une sécurité premium. Dashboard groupe, alertes centralisées et support prioritaire inclus.",
+      "cta": "Devenir partenaire agence"
+    },
+    "footer": {
+      "copyright": "© 2026 PassHajj · Protection intelligente Hajj & Omrah",
+      "privacy": "Confidentialité",
+      "terms": "CGU",
+      "support": "Support"
+    }
+  },
   "transport": {
     "select_mode": "Choisissez votre mode de transport",
     "select_mode_desc": "Sélectionnez comment vous voyagez pour adapter le formulaire",

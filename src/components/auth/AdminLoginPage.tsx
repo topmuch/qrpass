@@ -289,7 +289,7 @@ export default function AdminLoginPage() {
     .join('');
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0047d6] overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#f4b400] overflow-hidden">
       {/* ════════════════════════════════════════════════════════
           LEFT PANEL — "Midnight Command Center" (desktop only)
           ════════════════════════════════════════════════════════ */}
@@ -300,7 +300,7 @@ export default function AdminLoginPage() {
             className="absolute inset-0"
             style={{
               background:
-                'radial-gradient(ellipse at 30% 20%, rgba(0, 71, 214, 0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(0, 71, 214, 0.10) 0%, transparent 50%), linear-gradient(160deg, #0047d6 0%, #0033a8 40%, #0047d6 100%)',
+                'radial-gradient(ellipse at 30% 20%, rgba(0, 71, 214, 0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(0, 71, 214, 0.10) 0%, transparent 50%), linear-gradient(160deg, #f4b400 0%, #0033a8 40%, #f4b400 100%)',
             }}
           />
         </div>
@@ -473,7 +473,7 @@ export default function AdminLoginPage() {
       {/* ════════════════════════════════════════════════════════
           RIGHT PANEL — DARK MODE FORM
           ════════════════════════════════════════════════════════ */}
-      <div className="w-full lg:w-[48%] min-h-screen flex items-center justify-center bg-[#0047d6] px-6 py-12 sm:px-10 relative">
+      <div className="w-full lg:w-[48%] min-h-screen flex items-center justify-center bg-[#f4b400] px-6 py-12 sm:px-10 relative">
         {/* Subtle right-side background treatment */}
         <div className="absolute inset-0">
           <div

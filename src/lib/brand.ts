@@ -1,20 +1,24 @@
 /**
- * QRPass — Brand color tokens (shared across pages)
+ * PassHajj — Brand color tokens (shared across pages)
  *
- * Visual reference: blue background (#0047d6) + yellow cards (#fcd616),
- * black text on yellow, white text on blue. High-contrast, modern,
- * mobile-first.
+ * Visual reference: Yellow background (#f4b400) + Dark text (#0f172a),
+ * Green accent (#10b981). High-contrast, modern, mobile-first.
+ * Unified PassHajj palette — replaces the old QRPass blue+yellow scheme.
  */
 
-export const BRAND = '#0047d6';   // Bleu vif QRPass — fonds principaux, headers, boutons primaires
-export const ACCENT = '#fcd616';  // Jaune vif QRPass — cards, blocs de contenu, badges
-export const INK = '#1a1a1a';     // Noir — texte sur jaune, bordures dashed
+export const BRAND   = '#f4b400';  // Jaune PassHajj — fonds principaux, headers, boutons primary
+export const ACCENT  = '#10b981';  // Vert émeraude — badges "Nouveau", checks, succès
+export const INK     = '#0f172a';  // Noir profond — texte principal, boutons primary, bordures
 
 export const BRAND_COLORS = {
-  BRAND,
-  ACCENT,
-  INK,
-  BLUE: BRAND,
-  YELLOW: ACCENT,
-  BLACK: INK,
+  BRAND,           // #f4b400  Jaune principal
+  ACCENT,          // #10b981  Vert accent
+  INK,             // #0f172a  Noir profond
+  YELLOW: BRAND,   // #f4b400  (alias)
+  GREEN: ACCENT,   // #10b981  (alias)
+  BLACK: INK,      // #0f172a  (alias)
+  BLUE: '#1e40af', // Bleu secondaire (liens, info) — utilisation rare
+  MUTED: '#475569', // Gris texte secondaire
+  CARD: '#ffffff', // Blanc cartes
+  RADIUS: '20px',  // Border-radius standard
 } as const;

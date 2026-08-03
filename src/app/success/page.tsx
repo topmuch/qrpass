@@ -8,10 +8,10 @@ import SuccessOverlay from '@/components/ui/SuccessOverlay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { toast } from '@/hooks/use-toast';
 
-// ─── Brand constants (QRPass palette: blue #0047d6 + yellow #fcd616) ───
-const BRAND = '#0047d6'; // bleu vif — fonds, boutons primaires
-const ACCENT = '#fcd616'; // jaune vif — cards, accents
-const INK = '#1a1a1a'; // noir — texte sur jaune, bordures dashed
+// ─── Brand constants (QRPass palette: blue #f4b400 + yellow #f4b400) ───
+const BRAND = '#f4b400'; // bleu vif — fonds, boutons primaires
+const ACCENT = '#f4b400'; // jaune vif — cards, accents
+const INK = '#0f172a'; // noir — texte sur jaune, bordures dashed
 
 interface ActivationData {
   reference: string;
@@ -110,10 +110,10 @@ function SuccessContent() {
   // ─── Empty state : pas d'activation data ───
   if (!activationData) {
     return (
-      <main className="min-h-screen bg-[#0047d6] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-[#f4b400] flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <div className="bg-[#fcd616] border-2 border-dashed border-[#1a1a1a] rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#1a1a1a]">
+          <div className="bg-[#f4b400] border-2 border-dashed border-[#0f172a] rounded-2xl p-8 text-center">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-[#0f172a]">
               <CheckCircle className="w-8 h-8" style={{ color: INK }} />
             </div>
             <h1 className="text-2xl font-bold mb-2" style={{ color: INK }}>
@@ -136,7 +136,7 @@ function SuccessContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0047d6] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-[#f4b400] flex items-center justify-center p-4">
       {/* SuccessOverlay — feedback premium d'activation (indépendant du thème) */}
       <SuccessOverlay show={activationConfirmed} messageKey="activation.success" t={t} />
 

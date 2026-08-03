@@ -220,10 +220,10 @@ export default function AgenceLoginPage() {
       <div className="relative hidden lg:flex lg:w-[52%] min-h-screen flex-col overflow-hidden">
         {/* Base gradient */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0033a8] via-[#0047d6] to-[#0047d6]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0033a8] via-[#f4b400] to-[#f4b400]" />
           {/* Secondary depth gradient */}
           <div
-            className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/80 via-transparent to-[#0033a8]/60"
+            className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-transparent to-[#0033a8]/60"
           />
         </div>
 
@@ -298,7 +298,7 @@ export default function AgenceLoginPage() {
               </div>
               {/* Decorative dots */}
               <div
-                className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full bg-[#fcd616] animate-bounce"
+                className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full bg-[#f4b400] animate-bounce"
                 style={{ animationDelay: '0.4s' }}
               />
               <div
@@ -319,7 +319,7 @@ export default function AgenceLoginPage() {
             >
               Protégez chaque
               <br />
-              <span className="bg-gradient-to-r from-[#fcd616] via-[#fcd616] to-[#fcd616] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#f4b400] via-[#f4b400] to-[#f4b400] bg-clip-text text-transparent">
                 bagage, en toute
               </span>
               <br />
@@ -387,7 +387,7 @@ export default function AgenceLoginPage() {
                   aria-label={`Témoignage ${i + 1}`}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     i === activeTestimonial
-                      ? 'bg-[#fcd616] w-4'
+                      ? 'bg-[#f4b400] w-4'
                       : 'bg-white/20 w-1.5 hover:bg-white/35'
                   }`}
                 />
@@ -405,7 +405,7 @@ export default function AgenceLoginPage() {
         <div
           className="absolute top-0 left-0 right-0 h-1"
           style={{
-            background: 'linear-gradient(90deg, #0047d6, #fcd616, #0047d6, #fcd616, #0047d6)',
+            background: 'linear-gradient(90deg, #f4b400, #f4b400, #f4b400, #f4b400, #f4b400)',
           }}
         />
 
