@@ -486,10 +486,31 @@ export default function HomePage() {
         /* ─── FOOTER ─── */
         .hk-footer {
           background: var(--navy); color: rgba(255,255,255,0.6);
-          padding: 60px 24px 30px; text-align: center;
-          margin-top: auto;
+          padding: 48px 24px 24px; margin-top: auto;
         }
-        .hk-footer-inner { max-width: 800px; margin: 0 auto; }
+        .hk-footer-grid {
+          display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+          gap: 32px; max-width: 900px; margin: 0 auto 32px;
+        }
+        @media (max-width: 768px) {
+          .hk-footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+        }
+        @media (max-width: 480px) {
+          .hk-footer-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+        .hk-footer-col h4 {
+          font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; color: rgba(255,255,255,0.75);
+          margin-bottom: 12px;
+        }
+        .hk-footer-col ul { list-style: none; padding: 0; margin: 0; }
+        .hk-footer-col li { margin-bottom: 8px; }
+        .hk-footer-col a {
+          color: rgba(255,255,255,0.5); text-decoration: none;
+          font-size: 13px; transition: 0.2s;
+        }
+        .hk-footer-col a:hover { color: var(--brand); }
+        .hk-footer-inner { max-width: 900px; margin: 0 auto; text-align: center; }
         .hk-footer-logo {
           font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 14px;
         }
@@ -561,7 +582,7 @@ export default function HomePage() {
       <div className="hk">
         {/* ─── HEADER ─── */}
         <header className="hk-header">
-          <Image src="/logo.png" alt="PassHajj" width={170} height={65} style={{ objectFit: 'contain' }} priority />
+          <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain' }} priority />
           <div className="hk-nav">
             <button className="hk-lang" onClick={cycleLang} title="Switch language">
               🌐 {langLabels[lang]}
@@ -905,16 +926,41 @@ export default function HomePage() {
 
         {/* ─── FOOTER ─── */}
         <footer className="hk-footer">
-          <div className="hk-footer-inner">
-            <Image src="/logo.png" alt="PassHajj" width={160} height={61} style={{ objectFit: 'contain', background: 'rgba(255,255,255,0.9)', borderRadius: '12px', padding: '4px 8px' }} />
-            <p>{t('landing.footer.tagline')}</p>
-            <div className="hk-footer-links">
-              <Link href="/confidentialite">{t('landing.footer.privacy')}</Link>
-              <Link href="/cgu">{t('landing.footer.terms')}</Link>
-              <Link href="/contact">{t('landing.footer.support')}</Link>
-              <Link href="/contact">{t('landing.footer.contact')}</Link>
-              <Link href="/demo">{t('landing.footer.demo')}</Link>
+          <div className="hk-footer-grid">
+            {/* Logo & tagline */}
+            <div className="hk-footer-col">
+              <Image src="/logo.png" alt="PassHajj" width={140} height={54} style={{ objectFit: 'contain', background: 'rgba(255,255,255,0.95)', borderRadius: '12px', padding: '6px 10px', marginBottom: '12px' }} />
+              <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{t('landing.footer.tagline')}</p>
             </div>
+            {/* Produit */}
+            <div className="hk-footer-col">
+              <h4>{lang === 'ar' ? 'المنتج' : lang === 'en' ? 'Product' : 'Produit'}</h4>
+              <ul>
+                <li><a href="#produits">{t('landing.nav.products')}</a></li>
+                <li><a href="#comment-ca-marche">{t('landing.nav.howItWorks')}</a></li>
+                <li><Link href="/demo">{lang === 'ar' ? 'عرض توضيحي' : lang === 'en' ? 'Demo' : 'Démo'}</Link></li>
+              </ul>
+            </div>
+            {/* Entreprise */}
+            <div className="hk-footer-col">
+              <h4>{lang === 'ar' ? 'الشركة' : lang === 'en' ? 'Company' : 'Entreprise'}</h4>
+              <ul>
+                <li><Link href="/contact">{lang === 'ar' ? 'اتصل بنا' : lang === 'en' ? 'Contact' : 'Contact'}</Link></li>
+                <li><Link href="/a-propos">{lang === 'ar' ? 'من نحن' : lang === 'en' ? 'About' : 'À propos'}</Link></li>
+                <li><Link href="/devenir-partenaire">{lang === 'ar' ? 'شركاء' : lang === 'en' ? 'Partners' : 'Partenaires'}</Link></li>
+              </ul>
+            </div>
+            {/* Légal */}
+            <div className="hk-footer-col">
+              <h4>{lang === 'ar' ? 'قانوني' : lang === 'en' ? 'Legal' : 'Légal'}</h4>
+              <ul>
+                <li><Link href="/mentions-legales">{lang === 'ar' ? 'إشعار قانوني' : lang === 'en' ? 'Legal Notice' : 'Mentions légales'}</Link></li>
+                <li><Link href="/confidentialite">{lang === 'ar' ? 'سياسة الخصوصية' : lang === 'en' ? 'Privacy Policy' : 'Politique de confidentialité'}</Link></li>
+                <li><Link href="/cgu">{lang === 'ar' ? 'شروط الاستخدام' : lang === 'en' ? 'Terms of Use' : 'CGU'}</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="hk-footer-inner">
             <div className="hk-footer-bottom">
               <p>&copy; 2025 PassHajj. {t('landing.footer.rights')}</p>
             </div>

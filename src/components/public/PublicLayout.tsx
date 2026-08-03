@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import {
   QrCode,
@@ -32,7 +33,7 @@ export function PublicNavigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+            <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain' }} priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -100,7 +101,7 @@ export function PublicFooter() {
           {/* Logo */}
           <div>
             <div className="mb-4">
-              <img src="/logo.png" alt="PassHajj" className="h-16 w-auto object-contain brightness-0 invert" />
+              <Image src="/logo.png" alt="PassHajj" width={140} height={54} style={{ objectFit: 'contain', background: 'rgba(255,255,255,0.95)', borderRadius: '12px', padding: '6px 10px' }} />
             </div>
             <p className="text-white/50 text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import PublicLayout from '@/components/public/PublicLayout';
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,6 @@ function ContactContent() {
         <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: `${GOLD}10` }} />
         <div style={{ position: 'absolute', bottom: '-40px', left: '10%', width: '150px', height: '150px', borderRadius: '50%', background: `${GOLD}08` }} />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center" style={{ position: 'relative', zIndex: 1 }}>
-          <Image src="/logo.png" alt="PassHajj" width={180} height={69} style={{ objectFit: 'contain', margin: '0 auto 24px' }} />
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Contactez-nous
           </h1>
