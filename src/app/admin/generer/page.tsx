@@ -197,6 +197,7 @@ export default function GenererQRPage() {
       const payload = passType === 'identity'
         ? {
             count: agencyForm.travelerCount,
+            agencyId: agencyForm.agencyId,
           }
         : {
             context: 'agency',

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     });
     const existingSet = new Set(existingPilgrims.map((p) => p.qrCode));
 
-    // Create pilgrim records for setIds that don't have one
+    // Create pilgrim records for setIds that don't have one (propagate agencyId from baggage)
     const newPilgrimData = baggageSets
       .filter((b) => b.setId && !existingSet.has(b.setId))
       .map((b) => ({
@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
         nationality: '',
         isActive: false,
         duration: '30d',
+        agencyId: b.agencyId || null,
       }));
 
     if (newPilgrimData.length === 0) {
