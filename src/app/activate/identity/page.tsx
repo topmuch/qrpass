@@ -214,6 +214,20 @@ function IdentityActivateContent() {
       });
 
       if (response.ok) {
+        // Store activation data in sessionStorage for confirmation page (including base64 preview)
+        sessionStorage.setItem('activationData', JSON.stringify({
+          type: 'identity',
+          reference: code.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          photoUrl: photoUrl || null,
+          photoPreview: photoPreview || null,
+          bloodType,
+          hotel: hotelName,
+          room: roomNumber,
+          leaderPhone,
+        }));
+
         // Redirect to confirmation page
         const params = new URLSearchParams({
           type: 'identity',

@@ -196,6 +196,8 @@ function HajjActivateContent() {
           activatedAt: new Date().toISOString(),
           expiresAt: data.baggage?.expiresAt,
           photoUrl: photoUrl || data.baggage?.photoUrl || null,
+          // Store base64 preview for instant display on confirmation page (no server request needed)
+          photoPreview: photoPreview || null,
         }));
 
         // Redirect to confirmation page with URL params

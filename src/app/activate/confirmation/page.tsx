@@ -148,7 +148,9 @@ function ConfirmationContent() {
             hotel: parsed.hotel || '',
             room: parsed.room || '',
             leaderPhone: parsed.leaderPhone || '',
-            photo: parsed.photoUrl || null,
+            // Use base64 preview (photoPreview) as primary source — guaranteed to work without server request
+            // Fall back to server photoUrl if no preview available
+            photo: parsed.photoPreview || parsed.photoUrl || null,
           };
         }
       }
