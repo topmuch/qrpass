@@ -1,0 +1,931 @@
+     1→'use client';
+     2→
+     3→import { useState, useRef, useEffect, useCallback } from 'react';
+     4→import Link from 'next/link';
+     5→import dynamic from 'next/dynamic';
+     6→import { Button } from '@/components/ui/button';
+     7→import Image from 'next/image';
+     8→import { motion, useInView, AnimatePresence } from 'framer-motion';
+     9→import { useTranslation } from '@/hooks/useTranslation';
+    10→import type { Language } from '@/lib/i18n';
+    11→
+    12→const LandingChatbotWidget = dynamic(
+    13→  () => import('@/components/finder/LandingChatbotWidget'),
+    14→  { ssr: false, loading: () => null }
+    15→);
+    16→import TrackingWidget from '@/components/home/TrackingWidget';
+    17→import {
+    18→  Luggage,
+    19→  QrCode,
+    20→  Shield,
+    21→  Heart,
+    22→  Menu,
+    23→  X,
+    24→  ArrowRight,
+    25→  CheckCircle2,
+    26→  MapPin,
+    27→  MessageCircle,
+    28→  Smartphone,
+    29→  Users,
+    30→  Headphones,
+    31→  ScanLine,
+    32→  Globe,
+    33→  Phone,
+    34→  ChevronRight,
+    35→  ChevronLeft,
+    36→  LucideIcon,
+    37→} from 'lucide-react';
+    38→
+    39→/* ──────────────────────────────────────────────
+    40→   Brand Constants
+    41→   ────────────────────────────────────────────── */
+    42→const BRAND = {
+    43→  primary: '#8e44ad',
+    44→  primaryDark: '#6c3483',
+    45→  secondary: '#27ae60',
+    46→  accent: '#c0392b',
+    47→  background: '#f8f9fa',
+    48→  cardShadow: '0 4px 12px rgba(142, 68, 173, 0.15)',
+    49→} as const;
+    50→
+    51→/* ──────────────────────────────────────────────
+    52→   Animated Counter
+    53→   ────────────────────────────────────────────── */
+    54→function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
+    55→  const [count, setCount] = useState(0);
+    56→  const ref = useRef<HTMLSpanElement>(null);
+    57→  const inView = useInView(ref, { once: true });
+    58→
+    59→  useEffect(() => {
+    60→    if (!inView) return;
+    61→    let start = 0;
+    62→    const duration = 2000;
+    63→    const step = target / (duration / 16);
+    64→    const timer = setInterval(() => {
+    65→      start += step;
+    66→      if (start >= target) {
+    67→        setCount(target);
+    68→        clearInterval(timer);
+    69→      } else {
+    70→        setCount(Math.floor(start));
+    71→      }
+    72→    }, 16);
+    73→    return () => clearInterval(timer);
+    74→  }, [inView, target]);
+    75→
+    76→  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+    77→}
+    78→
+    79→/* ──────────────────────────────────────────────
+    80→   Fade-in wrapper
+    81→   ────────────────────────────────────────────── */
+    82→function FadeIn({
+    83→  children,
+    84→  className,
+    85→  delay = 0,
+    86→  direction = 'up',
+    87→}: {
+    88→  children: React.ReactNode;
+    89→  className?: string;
+    90→  delay?: number;
+    91→  direction?: 'up' | 'down' | 'left' | 'right';
+    92→}) {
+    93→  const ref = useRef<HTMLDivElement>(null);
+    94→  const inView = useInView(ref, { once: true, margin: '-60px' });
+    95→  const directions = {
+    96→    up: { y: 50, x: 0 },
+    97→    down: { y: -50, x: 0 },
+    98→    left: { x: 50, y: 0 },
+    99→    right: { x: -50, y: 0 },
+   100→  };
+   101→  return (
+   102→    <motion.div
+   103→      ref={ref}
+   104→      initial={{ opacity: 0, ...directions[direction] }}
+   105→      animate={inView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...directions[direction] }}
+   106→      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay }}
+   107→      className={className}
+   108→    >
+   109→      {children}
+   110→    </motion.div>
+   111→  );
+   112→}
+   113→
+   114→/* ══════════════════════════════════════════════
+   115→   NAVIGATION
+   116→   ══════════════════════════════════════════════ */
+   117→function Navigation() {
+   118→  const { t, lang, setLang, dir } = useTranslation();
+   119→  const [isOpen, setIsOpen] = useState(false);
+   120→  const [scrolled, setScrolled] = useState(false);
+   121→
+   122→  useEffect(() => {
+   123→    const onScroll = () => setScrolled(window.scrollY > 40);
+   124→    window.addEventListener('scroll', onScroll, { passive: true });
+   125→    return () => window.removeEventListener('scroll', onScroll);
+   126→  }, []);
+   127→
+   128→  const languages: { code: Language; label: string; flag: string }[] = [
+   129→    { code: 'fr', label: 'FR', flag: '🇫🇷' },
+   130→    { code: 'en', label: 'EN', flag: '🇬🇧' },
+   131→    { code: 'ar', label: 'AR', flag: '🇸🇦' },
+   132→  ];
+   133→
+   134→  return (
+   135→    <nav
+   136→      dir={dir}
+   137→      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+   138→        scrolled
+   139→          ? 'bg-white/95 backdrop-blur-xl shadow-md'
+   140→          : 'bg-white/70 backdrop-blur-lg'
+   141→      }`}
+   142→      style={{ borderBottom: scrolled ? `1px solid ${BRAND.primary}15` : 'none' }}
+   143→    >
+   144→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   145→        <div className="flex items-center justify-between h-16 lg:h-[72px]">
+   146→          {/* Logo */}
+   147→          <Link href="/" className="flex items-center gap-2.5 group">
+   148→            <Image
+   149→              src="/images/passhajj-logo.png"
+   150→              alt="PassHajj"
+   151→              width={140}
+   152→              height={48}
+   153→              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+   154→              priority
+   155→            />
+   156→          </Link>
+   157→
+   158→          {/* Language selector + Buttons (desktop) */}
+   159→          <div className="hidden md:flex items-center gap-3">
+   160→            {/* Language selector */}
+   161→            <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
+   162→              {languages.map((l) => (
+   163→                <button
+   164→                  key={l.code}
+   165→                  onClick={() => setLang(l.code)}
+   166→                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+   167→                    lang === l.code
+   168→                      ? 'bg-white text-[#8e44ad] shadow-sm'
+   169→                      : 'text-gray-500 hover:text-gray-700'
+   170→                  }`}
+   171→                  aria-label={`Switch to ${l.label}`}
+   172→                >
+   173→                  <span className="mr-1">{l.flag}</span>
+   174→                  {l.label}
+   175→                </button>
+   176→              ))}
+   177→            </div>
+   178→
+   179→            <Link href="/agence/connexion">
+   180→              <Button
+   181→                variant="ghost"
+   182→                className="text-gray-600 hover:text-[#8e44ad] font-medium text-sm"
+   183→              >
+   184→                {t('homepage.nav.login')}
+   185→              </Button>
+   186→            </Link>
+   187→            <Link href="/inscrire">
+   188→              <Button
+   189→                className="text-white font-semibold text-sm rounded-full px-6 h-10 shadow-lg transition-all duration-300 hover:scale-[1.02]"
+   190→                style={{
+   191→                  background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)`,
+   192→                  boxShadow: `0 4px 14px ${BRAND.primary}40`,
+   193→                }}
+   194→              >
+   195→                {t('homepage.nav.register')}
+   196→              </Button>
+   197→            </Link>
+   198→          </div>
+   199→
+   200→          {/* Mobile menu button */}
+   201→          <button
+   202→            className="md:hidden text-gray-700 p-2"
+   203→            onClick={() => setIsOpen(!isOpen)}
+   204→            aria-label="Menu"
+   205→          >
+   206→            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+   207→          </button>
+   208→        </div>
+   209→
+   210→        {/* Mobile menu */}
+   211→        <AnimatePresence>
+   212→          {isOpen && (
+   213→            <motion.div
+   214→              initial={{ opacity: 0, height: 0 }}
+   215→              animate={{ opacity: 1, height: 'auto' }}
+   216→              exit={{ opacity: 0, height: 0 }}
+   217→              className="md:hidden overflow-hidden"
+   218→            >
+   219→              <div className="py-4 border-t border-gray-100 space-y-1">
+   220→                {/* Language selector mobile */}
+   221→                <div className="flex items-center gap-1 px-3 pb-3">
+   222→                  {languages.map((l) => (
+   223→                    <button
+   224→                      key={l.code}
+   225→                      onClick={() => setLang(l.code)}
+   226→                      className={`px-3 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${
+   227→                        lang === l.code
+   228→                          ? 'bg-[#8e44ad] text-white'
+   229→                          : 'bg-gray-100 text-gray-600'
+   230→                      }`}
+   231→                    >
+   232→                      <span className="mr-1">{l.flag}</span>
+   233→                      {l.label}
+   234→                    </button>
+   235→                  ))}
+   236→                </div>
+   237→
+   238→                <hr className="border-gray-100 my-2" />
+   239→
+   240→                <Link href="/agence/connexion" onClick={() => setIsOpen(false)}>
+   241→                  <Button
+   242→                    variant="ghost"
+   243→                    className="w-full text-gray-600 font-medium justify-start"
+   244→                  >
+   245→                    {t('homepage.nav.login')}
+   246→                  </Button>
+   247→                </Link>
+   248→                <Link href="/inscrire" onClick={() => setIsOpen(false)}>
+   249→                  <Button
+   250→                    className="w-full text-white font-medium rounded-full mt-1"
+   251→                    style={{
+   252→                      background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)`,
+   253→                    }}
+   254→                  >
+   255→                    {t('homepage.nav.register')}
+   256→                  </Button>
+   257→                </Link>
+   258→              </div>
+   259→            </motion.div>
+   260→          )}
+   261→        </AnimatePresence>
+   262→      </div>
+   263→    </nav>
+   264→  );
+   265→}
+   266→
+   267→/* ══════════════════════════════════════════════
+   268→   HERO SECTION
+   269→   ══════════════════════════════════════════════ */
+   270→function HeroSection() {
+   271→  const { t, dir } = useTranslation();
+   272→
+   273→  return (
+   274→    <section
+   275→      dir={dir}
+   276→      className="relative pt-20 lg:pt-24 overflow-hidden min-h-[90vh] flex items-center"
+   277→    >
+   278→      {/* Background image with violet overlay */}
+   279→      <div className="absolute inset-0">
+   280→        <Image
+   281→          src="/images/passhajj-hero-bg.png"
+   282→          alt="PassHajj - Pèlerinage"
+   283→          fill
+   284→          className="object-cover"
+   285→          priority
+   286→          quality={90}
+   287→        />
+   288→        <div
+   289→          className="absolute inset-0"
+   290→          style={{
+   291→            background: `linear-gradient(135deg, rgba(142, 68, 173, 0.85) 0%, rgba(108, 52, 131, 0.9) 50%, rgba(39, 174, 96, 0.75) 100%)`,
+   292→          }}
+   293→        />
+   294→      </div>
+   295→
+   296→      {/* Decorative geometric pattern */}
+   297→      <div className="absolute inset-0 opacity-10">
+   298→        <div
+   299→          className="absolute top-20 left-10 w-32 h-32 border-2 border-white rounded-full"
+   300→          style={{ animation: 'pulse 4s ease-in-out infinite' }}
+   301→        />
+   302→        <div
+   303→          className="absolute bottom-32 right-20 w-24 h-24 border-2 border-white rounded-full"
+   304→          style={{ animation: 'pulse 3s ease-in-out infinite 1s' }}
+   305→        />
+   306→        <div
+   307→          className="absolute top-1/2 right-1/4 w-16 h-16 border border-white rounded-full"
+   308→          style={{ animation: 'pulse 5s ease-in-out infinite 0.5s' }}
+   309→        />
+   310→      </div>
+   311→
+   312→      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 w-full">
+   313→        <div className="text-center max-w-4xl mx-auto">
+   314→          {/* Title */}
+   315→          <FadeIn direction="up" delay={0}>
+   316→            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-4 leading-[1.05] tracking-[-0.02em]">
+   317→              {t('homepage.hero.title')}
+   318→            </h1>
+   319→          </FadeIn>
+   320→
+   321→          {/* Subtitle */}
+   322→          <FadeIn direction="up" delay={0.15}>
+   323→            <p className="text-xl sm:text-2xl md:text-3xl text-white/90 mb-10 font-light">
+   324→              {t('homepage.hero.subtitle')}
+   325→            </p>
+   326→          </FadeIn>
+   327→
+   328→          {/* Product cards */}
+   329→          <FadeIn direction="up" delay={0.3}>
+   330→            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-10 max-w-2xl mx-auto">
+   331→              {/* PassHajj Bagage Card */}
+   332→              <motion.div
+   333→                whileHover={{ scale: 1.03, y: -4 }}
+   334→                transition={{ duration: 0.3 }}
+   335→                className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-6 text-center cursor-pointer"
+   336→                style={{ boxShadow: BRAND.cardShadow }}
+   337→              >
+   338→                <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-white/20 flex items-center justify-center">
+   339→                  <Luggage className="w-7 h-7 text-white" />
+   340→                </div>
+   341→                <h3 className="text-lg font-bold text-white mb-1">
+   342→                  PassHajj Bagage
+   343→                </h3>
+   344→                <p className="text-sm text-white/75">
+   345→                  {t('homepage.products.bagage.description')}
+   346→                </p>
+   347→              </motion.div>
+   348→
+   349→              {/* PassHajj Identity Card */}
+   350→              <motion.div
+   351→                whileHover={{ scale: 1.03, y: -4 }}
+   352→                transition={{ duration: 0.3 }}
+   353→                className="bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-6 text-center cursor-pointer"
+   354→                style={{ boxShadow: BRAND.cardShadow }}
+   355→              >
+   356→                <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-white/20 flex items-center justify-center">
+   357→                  <Shield className="w-7 h-7 text-white" />
+   358→                </div>
+   359→                <h3 className="text-lg font-bold text-white mb-1">
+   360→                  PassHajj Identity
+   361→                </h3>
+   362→                <p className="text-sm text-white/75">
+   363→                  {t('homepage.products.identity.description')}
+   364→                </p>
+   365→              </motion.div>
+   366→            </div>
+   367→          </FadeIn>
+   368→
+   369→          {/* Main CTA */}
+   370→          <FadeIn direction="up" delay={0.45}>
+   371→            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+   372→              <Link href="/hajj/activate">
+   373→                <Button
+   374→                  className="bg-white hover:bg-gray-50 text-[#8e44ad] font-bold text-base px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-[1.03] gap-2 h-14"
+   375→                  style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.2)' }}
+   376→                >
+   377→                  <QrCode className="w-5 h-5" />
+   378→                  {t('homepage.hero.cta')}
+   379→                  <ArrowRight className="w-4 h-4" />
+   380→                </Button>
+   381→              </Link>
+   382→            </div>
+   383→
+   384→            <p className="mt-4 text-white/70 text-sm">
+   385→              <Link
+   386→                href="/agence/connexion"
+   387→                className="underline hover:text-white transition-colors"
+   388→              >
+   389→                {t('homepage.hero.login')}
+   390→              </Link>
+   391→            </p>
+   392→          </FadeIn>
+   393→        </div>
+   394→      </div>
+   395→    </section>
+   396→  );
+   397→}
+   398→
+   399→/* ══════════════════════════════════════════════
+   400→   PRODUCTS SECTION
+   401→   ══════════════════════════════════════════════ */
+   402→function ProductCard({
+   403→  icon: Icon,
+   404→  secondaryIcon: SecondaryIcon,
+   405→  title,
+   406→  description,
+   407→  features,
+   408→  learnMoreHref,
+   409→  activateHref,
+   410→  accentColor,
+   411→  delay = 0,
+   412→}: {
+   413→  icon: LucideIcon;
+   414→  secondaryIcon: LucideIcon;
+   415→  title: string;
+   416→  description: string;
+   417→  features: string[];
+   418→  learnMoreHref: string;
+   419→  activateHref: string;
+   420→  accentColor: string;
+   421→  delay?: number;
+   422→}) {
+   423→  const { t, dir } = useTranslation();
+   424→
+   425→  return (
+   426→    <FadeIn direction="up" delay={delay}>
+   427→      <motion.div
+   428→        whileHover={{ y: -6 }}
+   429→        transition={{ duration: 0.3 }}
+   430→        className="bg-white rounded-2xl overflow-hidden h-full flex flex-col"
+   431→        style={{ boxShadow: BRAND.cardShadow }}
+   432→      >
+   433→        {/* Card header with gradient */}
+   434→        <div
+   435→          className="px-6 py-8 text-white text-center"
+   436→          style={{
+   437→            background: `linear-gradient(135deg, ${accentColor} 0%, ${BRAND.primaryDark} 100%)`,
+   438→          }}
+   439→        >
+   440→          <div className="flex items-center justify-center gap-3 mb-3">
+   441→            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+   442→              <Icon className="w-6 h-6" />
+   443→            </div>
+   444→            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+   445→              <SecondaryIcon className="w-6 h-6" />
+   446→            </div>
+   447→          </div>
+   448→          <h3 className="text-xl font-bold">{title}</h3>
+   449→          <p className="text-white/80 text-sm mt-1">{description}</p>
+   450→        </div>
+   451→
+   452→        {/* Features list */}
+   453→        <div className="px-6 py-6 flex-1" dir={dir}>
+   454→          <ul className="space-y-3">
+   455→            {features.map((feature, i) => (
+   456→              <li key={i} className="flex items-start gap-3">
+   457→                <CheckCircle2
+   458→                  className="w-5 h-5 flex-shrink-0 mt-0.5"
+   459→                  style={{ color: accentColor }}
+   460→                />
+   461→                <span className="text-gray-700 text-sm leading-relaxed">
+   462→                  {feature}
+   463→                </span>
+   464→              </li>
+   465→            ))}
+   466→          </ul>
+   467→        </div>
+   468→
+   469→        {/* Buttons */}
+   470→        <div className="px-6 pb-6 flex flex-col sm:flex-row gap-3" dir={dir}>
+   471→          <Link href={learnMoreHref} className="flex-1">
+   472→            <Button
+   473→              variant="outline"
+   474→              className="w-full rounded-full font-semibold text-sm border-gray-200 hover:border-[#8e44ad] hover:text-[#8e44ad] transition-all"
+   475→            >
+   476→              {t('homepage.products.learn_more')}
+   477→            </Button>
+   478→          </Link>
+   479→          <Link href={activateHref} className="flex-1">
+   480→            <Button
+   481→              className="w-full text-white font-semibold text-sm rounded-full transition-all hover:scale-[1.02]"
+   482→              style={{
+   483→                background: `linear-gradient(135deg, ${accentColor} 0%, ${BRAND.primaryDark} 100%)`,
+   484→                boxShadow: `0 4px 14px ${accentColor}40`,
+   485→              }}
+   486→            >
+   487→              {t('homepage.products.activate_now')}
+   488→            </Button>
+   489→          </Link>
+   490→        </div>
+   491→      </motion.div>
+   492→    </FadeIn>
+   493→  );
+   494→}
+   495→
+   496→function ProductsSection() {
+   497→  const { t, dir } = useTranslation();
+   498→
+   499→  const bagageFeatures = [
+   500→    t('homepage.products.bagage.feature1'),
+   501→    t('homepage.products.bagage.feature2'),
+   502→    t('homepage.products.bagage.feature3'),
+   503→    t('homepage.products.bagage.feature4'),
+   504→  ];
+   505→
+   506→  const identityFeatures = [
+   507→    t('homepage.products.identity.feature1'),
+   508→    t('homepage.products.identity.feature2'),
+   509→    t('homepage.products.identity.feature3'),
+   510→    t('homepage.products.identity.feature4'),
+   511→  ];
+   512→
+   513→  return (
+   514→    <section dir={dir} className="py-16 md:py-24" style={{ background: BRAND.background }}>
+   515→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   516→        {/* Section header */}
+   517→        <FadeIn direction="up">
+   518→          <div className="text-center mb-12">
+   519→            <span
+   520→              className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-white mb-4"
+   521→              style={{ background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)` }}
+   522→            >
+   523→              {t('homepage.products.badge')}
+   524→            </span>
+   525→            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
+   526→              {t('homepage.products.title')}
+   527→            </h2>
+   528→            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+   529→              {t('homepage.products.subtitle')}
+   530→            </p>
+   531→          </div>
+   532→        </FadeIn>
+   533→
+   534→        {/* Product cards */}
+   535→        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+   536→          <ProductCard
+   537→            icon={Luggage}
+   538→            secondaryIcon={QrCode}
+   539→            title={t('homepage.products.bagage.title')}
+   540→            description={t('homepage.products.bagage.description')}
+   541→            features={bagageFeatures}
+   542→            learnMoreHref="/hajj-omra"
+   543→            activateHref="/hajj/activate"
+   544→            accentColor={BRAND.primary}
+   545→            delay={0}
+   546→          />
+   547→          <ProductCard
+   548→            icon={Shield}
+   549→            secondaryIcon={Heart}
+   550→            title={t('homepage.products.identity.title')}
+   551→            description={t('homepage.products.identity.description')}
+   552→            features={identityFeatures}
+   553→            learnMoreHref="/hajj-omra"
+   554→            activateHref="/pilgrim/activate"
+   555→            accentColor={BRAND.secondary}
+   556→            delay={0.15}
+   557→          />
+   558→        </div>
+   559→      </div>
+   560→    </section>
+   561→  );
+   562→}
+   563→
+   564→/* ══════════════════════════════════════════════
+   565→   HOW IT WORKS SECTION
+   566→   ══════════════════════════════════════════════ */
+   567→function StepsSection() {
+   568→  const { t, dir } = useTranslation();
+   569→
+   570→  const steps = [
+   571→    {
+   572→      number: '1',
+   573→      icon: ScanLine,
+   574→      title: t('homepage.steps.step1.title'),
+   575→      description: t('homepage.steps.step1.description'),
+   576→      color: BRAND.primary,
+   577→    },
+   578→    {
+   579→      number: '2',
+   580→      icon: Luggage,
+   581→      title: t('homepage.steps.step2.title'),
+   582→      description: t('homepage.steps.step2.description'),
+   583→      color: BRAND.secondary,
+   584→    },
+   585→    {
+   586→      number: '3',
+   587→      icon: MapPin,
+   588→      title: t('homepage.steps.step3.title'),
+   589→      description: t('homepage.steps.step3.description'),
+   590→      color: BRAND.accent,
+   591→    },
+   592→  ];
+   593→
+   594→  return (
+   595→    <section dir={dir} className="py-16 md:py-24 bg-white">
+   596→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   597→        {/* Section header */}
+   598→        <FadeIn direction="up">
+   599→          <div className="text-center mb-14">
+   600→            <span
+   601→              className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-white mb-4"
+   602→              style={{ background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)` }}
+   603→            >
+   604→              {t('homepage.steps.badge')}
+   605→            </span>
+   606→            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
+   607→              {t('homepage.steps.title')}
+   608→            </h2>
+   609→          </div>
+   610→        </FadeIn>
+   611→
+   612→        {/* Steps */}
+   613→        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto">
+   614→          {steps.map((step, idx) => (
+   615→            <FadeIn key={idx} direction="up" delay={idx * 0.15}>
+   616→              <div className="text-center relative">
+   617→                {/* Connector line (desktop only) */}
+   618→                {idx < steps.length - 1 && (
+   619→                  <div
+   620→                    className="hidden md:block absolute top-12 left-[60%] w-[80%] h-[2px] opacity-20"
+   621→                    style={{
+   622→                      background: `linear-gradient(90deg, ${step.color}, ${steps[idx + 1].color})`,
+   623→                    }}
+   624→                  />
+   625→                )}
+   626→
+   627→                {/* Step number circle */}
+   628→                <div className="relative inline-flex items-center justify-center mb-6">
+   629→                  <div
+   630→                    className="w-24 h-24 rounded-full flex items-center justify-center"
+   631→                    style={{
+   632→                      background: `linear-gradient(135deg, ${step.color}15, ${step.color}25)`,
+   633→                      border: `2px solid ${step.color}30`,
+   634→                    }}
+   635→                  >
+   636→                    <step.icon
+   637→                      className="w-10 h-10"
+   638→                      style={{ color: step.color }}
+   639→                    />
+   640→                  </div>
+   641→                  <span
+   642→                    className="absolute -top-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+   643→                    style={{ background: step.color }}
+   644→                  >
+   645→                    {step.number}
+   646→                  </span>
+   647→                </div>
+   648→
+   649→                <h3 className="text-lg font-bold text-gray-900 mb-2">
+   650→                  {step.title}
+   651→                </h3>
+   652→                <p className="text-gray-600 text-sm leading-relaxed max-w-xs mx-auto">
+   653→                  {step.description}
+   654→                </p>
+   655→              </div>
+   656→            </FadeIn>
+   657→          ))}
+   658→        </div>
+   659→      </div>
+   660→    </section>
+   661→  );
+   662→}
+   663→
+   664→/* ══════════════════════════════════════════════
+   665→   STATS SECTION
+   666→   ══════════════════════════════════════════════ */
+   667→function StatsSection() {
+   668→  const { t, dir } = useTranslation();
+   669→
+   670→  const stats = [
+   671→    { value: 10000, suffix: '+', label: t('homepage.stats.pilgrims') },
+   672→    { value: 98, suffix: '%', label: t('homepage.stats.recovery') },
+   673→    { value: 15, suffix: '+', label: t('homepage.stats.countries') },
+   674→    { value: 24, suffix: '/7', label: t('homepage.stats.support') },
+   675→  ];
+   676→
+   677→  return (
+   678→    <section
+   679→      dir={dir}
+   680→      className="py-14 md:py-20"
+   681→      style={{
+   682→        background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.primaryDark} 100%)`,
+   683→      }}
+   684→    >
+   685→      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+   686→        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+   687→          {stats.map((stat, idx) => (
+   688→            <FadeIn key={idx} direction="up" delay={idx * 0.1}>
+   689→              <div className="text-center">
+   690→                <div className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-1">
+   691→                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+   692→                </div>
+   693→                <div className="text-white/70 text-sm font-medium">
+   694→                  {stat.label}
+   695→                </div>
+   696→              </div>
+   697→            </FadeIn>
+   698→          ))}
+   699→        </div>
+   700→      </div>
+   701→    </section>
+   702→  );
+   703→}
+   704→
+   705→/* ══════════════════════════════════════════════
+   706→   AGENCIES SECTION (B2B)
+   707→   ══════════════════════════════════════════════ */
+   708→function AgenciesSection() {
+   709→  const { t, dir } = useTranslation();
+   710→
+   711→  const features = [
+   712→    {
+   713→      icon: Users,
+   714→      title: t('homepage.agencies.feature1_title'),
+   715→      description: t('homepage.agencies.feature1_desc'),
+   716→    },
+   717→    {
+   718→      icon: Globe,
+   719→      title: t('homepage.agencies.feature2_title'),
+   720→      description: t('homepage.agencies.feature2_desc'),
+   721→    },
+   722→    {
+   723→      icon: Headphones,
+   724→      title: t('homepage.agencies.feature3_title'),
+   725→      description: t('homepage.agencies.feature3_desc'),
+   726→    },
+   727→  ];
+   728→
+   729→  return (
+   730→    <section dir={dir} className="py-16 md:py-24" style={{ background: BRAND.background }}>
+   731→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   732→        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+   733→          {/* Left - Text */}
+   734→          <FadeIn direction="left">
+   735→            <div>
+   736→              <span
+   737→                className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-white mb-4"
+   738→                style={{ background: BRAND.secondary }}
+   739→              >
+   740→                {t('homepage.agencies.badge')}
+   741→              </span>
+   742→              <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+   743→                {t('homepage.agencies.title')}
+   744→              </h2>
+   745→              <p className="text-gray-600 text-lg leading-relaxed mb-8">
+   746→                {t('homepage.agencies.description')}
+   747→              </p>
+   748→
+   749→              <Link href="/devenir-partenaire">
+   750→                <Button
+   751→                  className="text-white font-bold text-base px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-[1.03] gap-2 h-14"
+   752→                  style={{
+   753→                    background: `linear-gradient(135deg, ${BRAND.secondary} 0%, #1e8449 100%)`,
+   754→                    boxShadow: `0 8px 30px ${BRAND.secondary}40`,
+   755→                  }}
+   756→                >
+   757→                  {t('homepage.agencies.cta')}
+   758→                  <ArrowRight className="w-5 h-5" />
+   759→                </Button>
+   760→              </Link>
+   761→            </div>
+   762→          </FadeIn>
+   763→
+   764→          {/* Right - Feature cards */}
+   765→          <FadeIn direction="right" delay={0.2}>
+   766→            <div className="space-y-4">
+   767→              {features.map((feature, idx) => (
+   768→                <motion.div
+   769→                  key={idx}
+   770→                  whileHover={{ x: dir === 'rtl' ? -6 : 6, scale: 1.01 }}
+   771→                  transition={{ duration: 0.2 }}
+   772→                  className="bg-white rounded-xl p-5 flex items-start gap-4"
+   773→                  style={{ boxShadow: BRAND.cardShadow }}
+   774→                >
+   775→                  <div
+   776→                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+   777→                    style={{
+   778→                      background: `linear-gradient(135deg, ${BRAND.primary}15, ${BRAND.primary}25)`,
+   779→                    }}
+   780→                  >
+   781→                    <feature.icon
+   782→                      className="w-6 h-6"
+   783→                      style={{ color: BRAND.primary }}
+   784→                    />
+   785→                  </div>
+   786→                  <div>
+   787→                    <h3 className="font-bold text-gray-900 mb-1">
+   788→                      {feature.title}
+   789→                    </h3>
+   790→                    <p className="text-gray-600 text-sm leading-relaxed">
+   791→                      {feature.description}
+   792→                    </p>
+   793→                  </div>
+   794→                </motion.div>
+   795→              ))}
+   796→            </div>
+   797→          </FadeIn>
+   798→        </div>
+   799→      </div>
+   800→    </section>
+   801→  );
+   802→}
+   803→
+   804→/* ══════════════════════════════════════════════
+   805→   FOOTER
+   806→   ══════════════════════════════════════════════ */
+   807→function Footer() {
+   808→  const { t, lang, setLang, dir } = useTranslation();
+   809→
+   810→  const languages: { code: Language; label: string }[] = [
+   811→    { code: 'fr', label: 'FR' },
+   812→    { code: 'en', label: 'EN' },
+   813→    { code: 'ar', label: 'AR' },
+   814→  ];
+   815→
+   816→  return (
+   817→    <footer
+   818→      dir={dir}
+   819→      className="bg-gray-900 text-white"
+   820→      style={{ borderTop: `3px solid ${BRAND.primary}` }}
+   821→    >
+   822→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+   823→        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+   824→          {/* Logo + copyright */}
+   825→          <div className="flex flex-col items-center md:items-start gap-2">
+   826→            <Image
+   827→              src="/images/passhajj-logo.png"
+   828→              alt="PassHajj"
+   829→              width={120}
+   830→              height={40}
+   831→              className="h-8 w-auto brightness-0 invert"
+   832→            />
+   833→            <p className="text-gray-400 text-sm text-center md:text-left">
+   834→              {t('homepage.footer.copyright')}
+   835→            </p>
+   836→          </div>
+   837→
+   838→          {/* Links */}
+   839→          <div className="flex items-center gap-6 text-sm">
+   840→            <Link
+   841→              href="/mentions-legales"
+   842→              className="text-gray-400 hover:text-white transition-colors"
+   843→            >
+   844→              {t('homepage.footer.legal')}
+   845→            </Link>
+   846→            <Link
+   847→              href="/confidentialite"
+   848→              className="text-gray-400 hover:text-white transition-colors"
+   849→            >
+   850→              {t('homepage.footer.privacy')}
+   851→            </Link>
+   852→            <Link
+   853→              href="/contact"
+   854→              className="text-gray-400 hover:text-white transition-colors"
+   855→            >
+   856→              {t('homepage.footer.contact')}
+   857→            </Link>
+   858→          </div>
+   859→
+   860→          {/* Language flags */}
+   861→          <div className="flex items-center gap-2 text-sm">
+   862→            {languages.map((l, idx) => (
+   863→              <span key={l.code} className="flex items-center">
+   864→                <button
+   865→                  onClick={() => setLang(l.code)}
+   866→                  className={`transition-colors ${
+   867→                    lang === l.code ? 'text-white font-bold' : 'text-gray-400 hover:text-white'
+   868→                  }`}
+   869→                >
+   870→                  {l.label}
+   871→                </button>
+   872→                {idx < languages.length - 1 && (
+   873→                  <span className="ml-2 text-gray-600">|</span>
+   874→                )}
+   875→              </span>
+   876→            ))}
+   877→          </div>
+   878→        </div>
+   879→      </div>
+   880→    </footer>
+   881→  );
+   882→}
+   883→
+   884→/* ══════════════════════════════════════════════
+   885→   MAIN HOMEPAGE
+   886→   ══════════════════════════════════════════════ */
+   887→export default function HomePage() {
+   888→  const { dir, isLoading } = useTranslation();
+   889→
+   890→  // Show loading state while translations load
+   891→  if (isLoading) {
+   892→    return (
+   893→      <div className="min-h-screen flex items-center justify-center" style={{ background: BRAND.background }}>
+   894→        <div className="text-center">
+   895→          <Image
+   896→            src="/images/passhajj-logo.png"
+   897→            alt="PassHajj"
+   898→            width={120}
+   899→            height={40}
+   900→            className="h-10 w-auto mx-auto mb-4 animate-pulse"
+   901→          />
+   902→          <div
+   903→            className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto"
+   904→            style={{ borderColor: BRAND.primary, borderTopColor: 'transparent' }}
+   905→          />
+   906→        </div>
+   907→      </div>
+   908→    );
+   909→  }
+   910→
+   911→  return (
+   912→    <div
+   913→      dir={dir}
+   914→      className="min-h-screen flex flex-col"
+   915→      style={{ direction: dir }}
+   916→    >
+   917→      <Navigation />
+   918→      <main className="flex-1">
+   919→        <HeroSection />
+   920→        <TrackingWidget />
+   921→        <ProductsSection />
+   922→        <StepsSection />
+   923→        <StatsSection />
+   924→        <AgenciesSection />
+   925→      </main>
+   926→      <Footer />
+   927→      <LandingChatbotWidget />
+   928→    </div>
+   929→  );
+   930→}
+   931→
