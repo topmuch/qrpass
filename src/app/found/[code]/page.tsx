@@ -19,7 +19,9 @@ interface LookupResult {
   found: boolean;
   types: ('baggage' | 'pilgrim')[];
   baggage: boolean;
+  baggageStatus: string | null;
   pilgrim: boolean;
+  pilgrimActive: boolean;
   pilgrimCode: string | null;
 }
 
@@ -91,7 +93,23 @@ export default function FoundSelectorPage() {
           return;
         }
 
-        // Always show selector — user chooses between Pass Bagage and Pass Identity
+        // Smart routing: skip selector when only one type is available
+        const hasBaggage = data.baggage;
+        const hasActivePilgrim = data.pilgrim && data.pilgrimActive && data.pilgrimCode;
+
+        if (hasBaggage && !hasActivePilgrim) {
+          // Only baggage found (no activated pilgrim) → go directly to scan/finder page
+          router.replace('/scan/' + code);
+          return;
+        }
+
+        if (!hasBaggage && hasActivePilgrim) {
+          // Only activated pilgrim found (no baggage) → go directly to pilgrim profile page
+          router.replace('/p/' + data.pilgrimCode);
+          return;
+        }
+
+        // Both types available (baggage + activated pilgrim) → show selector so user can choose
         setState('selector');
       } catch {
         setState('error');
@@ -266,13 +284,13 @@ export default function FoundSelectorPage() {
                 >
                   <div
                     className={`rounded-[20px] p-5 shadow-lg transition-all duration-200 ${
-                      lookupData?.pilgrim
+                      lookupData?.pilgrimActive
                         ? 'cursor-pointer hover:shadow-xl active:scale-[0.98]'
                         : 'opacity-50 cursor-not-allowed'
                     }`}
                     style={{ background: CARD_BG }}
                     onClick={() => {
-                      if (lookupData?.pilgrim && lookupData?.pilgrimCode) {
+                      if (lookupData?.pilgrimActive && lookupData?.pilgrimCode) {
                         router.push('/p/' + lookupData.pilgrimCode);
                       }
                     }}
@@ -280,7 +298,7 @@ export default function FoundSelectorPage() {
                     <div className="flex items-center gap-4 w-full">
                       <div
                         className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: lookupData?.pilgrim ? '#059669' : '#9ca3af' }}
+                        style={{ background: lookupData?.pilgrimActive ? '#059669' : '#9ca3af' }}
                       >
                         <UserCircle className="w-7 h-7 text-white" />
                       </div>
@@ -289,13 +307,13 @@ export default function FoundSelectorPage() {
                           Pass Identity
                         </h3>
                         <p className="text-sm mt-0.5" style={{ color: MUTED }}>
-                          {lookupData?.pilgrim
+                          {lookupData?.pilgrimActive
                             ? 'Identité et informations médicales'
                             : 'Non activé pour ce code'}
                         </p>
                       </div>
                       <div className="shrink-0">
-                        {lookupData?.pilgrim ? (
+                        {lookupData?.pilgrimActive ? (
                           <ChevronRight className="w-5 h-5" style={{ color: MUTED }} />
                         ) : (
                           <span className="text-xs font-medium px-2 py-1 rounded" style={{ color: MUTED, background: INPUT_BG }}>Bientôt</span>

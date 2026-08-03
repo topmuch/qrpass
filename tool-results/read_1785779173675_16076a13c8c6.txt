@@ -1,0 +1,661 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useCallback } from 'react';
+     4→import { useParams, useRouter } from 'next/navigation';
+     5→import { motion, AnimatePresence } from 'framer-motion';
+     6→import { Button } from '@/components/ui/button';
+     7→import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+     8→import { Input } from '@/components/ui/input';
+     9→import { Label } from '@/components/ui/label';
+    10→import { Textarea } from '@/components/ui/textarea';
+    11→import { Badge } from '@/components/ui/badge';
+    12→import {
+    13→  Select,
+    14→  SelectContent,
+    15→  SelectItem,
+    16→  SelectTrigger,
+    17→  SelectValue,
+    18→} from '@/components/ui/select';
+    19→import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+    20→import {
+    21→  ShieldCheck,
+    22→  ArrowLeft,
+    23→  CheckCircle,
+    24→  User,
+    25→  Heart,
+    26→  Hotel,
+    27→  Phone,
+    28→  Clock,
+    29→  Loader2,
+    30→  AlertCircle,
+    31→  Globe,
+    32→} from 'lucide-react';
+    33→import { useTranslation } from '@/hooks/useTranslation';
+    34→import { useToast } from '@/hooks/use-toast';
+    35→import { detectLanguageFromBrowser, LANGUAGE_DIRECTION, type Language } from '@/lib/i18n';
+    36→
+    37→// Common nationalities for the dropdown
+    38→const COMMON_NATIONALITIES = [
+    39→  { value: 'Marocaine', label: '🇲🇦 Marocaine' },
+    40→  { value: 'Algérienne', label: '🇩🇿 Algérienne' },
+    41→  { value: 'Tunisienne', label: '🇹🇳 Tunisienne' },
+    42→  { value: 'Sénégalaise', label: '🇸🇳 Sénégalaise' },
+    43→  { value: 'Mauritanienne', label: '🇲🇷 Mauritanienne' },
+    44→  { value: 'Malienne', label: '🇲🇱 Malienne' },
+    45→  { value: 'Ivoirienne', label: '🇨🇮 Ivoirienne' },
+    46→  { value: 'Guinéenne', label: '🇬🇳 Guinéenne' },
+    47→  { value: 'Soudanaise', label: '🇸🇩 Soudanaise' },
+    48→  { value: 'Égyptienne', label: '🇪🇬 Égyptienne' },
+    49→  { value: 'Saoudienne', label: '🇸🇦 Saoudienne' },
+    50→  { value: 'Indonésienne', label: '🇮🇩 Indonésienne' },
+    51→  { value: 'Pakistanaise', label: '🇵🇰 Pakistanaise' },
+    52→  { value: 'Indienne', label: '🇮🇳 Indienne' },
+    53→  { value: 'Turque', label: '🇹🇷 Turque' },
+    54→  { value: 'Iranienne', label: '🇮🇷 Iranienne' },
+    55→  { value: 'Nigériane', label: '🇳🇬 Nigériane' },
+    56→  { value: 'Bangladaise', label: '🇧🇩 Bangladaise' },
+    57→  { value: 'Française', label: '🇫🇷 Française' },
+    58→  { value: 'Britannique', label: '🇬🇧 Britannique' },
+    59→  { value: 'Autre', label: '🌍 Autre' },
+    60→];
+    61→
+    62→const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    63→
+    64→const DURATION_OPTIONS = [
+    65→  { value: '15d', labelKey: 'activate.duration15d' },
+    66→  { value: '30d', labelKey: 'activate.duration30d' },
+    67→  { value: '1y', labelKey: 'activate.duration1y' },
+    68→];
+    69→
+    70→interface FormData {
+    71→  fullName: string;
+    72→  nationality: string;
+    73→  bloodType: string;
+    74→  medicalInfo: string;
+    75→  hotelMecca: string;
+    76→  roomMecca: string;
+    77→  hotelMedina: string;
+    78→  roomMedina: string;
+    79→  groupLeaderPhone: string;
+    80→  agencyPhone: string;
+    81→  familyContact: string;
+    82→  duration: string;
+    83→}
+    84→
+    85→type PageState = 'loading' | 'not_found' | 'already_active' | 'form' | 'submitting' | 'success';
+    86→
+    87→export default function PilgrimActivatePage() {
+    88→  const { code } = useParams();
+    89→  const router = useRouter();
+    90→  const { t, lang, dir, isLoading: translationsLoading } = useTranslation();
+    91→  const { toast } = useToast();
+    92→
+    93→  const [pageState, setPageState] = useState<PageState>('loading');
+    94→  const [formData, setFormData] = useState<FormData>({
+    95→    fullName: '',
+    96→    nationality: '',
+    97→    bloodType: '',
+    98→    medicalInfo: '',
+    99→    hotelMecca: '',
+   100→    roomMecca: '',
+   101→    hotelMedina: '',
+   102→    roomMedina: '',
+   103→    groupLeaderPhone: '',
+   104→    agencyPhone: '',
+   105→    familyContact: '',
+   106→    duration: '30d',
+   107→  });
+   108→  const [nationalitySearch, setNationalitySearch] = useState('');
+   109→  const [showNationalityDropdown, setShowNationalityDropdown] = useState(false);
+   110→
+   111→  // Check QR code on load
+   112→  useEffect(() => {
+   113→    const checkCode = async () => {
+   114→      try {
+   115→        const response = await fetch(`/api/pilgrims/${code}`);
+   116→        if (response.ok) {
+   117→          const data = await response.json();
+   118→          if (data.active) {
+   119→            // Already active → redirect to dashboard
+   120→            router.push(`/pilgrim/dashboard/${code}`);
+   121→            return;
+   122→          }
+   123→          // Code exists but not active → show form
+   124→          setPageState('form');
+   125→        } else if (response.status === 404) {
+   126→          setPageState('not_found');
+   127→        } else {
+   128→          setPageState('not_found');
+   129→        }
+   130→      } catch (error) {
+   131→        console.error('Error checking code:', error);
+   132→        setPageState('not_found');
+   133→      }
+   134→    };
+   135→
+   136→    if (code) {
+   137→      checkCode();
+   138→    }
+   139→  }, [code, router]);
+   140→
+   141→  const handleSubmit = async (e: React.FormEvent) => {
+   142→    e.preventDefault();
+   143→    setPageState('submitting');
+   144→
+   145→    try {
+   146→      const response = await fetch(`/api/pilgrims/activate/${code}`, {
+   147→        method: 'POST',
+   148→        headers: { 'Content-Type': 'application/json' },
+   149→        body: JSON.stringify({
+   150→          fullName: formData.fullName,
+   151→          nationality: formData.nationality,
+   152→          bloodType: formData.bloodType || undefined,
+   153→          medicalInfo: formData.medicalInfo || undefined,
+   154→          hotelMecca: formData.hotelMecca || undefined,
+   155→          roomMecca: formData.roomMecca || undefined,
+   156→          hotelMedina: formData.hotelMedina || undefined,
+   157→          roomMedina: formData.roomMedina || undefined,
+   158→          groupLeaderPhone: formData.groupLeaderPhone,
+   159→          agencyPhone: formData.agencyPhone || undefined,
+   160→          familyContact: formData.familyContact || undefined,
+   161→          duration: formData.duration,
+   162→        }),
+   163→      });
+   164→
+   165→      if (response.ok) {
+   166→        setPageState('success');
+   167→      } else {
+   168→        const errorData = await response.json();
+   169→        toast({
+   170→          title: 'Erreur',
+   171→          description: errorData.message || t('pilgrim.activate.submit') + ' — erreur',
+   172→          variant: 'destructive',
+   173→        });
+   174→        setPageState('form');
+   175→      }
+   176→    } catch (error) {
+   177→      console.error('Activation error:', error);
+   178→      toast({
+   179→        title: 'Erreur',
+   180→        description: 'Erreur lors de l\'activation',
+   181→        variant: 'destructive',
+   182→      });
+   183→      setPageState('form');
+   184→    }
+   185→  };
+   186→
+   187→  const updateField = (field: keyof FormData, value: string) => {
+   188→    setFormData((prev) => ({ ...prev, [field]: value }));
+   189→  };
+   190→
+   191→  const filteredNationalities = COMMON_NATIONALITIES.filter(
+   192→    (n) =>
+   193→      n.value.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+   194→      n.label.toLowerCase().includes(nationalitySearch.toLowerCase())
+   195→  );
+   196→
+   197→  // Loading state
+   198→  if (pageState === 'loading' || translationsLoading) {
+   199→    return (
+   200→      <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900 flex items-center justify-center" dir={dir}>
+   201→        <div className="text-center text-white">
+   202→          <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4" />
+   203→          <p className="text-lg">Chargement...</p>
+   204→        </div>
+   205→      </main>
+   206→    );
+   207→  }
+   208→
+   209→  // Not found state
+   210→  if (pageState === 'not_found') {
+   211→    return (
+   212→      <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900 flex items-center justify-center p-4" dir={dir}>
+   213→        <motion.div
+   214→          initial={{ opacity: 0, y: 20 }}
+   215→          animate={{ opacity: 1, y: 0 }}
+   216→          className="text-center max-w-md"
+   217→        >
+   218→          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mb-6">
+   219→            <AlertCircle className="w-8 h-8 text-red-400" />
+   220→          </div>
+   221→          <h1 className="text-2xl font-bold text-white mb-3">{t('pilgrim.identity.notFound')}</h1>
+   222→          <p className="text-white/70 mb-8">{t('pilgrim.identity.notFoundDesc')}</p>
+   223→          <Button
+   224→            onClick={() => router.push('/')}
+   225→            className="bg-white text-emerald-700 hover:bg-white/90"
+   226→          >
+   227→            <ArrowLeft className="w-4 h-4 mr-2" />
+   228→            Retour
+   229→          </Button>
+   230→        </motion.div>
+   231→      </main>
+   232→    );
+   233→  }
+   234→
+   235→  // Success state
+   236→  if (pageState === 'success') {
+   237→    return (
+   238→      <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900 flex items-center justify-center p-4" dir={dir}>
+   239→        <motion.div
+   240→          initial={{ opacity: 0, scale: 0.9 }}
+   241→          animate={{ opacity: 1, scale: 1 }}
+   242→          transition={{ type: 'spring', duration: 0.6 }}
+   243→          className="text-center max-w-md"
+   244→        >
+   245→          <motion.div
+   246→            initial={{ scale: 0 }}
+   247→            animate={{ scale: 1 }}
+   248→            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+   249→            className="inline-flex items-center justify-center w-20 h-20 bg-emerald-400 rounded-full mb-6 shadow-lg shadow-emerald-400/30"
+   250→          >
+   251→            <CheckCircle className="w-10 h-10 text-white" />
+   252→          </motion.div>
+   253→          <h1 className="text-2xl font-bold text-white mb-3">{t('pilgrim.activate.success')}</h1>
+   254→          <p className="text-white/70 mb-8">{t('pilgrim.activate.successDesc')}</p>
+   255→          <Button
+   256→            onClick={() => router.push(`/pilgrim/dashboard/${code}`)}
+   257→            className="bg-white text-emerald-700 hover:bg-white/90 h-12 text-lg font-semibold px-8"
+   258→          >
+   259→            <ShieldCheck className="w-5 h-5 mr-2" />
+   260→            {t('pilgrim.dashboard.title')}
+   261→          </Button>
+   262→        </motion.div>
+   263→      </main>
+   264→    );
+   265→  }
+   266→
+   267→  // Form state
+   268→  return (
+   269→    <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900" dir={dir}>
+   270→      {/* Navigation */}
+   271→      <nav className="bg-emerald-800/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
+   272→        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+   273→          <button
+   274→            onClick={() => router.push('/')}
+   275→            className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
+   276→          >
+   277→            <ArrowLeft className="w-5 h-5" />
+   278→            <span>Retour</span>
+   279→          </button>
+   280→          <Badge className="bg-emerald-600/50 text-white border-emerald-500/30">
+   281→            <ShieldCheck className="w-3 h-3 mr-1" />
+   282→            Pass Identity
+   283→          </Badge>
+   284→        </div>
+   285→      </nav>
+   286→
+   287→      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+   288→        {/* Header */}
+   289→        <motion.div
+   290→          initial={{ opacity: 0, y: -20 }}
+   291→          animate={{ opacity: 1, y: 0 }}
+   292→          transition={{ duration: 0.5 }}
+   293→          className="text-center mb-8 sm:mb-12"
+   294→        >
+   295→          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-6">
+   296→            <ShieldCheck className="w-8 h-8 text-white" />
+   297→          </div>
+   298→          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+   299→            {t('pilgrim.activate.title')}
+   300→          </h1>
+   301→          <p className="text-white/70 text-lg">
+   302→            {t('pilgrim.activate.subtitle')}
+   303→          </p>
+   304→          <div className="mt-3 inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5">
+   305→            <span className="text-white/50 text-sm font-mono">QR:</span>
+   306→            <span className="text-white font-mono text-sm">{code}</span>
+   307→          </div>
+   308→        </motion.div>
+   309→
+   310→        {/* Form Card */}
+   311→        <motion.div
+   312→          initial={{ opacity: 0, y: 20 }}
+   313→          animate={{ opacity: 1, y: 0 }}
+   314→          transition={{ duration: 0.5, delay: 0.1 }}
+   315→        >
+   316→          <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+   317→            <CardContent className="p-6 sm:p-8">
+   318→              <form onSubmit={handleSubmit} className="space-y-8">
+   319→                {/* Personal Information Section */}
+   320→                <motion.section
+   321→                  initial={{ opacity: 0, x: -10 }}
+   322→                  animate={{ opacity: 1, x: 0 }}
+   323→                  transition={{ delay: 0.2 }}
+   324→                >
+   325→                  <div className="flex items-center gap-2 mb-4">
+   326→                    <User className="w-5 h-5 text-emerald-300" />
+   327→                    <h2 className="text-lg font-semibold text-white">{t('pilgrim.personal.sectionTitle')}</h2>
+   328→                  </div>
+   329→                  <div className="space-y-4">
+   330→                    {/* Full Name */}
+   331→                    <div className="space-y-2">
+   332→                      <Label htmlFor="fullName" className="text-white/90">
+   333→                        {t('pilgrim.activate.fullName')} <span className="text-red-400">*</span>
+   334→                      </Label>
+   335→                      <Input
+   336→                        id="fullName"
+   337→                        placeholder={t('pilgrim.activate.fullNamePlaceholder')}
+   338→                        value={formData.fullName}
+   339→                        onChange={(e) => updateField('fullName', e.target.value)}
+   340→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   341→                        required
+   342→                      />
+   343→                    </div>
+   344→
+   345→                    {/* Nationality */}
+   346→                    <div className="space-y-2 relative">
+   347→                      <Label htmlFor="nationality" className="text-white/90">
+   348→                        {t('pilgrim.activate.nationality')} <span className="text-red-400">*</span>
+   349→                      </Label>
+   350→                      <Input
+   351→                        id="nationality"
+   352→                        placeholder={t('pilgrim.activate.nationalityPlaceholder')}
+   353→                        value={nationalitySearch || formData.nationality}
+   354→                        onChange={(e) => {
+   355→                          setNationalitySearch(e.target.value);
+   356→                          updateField('nationality', e.target.value);
+   357→                          setShowNationalityDropdown(true);
+   358→                        }}
+   359→                        onFocus={() => setShowNationalityDropdown(true)}
+   360→                        onBlur={() => {
+   361→                          // Delay to allow click on dropdown item
+   362→                          setTimeout(() => setShowNationalityDropdown(false), 200);
+   363→                        }}
+   364→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   365→                        required
+   366→                      />
+   367→                      <Globe className="absolute right-3 top-9 w-4 h-4 text-white/40" />
+   368→                      <AnimatePresence>
+   369→                        {showNationalityDropdown && filteredNationalities.length > 0 && (
+   370→                          <motion.div
+   371→                            initial={{ opacity: 0, y: -5 }}
+   372→                            animate={{ opacity: 1, y: 0 }}
+   373→                            exit={{ opacity: 0, y: -5 }}
+   374→                            className="absolute z-50 w-full mt-1 bg-emerald-800 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto"
+   375→                          >
+   376→                            {filteredNationalities.map((n) => (
+   377→                              <button
+   378→                                key={n.value}
+   379→                                type="button"
+   380→                                className="w-full text-left px-4 py-2.5 text-white/90 hover:bg-white/10 transition-colors text-sm"
+   381→                                onClick={() => {
+   382→                                  updateField('nationality', n.value);
+   383→                                  setNationalitySearch('');
+   384→                                  setShowNationalityDropdown(false);
+   385→                                }}
+   386→                              >
+   387→                                {n.label}
+   388→                              </button>
+   389→                            ))}
+   390→                          </motion.div>
+   391→                        )}
+   392→                      </AnimatePresence>
+   393→                    </div>
+   394→
+   395→                    {/* Blood Type */}
+   396→                    <div className="space-y-2">
+   397→                      <Label className="text-white/90">{t('pilgrim.activate.bloodType')}</Label>
+   398→                      <Select
+   399→                        value={formData.bloodType}
+   400→                        onValueChange={(value) => updateField('bloodType', value)}
+   401→                      >
+   402→                        <SelectTrigger className="w-full bg-white/10 border-white/20 text-white focus:border-emerald-400">
+   403→                          <SelectValue placeholder={t('pilgrim.activate.bloodTypePlaceholder')} />
+   404→                        </SelectTrigger>
+   405→                        <SelectContent className="bg-emerald-800 border-white/20">
+   406→                          {BLOOD_TYPES.map((type) => (
+   407→                            <SelectItem key={type} value={type} className="text-white focus:bg-white/10 focus:text-white">
+   408→                              {type}
+   409→                            </SelectItem>
+   410→                          ))}
+   411→                        </SelectContent>
+   412→                      </Select>
+   413→                    </div>
+   414→
+   415→                    {/* Medical Info */}
+   416→                    <div className="space-y-2">
+   417→                      <Label htmlFor="medicalInfo" className="text-white/90">
+   418→                        {t('pilgrim.activate.medicalInfo')}
+   419→                      </Label>
+   420→                      <Textarea
+   421→                        id="medicalInfo"
+   422→                        placeholder={t('pilgrim.activate.medicalInfoPlaceholder')}
+   423→                        value={formData.medicalInfo}
+   424→                        onChange={(e) => updateField('medicalInfo', e.target.value)}
+   425→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30 min-h-20"
+   426→                        rows={3}
+   427→                      />
+   428→                    </div>
+   429→                  </div>
+   430→                </motion.section>
+   431→
+   432→                {/* Hotel/Accommodation Section */}
+   433→                <motion.section
+   434→                  initial={{ opacity: 0, x: -10 }}
+   435→                  animate={{ opacity: 1, x: 0 }}
+   436→                  transition={{ delay: 0.3 }}
+   437→                >
+   438→                  <div className="flex items-center gap-2 mb-4">
+   439→                    <Hotel className="w-5 h-5 text-emerald-300" />
+   440→                    <h2 className="text-lg font-semibold text-white">{t('pilgrim.hotel.sectionTitle')}</h2>
+   441→                  </div>
+   442→                  <div className="space-y-4">
+   443→                    {/* Mecca */}
+   444→                    <div className="bg-white/5 rounded-lg p-4 space-y-3">
+   445→                      <p className="text-white/70 text-sm font-medium">{t('pilgrim.hotel.mecca')}</p>
+   446→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   447→                        <div className="space-y-2">
+   448→                          <Label htmlFor="hotelMecca" className="text-white/80 text-sm">
+   449→                            {t('pilgrim.activate.hotelMecca')}
+   450→                          </Label>
+   451→                          <Input
+   452→                            id="hotelMecca"
+   453→                            placeholder={t('pilgrim.activate.hotelMeccaPlaceholder')}
+   454→                            value={formData.hotelMecca}
+   455→                            onChange={(e) => updateField('hotelMecca', e.target.value)}
+   456→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   457→                          />
+   458→                        </div>
+   459→                        <div className="space-y-2">
+   460→                          <Label htmlFor="roomMecca" className="text-white/80 text-sm">
+   461→                            {t('pilgrim.activate.roomMecca')}
+   462→                          </Label>
+   463→                          <Input
+   464→                            id="roomMecca"
+   465→                            placeholder={t('pilgrim.activate.roomMeccaPlaceholder')}
+   466→                            value={formData.roomMecca}
+   467→                            onChange={(e) => updateField('roomMecca', e.target.value)}
+   468→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   469→                          />
+   470→                        </div>
+   471→                      </div>
+   472→                    </div>
+   473→
+   474→                    {/* Medina */}
+   475→                    <div className="bg-white/5 rounded-lg p-4 space-y-3">
+   476→                      <p className="text-white/70 text-sm font-medium">{t('pilgrim.hotel.medina')}</p>
+   477→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   478→                        <div className="space-y-2">
+   479→                          <Label htmlFor="hotelMedina" className="text-white/80 text-sm">
+   480→                            {t('pilgrim.activate.hotelMedina')}
+   481→                          </Label>
+   482→                          <Input
+   483→                            id="hotelMedina"
+   484→                            placeholder={t('pilgrim.activate.hotelMedinaPlaceholder')}
+   485→                            value={formData.hotelMedina}
+   486→                            onChange={(e) => updateField('hotelMedina', e.target.value)}
+   487→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   488→                          />
+   489→                        </div>
+   490→                        <div className="space-y-2">
+   491→                          <Label htmlFor="roomMedina" className="text-white/80 text-sm">
+   492→                            {t('pilgrim.activate.roomMedina')}
+   493→                          </Label>
+   494→                          <Input
+   495→                            id="roomMedina"
+   496→                            placeholder={t('pilgrim.activate.roomMedinaPlaceholder')}
+   497→                            value={formData.roomMedina}
+   498→                            onChange={(e) => updateField('roomMedina', e.target.value)}
+   499→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   500→                          />
+   501→                        </div>
+   502→                      </div>
+   503→                    </div>
+   504→                  </div>
+   505→                </motion.section>
+   506→
+   507→                {/* Contacts Section */}
+   508→                <motion.section
+   509→                  initial={{ opacity: 0, x: -10 }}
+   510→                  animate={{ opacity: 1, x: 0 }}
+   511→                  transition={{ delay: 0.4 }}
+   512→                >
+   513→                  <div className="flex items-center gap-2 mb-4">
+   514→                    <Phone className="w-5 h-5 text-emerald-300" />
+   515→                    <h2 className="text-lg font-semibold text-white">{t('pilgrim.contacts.sectionTitle')}</h2>
+   516→                  </div>
+   517→                  <div className="space-y-4">
+   518→                    {/* Group Leader Phone */}
+   519→                    <div className="space-y-2">
+   520→                      <Label htmlFor="groupLeaderPhone" className="text-white/90">
+   521→                        {t('pilgrim.activate.groupLeaderPhone')} <span className="text-red-400">*</span>
+   522→                      </Label>
+   523→                      <Input
+   524→                        id="groupLeaderPhone"
+   525→                        type="tel"
+   526→                        placeholder={t('pilgrim.activate.groupLeaderPhonePlaceholder')}
+   527→                        value={formData.groupLeaderPhone}
+   528→                        onChange={(e) => updateField('groupLeaderPhone', e.target.value)}
+   529→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   530→                        required
+   531→                      />
+   532→                    </div>
+   533→
+   534→                    {/* Agency Phone */}
+   535→                    <div className="space-y-2">
+   536→                      <Label htmlFor="agencyPhone" className="text-white/90">
+   537→                        {t('pilgrim.activate.agencyPhone')}
+   538→                      </Label>
+   539→                      <Input
+   540→                        id="agencyPhone"
+   541→                        type="tel"
+   542→                        placeholder={t('pilgrim.activate.agencyPhonePlaceholder')}
+   543→                        value={formData.agencyPhone}
+   544→                        onChange={(e) => updateField('agencyPhone', e.target.value)}
+   545→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   546→                      />
+   547→                    </div>
+   548→
+   549→                    {/* Family Contact */}
+   550→                    <div className="space-y-2">
+   551→                      <Label htmlFor="familyContact" className="text-white/90">
+   552→                        {t('pilgrim.activate.familyContact')}
+   553→                      </Label>
+   554→                      <Input
+   555→                        id="familyContact"
+   556→                        type="tel"
+   557→                        placeholder={t('pilgrim.activate.familyContactPlaceholder')}
+   558→                        value={formData.familyContact}
+   559→                        onChange={(e) => updateField('familyContact', e.target.value)}
+   560→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   561→                      />
+   562→                    </div>
+   563→                  </div>
+   564→                </motion.section>
+   565→
+   566→                {/* Duration Section */}
+   567→                <motion.section
+   568→                  initial={{ opacity: 0, x: -10 }}
+   569→                  animate={{ opacity: 1, x: 0 }}
+   570→                  transition={{ delay: 0.5 }}
+   571→                >
+   572→                  <div className="flex items-center gap-2 mb-4">
+   573→                    <Clock className="w-5 h-5 text-emerald-300" />
+   574→                    <h2 className="text-lg font-semibold text-white">{t('pilgrim.activate.duration')}</h2>
+   575→                    <span className="text-red-400 text-sm">*</span>
+   576→                  </div>
+   577→                  <RadioGroup
+   578→                    value={formData.duration}
+   579→                    onValueChange={(value) => updateField('duration', value)}
+   580→                    className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+   581→                  >
+   582→                    {DURATION_OPTIONS.map((option) => (
+   583→                      <label
+   584→                        key={option.value}
+   585→                        className={`flex items-center gap-3 rounded-lg border p-4 cursor-pointer transition-all ${
+   586→                          formData.duration === option.value
+   587→                            ? 'border-emerald-400 bg-emerald-400/10'
+   588→                            : 'border-white/20 bg-white/5 hover:bg-white/10'
+   589→                        }`}
+   590→                      >
+   591→                        <RadioGroupItem
+   592→                          value={option.value}
+   593→                          className="border-white/40 text-emerald-400 data-[state=checked]:border-emerald-400"
+   594→                        />
+   595→                        <span className="text-white font-medium">{t(option.labelKey)}</span>
+   596→                      </label>
+   597→                    ))}
+   598→                  </RadioGroup>
+   599→                </motion.section>
+   600→
+   601→                {/* Info Box */}
+   602→                <motion.div
+   603→                  initial={{ opacity: 0 }}
+   604→                  animate={{ opacity: 1 }}
+   605→                  transition={{ delay: 0.6 }}
+   606→                  className="bg-white/10 rounded-lg p-4 space-y-2"
+   607→                >
+   608→                  <div className="flex items-center gap-2 text-white">
+   609→                    <Heart className="w-4 h-4 text-emerald-300" />
+   610→                    <span className="text-sm font-medium">
+   611→                      {t('pilgrim.identity.title')}
+   612→                    </span>
+   613→                  </div>
+   614→                  <p className="text-white/60 text-sm">
+   615→                    {t('pilgrim.activate.successDesc')}
+   616→                  </p>
+   617→                </motion.div>
+   618→
+   619→                {/* Submit Button */}
+   620→                <motion.div
+   621→                  initial={{ opacity: 0, y: 10 }}
+   622→                  animate={{ opacity: 1, y: 0 }}
+   623→                  transition={{ delay: 0.7 }}
+   624→                >
+   625→                  <Button
+   626→                    type="submit"
+   627→                    disabled={pageState === 'submitting'}
+   628→                    className="w-full bg-white text-emerald-700 hover:bg-white/90 h-12 text-lg font-semibold"
+   629→                  >
+   630→                    {pageState === 'submitting' ? (
+   631→                      <span className="flex items-center gap-2">
+   632→                        <Loader2 className="w-5 h-5 animate-spin" />
+   633→                        Activation en cours...
+   634→                      </span>
+   635→                    ) : (
+   636→                      <span className="flex items-center gap-2">
+   637→                        <ShieldCheck className="w-5 h-5" />
+   638→                        {t('pilgrim.activate.submit')}
+   639→                      </span>
+   640→                    )}
+   641→                  </Button>
+   642→                </motion.div>
+   643→              </form>
+   644→            </CardContent>
+   645→          </Card>
+   646→        </motion.div>
+   647→
+   648→        {/* Help Section */}
+   649→        <div className="mt-8 text-center">
+   650→          <p className="text-white/60 text-sm">
+   651→            Besoin d&apos;aide ? Contactez votre agence ou{' '}
+   652→            <a href="mailto:contact@qrpass.com" className="text-white underline">
+   653→              contact@qrpass.com
+   654→            </a>
+   655→          </p>
+   656→        </div>
+   657→      </div>
+   658→    </main>
+   659→  );
+   660→}
+   661→

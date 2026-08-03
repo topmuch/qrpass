@@ -31,6 +31,7 @@ export async function GET(
 
     const types: ('baggage' | 'pilgrim')[] = [];
     let linkedPilgrimCode: string | null = null;
+    let linkedPilgrimActive = false;
 
     if (baggage) {
       types.push('baggage');
@@ -42,6 +43,7 @@ export async function GET(
         });
         if (linkedPilgrim) {
           linkedPilgrimCode = linkedPilgrim.qrCode;
+          linkedPilgrimActive = linkedPilgrim.isActive;
           if (!types.includes('pilgrim')) {
             types.push('pilgrim');
           }
@@ -57,6 +59,7 @@ export async function GET(
       // The code itself IS the pilgrim code
       if (!linkedPilgrimCode) {
         linkedPilgrimCode = pilgrim.qrCode;
+        linkedPilgrimActive = pilgrim.isActive;
       }
     }
 
@@ -67,7 +70,9 @@ export async function GET(
         found,
         types,
         baggage: !!baggage,
+        baggageStatus: baggage?.status ?? null,
         pilgrim: types.includes('pilgrim'),
+        pilgrimActive: linkedPilgrimActive,
         // The pilgrim code to use for Pass Identity link
         // This is the setId (which is the pilgrim's qrCode) when found via baggage
         pilgrimCode: linkedPilgrimCode,

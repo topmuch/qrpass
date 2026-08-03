@@ -65,6 +65,27 @@ const PUBLIC_API_PREFIXES = [
   '/api/checklist',
   '/api/landing',
   '/api/route',  // health check
+  '/api/pilgrims/lookup',  // QR code lookup (public - called when scanning QR)
+  '/api/serve-upload',  // Uploaded files (public - baggage photos)
+];
+
+// Known protected sub-routes under /api/pilgrims (everything else under /api/pilgrims/ is a public QR code lookup)
+const PILGRIM_PROTECTED_SUBROUTES = [
+  '/api/pilgrims/generate',
+  '/api/pilgrims/activate',
+  '/api/pilgrims/upload-photo',
+  '/api/pilgrims/report',
+  '/api/pilgrims/backfill',
+];
+
+// Known protected sub-routes under /api/baggage (everything else under /api/baggage/ is a public QR code lookup)
+const BAGGAGE_PROTECTED_SUBROUTES = [
+  '/api/baggage/generate',
+  '/api/baggage/bulk',
+  '/api/baggage/export',
+  '/api/baggage/import',
+  '/api/baggage/delete',
+  '/api/baggage/stats',
 ];
 
 export function middleware(req: NextRequest) {
@@ -78,6 +99,24 @@ export function middleware(req: NextRequest) {
 
   // ─── 2. API publiques → toujours autoriser ───
   if (PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  // ─── 2b. GET /api/pilgrims/{qrCode} is public (viewing pilgrim profile by QR scan) ───
+  // Only known sub-routes (generate, activate, etc.) are protected
+  if (
+    pathname.startsWith('/api/pilgrims/') &&
+    req.method === 'GET' &&
+    !PILGRIM_PROTECTED_SUBROUTES.some((sub) => pathname.startsWith(sub))
+  ) {
+    return NextResponse.next();
+  }
+
+  // ─── 2c. GET /api/baggage/reference/{code} is public (viewing baggage by QR reference) ───
+  if (
+    pathname.startsWith('/api/baggage/reference/') &&
+    req.method === 'GET'
+  ) {
     return NextResponse.next();
   }
 

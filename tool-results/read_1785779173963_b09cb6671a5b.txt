@@ -1,0 +1,853 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useParams, useRouter } from 'next/navigation';
+     5→import { motion, AnimatePresence } from 'framer-motion';
+     6→import { QRCodeSVG } from 'qrcode.react';
+     7→import { Button } from '@/components/ui/button';
+     8→import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+     9→import { Input } from '@/components/ui/input';
+    10→import { Label } from '@/components/ui/label';
+    11→import { Textarea } from '@/components/ui/textarea';
+    12→import { Badge } from '@/components/ui/badge';
+    13→import {
+    14→  Select,
+    15→  SelectContent,
+    16→  SelectItem,
+    17→  SelectTrigger,
+    18→  SelectValue,
+    19→} from '@/components/ui/select';
+    20→import {
+    21→  ShieldCheck,
+    22→  ArrowLeft,
+    23→  CheckCircle,
+    24→  User,
+    25→  Heart,
+    26→  Hotel,
+    27→  Phone,
+    28→  Pencil,
+    29→  X,
+    30→  Save,
+    31→  Loader2,
+    32→  AlertCircle,
+    33→  QrCode,
+    34→  Calendar,
+    35→  Clock,
+    36→  Droplets,
+    37→} from 'lucide-react';
+    38→import { useTranslation } from '@/hooks/useTranslation';
+    39→import { useToast } from '@/hooks/use-toast';
+    40→import { detectLanguageFromBrowser, LANGUAGE_DIRECTION, type Language } from '@/lib/i18n';
+    41→
+    42→const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    43→
+    44→interface PilgrimData {
+    45→  id: string;
+    46→  code: string;
+    47→  fullName: string;
+    48→  nationality: string;
+    49→  bloodType: string | null;
+    50→  medicalInfo: string | null;
+    51→  hotelMecca: string | null;
+    52→  roomMecca: string | null;
+    53→  hotelMedina: string | null;
+    54→  roomMedina: string | null;
+    55→  groupLeaderPhone: string;
+    56→  agencyPhone: string | null;
+    57→  familyContact: string | null;
+    58→  duration: string;
+    59→  active: boolean;
+    60→  status: 'active' | 'inactive' | 'expired';
+    61→  expiresAt: string | null;
+    62→  activatedAt: string | null;
+    63→  updatedAt: string | null;
+    64→}
+    65→
+    66→interface EditFormData {
+    67→  bloodType: string;
+    68→  medicalInfo: string;
+    69→  hotelMecca: string;
+    70→  roomMecca: string;
+    71→  hotelMedina: string;
+    72→  roomMedina: string;
+    73→  groupLeaderPhone: string;
+    74→  agencyPhone: string;
+    75→  familyContact: string;
+    76→}
+    77→
+    78→type PageState = 'loading' | 'not_found' | 'view' | 'editing' | 'saving';
+    79→
+    80→export default function PilgrimDashboardPage() {
+    81→  const { code } = useParams();
+    82→  const router = useRouter();
+    83→  const { t, lang, dir, isLoading: translationsLoading } = useTranslation();
+    84→  const { toast } = useToast();
+    85→
+    86→  const [pageState, setPageState] = useState<PageState>('loading');
+    87→  const [pilgrimData, setPilgrimData] = useState<PilgrimData | null>(null);
+    88→  const [editData, setEditData] = useState<EditFormData>({
+    89→    bloodType: '',
+    90→    medicalInfo: '',
+    91→    hotelMecca: '',
+    92→    roomMecca: '',
+    93→    hotelMedina: '',
+    94→    roomMedina: '',
+    95→    groupLeaderPhone: '',
+    96→    agencyPhone: '',
+    97→    familyContact: '',
+    98→  });
+    99→
+   100→  // Fetch pilgrim data on load
+   101→  useEffect(() => {
+   102→    const fetchData = async () => {
+   103→      try {
+   104→        const response = await fetch(`/api/pilgrims/${code}`);
+   105→        if (response.ok) {
+   106→          const data = await response.json();
+   107→          setPilgrimData(data);
+   108→          setEditData({
+   109→            bloodType: data.bloodType || '',
+   110→            medicalInfo: data.medicalInfo || '',
+   111→            hotelMecca: data.hotelMecca || '',
+   112→            roomMecca: data.roomMecca || '',
+   113→            hotelMedina: data.hotelMedina || '',
+   114→            roomMedina: data.roomMedina || '',
+   115→            groupLeaderPhone: data.groupLeaderPhone || '',
+   116→            agencyPhone: data.agencyPhone || '',
+   117→            familyContact: data.familyContact || '',
+   118→          });
+   119→          setPageState('view');
+   120→        } else {
+   121→          setPageState('not_found');
+   122→        }
+   123→      } catch (error) {
+   124→        console.error('Error fetching pilgrim data:', error);
+   125→        setPageState('not_found');
+   126→      }
+   127→    };
+   128→
+   129→    if (code) {
+   130→      fetchData();
+   131→    }
+   132→  }, [code]);
+   133→
+   134→  const handleEdit = () => {
+   135→    // Reset edit data to current values
+   136→    if (pilgrimData) {
+   137→      setEditData({
+   138→        bloodType: pilgrimData.bloodType || '',
+   139→        medicalInfo: pilgrimData.medicalInfo || '',
+   140→        hotelMecca: pilgrimData.hotelMecca || '',
+   141→        roomMecca: pilgrimData.roomMecca || '',
+   142→        hotelMedina: pilgrimData.hotelMedina || '',
+   143→        roomMedina: pilgrimData.roomMedina || '',
+   144→        groupLeaderPhone: pilgrimData.groupLeaderPhone || '',
+   145→        agencyPhone: pilgrimData.agencyPhone || '',
+   146→        familyContact: pilgrimData.familyContact || '',
+   147→      });
+   148→    }
+   149→    setPageState('editing');
+   150→  };
+   151→
+   152→  const handleCancel = () => {
+   153→    // Reset edit data
+   154→    if (pilgrimData) {
+   155→      setEditData({
+   156→        bloodType: pilgrimData.bloodType || '',
+   157→        medicalInfo: pilgrimData.medicalInfo || '',
+   158→        hotelMecca: pilgrimData.hotelMecca || '',
+   159→        roomMecca: pilgrimData.roomMecca || '',
+   160→        hotelMedina: pilgrimData.hotelMedina || '',
+   161→        roomMedina: pilgrimData.roomMedina || '',
+   162→        groupLeaderPhone: pilgrimData.groupLeaderPhone || '',
+   163→        agencyPhone: pilgrimData.agencyPhone || '',
+   164→        familyContact: pilgrimData.familyContact || '',
+   165→      });
+   166→    }
+   167→    setPageState('view');
+   168→  };
+   169→
+   170→  const handleSave = async () => {
+   171→    setPageState('saving');
+   172→    try {
+   173→      const response = await fetch(`/api/pilgrims/${code}`, {
+   174→        method: 'PUT',
+   175→        headers: { 'Content-Type': 'application/json' },
+   176→        body: JSON.stringify({
+   177→          bloodType: editData.bloodType || undefined,
+   178→          medicalInfo: editData.medicalInfo || undefined,
+   179→          hotelMecca: editData.hotelMecca || undefined,
+   180→          roomMecca: editData.roomMecca || undefined,
+   181→          hotelMedina: editData.hotelMedina || undefined,
+   182→          roomMedina: editData.roomMedina || undefined,
+   183→          groupLeaderPhone: editData.groupLeaderPhone || undefined,
+   184→          agencyPhone: editData.agencyPhone || undefined,
+   185→          familyContact: editData.familyContact || undefined,
+   186→        }),
+   187→      });
+   188→
+   189→      if (response.ok) {
+   190→        const updatedData = await response.json();
+   191→        setPilgrimData(updatedData);
+   192→        setPageState('view');
+   193→        toast({
+   194→          title: t('pilgrim.dashboard.updateSuccess'),
+   195→          description: '',
+   196→        });
+   197→      } else {
+   198→        const errorData = await response.json();
+   199→        toast({
+   200→          title: t('pilgrim.dashboard.updateError'),
+   201→          description: errorData.message || 'Erreur',
+   202→          variant: 'destructive',
+   203→        });
+   204→        setPageState('editing');
+   205→      }
+   206→    } catch (error) {
+   207→      console.error('Error saving pilgrim data:', error);
+   208→      toast({
+   209→        title: t('pilgrim.dashboard.updateError'),
+   210→        description: 'Erreur de connexion',
+   211→        variant: 'destructive',
+   212→      });
+   213→      setPageState('editing');
+   214→    }
+   215→  };
+   216→
+   217→  const updateEditField = (field: keyof EditFormData, value: string) => {
+   218→    setEditData((prev) => ({ ...prev, [field]: value }));
+   219→  };
+   220→
+   221→  const getStatusBadge = (status: string) => {
+   222→    switch (status) {
+   223→      case 'active':
+   224→        return (
+   225→          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/30">
+   226→            <CheckCircle className="w-3 h-3 mr-1" />
+   227→            {t('pilgrim.dashboard.active')}
+   228→          </Badge>
+   229→        );
+   230→      case 'inactive':
+   231→        return (
+   232→          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 hover:bg-yellow-500/30">
+   233→            <Clock className="w-3 h-3 mr-1" />
+   234→            {t('pilgrim.dashboard.inactive')}
+   235→          </Badge>
+   236→        );
+   237→      case 'expired':
+   238→        return (
+   239→          <Badge className="bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-500/30">
+   240→            <AlertCircle className="w-3 h-3 mr-1" />
+   241→            {t('pilgrim.dashboard.expired')}
+   242→          </Badge>
+   243→        );
+   244→      default:
+   245→        return null;
+   246→    }
+   247→  };
+   248→
+   249→  const formatDate = (dateStr: string | null) => {
+   250→    if (!dateStr) return '—';
+   251→    try {
+   252→      return new Date(dateStr).toLocaleDateString(lang === 'ar' ? 'ar-SA' : lang === 'en' ? 'en-US' : 'fr-FR', {
+   253→        year: 'numeric',
+   254→        month: 'long',
+   255→        day: 'numeric',
+   256→      });
+   257→    } catch {
+   258→      return dateStr;
+   259→    }
+   260→  };
+   261→
+   262→  // Loading state
+   263→  if (pageState === 'loading' || translationsLoading) {
+   264→    return (
+   265→      <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900 flex items-center justify-center" dir={dir}>
+   266→        <div className="text-center text-white">
+   267→          <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4" />
+   268→          <p className="text-lg">Chargement...</p>
+   269→        </div>
+   270→      </main>
+   271→    );
+   272→  }
+   273→
+   274→  // Not found state
+   275→  if (pageState === 'not_found') {
+   276→    return (
+   277→      <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900 flex items-center justify-center p-4" dir={dir}>
+   278→        <motion.div
+   279→          initial={{ opacity: 0, y: 20 }}
+   280→          animate={{ opacity: 1, y: 0 }}
+   281→          className="text-center max-w-md"
+   282→        >
+   283→          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mb-6">
+   284→            <AlertCircle className="w-8 h-8 text-red-400" />
+   285→          </div>
+   286→          <h1 className="text-2xl font-bold text-white mb-3">{t('pilgrim.identity.notFound')}</h1>
+   287→          <p className="text-white/70 mb-8">{t('pilgrim.identity.notFoundDesc')}</p>
+   288→          <Button
+   289→            onClick={() => router.push('/')}
+   290→            className="bg-white text-emerald-700 hover:bg-white/90"
+   291→          >
+   292→            <ArrowLeft className="w-4 h-4 mr-2" />
+   293→            Retour
+   294→          </Button>
+   295→        </motion.div>
+   296→      </main>
+   297→    );
+   298→  }
+   299→
+   300→  if (!pilgrimData) return null;
+   301→
+   302→  const isEditing = pageState === 'editing' || pageState === 'saving';
+   303→  const isSaving = pageState === 'saving';
+   304→
+   305→  return (
+   306→    <main className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-900" dir={dir}>
+   307→      {/* Navigation */}
+   308→      <nav className="bg-emerald-800/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
+   309→        <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+   310→          <button
+   311→            onClick={() => router.push('/')}
+   312→            className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
+   313→          >
+   314→            <ArrowLeft className="w-5 h-5" />
+   315→            <span>Retour</span>
+   316→          </button>
+   317→          <div className="flex items-center gap-2">
+   318→            {getStatusBadge(pilgrimData.status)}
+   319→            <Badge className="bg-emerald-600/50 text-white border-emerald-500/30">
+   320→              <ShieldCheck className="w-3 h-3 mr-1" />
+   321→              Pass Identity
+   322→            </Badge>
+   323→          </div>
+   324→        </div>
+   325→      </nav>
+   326→
+   327→      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+   328→        {/* Header with QR Code and Status */}
+   329→        <motion.div
+   330→          initial={{ opacity: 0, y: -20 }}
+   331→          animate={{ opacity: 1, y: 0 }}
+   332→          transition={{ duration: 0.5 }}
+   333→          className="text-center mb-8"
+   334→        >
+   335→          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-6">
+   336→            <ShieldCheck className="w-8 h-8 text-white" />
+   337→          </div>
+   338→          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+   339→            {t('pilgrim.dashboard.title')}
+   340→          </h1>
+   341→          <p className="text-white/70 text-lg mb-4">
+   342→            {t('pilgrim.dashboard.subtitle')}
+   343→          </p>
+   344→        </motion.div>
+   345→
+   346→        {/* QR Code & Status Card */}
+   347→        <motion.div
+   348→          initial={{ opacity: 0, y: 20 }}
+   349→          animate={{ opacity: 1, y: 0 }}
+   350→          transition={{ duration: 0.5, delay: 0.1 }}
+   351→        >
+   352→          <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
+   353→            <CardContent className="p-6">
+   354→              <div className="flex flex-col sm:flex-row items-center gap-6">
+   355→                {/* QR Code */}
+   356→                <div className="bg-white rounded-xl p-4 flex-shrink-0">
+   357→                  <QRCodeSVG
+   358→                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/pilgrim/${code}`}
+   359→                    size={120}
+   360→                    level="M"
+   361→                    bgColor="#ffffff"
+   362→                    fgColor="#059669"
+   363→                  />
+   364→                </div>
+   365→                {/* Status Info */}
+   366→                <div className="flex-1 text-center sm:text-left space-y-3">
+   367→                  <div className="flex items-center justify-center sm:justify-start gap-2">
+   368→                    <QrCode className="w-4 h-4 text-white/60" />
+   369→                    <span className="text-white/60 text-sm">{t('pilgrim.dashboard.qrCode')}</span>
+   370→                    <span className="text-white font-mono text-sm bg-white/10 px-2 py-0.5 rounded">{code}</span>
+   371→                  </div>
+   372→                  <div className="flex items-center justify-center sm:justify-start gap-2">
+   373→                    <span className="text-white/60 text-sm">{t('pilgrim.dashboard.status')}:</span>
+   374→                    {getStatusBadge(pilgrimData.status)}
+   375→                  </div>
+   376→                  {pilgrimData.expiresAt && (
+   377→                    <div className="flex items-center justify-center sm:justify-start gap-2">
+   378→                      <Calendar className="w-4 h-4 text-white/60" />
+   379→                      <span className="text-white/60 text-sm">{t('pilgrim.dashboard.expiresAt')}:</span>
+   380→                      <span className="text-white text-sm font-medium">{formatDate(pilgrimData.expiresAt)}</span>
+   381→                    </div>
+   382→                  )}
+   383→                  {pilgrimData.updatedAt && (
+   384→                    <div className="flex items-center justify-center sm:justify-start gap-2">
+   385→                      <Clock className="w-4 h-4 text-white/60" />
+   386→                      <span className="text-white/60 text-sm">{t('pilgrim.dashboard.lastUpdated')}:</span>
+   387→                      <span className="text-white/80 text-sm">{formatDate(pilgrimData.updatedAt)}</span>
+   388→                    </div>
+   389→                  )}
+   390→                </div>
+   391→              </div>
+   392→            </CardContent>
+   393→          </Card>
+   394→        </motion.div>
+   395→
+   396→        {/* Personal Info Section (Read-Only) */}
+   397→        <motion.div
+   398→          initial={{ opacity: 0, y: 20 }}
+   399→          animate={{ opacity: 1, y: 0 }}
+   400→          transition={{ duration: 0.5, delay: 0.2 }}
+   401→        >
+   402→          <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
+   403→            <CardHeader className="pb-3">
+   404→              <CardTitle className="text-white flex items-center gap-2 text-lg">
+   405→                <User className="w-5 h-5 text-emerald-300" />
+   406→                {t('pilgrim.personal.sectionTitle')}
+   407→              </CardTitle>
+   408→            </CardHeader>
+   409→            <CardContent>
+   410→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   411→                <div>
+   412→                  <p className="text-white/60 text-sm mb-1">{t('pilgrim.personal.fullName')}</p>
+   413→                  <p className="text-white font-medium">{pilgrimData.fullName}</p>
+   414→                </div>
+   415→                <div>
+   416→                  <p className="text-white/60 text-sm mb-1">{t('pilgrim.personal.nationality')}</p>
+   417→                  <p className="text-white font-medium">{pilgrimData.nationality}</p>
+   418→                </div>
+   419→              </div>
+   420→            </CardContent>
+   421→          </Card>
+   422→        </motion.div>
+   423→
+   424→        {/* Medical Info Section (Editable) */}
+   425→        <motion.div
+   426→          initial={{ opacity: 0, y: 20 }}
+   427→          animate={{ opacity: 1, y: 0 }}
+   428→          transition={{ duration: 0.5, delay: 0.3 }}
+   429→        >
+   430→          <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
+   431→            <CardHeader className="pb-3">
+   432→              <div className="flex items-center justify-between">
+   433→                <CardTitle className="text-white flex items-center gap-2 text-lg">
+   434→                  <Heart className="w-5 h-5 text-emerald-300" />
+   435→                  {t('pilgrim.personal.medicalInfo')}
+   436→                </CardTitle>
+   437→                {!isEditing && (
+   438→                  <Button
+   439→                    variant="ghost"
+   440→                    size="sm"
+   441→                    onClick={handleEdit}
+   442→                    className="text-white/70 hover:text-white hover:bg-white/10"
+   443→                  >
+   444→                    <Pencil className="w-4 h-4" />
+   445→                  </Button>
+   446→                )}
+   447→              </div>
+   448→            </CardHeader>
+   449→            <CardContent>
+   450→              <AnimatePresence mode="wait">
+   451→                {isEditing ? (
+   452→                  <motion.div
+   453→                    key="editing"
+   454→                    initial={{ opacity: 0 }}
+   455→                    animate={{ opacity: 1 }}
+   456→                    exit={{ opacity: 0 }}
+   457→                    className="space-y-4"
+   458→                  >
+   459→                    <div className="space-y-2">
+   460→                      <Label className="text-white/90">{t('pilgrim.activate.bloodType')}</Label>
+   461→                      <Select
+   462→                        value={editData.bloodType}
+   463→                        onValueChange={(value) => updateEditField('bloodType', value)}
+   464→                      >
+   465→                        <SelectTrigger className="w-full bg-white/10 border-white/20 text-white focus:border-emerald-400">
+   466→                          <SelectValue placeholder={t('pilgrim.activate.bloodTypePlaceholder')} />
+   467→                        </SelectTrigger>
+   468→                        <SelectContent className="bg-emerald-800 border-white/20">
+   469→                          {BLOOD_TYPES.map((type) => (
+   470→                            <SelectItem key={type} value={type} className="text-white focus:bg-white/10 focus:text-white">
+   471→                              {type}
+   472→                            </SelectItem>
+   473→                          ))}
+   474→                        </SelectContent>
+   475→                      </Select>
+   476→                    </div>
+   477→                    <div className="space-y-2">
+   478→                      <Label className="text-white/90">{t('pilgrim.personal.medicalInfo')}</Label>
+   479→                      <Textarea
+   480→                        value={editData.medicalInfo}
+   481→                        onChange={(e) => updateEditField('medicalInfo', e.target.value)}
+   482→                        placeholder={t('pilgrim.activate.medicalInfoPlaceholder')}
+   483→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30 min-h-20"
+   484→                        rows={3}
+   485→                      />
+   486→                    </div>
+   487→                  </motion.div>
+   488→                ) : (
+   489→                  <motion.div
+   490→                    key="viewing"
+   491→                    initial={{ opacity: 0 }}
+   492→                    animate={{ opacity: 1 }}
+   493→                    exit={{ opacity: 0 }}
+   494→                    className="space-y-4"
+   495→                  >
+   496→                    <div>
+   497→                      <p className="text-white/60 text-sm mb-1 flex items-center gap-1">
+   498→                        <Droplets className="w-3 h-3" />
+   499→                        {t('pilgrim.personal.bloodType')}
+   500→                      </p>
+   501→                      <p className="text-white font-medium">
+   502→                        {pilgrimData.bloodType || (
+   503→                          <span className="text-white/40 italic">{t('pilgrim.personal.noMedicalInfo')}</span>
+   504→                        )}
+   505→                      </p>
+   506→                    </div>
+   507→                    <div>
+   508→                      <p className="text-white/60 text-sm mb-1">{t('pilgrim.personal.medicalInfo')}</p>
+   509→                      <p className="text-white">
+   510→                        {pilgrimData.medicalInfo || (
+   511→                          <span className="text-white/40 italic">{t('pilgrim.personal.noMedicalInfo')}</span>
+   512→                        )}
+   513→                      </p>
+   514→                    </div>
+   515→                  </motion.div>
+   516→                )}
+   517→              </AnimatePresence>
+   518→            </CardContent>
+   519→          </Card>
+   520→        </motion.div>
+   521→
+   522→        {/* Hotel/Accommodation Section (Editable) */}
+   523→        <motion.div
+   524→          initial={{ opacity: 0, y: 20 }}
+   525→          animate={{ opacity: 1, y: 0 }}
+   526→          transition={{ duration: 0.5, delay: 0.4 }}
+   527→        >
+   528→          <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
+   529→            <CardHeader className="pb-3">
+   530→              <div className="flex items-center justify-between">
+   531→                <CardTitle className="text-white flex items-center gap-2 text-lg">
+   532→                  <Hotel className="w-5 h-5 text-emerald-300" />
+   533→                  {t('pilgrim.hotel.sectionTitle')}
+   534→                </CardTitle>
+   535→                {!isEditing && (
+   536→                  <Button
+   537→                    variant="ghost"
+   538→                    size="sm"
+   539→                    onClick={handleEdit}
+   540→                    className="text-white/70 hover:text-white hover:bg-white/10"
+   541→                  >
+   542→                    <Pencil className="w-4 h-4" />
+   543→                  </Button>
+   544→                )}
+   545→              </div>
+   546→            </CardHeader>
+   547→            <CardContent>
+   548→              <AnimatePresence mode="wait">
+   549→                {isEditing ? (
+   550→                  <motion.div
+   551→                    key="editing"
+   552→                    initial={{ opacity: 0 }}
+   553→                    animate={{ opacity: 1 }}
+   554→                    exit={{ opacity: 0 }}
+   555→                    className="space-y-4"
+   556→                  >
+   557→                    {/* Mecca */}
+   558→                    <div className="bg-white/5 rounded-lg p-4 space-y-3">
+   559→                      <p className="text-white/70 text-sm font-medium">{t('pilgrim.hotel.mecca')}</p>
+   560→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   561→                        <div className="space-y-2">
+   562→                          <Label className="text-white/80 text-sm">{t('pilgrim.activate.hotelMecca')}</Label>
+   563→                          <Input
+   564→                            value={editData.hotelMecca}
+   565→                            onChange={(e) => updateEditField('hotelMecca', e.target.value)}
+   566→                            placeholder={t('pilgrim.activate.hotelMeccaPlaceholder')}
+   567→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   568→                          />
+   569→                        </div>
+   570→                        <div className="space-y-2">
+   571→                          <Label className="text-white/80 text-sm">{t('pilgrim.activate.roomMecca')}</Label>
+   572→                          <Input
+   573→                            value={editData.roomMecca}
+   574→                            onChange={(e) => updateEditField('roomMecca', e.target.value)}
+   575→                            placeholder={t('pilgrim.activate.roomMeccaPlaceholder')}
+   576→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   577→                          />
+   578→                        </div>
+   579→                      </div>
+   580→                    </div>
+   581→                    {/* Medina */}
+   582→                    <div className="bg-white/5 rounded-lg p-4 space-y-3">
+   583→                      <p className="text-white/70 text-sm font-medium">{t('pilgrim.hotel.medina')}</p>
+   584→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   585→                        <div className="space-y-2">
+   586→                          <Label className="text-white/80 text-sm">{t('pilgrim.activate.hotelMedina')}</Label>
+   587→                          <Input
+   588→                            value={editData.hotelMedina}
+   589→                            onChange={(e) => updateEditField('hotelMedina', e.target.value)}
+   590→                            placeholder={t('pilgrim.activate.hotelMedinaPlaceholder')}
+   591→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   592→                          />
+   593→                        </div>
+   594→                        <div className="space-y-2">
+   595→                          <Label className="text-white/80 text-sm">{t('pilgrim.activate.roomMedina')}</Label>
+   596→                          <Input
+   597→                            value={editData.roomMedina}
+   598→                            onChange={(e) => updateEditField('roomMedina', e.target.value)}
+   599→                            placeholder={t('pilgrim.activate.roomMedinaPlaceholder')}
+   600→                            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   601→                          />
+   602→                        </div>
+   603→                      </div>
+   604→                    </div>
+   605→                  </motion.div>
+   606→                ) : (
+   607→                  <motion.div
+   608→                    key="viewing"
+   609→                    initial={{ opacity: 0 }}
+   610→                    animate={{ opacity: 1 }}
+   611→                    exit={{ opacity: 0 }}
+   612→                    className="space-y-4"
+   613→                  >
+   614→                    {/* Mecca */}
+   615→                    <div className="bg-white/5 rounded-lg p-4">
+   616→                      <p className="text-white/60 text-sm font-medium mb-2">{t('pilgrim.hotel.mecca')}</p>
+   617→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   618→                        <div>
+   619→                          <p className="text-white/50 text-xs mb-1">{t('pilgrim.hotel.hotel')}</p>
+   620→                          <p className="text-white font-medium">
+   621→                            {pilgrimData.hotelMecca || <span className="text-white/40 italic">{t('pilgrim.hotel.notSpecified')}</span>}
+   622→                          </p>
+   623→                        </div>
+   624→                        <div>
+   625→                          <p className="text-white/50 text-xs mb-1">{t('pilgrim.hotel.room')}</p>
+   626→                          <p className="text-white font-medium">
+   627→                            {pilgrimData.roomMecca || <span className="text-white/40 italic">{t('pilgrim.hotel.notSpecified')}</span>}
+   628→                          </p>
+   629→                        </div>
+   630→                      </div>
+   631→                    </div>
+   632→                    {/* Medina */}
+   633→                    <div className="bg-white/5 rounded-lg p-4">
+   634→                      <p className="text-white/60 text-sm font-medium mb-2">{t('pilgrim.hotel.medina')}</p>
+   635→                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   636→                        <div>
+   637→                          <p className="text-white/50 text-xs mb-1">{t('pilgrim.hotel.hotel')}</p>
+   638→                          <p className="text-white font-medium">
+   639→                            {pilgrimData.hotelMedina || <span className="text-white/40 italic">{t('pilgrim.hotel.notSpecified')}</span>}
+   640→                          </p>
+   641→                        </div>
+   642→                        <div>
+   643→                          <p className="text-white/50 text-xs mb-1">{t('pilgrim.hotel.room')}</p>
+   644→                          <p className="text-white font-medium">
+   645→                            {pilgrimData.roomMedina || <span className="text-white/40 italic">{t('pilgrim.hotel.notSpecified')}</span>}
+   646→                          </p>
+   647→                        </div>
+   648→                      </div>
+   649→                    </div>
+   650→                  </motion.div>
+   651→                )}
+   652→              </AnimatePresence>
+   653→            </CardContent>
+   654→          </Card>
+   655→        </motion.div>
+   656→
+   657→        {/* Contacts Section (Editable) */}
+   658→        <motion.div
+   659→          initial={{ opacity: 0, y: 20 }}
+   660→          animate={{ opacity: 1, y: 0 }}
+   661→          transition={{ duration: 0.5, delay: 0.5 }}
+   662→        >
+   663→          <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
+   664→            <CardHeader className="pb-3">
+   665→              <div className="flex items-center justify-between">
+   666→                <CardTitle className="text-white flex items-center gap-2 text-lg">
+   667→                  <Phone className="w-5 h-5 text-emerald-300" />
+   668→                  {t('pilgrim.contacts.sectionTitle')}
+   669→                </CardTitle>
+   670→                {!isEditing && (
+   671→                  <Button
+   672→                    variant="ghost"
+   673→                    size="sm"
+   674→                    onClick={handleEdit}
+   675→                    className="text-white/70 hover:text-white hover:bg-white/10"
+   676→                  >
+   677→                    <Pencil className="w-4 h-4" />
+   678→                  </Button>
+   679→                )}
+   680→              </div>
+   681→            </CardHeader>
+   682→            <CardContent>
+   683→              <AnimatePresence mode="wait">
+   684→                {isEditing ? (
+   685→                  <motion.div
+   686→                    key="editing"
+   687→                    initial={{ opacity: 0 }}
+   688→                    animate={{ opacity: 1 }}
+   689→                    exit={{ opacity: 0 }}
+   690→                    className="space-y-4"
+   691→                  >
+   692→                    <div className="space-y-2">
+   693→                      <Label className="text-white/90">{t('pilgrim.activate.groupLeaderPhone')}</Label>
+   694→                      <Input
+   695→                        type="tel"
+   696→                        value={editData.groupLeaderPhone}
+   697→                        onChange={(e) => updateEditField('groupLeaderPhone', e.target.value)}
+   698→                        placeholder={t('pilgrim.activate.groupLeaderPhonePlaceholder')}
+   699→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   700→                      />
+   701→                    </div>
+   702→                    <div className="space-y-2">
+   703→                      <Label className="text-white/90">{t('pilgrim.activate.agencyPhone')}</Label>
+   704→                      <Input
+   705→                        type="tel"
+   706→                        value={editData.agencyPhone}
+   707→                        onChange={(e) => updateEditField('agencyPhone', e.target.value)}
+   708→                        placeholder={t('pilgrim.activate.agencyPhonePlaceholder')}
+   709→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   710→                      />
+   711→                    </div>
+   712→                    <div className="space-y-2">
+   713→                      <Label className="text-white/90">{t('pilgrim.activate.familyContact')}</Label>
+   714→                      <Input
+   715→                        type="tel"
+   716→                        value={editData.familyContact}
+   717→                        onChange={(e) => updateEditField('familyContact', e.target.value)}
+   718→                        placeholder={t('pilgrim.activate.familyContactPlaceholder')}
+   719→                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-emerald-400 focus:ring-emerald-400/30"
+   720→                      />
+   721→                    </div>
+   722→                  </motion.div>
+   723→                ) : (
+   724→                  <motion.div
+   725→                    key="viewing"
+   726→                    initial={{ opacity: 0 }}
+   727→                    animate={{ opacity: 1 }}
+   728→                    exit={{ opacity: 0 }}
+   729→                    className="space-y-3"
+   730→                  >
+   731→                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+   732→                      <div>
+   733→                        <p className="text-white/60 text-xs">{t('pilgrim.contacts.groupLeader')}</p>
+   734→                        <p className="text-white font-medium">
+   735→                          {pilgrimData.groupLeaderPhone || <span className="text-white/40 italic">{t('pilgrim.contacts.notSpecified')}</span>}
+   736→                        </p>
+   737→                      </div>
+   738→                      {pilgrimData.groupLeaderPhone && (
+   739→                        <a
+   740→                          href={`tel:${pilgrimData.groupLeaderPhone}`}
+   741→                          className="text-emerald-300 hover:text-emerald-200 transition-colors"
+   742→                        >
+   743→                          <Phone className="w-4 h-4" />
+   744→                        </a>
+   745→                      )}
+   746→                    </div>
+   747→                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+   748→                      <div>
+   749→                        <p className="text-white/60 text-xs">{t('pilgrim.contacts.agency')}</p>
+   750→                        <p className="text-white font-medium">
+   751→                          {pilgrimData.agencyPhone || <span className="text-white/40 italic">{t('pilgrim.contacts.notSpecified')}</span>}
+   752→                        </p>
+   753→                      </div>
+   754→                      {pilgrimData.agencyPhone && (
+   755→                        <a
+   756→                          href={`tel:${pilgrimData.agencyPhone}`}
+   757→                          className="text-emerald-300 hover:text-emerald-200 transition-colors"
+   758→                        >
+   759→                          <Phone className="w-4 h-4" />
+   760→                        </a>
+   761→                      )}
+   762→                    </div>
+   763→                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+   764→                      <div>
+   765→                        <p className="text-white/60 text-xs">{t('pilgrim.contacts.family')}</p>
+   766→                        <p className="text-white font-medium">
+   767→                          {pilgrimData.familyContact || <span className="text-white/40 italic">{t('pilgrim.contacts.notSpecified')}</span>}
+   768→                        </p>
+   769→                      </div>
+   770→                      {pilgrimData.familyContact && (
+   771→                        <a
+   772→                          href={`tel:${pilgrimData.familyContact}`}
+   773→                          className="text-emerald-300 hover:text-emerald-200 transition-colors"
+   774→                        >
+   775→                          <Phone className="w-4 h-4" />
+   776→                        </a>
+   777→                      )}
+   778→                    </div>
+   779→                  </motion.div>
+   780→                )}
+   781→              </AnimatePresence>
+   782→            </CardContent>
+   783→          </Card>
+   784→        </motion.div>
+   785→
+   786→        {/* Edit / Save / Cancel Buttons */}
+   787→        <AnimatePresence>
+   788→          {isEditing ? (
+   789→            <motion.div
+   790→              initial={{ opacity: 0, y: 10 }}
+   791→              animate={{ opacity: 1, y: 0 }}
+   792→              exit={{ opacity: 0, y: 10 }}
+   793→              className="flex gap-3 mb-8"
+   794→            >
+   795→              <Button
+   796→                onClick={handleCancel}
+   797→                disabled={isSaving}
+   798→                variant="outline"
+   799→                className="flex-1 border-white/20 text-white hover:bg-white/10 hover:text-white h-12"
+   800→              >
+   801→                <X className="w-4 h-4 mr-2" />
+   802→                {t('pilgrim.dashboard.cancel')}
+   803→              </Button>
+   804→              <Button
+   805→                onClick={handleSave}
+   806→                disabled={isSaving}
+   807→                className="flex-1 bg-white text-emerald-700 hover:bg-white/90 h-12 font-semibold"
+   808→              >
+   809→                {isSaving ? (
+   810→                  <span className="flex items-center gap-2">
+   811→                    <Loader2 className="w-4 h-4 animate-spin" />
+   812→                    ...
+   813→                  </span>
+   814→                ) : (
+   815→                  <span className="flex items-center gap-2">
+   816→                    <Save className="w-4 h-4" />
+   817→                    {t('pilgrim.dashboard.save')}
+   818→                  </span>
+   819→                )}
+   820→              </Button>
+   821→            </motion.div>
+   822→          ) : (
+   823→            <motion.div
+   824→              initial={{ opacity: 0, y: 10 }}
+   825→              animate={{ opacity: 1, y: 0 }}
+   826→              exit={{ opacity: 0, y: 10 }}
+   827→              className="mb-8"
+   828→            >
+   829→              <Button
+   830→                onClick={handleEdit}
+   831→                className="w-full bg-white/10 border border-white/20 text-white hover:bg-white/20 h-12"
+   832→              >
+   833→                <Pencil className="w-4 h-4 mr-2" />
+   834→                {t('pilgrim.dashboard.editInfo')}
+   835→              </Button>
+   836→            </motion.div>
+   837→          )}
+   838→        </AnimatePresence>
+   839→
+   840→        {/* Help Section */}
+   841→        <div className="text-center pb-8">
+   842→          <p className="text-white/60 text-sm">
+   843→            Besoin d&apos;aide ? Contactez votre agence ou{' '}
+   844→            <a href="mailto:contact@qrpass.com" className="text-white underline">
+   845→              contact@qrpass.com
+   846→            </a>
+   847→          </p>
+   848→        </div>
+   849→      </div>
+   850→    </main>
+   851→  );
+   852→}
+   853→

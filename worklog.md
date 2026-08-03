@@ -86,3 +86,28 @@ Work Log:
 Stage Summary:
 - All 4 issues fixed and verified
 - Screenshots saved to /tmp/
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix QR code re-scan flow - After activation, re-scanning should go directly to finder page, not selector
+
+Work Log:
+- Analyzed the QR code routing flow: all QR codes encode /found/{code} URL
+- Found the issue: /found/[code]/page.tsx ALWAYS showed the selector (Pass Bagage + Pass Identity) regardless of activation status
+- Updated /api/pilgrims/lookup/[code]/route.ts to return `baggageStatus` and `pilgrimActive` fields for smarter routing decisions
+- Updated /found/[code]/page.tsx with smart routing logic:
+  - Only baggage found (no active pilgrim) → auto-redirect to /scan/{code} (finder page)
+  - Only active pilgrim found (no baggage) → auto-redirect to /p/{pilgrimCode} (profile page)
+  - Both baggage + active pilgrim → show selector (user chooses)
+- Updated Pass Identity card in selector to use pilgrimActive for enabled/disabled state
+- Fixed middleware: added /api/pilgrims/lookup to public APIs
+- Fixed middleware: added smart routing for GET /api/pilgrims/{qrCode} (public for QR scans)
+- Fixed middleware: added /api/baggage/reference/ to public APIs for QR lookups
+- Fixed middleware: added /api/serve-upload to public APIs
+
+Stage Summary:
+- When scanning an activated baggage QR code, user now goes DIRECTLY to finder/trouveur page
+- Selector page only shows when BOTH baggage AND active pilgrim exist
+- Middleware now correctly allows public access to QR-related APIs
+- Test data created: HAJJ26-TEST01 (active), HAJJ26-TEST02 (pending_activation)
+- Verified with Agent Browser: /found/HAJJ26-TEST01 → /scan/HAJJ26-TEST01 (auto-redirect ✅)
