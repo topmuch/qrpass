@@ -398,16 +398,12 @@ export default function AgenceLoginPage() {
       </div>
 
       {/* ══════════════════════════════════════════════════
-          RIGHT PANEL — Clean White Form
+          RIGHT PANEL — Elegant Form with Navy + Gold accents
           ══════════════════════════════════════════════════ */}
-      <div className="w-full lg:w-[48%] min-h-screen flex items-center justify-center bg-white px-6 py-12 sm:px-10 relative">
-        {/* Gold gradient accent line at top */}
-        <div
-          className="absolute top-0 left-0 right-0 h-1"
-          style={{
-            background: 'linear-gradient(90deg, #f4b400, #f4b400, #f4b400, #f4b400, #f4b400)',
-          }}
-        />
+      <div className="w-full lg:w-[48%] min-h-screen flex items-center justify-center px-6 py-12 sm:px-10 relative" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #fefce8 50%, #f8fafc 100%)' }}>
+        {/* Subtle decorative circles */}
+        <div className="absolute top-20 right-10 w-64 h-64 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #f4b400, transparent)' }} />
+        <div className="absolute bottom-20 left-10 w-48 h-48 rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #0c1d3a, transparent)' }} />
 
         <motion.div
           className="w-full max-w-[400px] relative z-10"
@@ -420,7 +416,7 @@ export default function AgenceLoginPage() {
             className="lg:hidden flex items-center justify-center mb-8"
             variants={itemVariants}
           >
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-700 to-emerald-900 p-2 flex items-center justify-center shadow-lg shadow-emerald-800/20">
+            <div className="w-16 h-16 rounded-2xl p-2 flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
               <img
                 src="/logo.png"
                 alt="PassHajj"
@@ -431,7 +427,7 @@ export default function AgenceLoginPage() {
 
           {/* Badge */}
           <motion.div className="flex items-center gap-2 mb-6" variants={itemVariants}>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-700 text-white shadow-sm">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
               <Building2 className="w-3 h-3" />
               Agence
             </span>
@@ -439,10 +435,10 @@ export default function AgenceLoginPage() {
 
           {/* Header */}
           <motion.div className="mb-8" variants={itemVariants}>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+            <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: '#0c1d3a' }}>
               Bienvenue
             </h1>
-            <p className="text-slate-500 text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>
               Connectez-vous à votre espace agence pour gérer vos bagages et QR
               codes
             </p>
@@ -468,151 +464,164 @@ export default function AgenceLoginPage() {
             )}
           </AnimatePresence>
 
-          {/* Form */}
-          <motion.form
-            onSubmit={handleSubmit}
-            className="space-y-5"
+          {/* Form — glass card */}
+          <motion.div
+            className="rounded-2xl p-6 shadow-xl border"
+            style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderColor: 'rgba(244,180,0,0.12)' }}
             variants={itemVariants}
           >
-            {/* Email Field */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                Email
-              </label>
-              <div
-                className={`relative flex items-center rounded-xl border transition-all duration-200 ${
-                  focusedField === 'email'
-                    ? 'border-yellow-600 bg-white ring-4 ring-yellow-600/[0.08]'
-                    : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-                }`}
-              >
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email Field */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#0c1d3a' }}>
+                  Email
+                </label>
                 <div
-                  className={`pl-4 transition-colors duration-200 ${
-                    focusedField === 'email' ? 'text-amber-700' : 'text-slate-400'
+                  className={`relative flex items-center rounded-xl border-2 transition-all duration-200 ${
+                    focusedField === 'email'
+                      ? 'shadow-[0_0_0_3px_rgba(244,180,0,0.12)]'
+                      : ''
                   }`}
+                  style={{
+                    borderColor: focusedField === 'email' ? '#f4b400' : '#e2e8f0',
+                    backgroundColor: focusedField === 'email' ? '#fff' : '#f8fafc',
+                  }}
                 >
-                  <Mail className="w-[18px] h-[18px]" />
+                  <div
+                    className="pl-4 transition-colors duration-200"
+                    style={{ color: focusedField === 'email' ? '#f4b400' : '#94a3b8' }}
+                  >
+                    <Mail className="w-[18px] h-[18px]" />
+                  </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm"
+                    style={{ color: '#0c1d3a' }}
+                    placeholder="vous@agence.com"
+                    required
+                    autoComplete="email"
+                  />
                 </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField(null)}
-                  className="w-full bg-transparent border-none outline-none text-slate-900 placeholder-slate-400 py-3.5 px-3 text-sm"
-                  placeholder="vous@agence.com"
-                  required
-                  autoComplete="email"
-                />
               </div>
-            </div>
 
-            {/* Password Field */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                Mot de passe
-              </label>
-              <div
-                className={`relative flex items-center rounded-xl border transition-all duration-200 ${
-                  focusedField === 'password'
-                    ? 'border-yellow-600 bg-white ring-4 ring-yellow-600/[0.08]'
-                    : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-                }`}
-              >
+              {/* Password Field */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#0c1d3a' }}>
+                  Mot de passe
+                </label>
                 <div
-                  className={`pl-4 transition-colors duration-200 ${
+                  className={`relative flex items-center rounded-xl border-2 transition-all duration-200 ${
                     focusedField === 'password'
-                      ? 'text-amber-700'
-                      : 'text-slate-400'
+                      ? 'shadow-[0_0_0_3px_rgba(244,180,0,0.12)]'
+                      : ''
                   }`}
+                  style={{
+                    borderColor: focusedField === 'password' ? '#f4b400' : '#e2e8f0',
+                    backgroundColor: focusedField === 'password' ? '#fff' : '#f8fafc',
+                  }}
                 >
-                  <Lock className="w-[18px] h-[18px]" />
+                  <div
+                    className="pl-4 transition-colors duration-200"
+                    style={{ color: focusedField === 'password' ? '#f4b400' : '#94a3b8' }}
+                  >
+                    <Lock className="w-[18px] h-[18px]" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                    className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm"
+                    style={{ color: '#0c1d3a' }}
+                    placeholder="Entrez votre mot de passe"
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="pr-4 transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    style={{ color: focusedField === 'password' ? '#f4b400' : '#94a3b8' }}
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-[18px] h-[18px]" />
+                    ) : (
+                      <Eye className="w-[18px] h-[18px]" />
+                    )}
+                  </button>
                 </div>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setFocusedField('password')}
-                  onBlur={() => setFocusedField(null)}
-                  className="w-full bg-transparent border-none outline-none text-slate-900 placeholder-slate-400 py-3.5 px-3 text-sm"
-                  placeholder="Entrez votre mot de passe"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="pr-4 text-slate-400 hover:text-yellow-600 transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  tabIndex={-1}
-                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-[18px] h-[18px]" />
-                  ) : (
-                    <Eye className="w-[18px] h-[18px]" />
-                  )}
-                </button>
               </div>
-            </div>
 
-            {/* Remember me + Forgot password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center cursor-pointer gap-2 group">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 text-amber-700 focus:ring-amber-700/20 cursor-pointer"
-                />
-                <span className="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">
-                  Se souvenir de moi
-                </span>
-              </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm font-medium text-amber-700 hover:text-emerald-800 transition-colors"
+              {/* Remember me + Forgot password */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center cursor-pointer gap-2 group">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded cursor-pointer"
+                    style={{ accentColor: '#f4b400' }}
+                  />
+                  <span className="text-sm group-hover:text-slate-700 transition-colors" style={{ color: '#64748b' }}>
+                    Se souvenir de moi
+                  </span>
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-semibold transition-colors"
+                  style={{ color: '#f4b400' }}
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+
+              {/* Submit Button */}
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={loading ? {} : { scale: 1.01 }}
+                whileTap={loading ? {} : { scale: 0.98 }}
+                className="w-full font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm shadow-lg hover:shadow-xl"
+                style={{ background: 'linear-gradient(135deg, #f4b400, #d49b00)', color: '#0c1d3a', boxShadow: '0 4px 14px rgba(244,180,0,0.35)' }}
               >
-                Mot de passe oublié ?
-              </Link>
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              type="submit"
-              disabled={loading}
-              whileHover={loading ? {} : { scale: 1.01 }}
-              whileTap={loading ? {} : { scale: 0.98 }}
-              className="w-full text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-500 hover:to-yellow-600 shadow-lg shadow-yellow-600/25 hover:shadow-xl hover:shadow-yellow-600/30"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Connexion en cours...
-                </>
-              ) : (
-                <>
-                  Se connecter
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </motion.button>
-          </motion.form>
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Connexion en cours...
+                  </>
+                ) : (
+                  <>
+                    Se connecter
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </motion.button>
+            </form>
+          </motion.div>
 
           {/* Demo Account Card */}
           <motion.div
-            className="mt-6 p-4 rounded-xl bg-yellow-50/70 border border-yellow-100"
+            className="mt-6 p-4 rounded-xl border"
+            style={{ background: 'rgba(255,255,255,0.6)', borderColor: 'rgba(244,180,0,0.15)' }}
             variants={itemVariants}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-amber-700 flex items-center justify-center shadow-sm shadow-amber-700/20">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
                   <Fingerprint className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-emerald-900">
+                  <p className="text-xs font-semibold" style={{ color: '#0c1d3a' }}>
                     Compte démo
                   </p>
-                  <p className="text-[10px] text-yellow-600/70 font-mono leading-relaxed">
+                  <p className="text-[10px] font-mono leading-relaxed" style={{ color: '#94a3b8' }}>
                     agence@qrpass.com / agence123
                   </p>
                 </div>
@@ -620,7 +629,8 @@ export default function AgenceLoginPage() {
               <button
                 type="button"
                 onClick={fillDemo}
-                className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-amber-700 text-white hover:bg-yellow-600 active:scale-[0.97] transition-all duration-200 shadow-sm shadow-amber-700/20"
+                className="text-xs font-semibold px-3.5 py-2 rounded-lg text-white active:scale-[0.97] transition-all duration-200 shadow-sm"
+                style={{ background: '#0c1d3a' }}
               >
                 Remplir
               </button>
@@ -629,13 +639,15 @@ export default function AgenceLoginPage() {
 
           {/* Switch to Admin */}
           <motion.div
-            className="mt-8 text-center text-sm text-slate-500"
+            className="mt-8 text-center text-sm"
+            style={{ color: '#64748b' }}
             variants={itemVariants}
           >
             Vous êtes administrateur ?{' '}
             <Link
               href="/admin/connexion"
-              className="font-semibold text-amber-700 hover:text-emerald-800 transition-colors"
+              className="font-semibold transition-colors"
+              style={{ color: '#f4b400' }}
             >
               Connexion SuperAdmin
             </Link>
@@ -643,26 +655,27 @@ export default function AgenceLoginPage() {
 
           {/* Bottom links */}
           <motion.div
-            className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-400"
+            className="mt-6 flex items-center justify-center gap-4 text-xs"
+            style={{ color: '#94a3b8' }}
             variants={itemVariants}
           >
             <Link
               href="/cgu"
-              className="hover:text-yellow-600 transition-colors"
+              className="hover:text-slate-600 transition-colors"
             >
               CGU
             </Link>
-            <span className="text-slate-200">•</span>
+            <span style={{ color: '#cbd5e1' }}>•</span>
             <Link
               href="/confidentialite"
-              className="hover:text-yellow-600 transition-colors"
+              className="hover:text-slate-600 transition-colors"
             >
               Confidentialité
             </Link>
-            <span className="text-slate-200">•</span>
+            <span style={{ color: '#cbd5e1' }}>•</span>
             <Link
               href="/contact"
-              className="hover:text-yellow-600 transition-colors"
+              className="hover:text-slate-600 transition-colors"
             >
               Aide
             </Link>
