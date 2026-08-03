@@ -80,6 +80,10 @@ function HajjActivateContent() {
   // Validation errors
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+  // Deferred activation
+  const [deferredActivation, setDeferredActivation] = useState(false);
+  const [activationDate, setActivationDate] = useState('');
+
   // Pre-fill reference from URL
   useEffect(() => {
     if (qrFromUrl) {
@@ -160,6 +164,7 @@ function HajjActivateContent() {
           destination: destination.trim() || undefined,
           transportMode: 'flight',
           photoUrl: photoUrl || undefined,
+          activationDate: deferredActivation && activationDate ? activationDate : undefined,
         }),
       });
 
@@ -321,9 +326,43 @@ function HajjActivateContent() {
             <div className="bg-gray-50 rounded-xl p-3 mb-4 flex items-start gap-2">
               <Luggage className="w-5 h-5 text-gray-500 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-semibold">3 bagages seront activés</p>
-                <p className="text-xs" style={{ color: MUTED }}>1 cabine + 2 soute — Protection de 60 jours</p>
+                <p className="text-sm font-semibold">2 bagages soute seront activés</p>
+                <p className="text-xs" style={{ color: MUTED }}>Protection de 2 mois (60 jours) à partir de la date d&apos;activation</p>
               </div>
+            </div>
+
+            {/* Deferred Activation */}
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={deferredActivation}
+                    onChange={(e) => setDeferredActivation(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-black/20 rounded-full peer peer-checked:bg-black after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: TEXT }}>Activation différée</p>
+                  <p className="text-xs" style={{ color: MUTED }}>Choisir une date d&apos;activation future</p>
+                </div>
+              </div>
+              {deferredActivation && (
+                <div>
+                  <Label className="text-sm font-semibold mb-1.5 block">Date d&apos;activation *</Label>
+                  <Input
+                    type="date"
+                    value={activationDate}
+                    onChange={(e) => setActivationDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className={`h-12 rounded-xl text-base bg-gray-100 ${errors.activationDate ? 'border-red-500' : 'border-gray-300'}`}
+                  />
+                  <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+                    Les 60 jours commenceront à partir de cette date
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Next Button */}

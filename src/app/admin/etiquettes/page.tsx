@@ -18,7 +18,8 @@ import {
   FileText,
   Building2,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  UserRound,
 } from "lucide-react";
 
 interface QRSet {
@@ -448,15 +449,19 @@ export default function EtiquettesPage() {
                         className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                       >
                         <div className="flex items-center gap-4">
-                          {/* QR Icon */}
+                          {/* QR Icon with type badge */}
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                            activeTab === 'hajj'
-                              ? 'bg-emerald-100 dark:bg-blue-600/20'
-                              : 'bg-amber-100 dark:bg-blue-600/20'
+                            set.references[0]?.startsWith('PH-P-')
+                              ? 'bg-blue-100 dark:bg-blue-600/20'
+                              : activeTab === 'hajj'
+                                ? 'bg-amber-100 dark:bg-amber-600/20'
+                                : 'bg-amber-100 dark:bg-blue-600/20'
                           }`}>
-                            <QrCode className={`w-6 h-6 ${
-                              activeTab === 'hajj' ? 'text-blue-700' : 'text-amber-600'
-                            }`} />
+                            {set.references[0]?.startsWith('PH-P-') ? (
+                              <UserRound className="w-6 h-6 text-blue-600" />
+                            ) : (
+                              <Luggage className="w-6 h-6 text-amber-600" />
+                            )}
                           </div>
 
                           {/* Info */}
@@ -465,6 +470,16 @@ export default function EtiquettesPage() {
                               <h4 className="font-medium text-slate-800 dark:text-white">
                                 {set.setId}
                               </h4>
+                              {/* Type Badge */}
+                              {set.references[0]?.startsWith('PH-P-') ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400">
+                                  <UserRound className="w-3 h-3" /> Identity
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
+                                  <Luggage className="w-3 h-3" /> Bagage
+                                </span>
+                              )}
                               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                                 set.activationStatus === 'activated'
                                   ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
@@ -577,9 +592,9 @@ export default function EtiquettesPage() {
                       {ref}
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-xs">
-                      {selectedSet.type === 'hajj' 
-                        ? (index === 0 ? 'Cabine' : `Soute #${index}`)
-                        : `Bagage #${index + 1}`
+                      {ref.startsWith('PH-P-')
+                        ? 'Bracelet Identity'
+                        : `Soute #${index + 1}`
                       }
                     </p>
                   </div>

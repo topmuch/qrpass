@@ -21,7 +21,9 @@ import {
   AlertCircle,
   Shield,
   Archive,
-  Loader2
+  Loader2,
+  Luggage,
+  UserRound,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -37,6 +39,8 @@ interface Agency {
   createdAt: string;
 }
 
+type PassType = 'bagage' | 'identity';
+
 export default function GenererQRPage() {
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,6 +49,9 @@ export default function GenererQRPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [lastGeneratedRefs, setLastGeneratedRefs] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+
+  // Pass type selection
+  const [passType, setPassType] = useState<PassType>('bagage');
 
   // Agency form — Hajj only
   const [agencyForm, setAgencyForm] = useState({
@@ -69,9 +76,11 @@ export default function GenererQRPage() {
     }
   };
 
-  // Calculate QR count for display (Hajj: 3 bags per pilgrim)
+  // Calculate QR count for display
+  // Bagage: 2 QR soute per pilgrim | Identity: 1 QR bracelet per pilgrim
   const getQrCount = () => {
-    return agencyForm.travelerCount * 3;
+    const perPilgrim = passType === 'bagage' ? 2 : 1;
+    return agencyForm.travelerCount * perPilgrim;
   };
 
   // Validate agency form
@@ -178,15 +187,24 @@ export default function GenererQRPage() {
     setQrGenerating(true);
 
     try {
-      const payload = {
-        context: 'agency',
-        type: 'hajj' as const,
-        agencyId: agencyForm.agencyId,
-        travelerCount: agencyForm.travelerCount,
-        count: 3,
-      };
+      const endpoint = passType === 'identity'
+        ? '/api/pilgrims/generate'
+        : '/api/admin/baggages/generate';
 
-      const response = await fetch('/api/admin/baggages/generate', {
+      const payload = passType === 'identity'
+        ? {
+            count: agencyForm.travelerCount,
+          }
+        : {
+            context: 'agency',
+            type: 'hajj' as const,
+            passType: 'bagage' as const,
+            agencyId: agencyForm.agencyId,
+            travelerCount: agencyForm.travelerCount,
+            count: 2,
+          };
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -195,8 +213,9 @@ export default function GenererQRPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage(`${data.generated} codes QR générés avec succès !`);
-        setLastGeneratedRefs(data.references || []);
+        const refs = data.references || data.qrCodes || [];
+        setSuccessMessage(`${data.generated || refs.length} codes QR générés avec succès !`);
+        setLastGeneratedRefs(refs);
         setTimeout(() => {
           setSuccessMessage('');
           setLastGeneratedRefs([]);
@@ -217,7 +236,7 @@ export default function GenererQRPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Génération de QR Codes</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Créez des QR codes Pass Bagage pour les pèlerins Hajj & Omrah</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Créez des QR codes Pass Bagage ou Pass Identity pour les pèlerins Hajj</p>
       </div>
 
       {/* Success Message */}
@@ -258,13 +277,68 @@ export default function GenererQRPage() {
         </div>
       )}
 
+      {/* Pass Type Selection */}
+      <div className="mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setPassType('bagage')}
+            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+              passType === 'bagage'
+                ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-amber-300'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              passType === 'bagage' ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+            }`}>
+              <Luggage className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <p className={`font-semibold text-sm ${passType === 'bagage' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                Pass Bagage
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">2 QR soute par pèlerin</p>
+            </div>
+          </button>
+          <button
+            onClick={() => setPassType('identity')}
+            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+              passType === 'identity'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-300'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              passType === 'identity' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+            }`}>
+              <UserRound className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <p className={`font-semibold text-sm ${passType === 'identity' ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                Pass Identity
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">1 QR bracelet par pèlerin</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
       {/* Mode indicator */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-blue-600 text-white">
-          <Building2 className="w-5 h-5" />
+        <div className={`flex items-center gap-3 p-4 rounded-xl text-white ${
+          passType === 'bagage' ? 'bg-amber-600' : 'bg-blue-600'
+        }`}>
+          {passType === 'bagage' ? <Luggage className="w-5 h-5" /> : <UserRound className="w-5 h-5" />}
           <div>
-            <p className="font-medium">Génération Agence — Pass Bagage Hajj</p>
-            <p className="text-xs opacity-80">Chaque pèlerin reçoit 3 QR codes (1 cabine + 2 soutes)</p>
+            <p className="font-medium">
+              {passType === 'bagage' ? 'Génération Agence — Pass Bagage Hajj' : 'Génération Agence — Pass Identity Hajj'}
+            </p>
+            <p className="text-xs opacity-80">
+              {passType === 'bagage'
+                ? 'Chaque pèlerin reçoit 2 QR codes soute'
+                : 'Chaque pèlerin reçoit 1 QR code bracelet d\'identification'
+              }
+            </p>
           </div>
         </div>
       </div>
@@ -274,8 +348,11 @@ export default function GenererQRPage() {
         <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl">
           <CardHeader>
             <CardTitle className="text-slate-800 dark:text-white flex items-center gap-2">
-              <QrCode className="w-5 h-5 text-blue-600" />
-              Génération agence Hajj
+              {passType === 'bagage' ? (
+                <><Luggage className="w-5 h-5 text-amber-600" /> Génération Pass Bagage</>
+              ) : (
+                <><UserRound className="w-5 h-5 text-blue-600" /> Génération Pass Identity</>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -313,7 +390,11 @@ export default function GenererQRPage() {
               </div>
 
               <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-sm text-slate-600 dark:text-slate-300">
-                <p>🕌 Pour le Hajj, chaque pèlerin reçoit automatiquement 3 bagages (1 cabine + 2 soutes)</p>
+                {passType === 'bagage' ? (
+                  <p>🧳 Pour le Hajj, chaque pèlerin reçoit 2 QR codes bagage soute</p>
+                ) : (
+                  <p>👤 Pour le Hajj, chaque pèlerin reçoit 1 QR code bracelet d&apos;identification (PH-P-XXXXX)</p>
+                )}
               </div>
             </>
 
@@ -325,7 +406,9 @@ export default function GenererQRPage() {
             )}
 
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              className={`w-full text-white rounded-xl ${
+                passType === 'bagage' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
               onClick={handleGenerateQR}
               disabled={qrGenerating}
             >
@@ -352,7 +435,7 @@ export default function GenererQRPage() {
                 </Badge>
               </div>
               <div className="text-sm text-slate-500 dark:text-slate-400">
-                {agencyForm.travelerCount * 3} QR • En attente d'attribution
+                {getQrCount()} QR • {passType === 'bagage' ? 'Pass Bagage' : 'Pass Identity'} • En attente d&apos;attribution
               </div>
             </div>
 
@@ -361,7 +444,9 @@ export default function GenererQRPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-slate-500 dark:text-slate-400">Type</p>
-                  <p className="text-slate-800 dark:text-white font-medium">Hajj (Pèlerinage)</p>
+                  <p className="text-slate-800 dark:text-white font-medium">
+                    {passType === 'bagage' ? 'Pass Bagage (Soute)' : 'Pass Identity (Bracelet)'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-slate-500 dark:text-slate-400">Statut</p>
@@ -376,8 +461,8 @@ export default function GenererQRPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400">Expiration</p>
-                  <p className="text-slate-800 dark:text-white font-medium">60 jours</p>
+                  <p className="text-slate-500 dark:text-slate-400">Durée</p>
+                  <p className="text-slate-800 dark:text-white font-medium">2 mois (60 jours)</p>
                 </div>
               </div>
             </div>

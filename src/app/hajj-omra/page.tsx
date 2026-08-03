@@ -86,7 +86,7 @@ function HeroSection() {
         </h1>
 
         <p className="text-[#e0e6f0]/90 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-          3 bagages inclus (cabine + 2 soutes). Gérée par votre agence de voyage partenaire.
+          2 bagages soute inclus. Gérée par votre agence de voyage partenaire.
         </p>
 
         {/* Trust Pills */}
@@ -138,7 +138,7 @@ function ProcedureSection() {
     {
       step: "01",
       title: "Recevez vos QR",
-      desc: "Votre agence vous fournit 3 QR codes (1 cabine + 2 soutes) avant votre départ.",
+      desc: "Votre agence vous fournit 2 QR codes soute avant votre d\u00e9part.",
       icon: "📦"
     },
     {
@@ -205,7 +205,7 @@ function ProcedureSection() {
 // Advantages Section
 function AdvantagesSection() {
   const advantages = [
-    { icon: "✅", text: "3 QR codes inclus (cabine + 2 soutes)" },
+    { icon: "✅", text: "2 QR codes soute inclus" },
     { icon: "✅", text: "Activation en 30 secondes" },
     { icon: "✅", text: "Notification WhatsApp instantanée" },
     { icon: "✅", text: "Géré par votre agence — pas de gestion technique" },

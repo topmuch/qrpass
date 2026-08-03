@@ -161,20 +161,11 @@ export async function generateBaggages(options: GenerateBaggageOptions): Promise
 }
 
 // Calculate expiration date based on type
+// Fixed 2 months (60 days) for all types
 export function calculateExpirationDate(type: 'hajj' | 'voyageur', subtype?: 'sticker' | 'tag'): Date {
   const now = new Date();
-  
-  switch (type) {
-    case 'hajj':
-      return new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000); // +60 days
-    case 'voyageur':
-      if (subtype === 'tag') {
-        return new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // +365 days
-      }
-      return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // +7 days (sticker) - changed from 72h
-    default:
-      return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // Default 30 days
-  }
+  // Fixed 2 months (60 days) from activation
+  return new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 }
 
 // Validate reference format

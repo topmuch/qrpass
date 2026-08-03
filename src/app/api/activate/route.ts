@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { calculateExpirationDate } from '@/lib/qr';
 import { z } from 'zod';
 
 // Validation schema for activation
@@ -24,6 +23,8 @@ const activateSchema = z.object({
   busLineNumber: z.string().optional(),
   // Photo upload
   photoUrl: z.string().optional(),
+  // Deferred activation
+  activationDate: z.string().optional(), // ISO date string for deferred activation
 });
 
 export async function POST(request: NextRequest) {
@@ -51,11 +52,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine subtype for expiration calculation
-    const subtype = baggage.type === 'voyageur' ? 'sticker' : undefined;
-
-    // Calculate expiration date
-    const expiresAt = calculateExpirationDate(baggage.type as 'hajj' | 'voyageur', subtype);
+    // Calculate expiration: fixed 2 months (60 days) from activation or deferred date
+    const activationDate = validatedData.activationDate
+      ? new Date(validatedData.activationDate + 'T00:00:00')
+      : new Date();
+    const expiresAt = new Date(activationDate.getTime() + 60 * 24 * 60 * 60 * 1000);
 
     // Update baggage with traveler info
     const updatedBaggage = await db.baggage.update({

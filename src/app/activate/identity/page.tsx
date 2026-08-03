@@ -68,6 +68,10 @@ function IdentityActivateContent() {
   // Validation errors
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+  // Deferred activation
+  const [deferredActivation, setDeferredActivation] = useState(false);
+  const [activationDate, setActivationDate] = useState('');
+
   // Photo input ref
   const photoInputRef = useRef<HTMLInputElement>(null);
 
@@ -187,6 +191,11 @@ function IdentityActivateContent() {
 
       if (photoUrl) {
         payload.photoUrl = photoUrl;
+      }
+
+      // Add deferred activation date if selected
+      if (deferredActivation && activationDate) {
+        payload.activationDate = activationDate;
       }
 
       // Map hotel/room based on city
@@ -584,6 +593,43 @@ function IdentityActivateContent() {
               <p className="text-xs mt-1.5" style={{ color: MUTED }}>
                 Ce numéro recevra les alertes d&apos;urgence
               </p>
+            </div>
+
+            {/* Deferred Activation */}
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={deferredActivation}
+                    onChange={(e) => setDeferredActivation(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-black/20 rounded-full peer peer-checked:bg-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: TEXT }}>Activation différée</p>
+                  <p className="text-xs" style={{ color: MUTED }}>Choisir une date d&apos;activation future</p>
+                </div>
+              </div>
+              {deferredActivation && (
+                <div>
+                  <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                    Date d&apos;activation *
+                  </label>
+                  <input
+                    type="date"
+                    value={activationDate}
+                    onChange={(e) => setActivationDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className={inputNormalClass}
+                    style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                  />
+                  <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+                    Les 60 jours commenceront à partir de cette date
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Téléphone Famille */}

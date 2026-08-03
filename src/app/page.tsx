@@ -46,7 +46,7 @@ export default function HomePage() {
 
         /* HERO */
         .ph-hero {
-          padding: 120px 20px 60px; text-align: center; max-width: 800px; margin: 0 auto;
+          padding: 120px 20px 60px; text-align: center; max-width: 1000px; margin: 0 auto;
           animation: phFadeUp 0.8s ease;
         }
         @keyframes phFadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -60,7 +60,7 @@ export default function HomePage() {
         .ph-btn-outline:hover { border-color: #000; background: #fafafa; }
 
         /* BENEFITS */
-        .ph-benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .ph-benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .ph-benefit-card { background: var(--card); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; transition: 0.3s; }
         .ph-benefit-card:hover { transform: translateY(-4px); }
         .ph-icon { font-size: 32px; margin-bottom: 12px; display: block; }
@@ -68,9 +68,9 @@ export default function HomePage() {
         .ph-benefit-card p { font-size: 14px; color: var(--muted); }
 
         /* PRODUCTS */
-        .ph-products { max-width: 900px; margin: 60px auto; padding: 0 20px; }
+        .ph-products { max-width: 1200px; margin: 60px auto; padding: 0 20px; }
         .ph-section-title { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 32px; }
-        .ph-product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .ph-product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
         .ph-product-card { background: var(--card); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); position: relative; overflow: hidden; transition: 0.3s; border: 2px solid transparent; }
         .ph-product-card:hover { transform: translateY(-4px); border-color: #000; }
         .ph-product-badge { position: absolute; top: 16px; right: 16px; background: var(--accent); color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
@@ -82,7 +82,7 @@ export default function HomePage() {
         .ph-features li::before { content: "✓"; color: var(--accent); font-weight: 800; }
 
         /* HOW IT WORKS */
-        .ph-steps { max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center; }
+        .ph-steps { max-width: 1000px; margin: 60px auto; padding: 0 20px; text-align: center; }
         .ph-step-grid { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 32px; }
         .ph-step { flex: 1; min-width: 200px; }
         .ph-step-num { width: 40px; height: 40px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin: 0 auto 12px; }
@@ -90,7 +90,7 @@ export default function HomePage() {
         .ph-step p { font-size: 14px; color: var(--muted); }
 
         /* AGENCIES */
-        .ph-agencies { background: rgba(255,255,255,0.4); margin: 60px 20px; padding: 40px 20px; border-radius: var(--radius); text-align: center; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .ph-agencies { background: rgba(255,255,255,0.4); margin: 60px 20px; padding: 40px 20px; border-radius: var(--radius); text-align: center; max-width: 1200px; margin-left: auto; margin-right: auto; }
         .ph-agencies h2 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
         .ph-agencies p { color: var(--muted); max-width: 600px; margin: 0 auto 24px; }
 
@@ -125,7 +125,7 @@ export default function HomePage() {
           <p>{t('landing.hero.subtitle')}</p>
           <div className="ph-cta-group">
             <Link href="/select" className="ph-btn ph-btn-primary">{t('landing.hero.cta_primary')}</Link>
-            <Link href="/agencies" className="ph-btn ph-btn-outline">{t('landing.hero.cta_secondary')}</Link>
+            <Link href="/agences" className="ph-btn ph-btn-outline">{t('landing.hero.cta_secondary')}</Link>
           </div>
         </section>
 
@@ -205,7 +205,7 @@ export default function HomePage() {
         <section className="ph-agencies">
           <h2>{t('landing.agencies.title')}</h2>
           <p>{t('landing.agencies.desc')}</p>
-          <Link href="/agencies" className="ph-btn ph-btn-outline">{t('landing.agencies.cta')}</Link>
+          <Link href="/agences" className="ph-btn ph-btn-outline">{t('landing.agencies.cta')}</Link>
         </section>
 
         {/* ─── FOOTER ─── */}

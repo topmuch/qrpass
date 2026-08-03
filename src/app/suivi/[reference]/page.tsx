@@ -543,7 +543,7 @@ export default function SuiviPage() {
     const message = generatePreFilledMessage({
       baggage: {
         reference: data.baggage.reference,
-        bagType: data.baggage.baggageType || 'cabine',
+        bagType: data.baggage.baggageType || 'soute',
         transportMode: (data.baggage.transportMode || 'flight') as 'flight' | 'train' | 'boat' | 'bus',
         airlineName: data.baggage.airlineName || undefined,
         flightNumber: data.baggage.flightNumber || undefined,

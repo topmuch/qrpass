@@ -63,23 +63,9 @@ export async function POST(
       );
     }
 
-    // Calculate expiration date based on duration
-    const duration = body.duration || '30d';
-    const now = new Date();
-    let expiresAt: Date;
-
-    switch (duration) {
-      case '15d':
-        expiresAt = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
-        break;
-      case '1y':
-        expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
-        break;
-      case '30d':
-      default:
-        expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-        break;
-    }
+    // Calculate expiration date: fixed 2 months (60 days) from activation or deferred date
+    const activationDate = body.activationDate ? new Date(body.activationDate + 'T00:00:00') : new Date();
+    const expiresAt = new Date(activationDate.getTime() + 60 * 24 * 60 * 60 * 1000);
 
     // Prepare update data
     const updateData: Record<string, unknown> = {
@@ -87,7 +73,7 @@ export async function POST(
       nationality: nationality.trim(),
       groupLeaderPhone: groupLeaderPhone.trim(),
       isActive: true,
-      duration,
+      duration: '60d',
       expiresAt,
     };
 

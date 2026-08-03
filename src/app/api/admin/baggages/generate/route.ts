@@ -7,6 +7,7 @@ import { db } from '@/lib/db';
 const agencySchema = z.object({
   context: z.literal('agency'),
   type: z.literal('hajj'),
+  passType: z.enum(['bagage', 'identity']).optional(), // 'bagage' = 2 soute QR only
   agencyId: z.string().min(1),
   count: z.number().min(1).max(3),
   travelerCount: z.number().min(1).max(1000),
@@ -17,12 +18,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = agencySchema.parse(body);
 
-    // Generate for agency — Hajj only
+    // Generate for agency — Hajj only (Pass Bagage: 2 soute QR per pilgrim)
     const result = await generateBaggagesBatch({
       type: 'hajj',
       agencyId: validatedData.agencyId,
       travelerCount: validatedData.travelerCount,
-      count: 3,
+      count: validatedData.count,
     });
 
     return NextResponse.json({
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * Generate baggages for agency using BATCH INSERT for high performance.
- * Hajj: 3 bags per pilgrim (1 cabine + 2 soutes)
+ * Pass Bagage: 2 bags per pilgrim (soute only, no cabine)
  */
 async function generateBaggagesBatch(options: {
   type: 'hajj';
@@ -92,8 +93,8 @@ async function generateBaggagesBatch(options: {
         setId,
         agencyId,
         baggageIndex: i + 1,
-        // Hajj: 1st bag = cabine, rest = soute
-        baggageType: i === 0 ? 'cabine' : 'soute',
+        // All bags are soute only (no cabine)
+        baggageType: 'soute',
         status: 'pending_activation',
       });
     }
@@ -114,7 +115,7 @@ async function generateBaggagesBatch(options: {
     fullName: '', // Will be filled during activation
     nationality: '', // Will be filled during activation
     isActive: false,
-    duration: '30d',
+    duration: '60d', // Fixed 2 months
   }));
 
   // Batch insert pilgrims in chunks of 200

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         fullName: '', // Will be filled during activation
         nationality: '', // Will be filled during activation
         isActive: false,
-        duration: '30d',
+        duration: '60d', // Fixed 2 months
       })),
     });
 

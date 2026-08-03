@@ -1181,7 +1181,7 @@ export default function AgencyDashboardPage() {
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">
                               <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
-                                {baggage.baggageType === 'cabine' ? 'Cabine' : 'Soute'}
+                                {'Soute'}
                               </span>
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">

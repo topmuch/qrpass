@@ -167,7 +167,7 @@ export default async function PublicAgencyPage({ params }: PageProps) {
                         {baggage.status === 'active' ? 'Actif' : baggage.status === 'found' ? 'Retrouvé' : 'Scanné'}
                       </span>
                       <span className="text-sm text-slate-400 dark:text-slate-500 hidden sm:block">
-                        {baggage.baggageType === 'cabine' ? 'Cabine' : 'Soute'} #{baggage.baggageIndex}
+                        {'Soute'} #{baggage.baggageIndex}
                       </span>
                     </div>
                   </div>

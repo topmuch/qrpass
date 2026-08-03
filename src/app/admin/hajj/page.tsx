@@ -614,16 +614,12 @@ export default function HajjAdminPage() {
                         <div key={baggage.id} className="bg-slate-50 rounded-xl p-4">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                                baggage.baggageType === 'cabine' ? 'bg-blue-100' : 'bg-emerald-100'
-                              }`}>
-                                <Luggage className={`w-5 h-5 ${
-                                  baggage.baggageType === 'cabine' ? 'text-blue-600' : 'text-blue-700'
-                                }`} />
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100`}>
+                                <Luggage className={`w-5 h-5 text-amber-600`} />
                               </div>
                               <div>
                                 <p className="text-slate-800 font-medium">
-                                  {baggage.baggageType === 'cabine' ? 'Cabine' : `Soute ${index}`}
+                                  Soute {index + 1}
                                 </p>
                                 <p className="text-slate-500 text-sm font-mono">{baggage.reference}</p>
                               </div>
