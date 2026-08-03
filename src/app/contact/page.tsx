@@ -1,16 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import PublicLayout from '@/components/public/PublicLayout';
 import { Button } from "@/components/ui/button";
 import {
   Mail,
   Phone,
-  MapPinned,
+  MapPin,
   CheckCircle,
   Clock,
-  MessageCircle
+  MessageCircle,
+  Send,
+  ArrowRight,
+  Globe,
+  Headphones
 } from "lucide-react";
 
 function ContactContent() {
@@ -46,110 +51,160 @@ function ContactContent() {
     }
   };
 
+  const NAVY = '#0c1d3a';
+  const GOLD = '#f4b400';
+
   return (
     <>
       {/* Hero section */}
-      <section className="text-center py-16 bg-gradient-to-r from-[#080c1a] via-[#1e3a2e] to-[#080c1a]">
-        <div className="max-w-4xl mx-auto px-4">
+      <section style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY}dd)`, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: `${GOLD}10` }} />
+        <div style={{ position: 'absolute', bottom: '-40px', left: '10%', width: '150px', height: '150px', borderRadius: '50%', background: `${GOLD}08` }} />
+        <div className="max-w-4xl mx-auto px-4 py-20 text-center" style={{ position: 'relative', zIndex: 1 }}>
+          <Image src="/logo.png" alt="PassHajj" width={180} height={69} style={{ objectFit: 'contain', margin: '0 auto 24px' }} />
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Contactez-nous
           </h1>
-          <p className="text-[#a0a8b8] max-w-2xl mx-auto text-xl leading-relaxed">
-            Une question ? Un projet ? Notre équipe est là pour vous accompagner.
+          <p className="text-white/70 max-w-2xl mx-auto text-lg leading-relaxed">
+            Une question sur PassHajj ? Un projet de partenariat ? Notre équipe est là pour vous accompagner.
           </p>
         </div>
       </section>
 
-      {/* Contenu principal */}
-      <section className="py-16 px-4">
+      {/* Quick Contact Cards */}
+      <section style={{ background: '#f8fafc' }} className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Informations de contact */}
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Nos coordonnées</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-20 relative z-10">
+            {/* WhatsApp */}
+            <a
+              href="https://wa.me/33745349339"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
+            >
+              <div style={{ background: '#25D36615', width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MessageCircle style={{ color: '#25D366' }} className="w-7 h-7" />
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">WhatsApp</h3>
+              <p className="text-gray-500 text-sm mb-3">Réponse rapide garantie</p>
+              <span style={{ color: '#25D366' }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                Écrire sur WhatsApp <ArrowRight className="w-4 h-4" />
+              </span>
+            </a>
 
-              <div className="space-y-6">
-                {/* Adresse */}
-                <div className="flex items-start gap-4 p-4 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a]">
-                  <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/20 flex items-center justify-center border border-[#1E40AF]/30 shrink-0">
-                    <MapPinned className="w-6 h-6 text-[#1E40AF]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 text-white">Adresse</h3>
-                    <p className="text-[#a0a8b8]">43 Rue Maryse Bastié</p>
-                    <p className="text-[#a0a8b8]">78300 Poissy, France</p>
-                  </div>
+            {/* Email */}
+            <a
+              href="mailto:contact@qrpass.com"
+              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
+            >
+              <div style={{ background: `${GOLD}15`, width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Mail style={{ color: GOLD }} className="w-7 h-7" />
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Email</h3>
+              <p className="text-gray-500 text-sm mb-3">Réponse sous 24h ouvrées</p>
+              <span style={{ color: NAVY }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                Envoyer un email <ArrowRight className="w-4 h-4" />
+              </span>
+            </a>
+
+            {/* Téléphone */}
+            <a
+              href="tel:+33745349339"
+              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
+            >
+              <div style={{ background: `${NAVY}10`, width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Phone style={{ color: NAVY }} className="w-7 h-7" />
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Téléphone</h3>
+              <p className="text-gray-500 text-sm mb-3">+33 7 45 34 93 39</p>
+              <span style={{ color: NAVY }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                Appeler maintenant <ArrowRight className="w-4 h-4" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section style={{ background: '#f8fafc' }} className="pb-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Contact Info - Left side */}
+            <div className="lg:col-span-2 space-y-4">
+              <h2 className="text-2xl font-bold mb-6" style={{ color: NAVY }}>Nos coordonnées</h2>
+
+              {/* Adresse */}
+              <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div style={{ background: `${GOLD}12`, minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <MapPin style={{ color: GOLD }} className="w-5 h-5" />
                 </div>
-
-                {/* Téléphone */}
-                <div className="flex items-start gap-4 p-4 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a]">
-                  <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/20 flex items-center justify-center border border-[#1E40AF]/30 shrink-0">
-                    <Phone className="w-6 h-6 text-[#1E40AF]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 text-white">Téléphone</h3>
-                    <a href="tel:+33745349339" className="text-[#a0a8b8] hover:text-[#1E40AF] transition-colors">
-                      +33 7 45 34 93 39
-                    </a>
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="flex items-start gap-4 p-4 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a]">
-                  <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/20 flex items-center justify-center border border-[#1E40AF]/30 shrink-0">
-                    <Mail className="w-6 h-6 text-[#1E40AF]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 text-white">Email</h3>
-                    <a href="mailto:contact@qrpass.com" className="text-[#a0a8b8] hover:text-[#1E40AF] transition-colors">
-                      contact@qrpass.com
-                    </a>
-                  </div>
-                </div>
-
-                {/* Horaires */}
-                <div className="flex items-start gap-4 p-4 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a]">
-                  <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/20 flex items-center justify-center border border-[#1E40AF]/30 shrink-0">
-                    <Clock className="w-6 h-6 text-[#1E40AF]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 text-white">Horaires</h3>
-                    <p className="text-[#a0a8b8]">Lundi - Vendredi : 9h - 18h</p>
-                    <p className="text-[#a0a8b8]">Support 24/7 pour les urgences</p>
-                  </div>
-                </div>
-
-                {/* WhatsApp */}
-                <div className="flex items-start gap-4 p-4 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a]">
-                  <div className="w-12 h-12 rounded-lg bg-[#25D366]/20 flex items-center justify-center border border-[#25D366]/30 shrink-0">
-                    <MessageCircle className="w-6 h-6 text-[#25D366]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1 text-white">WhatsApp</h3>
-                    <a
-                      href="https://wa.me/33745349339"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#a0a8b8] hover:text-[#25D366] transition-colors"
-                    >
-                      +33 7 45 34 93 39
-                    </a>
-                    <p className="text-[#a0a8b8] text-sm mt-1">Réponse rapide garantie</p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Adresse</h3>
+                  <p className="text-gray-500 text-sm">43 Rue Maryse Bastié</p>
+                  <p className="text-gray-500 text-sm">78300 Poissy, France</p>
                 </div>
               </div>
+
+              {/* Horaires */}
+              <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div style={{ background: `${NAVY}0a`, minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock style={{ color: NAVY }} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Horaires</h3>
+                  <p className="text-gray-500 text-sm">Lun - Ven : 9h - 18h (CET)</p>
+                  <p className="text-gray-500 text-sm">Support 24/7 pour les urgences</p>
+                </div>
+              </div>
+
+              {/* Support */}
+              <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div style={{ background: '#25D36610', minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Headphones style={{ color: '#25D366' }} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Support pèlerins</h3>
+                  <p className="text-gray-500 text-sm">Assistance dédiée Hajj & Omrah</p>
+                  <p className="text-gray-500 text-sm">Multilingue (FR, EN, AR)</p>
+                </div>
+              </div>
+
+              {/* Site web */}
+              <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div style={{ background: `${GOLD}12`, minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Globe style={{ color: GOLD }} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Site web</h3>
+                  <p className="text-gray-500 text-sm">passhajj.com</p>
+                </div>
+              </div>
+
+              {/* Map */}
+              <a
+                href="https://maps.google.com/?q=43+Rue+Maryse+Bastie+78300+Poissy+France"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY}cc)` }}
+                className="block rounded-xl p-5 text-center hover:shadow-lg transition-all"
+              >
+                <MapPin className="w-6 h-6 text-white/60 mx-auto mb-2" />
+                <span className="text-white font-semibold text-sm">Voir sur Google Maps →</span>
+              </a>
             </div>
 
-            {/* Formulaire de contact */}
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Envoyez-nous un message</h2>
+            {/* Contact Form - Right side */}
+            <div className="lg:col-span-3">
+              <h2 className="text-2xl font-bold mb-6" style={{ color: NAVY }}>Envoyez-nous un message</h2>
 
-              <div className="bg-[#0a0f2c] rounded-xl p-6 border border-[#1a1a3a]">
+              <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
                 {submitted ? (
                   <div className="text-center py-12">
-                    <CheckCircle className="w-20 h-20 text-[#1E40AF] mx-auto mb-6" />
-                    <h3 className="text-2xl font-semibold mb-3 text-white">Message envoyé !</h3>
-                    <p className="text-[#a0a8b8] mb-6">
+                    <div style={{ background: `${GOLD}15`, width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CheckCircle style={{ color: '#10b981' }} className="w-10 h-10" />
+                    </div>
+                    <h3 className="text-2xl font-semibold mb-3" style={{ color: NAVY }}>Message envoyé !</h3>
+                    <p className="text-gray-500 mb-6">
                       Nous avons bien reçu votre message et vous répondrons dans les plus brefs délais.
                     </p>
                     <Button
@@ -157,7 +212,8 @@ function ContactContent() {
                         setSubmitted(false);
                         setFormData({ name: '', email: '', subject: '', message: '' });
                       }}
-                      className="bg-[#1E40AF] hover:bg-[#e01e5a] text-white"
+                      style={{ background: NAVY, color: '#fff' }}
+                      className="hover:opacity-90"
                     >
                       Envoyer un autre message
                     </Button>
@@ -166,47 +222,47 @@ function ContactContent() {
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2 text-white">Nom *</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color: NAVY }}>Nom *</label>
                         <input
                           type="text"
                           placeholder="Votre nom"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg bg-[#080c1a] border border-[#1a1a3a] text-white placeholder-[#a0a8b8] focus:outline-none focus:border-[#1E40AF]"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2 text-white">Email *</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color: NAVY }}>Email *</label>
                         <input
                           type="email"
                           placeholder="votre@email.com"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg bg-[#080c1a] border border-[#1a1a3a] text-white placeholder-[#a0a8b8] focus:outline-none focus:border-[#1E40AF]"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-white">Sujet</label>
+                      <label className="block text-sm font-medium mb-2" style={{ color: NAVY }}>Sujet</label>
                       <input
                         type="text"
                         placeholder="Objet de votre message"
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg bg-[#080c1a] border border-[#1a1a3a] text-white placeholder-[#a0a8b8] focus:outline-none focus:border-[#1E40AF]"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-white">Message *</label>
+                      <label className="block text-sm font-medium mb-2" style={{ color: NAVY }}>Message *</label>
                       <textarea
                         placeholder="Décrivez votre demande..."
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg bg-[#080c1a] border border-[#1a1a3a] text-white placeholder-[#a0a8b8] focus:outline-none focus:border-[#1E40AF] min-h-[160px]"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 min-h-[160px] transition-all"
                         required
                       />
                     </div>
@@ -214,12 +270,13 @@ function ContactContent() {
                     <Button
                       type="submit"
                       disabled={submitting}
-                      className="w-full bg-[#1E40AF] hover:bg-[#e01e5a] text-white py-4 font-bold text-lg disabled:opacity-50"
+                      style={{ background: GOLD, color: NAVY }}
+                      className="w-full py-4 font-bold text-lg disabled:opacity-50 hover:opacity-90 rounded-xl"
                     >
-                      {submitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                      {submitting ? 'Envoi en cours...' : <span className="inline-flex items-center gap-2"><Send className="w-5 h-5" /> Envoyer le message</span>}
                     </Button>
 
-                    <p className="text-[#a0a8b8] text-sm text-center">
+                    <p className="text-gray-400 text-sm text-center">
                       Nous répondons généralement sous 24h ouvrées.
                     </p>
                   </form>
@@ -227,23 +284,6 @@ function ContactContent() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Map section */}
-      <section className="py-16 px-4 bg-[#0a0f2c]">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-6">Nous trouver</h2>
-          <p className="text-[#a0a8b8] mb-8">Notre bureau est situé à Poissy, dans les Yvelines (78).</p>
-          <a
-            href="https://maps.google.com/?q=43+Rue+Maryse+Bastié+78300+Poissy+France"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#1E40AF] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#e01e5a] transition-colors"
-          >
-            <MapPinned className="w-5 h-5" />
-            Voir sur Google Maps
-          </a>
         </div>
       </section>
     </>

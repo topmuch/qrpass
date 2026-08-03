@@ -273,25 +273,37 @@ export default function HomePage() {
           display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
         }
         .hk-problem {
-          background: #fff; padding: 28px; border-radius: var(--radius);
-          box-shadow: var(--shadow); position: relative;
+          padding: 28px; border-radius: var(--radius);
+          box-shadow: var(--shadow-lg); position: relative;
           overflow: hidden; transition: all 0.3s;
+          border: 2px solid transparent;
         }
-        .hk-problem:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .hk-problem:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(12,29,58,0.15); }
+        .hk-problem--bagages { background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%); border-color: #fbbf24; }
+        .hk-problem--personnes { background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%); border-color: #60a5fa; }
+        .hk-problem--urgences { background: linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%); border-color: #f87171; }
         .hk-problem::before {
           content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-          background: var(--danger);
         }
+        .hk-problem--bagages::before { background: #fbbf24; }
+        .hk-problem--personnes::before { background: #3b82f6; }
+        .hk-problem--urgences::before { background: #ef4444; }
         .hk-problem-icon {
-          width: 52px; height: 52px;
-          background: rgba(239,68,68,0.08); border-radius: 14px;
+          width: 56px; height: 56px;
+          border-radius: 16px;
           display: flex; align-items: center; justify-content: center;
-          font-size: 26px; margin-bottom: 18px;
+          font-size: 28px; margin-bottom: 18px;
         }
+        .hk-problem--bagages .hk-problem-icon { background: rgba(251,191,36,0.15); }
+        .hk-problem--personnes .hk-problem-icon { background: rgba(59,130,246,0.12); }
+        .hk-problem--urgences .hk-problem-icon { background: rgba(239,68,68,0.12); }
         .hk-problem h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-        .hk-problem p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+        .hk-problem--bagages h3 { color: #92400e; }
+        .hk-problem--personnes h3 { color: #1e40af; }
+        .hk-problem--urgences h3 { color: #991b1b; }
+        .hk-problem p { font-size: 14px; color: #475569; line-height: 1.7; }
         .hk-problem--clickable { cursor: pointer; outline: none; }
-        .hk-problem--clickable:hover { border: 1px solid var(--brand); }
+        .hk-problem--clickable:hover { border-color: var(--brand) !important; }
         .hk-problem--clickable:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
         .hk-problem-more {
           display: inline-flex; align-items: center; gap: 4px;
@@ -359,18 +371,28 @@ export default function HomePage() {
         /* ─── COMPARISON ─── */
         .hk-comparison-table {
           background: #fff; border-radius: var(--radius);
-          overflow: hidden; box-shadow: var(--shadow);
+          overflow: hidden; box-shadow: var(--shadow-lg);
+          border: 1px solid #e2e8f0;
         }
         .hk-comp-row {
           display: grid; grid-template-columns: 1.5fr 1fr 1fr;
-          padding: 16px 24px; border-bottom: 1px solid #e2e8f0;
+          padding: 18px 28px; border-bottom: 1px solid #f1f5f9;
           align-items: center;
         }
-        .hk-comp-row--header { background: var(--navy); color: #fff; font-weight: 700; }
+        .hk-comp-row--header {
+          background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: #fff;
+          font-weight: 700; font-size: 15px;
+        }
+        .hk-comp-row:nth-child(even) { background: #f8fafc; }
         .hk-comp-row:last-child { border-bottom: none; }
         .hk-comp-cell { font-size: 14px; }
-        .hk-comp-cell--yes { color: var(--success); font-weight: 700; }
-        .hk-comp-cell--no { color: var(--danger); }
+        .hk-comp-cell--yes { color: var(--success); font-weight: 800; font-size: 18px; }
+        .hk-comp-cell--no { color: var(--danger); font-weight: 800; font-size: 18px; }
+        .hk-comp-product {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          font-size: 15px; font-weight: 800;
+        }
+        .hk-comp-product-icon { font-size: 22px; }
 
         /* ─── HOW IT WORKS ─── */
         .hk-steps-grid {
@@ -384,12 +406,14 @@ export default function HomePage() {
         }
         .hk-step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
         .hk-step-icon {
-          width: 72px; height: 72px; margin: 0 auto 20px;
-          background: linear-gradient(135deg, var(--navy), var(--navy-light));
-          color: #fff; border-radius: 50%;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 32px;
-          box-shadow: 0 8px 24px rgba(12,29,58,0.2);
+          width: 120px; height: 120px; margin: 0 auto 20px;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(12,29,58,0.15);
+          border: 2px solid #e2e8f0;
+        }
+        .hk-step-icon img {
+          width: 100%; height: 100%; object-fit: cover;
         }
         .hk-step-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
         .hk-step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
@@ -537,7 +561,7 @@ export default function HomePage() {
       <div className="hk">
         {/* ─── HEADER ─── */}
         <header className="hk-header">
-          <Image src="/logo.png" alt="PassHajj" width={140} height={54} style={{ objectFit: 'contain' }} priority />
+          <Image src="/logo.png" alt="PassHajj" width={170} height={65} style={{ objectFit: 'contain' }} priority />
           <div className="hk-nav">
             <button className="hk-lang" onClick={cycleLang} title="Switch language">
               🌐 {langLabels[lang]}
@@ -545,6 +569,7 @@ export default function HomePage() {
             <a href="#produits" className="hk-nav-link">{t('landing.nav.products')}</a>
             <a href="#comment-ca-marche" className="hk-nav-link">{t('landing.nav.howItWorks')}</a>
             <Link href="/login" className="hk-nav-link">{t('landing.nav.login')}</Link>
+            <Link href="/contact" className="hk-nav-link">{lang === 'ar' ? 'اتصل بنا' : lang === 'en' ? 'Contact' : 'Contact'}</Link>
             <Link href="/select" className="hk-btn-cta">{t('landing.nav.activate')}</Link>
             <button className="hk-hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? '✕' : '☰'}
@@ -557,6 +582,7 @@ export default function HomePage() {
           <a href="#produits" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.products')}</a>
           <a href="#comment-ca-marche" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.howItWorks')}</a>
           <Link href="/login" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.login')}</Link>
+          <Link href="/contact" className="hk-nav-link" onClick={() => setMobileMenuOpen(false)}>{lang === 'ar' ? 'اتصل بنا' : lang === 'en' ? 'Contact' : 'Contact'}</Link>
           <Link href="/select" className="hk-btn-cta" onClick={() => setMobileMenuOpen(false)}>{t('landing.nav.activate')}</Link>
         </div>
 
@@ -638,19 +664,19 @@ export default function HomePage() {
               <p className="hk-subtitle reveal">{t('landing.problem.subtitle')}</p>
             </div>
             <div className="hk-problems-grid">
-              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('bagages')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('bagages'); }}>
+              <div className="hk-problem hk-problem--bagages reveal hk-problem--clickable" onClick={() => setProblemDialog('bagages')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('bagages'); }}>
                 <div className="hk-problem-icon">🧳</div>
                 <h3>{t('landing.problem.p1Title')}</h3>
                 <p>{t('landing.problem.p1Desc')}</p>
                 <span className="hk-problem-more">{lang === 'ar' ? '← المزيد' : lang === 'en' ? 'Learn more →' : 'En savoir plus →'}</span>
               </div>
-              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('personnes')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('personnes'); }}>
+              <div className="hk-problem hk-problem--personnes reveal hk-problem--clickable" onClick={() => setProblemDialog('personnes')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('personnes'); }}>
                 <div className="hk-problem-icon">👴</div>
                 <h3>{t('landing.problem.p2Title')}</h3>
                 <p>{t('landing.problem.p2Desc')}</p>
                 <span className="hk-problem-more">{lang === 'ar' ? '← المزيد' : lang === 'en' ? 'Learn more →' : 'En savoir plus →'}</span>
               </div>
-              <div className="hk-problem reveal hk-problem--clickable" onClick={() => setProblemDialog('urgences')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('urgences'); }}>
+              <div className="hk-problem hk-problem--urgences reveal hk-problem--clickable" onClick={() => setProblemDialog('urgences')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setProblemDialog('urgences'); }}>
                 <div className="hk-problem-icon">🏥</div>
                 <h3>{t('landing.problem.p3Title')}</h3>
                 <p>{t('landing.problem.p3Desc')}</p>
@@ -754,43 +780,43 @@ export default function HomePage() {
             <div className="hk-comparison-table reveal">
               <div className="hk-comp-row hk-comp-row--header">
                 <div className="hk-comp-cell">{t('landing.comparison.feature')}</div>
-                <div className="hk-comp-cell">Pass Bagage</div>
-                <div className="hk-comp-cell">Pass Identity</div>
+                <div className="hk-comp-cell"><div className="hk-comp-product"><span className="hk-comp-product-icon">🧳</span> Pass Bagage</div></div>
+                <div className="hk-comp-cell"><div className="hk-comp-product"><span className="hk-comp-product-icon">👤</span> Pass Identity</div></div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.forWho')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.forWho')}</div>
                 <div className="hk-comp-cell">{t('landing.comparison.bagageFor')}</div>
                 <div className="hk-comp-cell">{t('landing.comparison.identityFor')}</div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.whatsapp')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.whatsapp')}</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.gps')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.gps')}</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.medical')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.medical')}</div>
                 <div className="hk-comp-cell hk-comp-cell--no">✗</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.photo')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.photo')}</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
               </div>
               <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.remoteEdit')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:600}}>{t('landing.comparison.remoteEdit')}</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
                 <div className="hk-comp-cell hk-comp-cell--yes">✓</div>
               </div>
-              <div className="hk-comp-row">
-                <div className="hk-comp-cell">{t('landing.comparison.price')}</div>
-                <div className="hk-comp-cell">2 500 FCFA</div>
-                <div className="hk-comp-cell">5 000 FCFA</div>
+              <div className="hk-comp-row" style={{background:'linear-gradient(135deg, #f8fafc, #f1f5f9)'}}>
+                <div className="hk-comp-cell" style={{fontWeight:800, color:'var(--ink)'}}>{t('landing.comparison.price')}</div>
+                <div className="hk-comp-cell" style={{fontWeight:800, color:'var(--navy)', fontSize:'16px'}}>2 500 FCFA</div>
+                <div className="hk-comp-cell" style={{fontWeight:800, color:'var(--navy)', fontSize:'16px'}}>5 000 FCFA</div>
               </div>
             </div>
           </div>
@@ -805,19 +831,19 @@ export default function HomePage() {
           </div>
           <div className="hk-steps-grid">
             <div className="hk-step-card reveal">
-              <div className="hk-step-icon">🔑</div>
+              <div className="hk-step-icon"><Image src="/images/step-activation.png" alt="Activation" width={120} height={120} style={{objectFit:'cover'}} /></div>
               <h3>{t('landing.how.s1Title')}</h3>
               <p>{t('landing.how.s1Desc')}</p>
               <div className="hk-step-connector">→</div>
             </div>
             <div className="hk-step-card reveal">
-              <div className="hk-step-icon">🛡️</div>
+              <div className="hk-step-icon"><Image src="/images/step-protection.png" alt="Protection" width={120} height={120} style={{objectFit:'cover'}} /></div>
               <h3>{t('landing.how.s2Title')}</h3>
               <p>{t('landing.how.s2Desc')}</p>
               <div className="hk-step-connector">→</div>
             </div>
             <div className="hk-step-card reveal">
-              <div className="hk-step-icon">🚨</div>
+              <div className="hk-step-icon"><Image src="/images/step-alert.png" alt="Alerte" width={120} height={120} style={{objectFit:'cover'}} /></div>
               <h3>{t('landing.how.s3Title')}</h3>
               <p>{t('landing.how.s3Desc')}</p>
             </div>
@@ -880,7 +906,7 @@ export default function HomePage() {
         {/* ─── FOOTER ─── */}
         <footer className="hk-footer">
           <div className="hk-footer-inner">
-            <Image src="/logo.png" alt="PassHajj" width={160} height={61} style={{ objectFit: 'contain' }} />
+            <Image src="/logo.png" alt="PassHajj" width={160} height={61} style={{ objectFit: 'contain', background: 'rgba(255,255,255,0.9)', borderRadius: '12px', padding: '4px 8px' }} />
             <p>{t('landing.footer.tagline')}</p>
             <div className="hk-footer-links">
               <Link href="/confidentialite">{t('landing.footer.privacy')}</Link>
