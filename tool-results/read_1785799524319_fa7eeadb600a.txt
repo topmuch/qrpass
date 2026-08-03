@@ -1,0 +1,1256 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import Link from 'next/link';
+     5→import {
+     6→  Luggage,
+     7→  Search,
+     8→  Eye,
+     9→  Clock,
+    10→  AlertTriangle,
+    11→  CheckCircle,
+    12→  MapPin,
+    13→  QrCode,
+    14→  X,
+    15→  Plus,
+    16→  Filter,
+    17→  AlertOctagon,
+    18→  Trash2,
+    19→  Loader2,
+    20→  UserRound,
+    21→  Heart,
+    22→  Hotel,
+    23→  Phone
+    24→} from "lucide-react";
+    25→import { useAgency } from '../layout';
+    26→import { isActive, isPending } from '@/lib/status';
+    27→
+    28→interface Baggage {
+    29→  id: string;
+    30→  reference: string;
+    31→  type: string;
+    32→  travelerFirstName: string | null;
+    33→  travelerLastName: string | null;
+    34→  whatsappOwner: string | null;
+    35→  baggageIndex: number;
+    36→  baggageType: string;
+    37→  status: string;
+    38→  createdAt: string;
+    39→  expiresAt: string | null;
+    40→  lastScanDate: string | null;
+    41→  lastLocation: string | null;
+    42→}
+    43→
+    44→interface Pilgrim {
+    45→  id: string;
+    46→  qrCode: string;
+    47→  fullName: string;
+    48→  nationality: string;
+    49→  photoUrl: string | null;
+    50→  bloodType: string | null;
+    51→  medicalInfo: string | null;
+    52→  hotelMecca: string | null;
+    53→  roomMecca: string | null;
+    54→  hotelMedina: string | null;
+    55→  roomMedina: string | null;
+    56→  groupLeaderPhone: string | null;
+    57→  agencyPhone: string | null;
+    58→  familyContact: string | null;
+    59→  isActive: boolean;
+    60→  duration: string;
+    61→  expiresAt: string | null;
+    62→  createdAt: string;
+    63→}
+    64→
+    65→export default function BaggagesPage() {
+    66→  const { agencyId, agencyName } = useAgency();
+    67→  const [baggages, setBaggages] = useState<Baggage[]>([]);
+    68→  const [filteredBaggages, setFilteredBaggages] = useState<Baggage[]>([]);
+    69→  const [loading, setLoading] = useState(true);
+    70→  const [search, setSearch] = useState('');
+    71→  const [statusFilter, setStatusFilter] = useState('all');
+    72→  const [selectedBaggage, setSelectedBaggage] = useState<Baggage | null>(null);
+    73→  const [showDetailModal, setShowDetailModal] = useState(false);
+    74→  const [actionLoading, setActionLoading] = useState<string | null>(null);
+    75→
+    76→  // Bulk selection state
+    77→  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    78→  const [deleteLoading, setDeleteLoading] = useState(false);
+    79→  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    80→
+    81→  const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
+    82→  const [pilgrimsLoading, setPilgrimsLoading] = useState(true);
+    83→  const [selectedPilgrim, setSelectedPilgrim] = useState<Pilgrim | null>(null);
+    84→  const [showPilgrimDetail, setShowPilgrimDetail] = useState(false);
+    85→
+    86→  useEffect(() => {
+    87→    fetchBaggages();
+    88→    fetchPilgrims();
+    89→  }, [agencyId]);
+    90→
+    91→  useEffect(() => {
+    92→    filterBaggages();
+    93→  }, [baggages, search, statusFilter]);
+    94→
+    95→  const fetchBaggages = async () => {
+    96→    try {
+    97→      const params = new URLSearchParams({
+    98→        agencyId: agencyId,
+    99→      });
+   100→
+   101→      const response = await fetch(`/api/agency/baggages?${params}`);
+   102→      const data = await response.json();
+   103→      setBaggages(data.baggages || []);
+   104→    } catch (error) {
+   105→      console.error('Error fetching baggages:', error);
+   106→    } finally {
+   107→      setLoading(false);
+   108→    }
+   109→  };
+   110→
+   111→  const fetchPilgrims = async () => {
+   112→    try {
+   113→      const params = new URLSearchParams({ agencyId });
+   114→      const response = await fetch(`/api/agency/pilgrims?${params}`);
+   115→      const data = await response.json();
+   116→      setPilgrims(data.pilgrims || []);
+   117→    } catch (error) {
+   118→      console.error('Error fetching pilgrims:', error);
+   119→    } finally {
+   120→      setPilgrimsLoading(false);
+   121→    }
+   122→  };
+   123→
+   124→  const filterBaggages = () => {
+   125→    let filtered = [...baggages];
+   126→
+   127→    if (statusFilter !== 'all') {
+   128→      filtered = filtered.filter(b => b.status === statusFilter);
+   129→    }
+   130→
+   131→    if (search.trim()) {
+   132→      const searchLower = search.toLowerCase();
+   133→      filtered = filtered.filter(b =>
+   134→        b.reference.toLowerCase().includes(searchLower) ||
+   135→        `${b.travelerFirstName || ''} ${b.travelerLastName || ''}`.toLowerCase().includes(searchLower)
+   136→      );
+   137→    }
+   138→
+   139→    setFilteredBaggages(filtered);
+   140→  };
+   141→
+   142→  // AGENCY-FIX: Split filtered baggages into activated and pending sections
+   143→  const activatedBaggages = filteredBaggages.filter(b =>
+   144→    isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked'
+   145→  );
+   146→  const pendingBaggages = filteredBaggages.filter(b =>
+   147→    isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
+   148→  );
+   149→
+   150→  // Bulk selection handlers
+   151→  const toggleSelect = (id: string) => {
+   152→    setSelectedIds(prev => {
+   153→      const next = new Set(prev);
+   154→      if (next.has(id)) {
+   155→        next.delete(id);
+   156→      } else {
+   157→        next.add(id);
+   158→      }
+   159→      return next;
+   160→    });
+   161→  };
+   162→
+   163→  const toggleSelectAll = (baggageList: Baggage[]) => {
+   164→    setSelectedIds(prev => {
+   165→      const next = new Set(prev);
+   166→      const allSelected = baggageList.every(b => next.has(b.id));
+   167→      if (allSelected) {
+   168→        // Deselect all in this list
+   169→        for (const b of baggageList) {
+   170→          next.delete(b.id);
+   171→        }
+   172→      } else {
+   173→        // Select all in this list
+   174→        for (const b of baggageList) {
+   175→          next.add(b.id);
+   176→        }
+   177→      }
+   178→      return next;
+   179→    });
+   180→  };
+   181→
+   182→  const handleBulkDelete = async () => {
+   183→    if (selectedIds.size === 0) return;
+   184→    setShowDeleteConfirm(true);
+   185→  };
+   186→
+   187→  const confirmBulkDelete = async () => {
+   188→    setDeleteLoading(true);
+   189→    try {
+   190→      const response = await fetch('/api/agency/baggages', {
+   191→        method: 'DELETE',
+   192→        headers: { 'Content-Type': 'application/json' },
+   193→        body: JSON.stringify({
+   194→          agencyId,
+   195→          ids: Array.from(selectedIds),
+   196→        }),
+   197→      });
+   198→
+   199→      const data = await response.json();
+   200→
+   201→      if (response.ok) {
+   202→        // Remove deleted items from local state
+   203→        const deletedSet = new Set(selectedIds);
+   204→        setBaggages(prev => prev.filter(b => !deletedSet.has(b.id)));
+   205→        setSelectedIds(new Set());
+   206→        setShowDeleteConfirm(false);
+   207→        alert(`${data.deleted} QR code(s) supprimé(s) avec succès`);
+   208→      } else {
+   209→        alert(data.error || 'Erreur lors de la suppression');
+   210→      }
+   211→    } catch (error) {
+   212→      console.error('Bulk delete error:', error);
+   213→      alert('Erreur lors de la suppression');
+   214→    } finally {
+   215→      setDeleteLoading(false);
+   216→    }
+   217→  };
+   218→
+   219→  const handleDeleteAllPending = async () => {
+   220→    if (!confirm(`Supprimer TOUS les QR codes en attente d'activation de votre agence ?\n\nCette action est irréversible.`)) return;
+   221→
+   222→    setDeleteLoading(true);
+   223→    try {
+   224→      const response = await fetch('/api/agency/baggages', {
+   225→        method: 'DELETE',
+   226→        headers: { 'Content-Type': 'application/json' },
+   227→        body: JSON.stringify({
+   228→          agencyId,
+   229→          status: 'pending_activation',
+   230→        }),
+   231→      });
+   232→
+   233→      const data = await response.json();
+   234→
+   235→      if (response.ok) {
+   236→        setBaggages(prev => prev.filter(b => !isPending(b.status)));
+   237→        setSelectedIds(new Set());
+   238→        alert(`${data.deleted} QR code(s) en attente supprimé(s)`);
+   239→      } else {
+   240→        alert(data.error || 'Erreur lors de la suppression');
+   241→      }
+   242→    } catch (error) {
+   243→      console.error('Delete all pending error:', error);
+   244→      alert('Erreur lors de la suppression');
+   245→    } finally {
+   246→      setDeleteLoading(false);
+   247→    }
+   248→  };
+   249→
+   250→  const formatDate = (dateString: string | null) => {
+   251→    if (!dateString) return 'Jamais';
+   252→    const date = new Date(dateString);
+   253→    return date.toLocaleDateString('fr-FR', {
+   254→      day: '2-digit',
+   255→      month: '2-digit',
+   256→      year: 'numeric'
+   257→    });
+   258→  };
+   259→
+   260→  const formatDateTime = (dateString: string | null) => {
+   261→    if (!dateString) return '-';
+   262→    const date = new Date(dateString);
+   263→    return date.toLocaleDateString('fr-FR', {
+   264→      day: '2-digit',
+   265→      month: '2-digit',
+   266→      year: 'numeric'
+   267→    }) + ' à ' + date.toLocaleTimeString('fr-FR', {
+   268→      hour: '2-digit',
+   269→      minute: '2-digit'
+   270→    });
+   271→  };
+   272→
+   273→  // Handle Declare Lost
+   274→  const handleDeclareLost = async (baggageId: string) => {
+   275→    if (!confirm('⚠️ Êtes-vous sûr de vouloir déclarer ce bagage comme perdu ?\n\nUne alerte sera envoyée au SuperAdmin.')) return;
+   276→
+   277→    setActionLoading(baggageId);
+   278→    try {
+   279→      const response = await fetch(`/api/baggage/${baggageId}/declare-lost`, {
+   280→        method: 'PUT',
+   281→      });
+   282→      const data = await response.json();
+   283→
+   284→      if (response.ok) {
+   285→        setBaggages(prev => prev.map(b => 
+   286→          b.id === baggageId ? { ...b, status: 'lost' } : b
+   287→        ));
+   288→        setShowDetailModal(false);
+   289→        setSelectedBaggage(null);
+   290→      } else {
+   291→        alert(data.error || 'Erreur lors de la déclaration');
+   292→      }
+   293→    } catch (error) {
+   294→      console.error('Declare lost error:', error);
+   295→      alert('Erreur lors de la déclaration');
+   296→    } finally {
+   297→      setActionLoading(null);
+   298→    }
+   299→  };
+   300→
+   301→  // Handle Mark Found
+   302→  const handleMarkFound = async (baggageId: string) => {
+   303→    if (!confirm('✅ Marquer ce bagage comme retrouvé ?')) return;
+   304→
+   305→    setActionLoading(baggageId);
+   306→    try {
+   307→      const response = await fetch(`/api/baggage/${baggageId}/mark-found`, {
+   308→        method: 'PUT',
+   309→      });
+   310→      const data = await response.json();
+   311→
+   312→      if (response.ok) {
+   313→        setBaggages(prev => prev.map(b => 
+   314→          b.id === baggageId ? { ...b, status: 'found' } : b
+   315→        ));
+   316→        setShowDetailModal(false);
+   317→        setSelectedBaggage(null);
+   318→      } else {
+   319→        alert(data.error || 'Erreur lors de la mise à jour');
+   320→      }
+   321→    } catch (error) {
+   322→      console.error('Mark found error:', error);
+   323→      alert('Erreur lors de la mise à jour');
+   324→    } finally {
+   325→      setActionLoading(null);
+   326→    }
+   327→  };
+   328→
+   329→  const getStatusBadge = (status: string) => {
+   330→    const statusConfig: Record<string, { label: string; className: string }> = {
+   331→      pending_activation: { label: 'En attente', className: 'bg-amber-100 dark:bg-blue-600/10 text-amber-700 dark:text-blue-500' },
+   332→      active: { label: 'Actif', className: 'bg-emerald-100 dark:bg-blue-600/10 text-emerald-700 dark:text-blue-500' },
+   333→      scanned: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
+   334→      lost: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
+   335→      found: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
+   336→      blocked: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+   337→    };
+   338→
+   339→    const config = statusConfig[status] || { label: status, className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' };
+   340→
+   341→    return (
+   342→      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
+   343→        {config.label}
+   344→      </span>
+   345→    );
+   346→  };
+   347→
+   348→  const filterButtons = [
+   349→    { id: 'all', label: 'Tous' },
+   350→    { id: 'scanned', label: 'Scannés' },
+   351→    { id: 'pending_activation', label: 'En attente' },
+   352→    { id: 'lost', label: 'Perdus' },
+   353→    { id: 'found', label: 'Retrouvés' },
+   354→  ];
+   355→
+   356→  return (
+   357→    <div className="max-w-7xl mx-auto">
+   358→      {/* Header */}
+   359→      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+   360→        <div>
+   361→          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Gestion des bagages</h1>
+   362→          <p className="text-slate-500 dark:text-slate-400 mt-1">Liste complète des bagages de votre agence</p>
+   363→        </div>
+   364→        {/* Delete All Pending Button */}
+   365→        {pendingBaggages.length > 0 && selectedIds.size === 0 && (
+   366→          <button
+   367→            onClick={handleDeleteAllPending}
+   368→            disabled={deleteLoading}
+   369→            className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-rose-500/20 disabled:opacity-50"
+   370→          >
+   371→            {deleteLoading ? (
+   372→              <Loader2 className="w-4 h-4 animate-spin" />
+   373→            ) : (
+   374→              <Trash2 className="w-4 h-4" />
+   375→            )}
+   376→            Supprimer tous les QR en attente ({pendingBaggages.length})
+   377→          </button>
+   378→        )}
+   379→      </div>
+   380→
+   381→      {/* Bulk Action Bar - Shows when items are selected */}
+   382→      {selectedIds.size > 0 && (
+   383→        <div className="mb-6 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-800 rounded-xl px-5 py-3 flex items-center justify-between flex-wrap gap-3">
+   384→          <div className="flex items-center gap-3">
+   385→            <div className="w-8 h-8 rounded-lg bg-rose-500 flex items-center justify-center">
+   386→              <Trash2 className="w-4 h-4 text-white" />
+   387→            </div>
+   388→            <span className="text-rose-700 dark:text-rose-400 font-medium text-sm">
+   389→              {selectedIds.size} QR code(s) sélectionné(s)
+   390→            </span>
+   391→          </div>
+   392→          <div className="flex items-center gap-2">
+   393→            <button
+   394→              onClick={() => setSelectedIds(new Set())}
+   395→              className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors"
+   396→            >
+   397→              Annuler
+   398→            </button>
+   399→            <button
+   400→              onClick={handleBulkDelete}
+   401→              disabled={deleteLoading}
+   402→              className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+   403→            >
+   404→              {deleteLoading ? (
+   405→                <Loader2 className="w-4 h-4 animate-spin" />
+   406→              ) : (
+   407→                <Trash2 className="w-4 h-4" />
+   408→              )}
+   409→              Supprimer la sélection
+   410→            </button>
+   411→          </div>
+   412→        </div>
+   413→      )}
+   414→
+   415→      {/* Stats Cards - Multicolored */}
+   416→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+   417→        <div className="kpi-card kpi-card-green p-5">
+   418→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   419→            <Luggage className="w-5 h-5 text-white" />
+   420→          </div>
+   421→          <p className="text-2xl font-bold text-white">{baggages.length}</p>
+   422→          <p className="text-sm text-white/80">Total bagages</p>
+   423→        </div>
+   424→        <div className="kpi-card kpi-card-blue p-5">
+   425→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   426→            <CheckCircle className="w-5 h-5 text-white" />
+   427→          </div>
+   428→          <p className="text-2xl font-bold text-white">{baggages.filter(b => isActive(b.status)).length}</p>
+   429→          <p className="text-sm text-white/80">Actifs</p>
+   430→        </div>
+   431→        <div className="kpi-card kpi-card-orange p-5">
+   432→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   433→            <Clock className="w-5 h-5 text-white" />
+   434→          </div>
+   435→          <p className="text-2xl font-bold text-white">{baggages.filter(b => isPending(b.status)).length}</p>
+   436→          <p className="text-sm text-white/80">En attente</p>
+   437→        </div>
+   438→        <div className="kpi-card kpi-card-red p-5">
+   439→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   440→            <AlertTriangle className="w-5 h-5 text-white" />
+   441→          </div>
+   442→          <p className="text-2xl font-bold text-white">{baggages.filter(b => b.status === 'lost').length}</p>
+   443→          <p className="text-sm text-white/80">Perdus</p>
+   444→        </div>
+   445→      </div>
+   446→
+   447→      {/* Search Bar */}
+   448→      <div className="mb-6">
+   449→        <div className="relative">
+   450→          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+   451→          <input
+   452→            type="text"
+   453→            placeholder="Rechercher par nom ou référence..."
+   454→            value={search}
+   455→            onChange={(e) => setSearch(e.target.value)}
+   456→            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+   457→          />
+   458→        </div>
+   459→      </div>
+   460→
+   461→      {/* Filter Buttons */}
+   462→      <div className="flex flex-wrap gap-2 mb-6">
+   463→        {filterButtons.map((btn) => (
+   464→          <button
+   465→            key={btn.id}
+   466→            onClick={() => setStatusFilter(btn.id)}
+   467→            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+   468→              statusFilter === btn.id
+   469→                ? 'bg-blue-600 text-white shadow-lg'
+   470→                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+   471→            }`}
+   472→          >
+   473→            {btn.label}
+   474→          </button>
+   475→        ))}
+   476→      </div>
+   477→
+   478→      {/* Loading state */}
+   479→      {loading ? (
+   480→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   481→          <div className="text-center py-12">
+   482→            <div className="flex items-center justify-center gap-3">
+   483→              <div className="w-6 h-6 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+   484→              <span className="text-slate-500">Chargement...</span>
+   485→            </div>
+   486→          </div>
+   487→        </div>
+   488→      ) : filteredBaggages.length === 0 ? (
+   489→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   490→          <div className="text-center py-12">
+   491→            <div className="flex flex-col items-center">
+   492→              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+   493→                <Luggage className="w-8 h-8 text-slate-400" />
+   494→              </div>
+   495→              <p className="text-slate-500 dark:text-slate-400">Aucun bagage trouvé</p>
+   496→            </div>
+   497→          </div>
+   498→        </div>
+   499→      ) : (
+   500→        <>
+   501→          {/* Section 1 — Bagages activés */}
+   502→          {activatedBaggages.length > 0 && (
+   503→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
+   504→              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-blue-600/5">
+   505→                <div className="flex items-center gap-2">
+   506→                  <div className="w-3 h-3 rounded-full bg-blue-600" />
+   507→                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   508→                    Bagages activés ({activatedBaggages.length})
+   509→                  </h2>
+   510→                </div>
+   511→              </div>
+   512→              <div className="overflow-x-auto">
+   513→                <table className="w-full">
+   514→                  <thead>
+   515→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   516→                      <th className="text-left px-4 py-4 w-10">
+   517→                        <input
+   518→                          type="checkbox"
+   519→                          checked={activatedBaggages.length > 0 && activatedBaggages.every(b => selectedIds.has(b.id))}
+   520→                          onChange={() => toggleSelectAll(activatedBaggages)}
+   521→                          className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   522→                        />
+   523→                      </th>
+   524→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
+   525→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   526→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Dernier scan</th>
+   527→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+   528→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   529→                    </tr>
+   530→                  </thead>
+   531→                  <tbody>
+   532→                    {activatedBaggages.map((baggage) => (
+   533→                      <tr
+   534→                        key={baggage.id}
+   535→                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+   536→                          baggage.status === 'lost' ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
+   537→                        } ${selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''}`}
+   538→                      >
+   539→                        <td className="px-4 py-4">
+   540→                          <input
+   541→                            type="checkbox"
+   542→                            checked={selectedIds.has(baggage.id)}
+   543→                            onChange={() => toggleSelect(baggage.id)}
+   544→                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   545→                          />
+   546→                        </td>
+   547→                        <td className="px-6 py-4">
+   548→                          <div className="flex items-center gap-2">
+   549→                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-blue-600/10 flex items-center justify-center">
+   550→                              <QrCode className="w-4 h-4 text-blue-600" />
+   551→                            </div>
+   552→                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+   553→                              {baggage.reference}
+   554→                            </span>
+   555→                          </div>
+   556→                        </td>
+   557→                        <td className="px-6 py-4">
+   558→                          {baggage.travelerFirstName || baggage.travelerLastName ? (
+   559→                            <span className="text-slate-800 dark:text-white font-medium">
+   560→                              {baggage.travelerFirstName} {baggage.travelerLastName}
+   561→                            </span>
+   562→                          ) : (
+   563→                            <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   564→                              Non assigné
+   565→                            </span>
+   566→                          )}
+   567→                        </td>
+   568→                        <td className="px-6 py-4 hidden md:table-cell">
+   569→                          {baggage.lastScanDate ? (
+   570→                            <span className="text-slate-600 dark:text-slate-300">{formatDateTime(baggage.lastScanDate)}</span>
+   571→                          ) : (
+   572→                            <span className="text-slate-400 dark:text-slate-500">Jamais</span>
+   573→                          )}
+   574→                        </td>
+   575→                        <td className="px-6 py-4">
+   576→                          {getStatusBadge(baggage.status)}
+   577→                        </td>
+   578→                        <td className="px-6 py-4">
+   579→                          <div className="flex items-center gap-2">
+   580→                            {isActive(baggage.status) && (
+   581→                              <button
+   582→                                onClick={() => handleDeclareLost(baggage.id)}
+   583→                                disabled={actionLoading === baggage.id}
+   584→                                className="p-2 rounded-lg bg-rose-100 dark:bg-rose-500/10 hover:bg-rose-200 dark:hover:bg-rose-500/20 transition-colors group"
+   585→                                title="Déclarer perdu"
+   586→                              >
+   587→                                {actionLoading === baggage.id ? (
+   588→                                  <div className="w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+   589→                                ) : (
+   590→                                  <AlertOctagon className="w-4 h-4 text-rose-500" />
+   591→                                )}
+   592→                              </button>
+   593→                            )}
+   594→                            {baggage.status === 'lost' && (
+   595→                              <button
+   596→                                onClick={() => handleMarkFound(baggage.id)}
+   597→                                disabled={actionLoading === baggage.id}
+   598→                                className="p-2 rounded-lg bg-emerald-100 dark:bg-blue-600/10 hover:bg-emerald-200 dark:hover:bg-blue-600/20 transition-colors group"
+   599→                                title="Marquer retrouvé"
+   600→                              >
+   601→                                {actionLoading === baggage.id ? (
+   602→                                  <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+   603→                                ) : (
+   604→                                  <CheckCircle className="w-4 h-4 text-blue-600" />
+   605→                                )}
+   606→                              </button>
+   607→                            )}
+   608→                            <button
+   609→                              onClick={() => {
+   610→                                setSelectedBaggage(baggage);
+   611→                                setShowDetailModal(true);
+   612→                              }}
+   613→                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   614→                              title="Voir détails"
+   615→                            >
+   616→                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+   617→                            </button>
+   618→                          </div>
+   619→                        </td>
+   620→                      </tr>
+   621→                    ))}
+   622→                  </tbody>
+   623→                </table>
+   624→              </div>
+   625→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+   626→                <span className="text-slate-500 dark:text-slate-400 text-sm">
+   627→                  {activatedBaggages.length} bagage(s) activé(s)
+   628→                </span>
+   629→              </div>
+   630→            </div>
+   631→          )}
+   632→
+   633→          {/* Section 2 — QR en attente d'activation */}
+   634→          {pendingBaggages.length > 0 && (
+   635→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
+   636→              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-blue-600/5">
+   637→                <div className="flex items-center justify-between">
+   638→                  <div className="flex items-center gap-2">
+   639→                    <div className="w-3 h-3 rounded-full bg-blue-600" />
+   640→                    <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   641→                      QR en attente d'activation ({pendingBaggages.length})
+   642→                    </h2>
+   643→                  </div>
+   644→                  <button
+   645→                    onClick={handleDeleteAllPending}
+   646→                    disabled={deleteLoading}
+   647→                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 border border-rose-200 dark:border-rose-800"
+   648→                  >
+   649→                    {deleteLoading ? (
+   650→                      <Loader2 className="w-3 h-3 animate-spin" />
+   651→                    ) : (
+   652→                      <Trash2 className="w-3 h-3" />
+   653→                    )}
+   654→                    Supprimer tout
+   655→                  </button>
+   656→                </div>
+   657→              </div>
+   658→              <div className="overflow-x-auto">
+   659→                <table className="w-full">
+   660→                  <thead>
+   661→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   662→                      <th className="text-left px-4 py-4 w-10">
+   663→                        <input
+   664→                          type="checkbox"
+   665→                          checked={pendingBaggages.length > 0 && pendingBaggages.every(b => selectedIds.has(b.id))}
+   666→                          onChange={() => toggleSelectAll(pendingBaggages)}
+   667→                          className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   668→                        />
+   669→                      </th>
+   670→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
+   671→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   672→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Type</th>
+   673→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
+   674→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   675→                    </tr>
+   676→                  </thead>
+   677→                  <tbody>
+   678→                    {pendingBaggages.map((baggage) => (
+   679→                      <tr
+   680→                        key={baggage.id}
+   681→                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+   682→                          selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''
+   683→                        }`}
+   684→                      >
+   685→                        <td className="px-4 py-4">
+   686→                          <input
+   687→                            type="checkbox"
+   688→                            checked={selectedIds.has(baggage.id)}
+   689→                            onChange={() => toggleSelect(baggage.id)}
+   690→                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   691→                          />
+   692→                        </td>
+   693→                        <td className="px-6 py-4">
+   694→                          <div className="flex items-center gap-2">
+   695→                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-blue-600/10 flex items-center justify-center">
+   696→                              <QrCode className="w-4 h-4 text-blue-600" />
+   697→                            </div>
+   698→                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+   699→                              {baggage.reference}
+   700→                            </span>
+   701→                          </div>
+   702→                        </td>
+   703→                        <td className="px-6 py-4">
+   704→                          <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   705→                            Non assigné
+   706→                          </span>
+   707→                        </td>
+   708→                        <td className="px-6 py-4 hidden md:table-cell">
+   709→                          <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
+   710→                            {'Soute'}
+   711→                          </span>
+   712→                        </td>
+   713→                        <td className="px-6 py-4 hidden md:table-cell">
+   714→                          <span className="text-slate-400 dark:text-slate-500 text-sm">
+   715→                            {formatDate(baggage.createdAt)}
+   716→                          </span>
+   717→                        </td>
+   718→                        <td className="px-6 py-4">
+   719→                          <div className="flex items-center gap-2">
+   720→                            <button
+   721→                              onClick={() => {
+   722→                                setSelectedBaggage(baggage);
+   723→                                setShowDetailModal(true);
+   724→                              }}
+   725→                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   726→                              title="Voir détails"
+   727→                            >
+   728→                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+   729→                            </button>
+   730→                          </div>
+   731→                        </td>
+   732→                      </tr>
+   733→                    ))}
+   734→                  </tbody>
+   735→                </table>
+   736→              </div>
+   737→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+   738→                <span className="text-slate-500 dark:text-slate-400 text-sm">
+   739→                  {pendingBaggages.length} QR en attente d'activation
+   740→                </span>
+   741→              </div>
+   742→            </div>
+   743→          )}
+   744→
+   745→          {/* Footer global */}
+   746→          <div className="text-center">
+   747→            <span className="text-slate-400 dark:text-slate-500 text-xs">
+   748→              {filteredBaggages.length} bagage(s) affiché(s) sur {baggages.length}
+   749→            </span>
+   750→          </div>
+   751→        </>
+   752→      )}
+   753→
+   754→      {/* ─── Pass Identity Section ─── */}
+   755→      <div className="mt-8 mb-4 flex items-center gap-3">
+   756→        <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
+   757→          <UserRound className="w-5 h-5 text-white" />
+   758→        </div>
+   759→        <div>
+   760→          <h2 className="text-xl font-bold text-slate-800 dark:text-white">Pass Identity</h2>
+   761→          <p className="text-slate-500 dark:text-slate-400 text-sm">Bracelets d'identification des pèlerins</p>
+   762→        </div>
+   763→      </div>
+   764→
+   765→      {pilgrimsLoading ? (
+   766→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   767→          <div className="text-center py-12">
+   768→            <div className="flex items-center justify-center gap-3">
+   769→              <div className="w-6 h-6 border-2 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin" />
+   770→              <span className="text-slate-500">Chargement des Pass Identity...</span>
+   771→            </div>
+   772→          </div>
+   773→        </div>
+   774→      ) : pilgrims.length === 0 ? (
+   775→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   776→          <div className="text-center py-12">
+   777→            <div className="flex flex-col items-center">
+   778→              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+   779→                <UserRound className="w-8 h-8 text-slate-400" />
+   780→              </div>
+   781→              <p className="text-slate-500 dark:text-slate-400">Aucun Pass Identity généré</p>
+   782→              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">Les QR codes Identity sont générés par le SuperAdmin</p>
+   783→            </div>
+   784→          </div>
+   785→        </div>
+   786→      ) : (
+   787→        <>
+   788→          {/* Pilgrim Stats */}
+   789→          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+   790→            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-5 text-white">
+   791→              <div className="flex items-center gap-3">
+   792→                <UserRound className="w-8 h-8" />
+   793→                <div>
+   794→                  <p className="text-2xl font-bold">{pilgrims.length}</p>
+   795→                  <p className="text-sm text-white/80">Total Identity</p>
+   796→                </div>
+   797→              </div>
+   798→            </div>
+   799→            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
+   800→              <div className="flex items-center gap-3">
+   801→                <CheckCircle className="w-8 h-8" />
+   802→                <div>
+   803→                  <p className="text-2xl font-bold">{pilgrims.filter(p => p.isActive).length}</p>
+   804→                  <p className="text-sm text-white/80">Activés</p>
+   805→                </div>
+   806→              </div>
+   807→            </div>
+   808→            <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-5 text-white col-span-2 lg:col-span-1">
+   809→              <div className="flex items-center gap-3">
+   810→                <Clock className="w-8 h-8" />
+   811→                <div>
+   812→                  <p className="text-2xl font-bold">{pilgrims.filter(p => !p.isActive).length}</p>
+   813→                  <p className="text-sm text-white/80">En attente</p>
+   814→                </div>
+   815→              </div>
+   816→            </div>
+   817→          </div>
+   818→
+   819→          {/* Pilgrims Table */}
+   820→          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   821→            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-600/5">
+   822→              <div className="flex items-center gap-2">
+   823→                <div className="w-3 h-3 rounded-full bg-emerald-600" />
+   824→                <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   825→                  Bracelets d'identification ({pilgrims.length})
+   826→                </h2>
+   827→              </div>
+   828→            </div>
+   829→            <div className="overflow-x-auto">
+   830→              <table className="w-full">
+   831→                <thead>
+   832→                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   833→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Code QR</th>
+   834→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   835→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Groupe sanguin</th>
+   836→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden lg:table-cell">Hôtel Mecque</th>
+   837→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+   838→                    <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   839→                  </tr>
+   840→                </thead>
+   841→                <tbody>
+   842→                  {pilgrims.map((pilgrim) => (
+   843→                    <tr
+   844→                      key={pilgrim.id}
+   845→                      className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+   846→                    >
+   847→                      <td className="px-6 py-4">
+   848→                        <div className="flex items-center gap-2">
+   849→                          <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-600/10 flex items-center justify-center">
+   850→                            <QrCode className="w-4 h-4 text-emerald-600" />
+   851→                          </div>
+   852→                          <span className="text-slate-800 dark:text-white font-mono font-medium">
+   853→                            {pilgrim.qrCode}
+   854→                          </span>
+   855→                        </div>
+   856→                      </td>
+   857→                      <td className="px-6 py-4">
+   858→                        {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? (
+   859→                          <div>
+   860→                            <span className="text-slate-800 dark:text-white font-medium">{pilgrim.fullName}</span>
+   861→                            {pilgrim.nationality && pilgrim.nationality.trim() !== '' && (
+   862→                              <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">({pilgrim.nationality})</span>
+   863→                            )}
+   864→                          </div>
+   865→                        ) : (
+   866→                          <span className="px-2 py-1 bg-amber-100 dark:bg-amber-600/20 text-amber-600 dark:text-amber-500 rounded-full text-xs font-medium">
+   867→                            Non activé
+   868→                          </span>
+   869→                        )}
+   870→                      </td>
+   871→                      <td className="px-6 py-4 hidden md:table-cell">
+   872→                        {pilgrim.bloodType ? (
+   873→                          <span className="px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold">
+   874→                            {pilgrim.bloodType}
+   875→                          </span>
+   876→                        ) : (
+   877→                          <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
+   878→                        )}
+   879→                      </td>
+   880→                      <td className="px-6 py-4 hidden lg:table-cell">
+   881→                        {pilgrim.hotelMecca ? (
+   882→                          <span className="text-slate-600 dark:text-slate-300 text-sm">{pilgrim.hotelMecca}</span>
+   883→                        ) : (
+   884→                          <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
+   885→                        )}
+   886→                      </td>
+   887→                      <td className="px-6 py-4">
+   888→                        {pilgrim.isActive ? (
+   889→                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+   890→                            Actif
+   891→                          </span>
+   892→                        ) : (
+   893→                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400">
+   894→                            En attente
+   895→                          </span>
+   896→                        )}
+   897→                      </td>
+   898→                      <td className="px-6 py-4">
+   899→                        <button
+   900→                          onClick={() => {
+   901→                            setSelectedPilgrim(pilgrim);
+   902→                            setShowPilgrimDetail(true);
+   903→                          }}
+   904→                          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   905→                          title="Voir détails"
+   906→                        >
+   907→                          <Eye className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
+   908→                        </button>
+   909→                      </td>
+   910→                    </tr>
+   911→                  ))}
+   912→                </tbody>
+   913→              </table>
+   914→            </div>
+   915→            <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+   916→              <span className="text-slate-500 dark:text-slate-400 text-sm">
+   917→                {pilgrims.length} Pass Identity
+   918→              </span>
+   919→            </div>
+   920→          </div>
+   921→        </>
+   922→      )}
+   923→
+   924→      {/* Delete Confirmation Modal */}
+   925→      {showDeleteConfirm && (
+   926→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+   927→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-800">
+   928→            <div className="p-6 text-center">
+   929→              <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+   930→                <Trash2 className="w-8 h-8 text-rose-500" />
+   931→              </div>
+   932→              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+   933→                Confirmer la suppression
+   934→              </h3>
+   935→              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+   936→                Vous allez supprimer <span className="font-bold text-rose-600">{selectedIds.size}</span> QR code(s). Cette action est irréversible.
+   937→              </p>
+   938→              <div className="flex gap-3">
+   939→                <button
+   940→                  onClick={() => setShowDeleteConfirm(false)}
+   941→                  className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-medium text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+   942→                >
+   943→                  Annuler
+   944→                </button>
+   945→                <button
+   946→                  onClick={confirmBulkDelete}
+   947→                  disabled={deleteLoading}
+   948→                  className="flex-1 py-2.5 bg-rose-500 text-white rounded-xl font-medium text-sm hover:bg-rose-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+   949→                >
+   950→                  {deleteLoading ? (
+   951→                    <Loader2 className="w-4 h-4 animate-spin" />
+   952→                  ) : (
+   953→                    <Trash2 className="w-4 h-4" />
+   954→                  )}
+   955→                  Supprimer
+   956→                </button>
+   957→              </div>
+   958→            </div>
+   959→          </div>
+   960→        </div>
+   961→      )}
+   962→
+   963→      {/* Detail Modal */}
+   964→      {showDetailModal && selectedBaggage && (
+   965→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+   966→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
+   967→            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+   968→              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Détails du bagage</h2>
+   969→              <button
+   970→                onClick={() => {
+   971→                  setShowDetailModal(false);
+   972→                  setSelectedBaggage(null);
+   973→                }}
+   974→                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+   975→              >
+   976→                <X className="w-5 h-5 text-slate-400" />
+   977→              </button>
+   978→            </div>
+   979→            <div className="p-6 space-y-4">
+   980→              <div className="flex items-center gap-3">
+   981→                <div className="w-12 h-12 bg-amber-100 dark:bg-blue-600/10 rounded-xl flex items-center justify-center">
+   982→                  <QrCode className="w-6 h-6 text-blue-600" />
+   983→                </div>
+   984→                <div>
+   985→                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
+   986→                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+   987→                </div>
+   988→              </div>
+   989→
+   990→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   991→                <div>
+   992→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
+   993→                  {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
+   994→                    <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
+   995→                  ) : (
+   996→                    <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   997→                      À attribuer
+   998→                    </span>
+   999→                  )}
+  1000→                </div>
+  1001→                <div>
+  1002→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
+  1003→                  <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+  1004→                </div>
+  1005→              </div>
+  1006→
+  1007→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1008→                <div>
+  1009→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
+  1010→                  {getStatusBadge(selectedBaggage.status)}
+  1011→                </div>
+  1012→                <div>
+  1013→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
+  1014→                  <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
+  1015→                </div>
+  1016→              </div>
+  1017→
+  1018→              <div>
+  1019→                <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
+  1020→                <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
+  1021→                {selectedBaggage.lastLocation && (
+  1022→                  <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
+  1023→                    <MapPin className="w-3 h-3" />
+  1024→                    {selectedBaggage.lastLocation}
+  1025→                  </p>
+  1026→                )}
+  1027→              </div>
+  1028→
+  1029→              {/* Attribuer edit form for unassigned baggages */}
+  1030→              {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && (
+  1031→                <div className="p-4 bg-amber-50 dark:bg-blue-600/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+  1032→                  <h4 className="text-amber-700 dark:text-blue-500 font-medium mb-3">Attribuer ce bagage</h4>
+  1033→                  <div className="space-y-3">
+  1034→                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  1035→                      <input
+  1036→                        type="text"
+  1037→                        placeholder="Prénom"
+  1038→                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+  1039→                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerFirstName: e.target.value })}
+  1040→                      />
+  1041→                      <input
+  1042→                        type="text"
+  1043→                        placeholder="Nom"
+  1044→                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+  1045→                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerLastName: e.target.value })}
+  1046→                      />
+  1047→                    </div>
+  1048→                    <input
+  1049→                      type="tel"
+  1050→                      placeholder="WhatsApp (ex: +33612345678)"
+  1051→                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+  1052→                      onChange={(e) => setSelectedBaggage({ ...selectedBaggage, whatsappOwner: e.target.value })}
+  1053→                    />
+  1054→                    <button
+  1055→                      onClick={async () => {
+  1056→                        try {
+  1057→                          const res = await fetch(`/api/baggage/${selectedBaggage.id}`, {
+  1058→                            method: 'PUT',
+  1059→                            headers: { 'Content-Type': 'application/json' },
+  1060→                            body: JSON.stringify({
+  1061→                              travelerFirstName: selectedBaggage.travelerFirstName,
+  1062→                              travelerLastName: selectedBaggage.travelerLastName,
+  1063→                              whatsappOwner: selectedBaggage.whatsappOwner,
+  1064→                              status: 'active'
+  1065→                            }),
+  1066→                          });
+  1067→                          if (res.ok) {
+  1068→                            fetchBaggages();
+  1069→                            setShowDetailModal(false);
+  1070→                          }
+  1071→                        } catch (error) {
+  1072→                          console.error('Error updating baggage:', error);
+  1073→                        }
+  1074→                      }}
+  1075→                      className="w-full py-2 bg-[#2563EB] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
+  1076→                    >
+  1077→                      Enregistrer
+  1078→                    </button>
+  1079→                  </div>
+  1080→                </div>
+  1081→              )}
+  1082→
+  1083→              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+  1084→                {/* Action Buttons based on status */}
+  1085→                {isActive(selectedBaggage.status) && (
+  1086→                  <button
+  1087→                    onClick={() => handleDeclareLost(selectedBaggage.id)}
+  1088→                    disabled={actionLoading === selectedBaggage.id}
+  1089→                    className="w-full py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+  1090→                  >
+  1091→                    {actionLoading === selectedBaggage.id ? (
+  1092→                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+  1093→                    ) : (
+  1094→                      <>
+  1095→                        <AlertOctagon className="w-4 h-4" />
+  1096→                        Déclarer comme perdu
+  1097→                      </>
+  1098→                    )}
+  1099→                  </button>
+  1100→                )}
+  1101→
+  1102→                {isLost(selectedBaggage.status) && (
+  1103→                  <button
+  1104→                    onClick={() => handleMarkFound(selectedBaggage.id)}
+  1105→                    disabled={actionLoading === selectedBaggage.id}
+  1106→                    className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+  1107→                  >
+  1108→                    {actionLoading === selectedBaggage.id ? (
+  1109→                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+  1110→                    ) : (
+  1111→                      <>
+  1112→                        <CheckCircle className="w-4 h-4" />
+  1113→                        Marquer comme retrouvé
+  1114→                      </>
+  1115→                    )}
+  1116→                  </button>
+  1117→                )}
+  1118→
+  1119→                <Link
+  1120→                  href={`/found/${selectedBaggage.reference}`}
+  1121→                  className="block w-full text-center py-3 bg-blue-600 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium"
+  1122→                >
+  1123→                  Tester le scan
+  1124→                </Link>
+  1125→              </div>
+  1126→            </div>
+  1127→          </div>
+  1128→        </div>
+  1129→      )}
+  1130→
+  1131→      {/* Pilgrim Detail Modal */}
+  1132→      {showPilgrimDetail && selectedPilgrim && (
+  1133→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+  1134→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
+  1135→            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+  1136→              <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+  1137→                <UserRound className="w-5 h-5 text-emerald-600" />
+  1138→                Pass Identity
+  1139→              </h2>
+  1140→              <button
+  1141→                onClick={() => {
+  1142→                  setShowPilgrimDetail(false);
+  1143→                  setSelectedPilgrim(null);
+  1144→                }}
+  1145→                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+  1146→              >
+  1147→                <X className="w-5 h-5 text-slate-400" />
+  1148→              </button>
+  1149→            </div>
+  1150→            <div className="p-6 space-y-4">
+  1151→              <div className="flex items-center gap-3">
+  1152→                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-600/10 rounded-xl flex items-center justify-center">
+  1153→                  <QrCode className="w-6 h-6 text-emerald-600" />
+  1154→                </div>
+  1155→                <div>
+  1156→                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedPilgrim.qrCode}</p>
+  1157→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pass Identity Hajj</p>
+  1158→                </div>
+  1159→              </div>
+  1160→
+  1161→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1162→                <div>
+  1163→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Nom complet</p>
+  1164→                  <p className="text-slate-800 dark:text-white font-medium">{selectedPilgrim.fullName && selectedPilgrim.fullName.trim() !== '' ? selectedPilgrim.fullName : 'Non renseigné'}</p>
+  1165→                </div>
+  1166→                <div>
+  1167→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Nationalité</p>
+  1168→                  <p className="text-slate-800 dark:text-white font-medium">{selectedPilgrim.nationality && selectedPilgrim.nationality.trim() !== '' ? selectedPilgrim.nationality : 'Non renseignée'}</p>
+  1169→                </div>
+  1170→              </div>
+  1171→
+  1172→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1173→                <div>
+  1174→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Groupe sanguin</p>
+  1175→                  {selectedPilgrim.bloodType ? (
+  1176→                    <span className="px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold">{selectedPilgrim.bloodType}</span>
+  1177→                  ) : (
+  1178→                    <p className="text-slate-400">—</p>
+  1179→                  )}
+  1180→                </div>
+  1181→                <div>
+  1182→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
+  1183→                  {selectedPilgrim.isActive ? (
+  1184→                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">Actif</span>
+  1185→                  ) : (
+  1186→                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400">En attente d'activation</span>
+  1187→                  )}
+  1188→                </div>
+  1189→              </div>
+  1190→
+  1191→              {selectedPilgrim.medicalInfo && (
+  1192→                <div>
+  1193→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Informations médicales</p>
+  1194→                  <p className="text-slate-800 dark:text-white text-sm">{selectedPilgrim.medicalInfo}</p>
+  1195→                </div>
+  1196→              )}
+  1197→
+  1198→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+  1199→                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-3">Hébergement</p>
+  1200→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1201→                  <div>
+  1202→                    <p className="text-slate-500 dark:text-slate-400 text-xs">Mecque</p>
+  1203→                    <p className="text-slate-800 dark:text-white text-sm font-medium">{selectedPilgrim.hotelMecca || '—'}{selectedPilgrim.roomMecca ? ` (Ch. ${selectedPilgrim.roomMecca})` : ''}</p>
+  1204→                  </div>
+  1205→                  <div>
+  1206→                    <p className="text-slate-500 dark:text-slate-400 text-xs">Médine</p>
+  1207→                    <p className="text-slate-800 dark:text-white text-sm font-medium">{selectedPilgrim.hotelMedina || '—'}{selectedPilgrim.roomMedina ? ` (Ch. ${selectedPilgrim.roomMedina})` : ''}</p>
+  1208→                  </div>
+  1209→                </div>
+  1210→              </div>
+  1211→
+  1212→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+  1213→                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-3">Contacts</p>
+  1214→                <div className="space-y-2">
+  1215→                  {selectedPilgrim.groupLeaderPhone && (
+  1216→                    <div className="flex items-center gap-2">
+  1217→                      <Phone className="w-4 h-4 text-slate-400" />
+  1218→                      <span className="text-sm text-slate-600 dark:text-slate-300">Chef de groupe: {selectedPilgrim.groupLeaderPhone}</span>
+  1219→                    </div>
+  1220→                  )}
+  1221→                  {selectedPilgrim.familyContact && (
+  1222→                    <div className="flex items-center gap-2">
+  1223→                      <Heart className="w-4 h-4 text-slate-400" />
+  1224→                      <span className="text-sm text-slate-600 dark:text-slate-300">Famille: {selectedPilgrim.familyContact}</span>
+  1225→                    </div>
+  1226→                  )}
+  1227→                </div>
+  1228→              </div>
+  1229→
+  1230→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+  1231→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  1232→                  <div>
+  1233→                    <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
+  1234→                    <p className="text-slate-800 dark:text-white text-sm">{formatDate(selectedPilgrim.createdAt)}</p>
+  1235→                  </div>
+  1236→                  <div>
+  1237→                    <p className="text-slate-500 dark:text-slate-400 text-sm">Expiration</p>
+  1238→                    <p className="text-slate-800 dark:text-white text-sm">{selectedPilgrim.expiresAt ? formatDate(selectedPilgrim.expiresAt) : '—'}</p>
+  1239→                  </div>
+  1240→                </div>
+  1241→              </div>
+  1242→
+  1243→              <Link
+  1244→                href={`/p/${selectedPilgrim.qrCode}`}
+  1245→                className="block w-full text-center py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-medium mt-4"
+  1246→              >
+  1247→                Voir le profil public
+  1248→              </Link>
+  1249→            </div>
+  1250→          </div>
+  1251→        </div>
+  1252→      )}
+  1253→    </div>
+  1254→  );
+  1255→}
+  1256→

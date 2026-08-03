@@ -25,7 +25,8 @@ import {
   ExternalLink,
   Copy,
   ShoppingCart,
-  MoreVertical
+  MoreVertical,
+  UserRound
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,6 +75,7 @@ function Sidebar({ isOpen, setIsOpen, unreadMessages, onLogout, userName, agency
   const menuItems: MenuItem[] = [
     { label: "Tableau de bord", icon: <Home className="w-5 h-5" />, href: "/agence/tableau-de-bord" },
     { label: "Bagages", icon: <Luggage className="w-5 h-5" />, href: "/agence/baggages" },
+    { label: "Identity", icon: <UserRound className="w-5 h-5" />, href: "/agence/identity" },
     { label: "Assistance", icon: <MessageCircle className="w-5 h-5" />, href: "/agence/assistance", badge: unreadMessages },
     { label: "Trouvailles", icon: <CheckCircle className="w-5 h-5" />, href: "/agence/trouvailles" },
     { label: "Perdus", icon: <AlertTriangle className="w-5 h-5" />, href: "/agence/perdus" },
