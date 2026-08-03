@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
     // Parse and validate count
     const count = Math.min(Math.max(Math.floor(body.count || 1), 1), 100);
 
+    // Accept agencyId from request (set by admin when generating for an agency)
+    const agencyId: string | undefined = body.agencyId || undefined;
+
     // Generate unique QR codes
     const qrCodes: string[] = [];
     const uniqueCodes = new Set<string>();
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     const allCodes = Array.from(uniqueCodes);
 
-    // Create Pilgrim records with isActive = false
+    // Create Pilgrim records with isActive = false, with agencyId if provided
     await db.pilgrim.createMany({
       data: allCodes.map((qrCode) => ({
         qrCode,
@@ -93,6 +96,7 @@ export async function POST(request: NextRequest) {
         nationality: '', // Will be filled during activation
         isActive: false,
         duration: '60d', // Fixed 2 months
+        agencyId: agencyId || null,
       })),
     });
 

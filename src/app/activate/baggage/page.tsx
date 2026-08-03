@@ -1,59 +1,50 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Globe, CheckCircle, Loader2, ChevronDown, Luggage } from 'lucide-react';
+import { Camera, Globe, CheckCircle, Loader2, Luggage } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-// ─── Brand constants (Blue Navy + Gold) ───
-const BG = '#fbbf24';
+// ─── Brand constants (original yellow) ───
+const BG = '#f4b400';
 const CARD_BG = '#ffffff';
-const TEXT = '#0f172a';
+const TEXT = '#1a1a1a';
 const MUTED = '#6b7280';
 const INPUT_BG = '#f8fafc';
 const INPUT_BORDER = '#e2e8f0';
-const PRIMARY = '#1e3a8a';
-const PRIMARY_LIGHT = '#3b82f6';
+const BTN_PRIMARY = '#111827';
+const BTN_PRIMARY_HOVER = '#374151';
 const RADIUS = '20px';
 
-// ─── Country codes with flags ───
-const COUNTRY_CODES = [
-  { value: '+221', flag: '🇸🇳', label: 'Sénégal' },
-  { value: '+225', flag: '🇨🇮', label: "Côte d'Ivoire" },
-  { value: '+237', flag: '🇨🇲', label: 'Cameroun' },
-  { value: '+212', flag: '🇲🇦', label: 'Maroc' },
-  { value: '+213', flag: '🇩🇿', label: 'Algérie' },
-  { value: '+216', flag: '🇹🇳', label: 'Tunisie' },
-  { value: '+226', flag: '🇧🇫', label: 'Burkina Faso' },
-  { value: '+223', flag: '🇲🇱', label: 'Mali' },
-  { value: '+227', flag: '🇳🇪', label: 'Niger' },
-  { value: '+966', flag: '🇸🇦', label: 'Arabie Saoudite' },
-  { value: '+33', flag: '🇫🇷', label: 'France' },
-  { value: '+1', flag: '🇺🇸', label: 'USA/Canada' },
-  { value: '+44', flag: '🇬🇧', label: 'Royaume-Uni' },
-  { value: '+32', flag: '🇧🇪', label: 'Belgique' },
-  { value: '+49', flag: '🇩🇪', label: 'Allemagne' },
-];
-
-// Map country codes from IP detection to dial codes
-const COUNTRY_TO_DIAL: Record<string, string> = {
-  SN: '+221', CI: '+225', CM: '+237', MA: '+212',
-  DZ: '+213', TN: '+216', BF: '+226', ML: '+223',
-  NE: '+227', SA: '+966', FR: '+33', BE: '+32',
-  CA: '+1', US: '+1', GB: '+44', DE: '+49',
-};
-
-// ─── Airlines for autocomplete ───
+// ─── Airlines (select dropdown) ───
 const AIRLINES = [
-  'Saudia Airlines', 'Air France', 'Emirates', 'Qatar Airways',
-  'Turkish Airlines', 'Ethiopian Airlines', 'Royal Air Maroc',
-  'Air Algérie', 'Tunisair', 'EgyptAir', 'Kenya Airways',
-  'Lufthansa', 'British Airways', 'KLM', 'Air Sénégal',
-  'Royal Jordanian', 'Kuwait Airways', 'Oman Air',
-  'Gulf Air', 'Flynas', 'flydubai', 'Wizz Air',
-  'Mauritania Airlines', 'Air Côte d\'Ivoire', 'Camair-Co',
+  'Saudia Airlines',
+  'Air France',
+  'Emirates',
+  'Qatar Airways',
+  'Turkish Airlines',
+  'Ethiopian Airlines',
+  'Royal Air Maroc',
+  'Air Algérie',
+  'Tunisair',
+  'EgyptAir',
+  'Kenya Airways',
+  'Lufthansa',
+  'British Airways',
+  'KLM',
+  'Air Sénégal',
+  'Royal Jordanian',
+  'Kuwait Airways',
+  'Oman Air',
+  'Gulf Air',
+  'Flynas',
+  'flydubai',
+  'Wizz Air',
+  'Mauritania Airlines',
+  "Air Côte d'Ivoire",
+  'Camair-Co',
 ];
 
 // ─── Destinations ───
@@ -87,7 +78,7 @@ function LangSelector({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => voi
               type="button"
               onClick={() => { setLang(l); setOpen(false); }}
               className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
-                lang === l ? 'bg-[#fbbf24] text-black' : 'text-black hover:bg-[#fbbf24]/30'
+                lang === l ? 'bg-[#f4b400] text-black' : 'text-black hover:bg-[#f4b400]/30'
               }`}
             >
               {LANG_NAMES[l]}
@@ -110,12 +101,12 @@ const T = {
     fullName: 'Votre nom complet *',
     fullNamePlaceholder: 'Ex: Ahmed Ndiaye',
     whatsapp: 'WhatsApp (Chef de groupe) *',
-    whatsappHint: '📱 Indicatif détecté automatiquement',
-    phonePlaceholder: '77 123 45 67',
+    whatsappHint: 'Ce numéro recevra les alertes si le bagage est trouvé',
+    phonePlaceholder: '+221 77 123 45 67',
     email: 'Email (optionnel)',
     emailPlaceholder: 'email@exemple.com',
     airline: 'Compagnie aérienne *',
-    airlinePlaceholder: 'Rechercher (ex: Saudia, Air France...)',
+    airlinePlaceholder: 'Choisir une compagnie...',
     flightNumber: 'Numéro de vol *',
     flightPlaceholder: 'Ex: SV1234',
     destination: 'Destination *',
@@ -147,12 +138,12 @@ const T = {
     fullName: 'Your full name *',
     fullNamePlaceholder: 'Ex: Ahmed Ndiaye',
     whatsapp: 'WhatsApp (Group leader) *',
-    whatsappHint: '📱 Country code auto-detected',
-    phonePlaceholder: '77 123 45 67',
+    whatsappHint: 'This number will receive alerts if baggage is found',
+    phonePlaceholder: '+221 77 123 45 67',
     email: 'Email (optional)',
     emailPlaceholder: 'email@example.com',
     airline: 'Airline *',
-    airlinePlaceholder: 'Search (e.g: Saudia, Air France...)',
+    airlinePlaceholder: 'Choose an airline...',
     flightNumber: 'Flight number *',
     flightPlaceholder: 'Ex: SV1234',
     destination: 'Destination *',
@@ -184,12 +175,12 @@ const T = {
     fullName: 'الاسم الكامل *',
     fullNamePlaceholder: 'مثال: أحمد نداي',
     whatsapp: 'واتساب (قائد المجموعة) *',
-    whatsappHint: '📱 رمز الدولة مكتشف تلقائياً',
-    phonePlaceholder: '77 123 45 67',
+    whatsappHint: 'سيستقبل هذا الرقم التنبيهات إذا وُجدت الحقيبة',
+    phonePlaceholder: '+221 77 123 45 67',
     email: 'البريد الإلكتروني (اختياري)',
     emailPlaceholder: 'email@example.com',
     airline: 'شركة الطيران *',
-    airlinePlaceholder: 'بحث (مثال: السعودية، إير فرانس...)',
+    airlinePlaceholder: 'اختر شركة...',
     flightNumber: 'رقم الرحلة *',
     flightPlaceholder: 'مثال: SV1234',
     destination: 'الوجهة *',
@@ -214,6 +205,9 @@ const T = {
   },
 };
 
+// ─── Shared input classes ───
+const inputCls = `h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#111827] focus:bg-white focus:ring-2 focus:ring-[#111827]/10`;
+
 // ─── Main Component ───
 function BaggageActivateContent() {
   const router = useRouter();
@@ -228,7 +222,6 @@ function BaggageActivateContent() {
   // Form state
   const [reference, setReference] = useState('');
   const [fullName, setFullName] = useState('');
-  const [countryCode, setCountryCode] = useState('+221');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [airline, setAirline] = useState('');
@@ -244,72 +237,12 @@ function BaggageActivateContent() {
   const [deferredActivation, setDeferredActivation] = useState(false);
   const [activationDate, setActivationDate] = useState('');
 
-  // Autocomplete state
-  const [airlineResults, setAirlineResults] = useState<string[]>([]);
-  const [showAirlineResults, setShowAirlineResults] = useState(false);
-  const airlineRef = useRef<HTMLDivElement>(null);
-
-  // Country code dropdown
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const countryRef = useRef<HTMLDivElement>(null);
-
   // Pre-fill QR from URL
   useEffect(() => {
     if (qrFromUrl) {
       setReference(qrFromUrl.toUpperCase());
     }
   }, [qrFromUrl]);
-
-  // Detect country by IP
-  useEffect(() => {
-    async function detectCountry() {
-      try {
-        const res = await fetch('/api/detect-country');
-        if (res.ok) {
-          const data = await res.json();
-          const dial = COUNTRY_TO_DIAL[data.countryCode];
-          if (dial) {
-            setCountryCode(dial);
-          }
-        }
-      } catch {
-        // Silently fail, keep default +221
-      }
-    }
-    detectCountry();
-  }, []);
-
-  // Close dropdowns on outside click
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (airlineRef.current && !airlineRef.current.contains(e.target as Node)) {
-        setShowAirlineResults(false);
-      }
-      if (countryRef.current && !countryRef.current.contains(e.target as Node)) {
-        setShowCountryDropdown(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  // Airline autocomplete handler
-  const handleAirlineInput = useCallback((value: string) => {
-    setAirline(value);
-    if (value.length < 2) {
-      setAirlineResults([]);
-      setShowAirlineResults(false);
-      return;
-    }
-    const filtered = AIRLINES.filter(a => a.toLowerCase().includes(value.toLowerCase()));
-    setAirlineResults(filtered);
-    setShowAirlineResults(filtered.length > 0);
-  }, []);
-
-  const selectAirline = useCallback((name: string) => {
-    setAirline(name);
-    setShowAirlineResults(false);
-  }, []);
 
   // Photo preview
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -336,7 +269,7 @@ function BaggageActivateContent() {
       toast({ title: 'Numéro WhatsApp requis', variant: 'destructive' });
       return false;
     }
-    if (!airline.trim()) {
+    if (!airline) {
       toast({ title: 'Compagnie aérienne requise', variant: 'destructive' });
       return false;
     }
@@ -393,8 +326,8 @@ function BaggageActivateContent() {
           reference: reference.toUpperCase(),
           travelerFirstName: firstName,
           travelerLastName: lastName,
-          whatsappOwner: `${countryCode}${phone.trim()}`,
-          airlineName: airline.trim(),
+          whatsappOwner: phone.trim(),
+          airlineName: airline,
           flightNumber: flightNumber.trim().toUpperCase(),
           destination,
           departureDate,
@@ -407,12 +340,11 @@ function BaggageActivateContent() {
 
       if (response.ok) {
         const data = await response.json();
-        // Store activation data for confirmation page
         sessionStorage.setItem('activationData', JSON.stringify({
           reference: reference.toUpperCase(),
           firstName,
           lastName,
-          whatsapp: `${countryCode}${phone.trim()}`,
+          whatsapp: phone.trim(),
           airlineName: airline,
           flightNumber,
           destination,
@@ -428,7 +360,7 @@ function BaggageActivateContent() {
           lastName,
           flight: flightNumber,
           destination,
-          chefPhone: `${countryCode}${phone.trim()}`,
+          chefPhone: phone.trim(),
         });
         if (photoUrl) params.set('photo', photoUrl);
         router.push(`/activate/confirmation?${params.toString()}`);
@@ -463,7 +395,7 @@ function BaggageActivateContent() {
       {/* ─── Progress Bar ─── */}
       <div className="w-full max-w-[480px] mb-5">
         <div className="h-1 bg-white/40 rounded-full overflow-hidden">
-          <div className="h-full bg-black rounded-full" style={{ width: '50%', transition: 'width 0.3s ease' }} />
+          <div className="h-full bg-black rounded-full" style={{ width: '50%' }} />
         </div>
       </div>
 
@@ -500,53 +432,21 @@ function BaggageActivateContent() {
               onChange={(e) => setFullName(e.target.value)}
               placeholder={t.fullNamePlaceholder}
               required
-              className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+              className={inputCls}
             />
           </div>
 
-          {/* WhatsApp with Country Code */}
+          {/* WhatsApp - SIMPLE phone input, no country code */}
           <div className="mb-5">
             <Label className="text-[13px] font-semibold mb-1.5 block">{t.whatsapp}</Label>
-            <div className="flex gap-2">
-              {/* Country Code Selector */}
-              <div className="relative" ref={countryRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                  className="h-[52px] w-[110px] flex items-center justify-center gap-1 border-[1.5px] border-[#e2e8f0] rounded-xl bg-[#f8fafc] text-[15px] font-semibold hover:bg-white hover:border-[#1e3a8a] transition-colors"
-                >
-                  {COUNTRY_CODES.find(c => c.value === countryCode)?.flag} {countryCode}
-                  <ChevronDown className="w-3.5 h-3.5 ml-0.5 opacity-50" />
-                </button>
-                {showCountryDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-[220px] bg-white border border-[#e2e8f0] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] max-h-[240px] overflow-y-auto z-50">
-                    {COUNTRY_CODES.map((c) => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => { setCountryCode(c.value); setShowCountryDropdown(false); }}
-                        className={`w-full px-3 py-2.5 text-left text-sm flex items-center gap-2 hover:bg-[#f8fafc] transition-colors ${
-                          countryCode === c.value ? 'bg-[#1e3a8a]/5 font-semibold' : ''
-                        }`}
-                      >
-                        <span className="text-lg">{c.flag}</span>
-                        <span>{c.value}</span>
-                        <span className="text-gray-400 text-xs">{c.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* Phone Number */}
-              <Input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder={t.phonePlaceholder}
-                required
-                className="flex-1 h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
-              />
-            </div>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder={t.phonePlaceholder}
+              required
+              className={inputCls}
+            />
             <p className="text-xs mt-1.5 text-gray-500">{t.whatsappHint}</p>
           </div>
 
@@ -558,37 +458,24 @@ function BaggageActivateContent() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t.emailPlaceholder}
-              className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+              className={inputCls}
             />
           </div>
 
-          {/* Airline Autocomplete */}
+          {/* Airline - SELECT DROPDOWN */}
           <div className="mb-5">
             <Label className="text-[13px] font-semibold mb-1.5 block">{t.airline}</Label>
-            <div className="relative" ref={airlineRef}>
-              <Input
-                value={airline}
-                onChange={(e) => handleAirlineInput(e.target.value)}
-                placeholder={t.airlinePlaceholder}
-                required
-                autoComplete="off"
-                className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
-              />
-              {showAirlineResults && airlineResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#e2e8f0] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] max-h-[200px] overflow-y-auto z-10">
-                  {airlineResults.map((a) => (
-                    <button
-                      key={a}
-                      type="button"
-                      onClick={() => selectAirline(a)}
-                      className="w-full px-3.5 py-3 text-left text-sm hover:bg-[#f8fafc] transition-colors border-b border-[#f1f5f9] last:border-b-0"
-                    >
-                      {a}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <select
+              value={airline}
+              onChange={(e) => setAirline(e.target.value)}
+              required
+              className={`w-full ${inputCls} appearance-none cursor-pointer`}
+            >
+              <option value="">{t.airlinePlaceholder}</option>
+              {AIRLINES.map((a) => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
           </div>
 
           {/* Flight Number */}
@@ -599,7 +486,7 @@ function BaggageActivateContent() {
               onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
               placeholder={t.flightPlaceholder}
               required
-              className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] font-mono tracking-wider focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+              className={`${inputCls} font-mono tracking-wider`}
             />
           </div>
 
@@ -610,7 +497,7 @@ function BaggageActivateContent() {
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               required
-              className="w-full h-[52px] px-3.5 border-[1.5px] border-[#e2e8f0] rounded-xl bg-[#f8fafc] text-[15px] outline-none transition-colors focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10 appearance-none cursor-pointer"
+              className={`w-full ${inputCls} appearance-none cursor-pointer`}
             >
               <option value="">{t.destinationPlaceholder}</option>
               {DESTINATIONS.map((d) => (
@@ -629,13 +516,13 @@ function BaggageActivateContent() {
                 onChange={(e) => setDepartureDate(e.target.value)}
                 min={today}
                 required
-                className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className={inputCls}
               />
               <Input
                 type="time"
                 value={departureTime}
                 onChange={(e) => setDepartureTime(e.target.value)}
-                className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+                className={inputCls}
               />
             </div>
           </div>
@@ -659,7 +546,7 @@ function BaggageActivateContent() {
                   onChange={(e) => setDeferredActivation(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-[#1e3a8a]/20 rounded-full peer peer-checked:bg-[#1e3a8a] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-black/20 rounded-full peer peer-checked:bg-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
               </label>
               <div>
                 <p className="text-sm font-semibold" style={{ color: TEXT }}>{t.deferred}</p>
@@ -674,7 +561,7 @@ function BaggageActivateContent() {
                   value={activationDate}
                   onChange={(e) => setActivationDate(e.target.value)}
                   min={today}
-                  className="h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#1e3a8a] focus:bg-white focus:ring-2 focus:ring-[#1e3a8a]/10"
+                  className={inputCls}
                 />
                 <p className="text-xs mt-1.5 text-gray-500">{t.deferredDateHint}</p>
               </div>
@@ -684,7 +571,7 @@ function BaggageActivateContent() {
           {/* Photo Upload */}
           <div className="mb-6">
             <Label className="text-[13px] font-semibold mb-1.5 block">{t.photo}</Label>
-            <label className="block border-2 border-dashed border-[#e2e8f0] rounded-2xl p-6 text-center bg-[#fafafa] cursor-pointer hover:border-[#1e3a8a] hover:bg-white transition-colors">
+            <label className="block border-2 border-dashed border-[#e2e8f0] rounded-2xl p-6 text-center bg-[#fafafa] cursor-pointer hover:border-black hover:bg-white transition-colors">
               {photoPreview ? (
                 <img src={photoPreview} alt="Aperçu" className="max-w-[150px] max-h-[150px] rounded-xl mx-auto" />
               ) : (
@@ -707,8 +594,8 @@ function BaggageActivateContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(30,58,138,0.3)] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
-            style={{ background: PRIMARY }}
+            className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+            style={{ background: BTN_PRIMARY }}
           >
             {loading ? (
               <>
@@ -732,7 +619,7 @@ function BaggageActivateContent() {
         <a href="/contact" className="text-black font-semibold underline">{t.help}</a>
       </div>
 
-      {/* ─── Keyframe animations (injected via style) ─── */}
+      {/* ─── Keyframe animations ─── */}
       <style jsx global>{`
         @keyframes fadeInDown {
           from { opacity: 0; transform: translateY(-15px); }

@@ -27,6 +27,8 @@ interface DashboardStats {
   qrActivatedVoyageur: number;
   totalPelerins: number;
   totalVoyageurs: number;
+  totalIdentityQR?: number;
+  activatedIdentityQR?: number;
   expiringSoon: number;
   pendingOrders: number;
   totalAgencies: number;
@@ -308,6 +310,8 @@ export default function DashboardPage() {
     qrActivatedVoyageur: 0,
     totalPelerins: 0,
     totalVoyageurs: 0,
+    totalIdentityQR: 0,
+    activatedIdentityQR: 0,
     expiringSoon: 0,
     pendingOrders: 0,
     totalAgencies: 0,
@@ -373,21 +377,21 @@ export default function DashboardPage() {
     { 
       title: 'Total QR Codes', 
       value: stats.totalQR, 
-      subtitle: `👤 ${stats.qrActivatedHajj} Identity + 🧳 ${stats.qrActivatedVoyageur} Bagage actifs`,
+      subtitle: `🧳 ${stats.qrActivatedHajj} Bagage + 👤 ${stats.qrActivatedVoyageur} Identity actifs`,
       icon: <QrCode className="w-6 h-6 text-white" />,
       colorVariant: 'green' as const
     },
     { 
       title: '🧳 Pass Bagage', 
-      value: stats.qrActivatedVoyageur, 
-      subtitle: 'Codes activés',
+      value: stats.qrActivatedHajj, 
+      subtitle: 'Codes Bagage activés',
       icon: <Package className="w-6 h-6 text-white" />,
       colorVariant: 'indigo' as const
     },
     { 
       title: '👤 Pass Identity', 
-      value: stats.totalPelerins + stats.totalVoyageurs, 
-      subtitle: `${stats.totalPelerins} Pèlerins + ${stats.totalVoyageurs} Voyageurs`,
+      value: stats.qrActivatedVoyageur, 
+      subtitle: `${stats.totalIdentityQR || 0} générés, ${stats.activatedIdentityQR || 0} activés`,
       icon: <Users className="w-6 h-6 text-white" />,
       colorVariant: 'green' as const
     },

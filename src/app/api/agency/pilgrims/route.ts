@@ -16,12 +16,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Find users belonging to this agency, then get their pilgrims
+    // Find pilgrims directly by agencyId (set at generation time)
     const pilgrims = await db.pilgrim.findMany({
       where: {
-        owner: {
-          agencyId: agencyId,
-        },
+        agencyId: agencyId,
       },
       orderBy: { createdAt: 'desc' },
     });

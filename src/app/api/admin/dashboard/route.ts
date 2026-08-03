@@ -18,13 +18,25 @@ export async function GET() {
       }
     });
 
+    // Get all pilgrims (Pass Identity)
+    const pilgrims = await db.pilgrim.findMany({
+      select: {
+        id: true,
+        isActive: true,
+        createdAt: true,
+        expiresAt: true,
+        fullName: true,
+        agencyId: true,
+      }
+    });
+
     // Get agencies count
     const agenciesCount = await db.agency.count();
 
     // Calculate statistics
-    const totalQR = baggages.length;
+    const totalQR = baggages.length + pilgrims.length;
     const qrActivatedHajj = baggages.filter(b => b.type === 'hajj' && isActive(b.status)).length;
-    const qrActivatedVoyageur = 0;
+    const qrActivatedIdentity = pilgrims.filter(p => p.isActive).length;
 
     // Count unique pilgrims (Hajj) - group by name
     const hajjBaggages = baggages.filter(b => b.type === 'hajj' && b.travelerFirstName);
@@ -32,19 +44,25 @@ export async function GET() {
       hajjBaggages.map(b => `${b.travelerFirstName}_${b.travelerLastName}`)
     ).size;
 
-    // Count unique travelers (Voyageur)
-    const uniqueVoyageurs = 0;
+    // Count unique voyageurs (Identity / Pass Identity)
+    const uniqueVoyageurs = pilgrims.filter(p => p.fullName && p.fullName.trim() !== '').length;
 
-    // Count expiring soon (within 7 days)
+    // Count expiring soon (within 7 days) — both baggages and pilgrims
     const now = new Date();
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const expiringSoon = baggages.filter(b => 
-      b.expiresAt && 
-      new Date(b.expiresAt) <= sevenDaysFromNow && 
+    const expiringSoonBaggage = baggages.filter(b =>
+      b.expiresAt &&
+      new Date(b.expiresAt) <= sevenDaysFromNow &&
       new Date(b.expiresAt) > now
     ).length;
+    const expiringSoonPilgrim = pilgrims.filter(p =>
+      p.expiresAt &&
+      new Date(p.expiresAt) <= sevenDaysFromNow &&
+      new Date(p.expiresAt) > now
+    ).length;
+    const expiringSoon = expiringSoonBaggage + expiringSoonPilgrim;
 
-    // Get daily activations for the last 7 days
+    // Get daily activations for the last 7 days (combined baggages + pilgrims)
     const last7Days: { day: string; count: number }[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
@@ -52,14 +70,21 @@ export async function GET() {
       const dayStart = new Date(date.setHours(0, 0, 0, 0));
       const dayEnd = new Date(date.setHours(23, 59, 59, 999));
 
-      const dayActivations = baggages.filter(b => {
+      // Baggage activations
+      const dayBaggageActivations = baggages.filter(b => {
         const createdAt = new Date(b.createdAt);
         return createdAt >= dayStart && createdAt <= dayEnd && b.type === 'hajj';
       }).length;
 
+      // Pilgrim (Identity) activations
+      const dayPilgrimActivations = pilgrims.filter(p => {
+        const createdAt = new Date(p.createdAt);
+        return createdAt >= dayStart && createdAt <= dayEnd;
+      }).length;
+
       last7Days.push({
         day: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][date.getDay()],
-        count: Math.floor(dayActivations / 3), // Divide by 3 to get pilgrim count
+        count: Math.floor(dayBaggageActivations / 2) + dayPilgrimActivations, // Divide baggage by 2 (2 per pilgrim), add identity
       });
     }
 
@@ -92,7 +117,7 @@ export async function GET() {
 
     const recentActivities: ActivityType[] = recentScans.map((scan) => {
       const timeAgo = getTimeAgo(new Date(scan.createdAt));
-      const name = scan.baggage.travelerFirstName 
+      const name = scan.baggage.travelerFirstName
         ? `${scan.baggage.travelerFirstName} ${scan.baggage.travelerLastName || ''} - Hajj`
         : `Scan ${scan.baggage.reference}`;
 
@@ -118,21 +143,39 @@ export async function GET() {
           name: `${b.travelerFirstName} ${b.travelerLastName || ''} - Hajj`,
           reference: '',
           time: getTimeAgo(new Date(b.createdAt)),
-          details: '3 QR activés',
+          details: '2 QR activés',
           status: 'success' as const,
         }));
 
       recentActivities.push(...recentActivations);
     }
 
+    // Add pilgrim activations to recent activities
+    const recentPilgrimActivations: ActivityType[] = pilgrims
+      .filter(p => p.isActive && p.fullName && p.fullName.trim() !== '')
+      .slice(0, 5)
+      .map((p, index) => ({
+        id: `pilgrim-activation-${index}`,
+        type: 'activation' as const,
+        name: `${p.fullName} - Identity`,
+        reference: '',
+        time: getTimeAgo(new Date(p.createdAt)),
+        details: '👤 Pass Identity activé',
+        status: 'success' as const,
+      }));
+
+    recentActivities.push(...recentPilgrimActivations);
+
     const stats = {
       totalQR,
       qrActivatedHajj,
-      qrActivatedVoyageur,
+      qrActivatedVoyageur: qrActivatedIdentity, // Identity = Voyageur in the UI
       totalPelerins: uniquePelerins,
       totalVoyageurs: uniqueVoyageurs,
+      totalIdentityQR: pilgrims.length, // Total identity QR generated
+      activatedIdentityQR: qrActivatedIdentity, // Identity QR activated
       expiringSoon,
-      pendingOrders: 0, // Placeholder for B2B orders feature
+      pendingOrders: 0,
       totalAgencies: agenciesCount,
     };
 

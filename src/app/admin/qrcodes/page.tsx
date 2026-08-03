@@ -352,7 +352,8 @@ export default function QRCodesPage() {
   // Filter buttons
   const filterButtons = [
     { id: 'all', label: 'Tous' },
-    { id: 'hajj', label: 'Hajj' },
+    { id: 'hajj', label: '🧳 Bagage' },
+    { id: 'identity', label: '👤 Identity' },
   ];
 
   // KPI Cards

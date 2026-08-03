@@ -5,23 +5,24 @@ import { db } from '@/lib/db';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // 'hajj' or 'voyageur'
+    const type = searchParams.get('type'); // 'hajj', 'identity', or 'all'
     const search = searchParams.get('search');
     const agencyId = searchParams.get('agencyId');
 
-    // Build where clause
-    const where: Record<string, unknown> = {};
-    
-    if (type && type !== 'all') {
-      where.type = type;
+    // ─── Baggage QR sets ───
+    const baggageWhere: Record<string, unknown> = {};
+
+    if (type && type !== 'all' && type !== 'identity') {
+      baggageWhere.type = type;
     }
-    
+    // If type is 'identity', skip baggage query entirely
+
     if (agencyId) {
-      where.agencyId = agencyId;
+      baggageWhere.agencyId = agencyId;
     }
-    
+
     if (search) {
-      where.OR = [
+      baggageWhere.OR = [
         { reference: { contains: search.toUpperCase() } },
         { setId: { contains: search.toUpperCase() } },
         { travelerFirstName: { contains: search } },
@@ -29,14 +30,14 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Get all baggages
-    const baggages = await db.baggage.findMany({
-      where,
+    // Get baggages (skip if type is 'identity')
+    const baggages = type === 'identity' ? [] : await db.baggage.findMany({
+      where: baggageWhere,
       include: { agency: true },
       orderBy: { createdAt: 'desc' },
     });
 
-    // Group by setId or create virtual sets based on reference prefix (first part before -)
+    // Group baggages by setId
     const setsMap = new Map<string, {
       id: string;
       setId: string;
@@ -52,9 +53,8 @@ export async function GET(request: NextRequest) {
     }>();
 
     baggages.forEach((baggage) => {
-      // Use setId if available, otherwise group by reference prefix (e.g., HAJJ26)
       const setId = baggage.setId || baggage.reference.split('-')[0];
-      
+
       if (!setsMap.has(setId)) {
         setsMap.set(setId, {
           id: setId,
@@ -66,29 +66,69 @@ export async function GET(request: NextRequest) {
           qrCount: 0,
           references: [],
           status: 'generated',
-          travelerName: baggage.travelerFirstName 
+          travelerName: baggage.travelerFirstName
             ? `${baggage.travelerFirstName} ${baggage.travelerLastName || ''}`.trim()
             : null,
           baggageIds: [],
         });
       }
-      
+
       const set = setsMap.get(setId)!;
       set.qrCount++;
       set.references.push(baggage.reference);
       set.baggageIds.push(baggage.id);
     });
 
+    // ─── Identity (Pilgrim) QR sets ───
+    // Show pilgrims unless type filter explicitly excludes them
+    if (type !== 'hajj') {
+      const pilgrimWhere: Record<string, unknown> = {};
+      if (agencyId) {
+        pilgrimWhere.agencyId = agencyId;
+      }
+      if (search) {
+        pilgrimWhere.OR = [
+          { qrCode: { contains: search.toUpperCase() } },
+          { fullName: { contains: search } },
+        ];
+      }
+
+      const pilgrims = await db.pilgrim.findMany({
+        where: pilgrimWhere,
+        include: { agency: true },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Group pilgrims — each pilgrim is its own "set" with 1 QR
+      pilgrims.forEach((pilgrim) => {
+        const setId = `IDENTITY-${pilgrim.qrCode}`;
+        setsMap.set(setId, {
+          id: setId,
+          setId: setId,
+          type: 'identity',
+          agencyId: pilgrim.agencyId,
+          agencyName: pilgrim.agency?.name || null,
+          createdAt: pilgrim.createdAt,
+          qrCount: 1,
+          references: [pilgrim.qrCode],
+          status: pilgrim.isActive ? 'active' : 'pending_activation',
+          travelerName: pilgrim.fullName && pilgrim.fullName.trim() !== '' ? pilgrim.fullName : null,
+          baggageIds: [pilgrim.id],
+        });
+      });
+    }
+
     // Convert to array and sort by date
-    const sets = Array.from(setsMap.values()).sort((a, b) => 
+    const sets = Array.from(setsMap.values()).sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     // Calculate stats
     const stats = {
       totalSets: sets.length,
-      totalQr: baggages.length,
+      totalQr: baggages.length + (type !== 'hajj' ? (await db.pilgrim.count()) : 0),
       hajjSets: sets.filter(s => s.type === 'hajj').length,
+      identitySets: sets.filter(s => s.type === 'identity').length,
     };
 
     return NextResponse.json({
@@ -120,7 +160,29 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`[DELETE QR] Attempting to delete set: ${setId}`);
 
-    // Build the where clause - match by setId OR by reference prefix
+    // Check if this is an Identity (Pilgrim) set
+    if (setId.startsWith('IDENTITY-')) {
+      const qrCode = setId.replace('IDENTITY-', '');
+      const pilgrim = await db.pilgrim.findUnique({ where: { qrCode } });
+
+      if (!pilgrim) {
+        return NextResponse.json(
+          { error: 'Pilgrim not found', setId },
+          { status: 404 }
+        );
+      }
+
+      await db.pilgrim.delete({ where: { id: pilgrim.id } });
+
+      return NextResponse.json({
+        success: true,
+        deletedCount: 1,
+        setId,
+        deletedReferences: [qrCode],
+      });
+    }
+
+    // Baggage set deletion
     const whereClause = {
       OR: [
         { setId: setId },
@@ -128,7 +190,6 @@ export async function DELETE(request: NextRequest) {
       ]
     };
 
-    // Find all baggages matching this set
     const baggages = await db.baggage.findMany({
       where: whereClause,
       select: { id: true, reference: true }
@@ -146,15 +207,14 @@ export async function DELETE(request: NextRequest) {
 
     const baggageIds = baggages.map(b => b.id);
 
-    // Delete baggages (ScanLogs will be cascade deleted automatically)
-    const deleteResult = await db.baggage.deleteMany({ 
-      where: { id: { in: baggageIds } } 
+    const deleteResult = await db.baggage.deleteMany({
+      where: { id: { in: baggageIds } }
     });
 
     console.log(`[DELETE QR] Successfully deleted ${deleteResult.count} baggages`);
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       deletedCount: deleteResult.count,
       setId,
       deletedReferences: baggages.map(b => b.reference)

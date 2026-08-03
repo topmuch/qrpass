@@ -68,6 +68,7 @@ model Agency {
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
   baggages  Baggage[]
+  pilgrims  Pilgrim[]
   users     User[]
   invoices  Invoice[]
 }
@@ -567,6 +568,8 @@ model Pilgrim {
   expiresAt        DateTime?
   ownerId          String?
   owner            User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  agencyId         String?  // Direct link to agency (set at generation time)
+  agency           Agency?  @relation(fields: [agencyId], references: [id], onDelete: SetNull)
   reports          PilgrimReport[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -574,6 +577,7 @@ model Pilgrim {
   @@index([qrCode])
   @@index([isActive])
   @@index([createdAt])
+  @@index([agencyId])
 }
 
 // PilgrimReport model - someone found/reported a pilgrim in need
