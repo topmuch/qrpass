@@ -350,3 +350,29 @@ Stage Summary:
 - Logo larger in header, properly rounded in footer
 - Contact button added to navigation
 - Contact page fully redesigned with modern, clear layout
+
+---
+Task ID: 1
+Agent: main
+Task: Fix multiple QR code and UI issues: logo on finder page, QR code identity in agency dashboard, broken scan flow
+
+Work Log:
+- Fixed logo not displaying on finder page (/found/[code]/page.tsx) by adding white background container with borderRadius and padding, matching other pages
+- Fixed critical flow bug: when scanning a non-activated Pilgrim QR code (PH-P-XXXXX), the page now redirects to /activate/identity?code=... instead of showing a broken selector with grayed-out Pass Identity
+- Fixed Pass Identity card always being grayed out: now shows "Activer votre bracelet d'identification" with amber "Activer" badge when not activated, and "Identité et informations médicales" with green chevron when activated
+- Fixed Pass Bagage card showing when no baggage exists: now only shows Pass Bagage card if lookupData.baggage is true
+- Added complete Pass Identity section to agency baggages page (/agence/baggages/page.tsx):
+  - New Pilgrim interface and state variables
+  - fetchPilgrims() function calling /api/agency/pilgrims API
+  - Stats cards showing Total Identity, Activated, Pending counts
+  - Full table with QR code, pilgrim name, blood type, hotel Mecca, status, and detail action
+  - Pilgrim detail modal showing all info: name, nationality, blood type, medical info, hotels (Mecca & Medina), contacts, dates, and "Voir le profil public" link
+- Added UserRound, Heart, Hotel, Phone icons to lucide-react import
+
+Stage Summary:
+- Logo now displays correctly on finder page with white background container
+- Scanning a Pilgrim-only QR code (PH-P-XXXXX) now redirects to activation page instead of broken selector
+- Pass Identity card is clickable for both activated and non-activated states
+- Pass Bagage card only shows when baggage data exists
+- Agency dashboard now shows all 3 Pass Identity QR codes in a dedicated section with full detail modal
+- All browser tests pass: /found/PH-P-G6ZE5 → /activate/identity, /found/HAJJ26-TEST01 → /scan/..., agency baggages page shows Identity section

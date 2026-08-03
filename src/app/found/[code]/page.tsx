@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Luggage, UserCircle, AlertCircle, Loader2, Globe, ChevronRight, Shield } from 'lucide-react';
+import { Luggage, UserCircle, AlertCircle, Globe, ChevronRight, Shield } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import Image from 'next/image';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -96,21 +96,29 @@ export default function FoundSelectorPage() {
 
         // Smart routing: skip selector when only one type is available
         const hasBaggage = data.baggage;
-        const hasActivePilgrim = data.pilgrim && data.pilgrimActive && data.pilgrimCode;
+        const hasPilgrim = data.pilgrim && data.pilgrimCode;
+        const hasActivePilgrim = hasPilgrim && data.pilgrimActive;
 
-        if (hasBaggage && !hasActivePilgrim) {
-          // Only baggage found (no activated pilgrim) → go directly to scan/finder page
+        // Case 1: Only baggage found (no pilgrim at all) → go to scan page
+        if (hasBaggage && !hasPilgrim) {
           router.replace('/scan/' + code);
           return;
         }
 
+        // Case 2: Only activated pilgrim found (no baggage) → go to pilgrim profile
         if (!hasBaggage && hasActivePilgrim) {
-          // Only activated pilgrim found (no baggage) → go directly to pilgrim profile page
           router.replace('/p/' + data.pilgrimCode);
           return;
         }
 
-        // Both types available (baggage + activated pilgrim) → show selector so user can choose
+        // Case 3: Only non-activated pilgrim found (no baggage) → go to identity activation
+        if (!hasBaggage && hasPilgrim && !data.pilgrimActive) {
+          router.replace('/activate/identity?code=' + encodeURIComponent(data.pilgrimCode!));
+          return;
+        }
+
+        // Case 4: Baggage + activated pilgrim → show selector (both available)
+        // Case 5: Baggage + non-activated pilgrim → show selector (baggage works, identity needs activation)
         setState('selector');
       } catch {
         setState('error');
@@ -125,7 +133,18 @@ export default function FoundSelectorPage() {
       {/* ─── Header ─── */}
       <div className="w-full flex items-center justify-between px-5 pt-4 pb-2">
         <div className="flex items-center">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+          <Image
+            src="/logo.png"
+            alt="PassHajj"
+            width={120}
+            height={46}
+            style={{
+              objectFit: 'contain',
+              background: 'rgba(255,255,255,0.95)',
+              borderRadius: '10px',
+              padding: '4px 8px',
+            }}
+          />
         </div>
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
@@ -244,83 +263,87 @@ export default function FoundSelectorPage() {
 
               {/* Two large selector cards */}
               <div className="w-full flex flex-col gap-4">
-                {/* Pass Bagage Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 180 }}
-                >
-                  <div
-                    className="rounded-[20px] p-5 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
-                    style={{ background: CARD_BG }}
-                    onClick={() => router.push('/scan/' + code)}
+                {/* Pass Bagage Card - only show if baggage exists */}
+                {lookupData?.baggage && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 180 }}
                   >
-                    <div className="flex items-center gap-4 w-full">
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: BTN_PRIMARY }}
-                      >
-                        <Luggage className="w-7 h-7 text-white" />
+                    <div
+                      className="rounded-[20px] p-5 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                      style={{ background: CARD_BG }}
+                      onClick={() => router.push('/scan/' + code)}
+                    >
+                      <div className="flex items-center gap-4 w-full">
+                        <div
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                          style={{ background: BTN_PRIMARY }}
+                        >
+                          <Luggage className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <h3 className="text-lg font-bold" style={{ color: INK }}>
+                            Pass Bagage
+                          </h3>
+                          <p className="text-sm mt-0.5" style={{ color: MUTED }}>
+                            Protéger et retrouver vos bagages
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 shrink-0" style={{ color: MUTED }} />
                       </div>
-                      <div className="flex-1 text-left">
-                        <h3 className="text-lg font-bold" style={{ color: INK }}>
-                          Pass Bagage
-                        </h3>
-                        <p className="text-sm mt-0.5" style={{ color: MUTED }}>
-                          Protéger et retrouver vos bagages
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 shrink-0" style={{ color: MUTED }} />
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                )}
 
-                {/* Pass Identity Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.35, type: 'spring', stiffness: 180 }}
-                >
-                  <div
-                    className={`rounded-[20px] p-5 shadow-lg transition-all duration-200 ${
-                      lookupData?.pilgrimActive
-                        ? 'cursor-pointer hover:shadow-xl active:scale-[0.98]'
-                        : 'opacity-50 cursor-not-allowed'
-                    }`}
-                    style={{ background: CARD_BG }}
-                    onClick={() => {
-                      if (lookupData?.pilgrimActive && lookupData?.pilgrimCode) {
-                        router.push('/p/' + lookupData.pilgrimCode);
-                      }
-                    }}
+                {/* Pass Identity Card - clickable for both activated and non-activated */}
+                {lookupData?.pilgrim && lookupData?.pilgrimCode && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35, type: 'spring', stiffness: 180 }}
                   >
-                    <div className="flex items-center gap-4 w-full">
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: lookupData?.pilgrimActive ? '#059669' : '#9ca3af' }}
-                      >
-                        <UserCircle className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <h3 className="text-lg font-bold" style={{ color: INK }}>
-                          Pass Identity
-                        </h3>
-                        <p className="text-sm mt-0.5" style={{ color: MUTED }}>
-                          {lookupData?.pilgrimActive
-                            ? 'Identité et informations médicales'
-                            : 'Non activé pour ce code'}
-                        </p>
-                      </div>
-                      <div className="shrink-0">
-                        {lookupData?.pilgrimActive ? (
-                          <ChevronRight className="w-5 h-5" style={{ color: MUTED }} />
-                        ) : (
-                          <span className="text-xs font-medium px-2 py-1 rounded" style={{ color: MUTED, background: INPUT_BG }}>Bientôt</span>
-                        )}
+                    <div
+                      className="rounded-[20px] p-5 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                      style={{ background: CARD_BG }}
+                      onClick={() => {
+                        if (lookupData.pilgrimActive && lookupData.pilgrimCode) {
+                          // Already activated → go to profile page
+                          router.push('/p/' + lookupData.pilgrimCode);
+                        } else if (lookupData.pilgrimCode) {
+                          // Not activated → go to activation page
+                          router.push('/activate/identity?code=' + encodeURIComponent(lookupData.pilgrimCode));
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-4 w-full">
+                        <div
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                          style={{ background: lookupData.pilgrimActive ? '#059669' : '#f59e0b' }}
+                        >
+                          <UserCircle className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <h3 className="text-lg font-bold" style={{ color: INK }}>
+                            Pass Identity
+                          </h3>
+                          <p className="text-sm mt-0.5" style={{ color: MUTED }}>
+                            {lookupData.pilgrimActive
+                              ? 'Identité et informations médicales'
+                              : 'Activer votre bracelet d\'identification'}
+                          </p>
+                        </div>
+                        <div className="shrink-0">
+                          {lookupData.pilgrimActive ? (
+                            <ChevronRight className="w-5 h-5" style={{ color: MUTED }} />
+                          ) : (
+                            <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-white" style={{ background: '#f59e0b' }}>Activer</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                )}
               </div>
 
               {/* Trust note */}

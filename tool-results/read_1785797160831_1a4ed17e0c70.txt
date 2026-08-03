@@ -1,0 +1,919 @@
+     1→     1→'use client';
+     2→     2→
+     3→     3→import { useState, useEffect } from 'react';
+     4→     4→import Link from 'next/link';
+     5→     5→import {
+     6→     6→  Luggage,
+     7→     7→  Search,
+     8→     8→  Eye,
+     9→     9→  Clock,
+    10→    10→  AlertTriangle,
+    11→    11→  CheckCircle,
+    12→    12→  MapPin,
+    13→    13→  QrCode,
+    14→    14→  X,
+    15→    15→  Plus,
+    16→    16→  Filter,
+    17→    17→  AlertOctagon,
+    18→    18→  Trash2,
+    19→    19→  Loader2
+    20→    20→} from "lucide-react";
+    21→    21→import { useAgency } from '../layout';
+    22→    22→import { isActive, isPending } from '@/lib/status';
+    23→    23→
+    24→    24→interface Baggage {
+    25→    25→  id: string;
+    26→    26→  reference: string;
+    27→    27→  type: string;
+    28→    28→  travelerFirstName: string | null;
+    29→    29→  travelerLastName: string | null;
+    30→    30→  whatsappOwner: string | null;
+    31→    31→  baggageIndex: number;
+    32→    32→  baggageType: string;
+    33→    33→  status: string;
+    34→    34→  createdAt: string;
+    35→    35→  expiresAt: string | null;
+    36→    36→  lastScanDate: string | null;
+    37→    37→  lastLocation: string | null;
+    38→    38→}
+    39→    39→
+    40→    40→export default function BaggagesPage() {
+    41→    41→  const { agencyId, agencyName } = useAgency();
+    42→    42→  const [baggages, setBaggages] = useState<Baggage[]>([]);
+    43→    43→  const [filteredBaggages, setFilteredBaggages] = useState<Baggage[]>([]);
+    44→    44→  const [loading, setLoading] = useState(true);
+    45→    45→  const [search, setSearch] = useState('');
+    46→    46→  const [statusFilter, setStatusFilter] = useState('all');
+    47→    47→  const [selectedBaggage, setSelectedBaggage] = useState<Baggage | null>(null);
+    48→    48→  const [showDetailModal, setShowDetailModal] = useState(false);
+    49→    49→  const [actionLoading, setActionLoading] = useState<string | null>(null);
+    50→    50→
+    51→    51→  // Bulk selection state
+    52→    52→  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    53→    53→  const [deleteLoading, setDeleteLoading] = useState(false);
+    54→    54→  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    55→    55→
+    56→    56→  useEffect(() => {
+    57→    57→    fetchBaggages();
+    58→    58→  }, [agencyId]);
+    59→    59→
+    60→    60→  useEffect(() => {
+    61→    61→    filterBaggages();
+    62→    62→  }, [baggages, search, statusFilter]);
+    63→    63→
+    64→    64→  const fetchBaggages = async () => {
+    65→    65→    try {
+    66→    66→      const params = new URLSearchParams({
+    67→    67→        agencyId: agencyId,
+    68→    68→      });
+    69→    69→
+    70→    70→      const response = await fetch(`/api/agency/baggages?${params}`);
+    71→    71→      const data = await response.json();
+    72→    72→      setBaggages(data.baggages || []);
+    73→    73→    } catch (error) {
+    74→    74→      console.error('Error fetching baggages:', error);
+    75→    75→    } finally {
+    76→    76→      setLoading(false);
+    77→    77→    }
+    78→    78→  };
+    79→    79→
+    80→    80→  const filterBaggages = () => {
+    81→    81→    let filtered = [...baggages];
+    82→    82→
+    83→    83→    if (statusFilter !== 'all') {
+    84→    84→      filtered = filtered.filter(b => b.status === statusFilter);
+    85→    85→    }
+    86→    86→
+    87→    87→    if (search.trim()) {
+    88→    88→      const searchLower = search.toLowerCase();
+    89→    89→      filtered = filtered.filter(b =>
+    90→    90→        b.reference.toLowerCase().includes(searchLower) ||
+    91→    91→        `${b.travelerFirstName || ''} ${b.travelerLastName || ''}`.toLowerCase().includes(searchLower)
+    92→    92→      );
+    93→    93→    }
+    94→    94→
+    95→    95→    setFilteredBaggages(filtered);
+    96→    96→  };
+    97→    97→
+    98→    98→  // AGENCY-FIX: Split filtered baggages into activated and pending sections
+    99→    99→  const activatedBaggages = filteredBaggages.filter(b =>
+   100→   100→    isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked'
+   101→   101→  );
+   102→   102→  const pendingBaggages = filteredBaggages.filter(b =>
+   103→   103→    isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
+   104→   104→  );
+   105→   105→
+   106→   106→  // Bulk selection handlers
+   107→   107→  const toggleSelect = (id: string) => {
+   108→   108→    setSelectedIds(prev => {
+   109→   109→      const next = new Set(prev);
+   110→   110→      if (next.has(id)) {
+   111→   111→        next.delete(id);
+   112→   112→      } else {
+   113→   113→        next.add(id);
+   114→   114→      }
+   115→   115→      return next;
+   116→   116→    });
+   117→   117→  };
+   118→   118→
+   119→   119→  const toggleSelectAll = (baggageList: Baggage[]) => {
+   120→   120→    setSelectedIds(prev => {
+   121→   121→      const next = new Set(prev);
+   122→   122→      const allSelected = baggageList.every(b => next.has(b.id));
+   123→   123→      if (allSelected) {
+   124→   124→        // Deselect all in this list
+   125→   125→        for (const b of baggageList) {
+   126→   126→          next.delete(b.id);
+   127→   127→        }
+   128→   128→      } else {
+   129→   129→        // Select all in this list
+   130→   130→        for (const b of baggageList) {
+   131→   131→          next.add(b.id);
+   132→   132→        }
+   133→   133→      }
+   134→   134→      return next;
+   135→   135→    });
+   136→   136→  };
+   137→   137→
+   138→   138→  const handleBulkDelete = async () => {
+   139→   139→    if (selectedIds.size === 0) return;
+   140→   140→    setShowDeleteConfirm(true);
+   141→   141→  };
+   142→   142→
+   143→   143→  const confirmBulkDelete = async () => {
+   144→   144→    setDeleteLoading(true);
+   145→   145→    try {
+   146→   146→      const response = await fetch('/api/agency/baggages', {
+   147→   147→        method: 'DELETE',
+   148→   148→        headers: { 'Content-Type': 'application/json' },
+   149→   149→        body: JSON.stringify({
+   150→   150→          agencyId,
+   151→   151→          ids: Array.from(selectedIds),
+   152→   152→        }),
+   153→   153→      });
+   154→   154→
+   155→   155→      const data = await response.json();
+   156→   156→
+   157→   157→      if (response.ok) {
+   158→   158→        // Remove deleted items from local state
+   159→   159→        const deletedSet = new Set(selectedIds);
+   160→   160→        setBaggages(prev => prev.filter(b => !deletedSet.has(b.id)));
+   161→   161→        setSelectedIds(new Set());
+   162→   162→        setShowDeleteConfirm(false);
+   163→   163→        alert(`${data.deleted} QR code(s) supprimé(s) avec succès`);
+   164→   164→      } else {
+   165→   165→        alert(data.error || 'Erreur lors de la suppression');
+   166→   166→      }
+   167→   167→    } catch (error) {
+   168→   168→      console.error('Bulk delete error:', error);
+   169→   169→      alert('Erreur lors de la suppression');
+   170→   170→    } finally {
+   171→   171→      setDeleteLoading(false);
+   172→   172→    }
+   173→   173→  };
+   174→   174→
+   175→   175→  const handleDeleteAllPending = async () => {
+   176→   176→    if (!confirm(`Supprimer TOUS les QR codes en attente d'activation de votre agence ?\n\nCette action est irréversible.`)) return;
+   177→   177→
+   178→   178→    setDeleteLoading(true);
+   179→   179→    try {
+   180→   180→      const response = await fetch('/api/agency/baggages', {
+   181→   181→        method: 'DELETE',
+   182→   182→        headers: { 'Content-Type': 'application/json' },
+   183→   183→        body: JSON.stringify({
+   184→   184→          agencyId,
+   185→   185→          status: 'pending_activation',
+   186→   186→        }),
+   187→   187→      });
+   188→   188→
+   189→   189→      const data = await response.json();
+   190→   190→
+   191→   191→      if (response.ok) {
+   192→   192→        setBaggages(prev => prev.filter(b => !isPending(b.status)));
+   193→   193→        setSelectedIds(new Set());
+   194→   194→        alert(`${data.deleted} QR code(s) en attente supprimé(s)`);
+   195→   195→      } else {
+   196→   196→        alert(data.error || 'Erreur lors de la suppression');
+   197→   197→      }
+   198→   198→    } catch (error) {
+   199→   199→      console.error('Delete all pending error:', error);
+   200→   200→      alert('Erreur lors de la suppression');
+   201→   201→    } finally {
+   202→   202→      setDeleteLoading(false);
+   203→   203→    }
+   204→   204→  };
+   205→   205→
+   206→   206→  const formatDate = (dateString: string | null) => {
+   207→   207→    if (!dateString) return 'Jamais';
+   208→   208→    const date = new Date(dateString);
+   209→   209→    return date.toLocaleDateString('fr-FR', {
+   210→   210→      day: '2-digit',
+   211→   211→      month: '2-digit',
+   212→   212→      year: 'numeric'
+   213→   213→    });
+   214→   214→  };
+   215→   215→
+   216→   216→  const formatDateTime = (dateString: string | null) => {
+   217→   217→    if (!dateString) return '-';
+   218→   218→    const date = new Date(dateString);
+   219→   219→    return date.toLocaleDateString('fr-FR', {
+   220→   220→      day: '2-digit',
+   221→   221→      month: '2-digit',
+   222→   222→      year: 'numeric'
+   223→   223→    }) + ' à ' + date.toLocaleTimeString('fr-FR', {
+   224→   224→      hour: '2-digit',
+   225→   225→      minute: '2-digit'
+   226→   226→    });
+   227→   227→  };
+   228→   228→
+   229→   229→  // Handle Declare Lost
+   230→   230→  const handleDeclareLost = async (baggageId: string) => {
+   231→   231→    if (!confirm('⚠️ Êtes-vous sûr de vouloir déclarer ce bagage comme perdu ?\n\nUne alerte sera envoyée au SuperAdmin.')) return;
+   232→   232→
+   233→   233→    setActionLoading(baggageId);
+   234→   234→    try {
+   235→   235→      const response = await fetch(`/api/baggage/${baggageId}/declare-lost`, {
+   236→   236→        method: 'PUT',
+   237→   237→      });
+   238→   238→      const data = await response.json();
+   239→   239→
+   240→   240→      if (response.ok) {
+   241→   241→        setBaggages(prev => prev.map(b => 
+   242→   242→          b.id === baggageId ? { ...b, status: 'lost' } : b
+   243→   243→        ));
+   244→   244→        setShowDetailModal(false);
+   245→   245→        setSelectedBaggage(null);
+   246→   246→      } else {
+   247→   247→        alert(data.error || 'Erreur lors de la déclaration');
+   248→   248→      }
+   249→   249→    } catch (error) {
+   250→   250→      console.error('Declare lost error:', error);
+   251→   251→      alert('Erreur lors de la déclaration');
+   252→   252→    } finally {
+   253→   253→      setActionLoading(null);
+   254→   254→    }
+   255→   255→  };
+   256→   256→
+   257→   257→  // Handle Mark Found
+   258→   258→  const handleMarkFound = async (baggageId: string) => {
+   259→   259→    if (!confirm('✅ Marquer ce bagage comme retrouvé ?')) return;
+   260→   260→
+   261→   261→    setActionLoading(baggageId);
+   262→   262→    try {
+   263→   263→      const response = await fetch(`/api/baggage/${baggageId}/mark-found`, {
+   264→   264→        method: 'PUT',
+   265→   265→      });
+   266→   266→      const data = await response.json();
+   267→   267→
+   268→   268→      if (response.ok) {
+   269→   269→        setBaggages(prev => prev.map(b => 
+   270→   270→          b.id === baggageId ? { ...b, status: 'found' } : b
+   271→   271→        ));
+   272→   272→        setShowDetailModal(false);
+   273→   273→        setSelectedBaggage(null);
+   274→   274→      } else {
+   275→   275→        alert(data.error || 'Erreur lors de la mise à jour');
+   276→   276→      }
+   277→   277→    } catch (error) {
+   278→   278→      console.error('Mark found error:', error);
+   279→   279→      alert('Erreur lors de la mise à jour');
+   280→   280→    } finally {
+   281→   281→      setActionLoading(null);
+   282→   282→    }
+   283→   283→  };
+   284→   284→
+   285→   285→  const getStatusBadge = (status: string) => {
+   286→   286→    const statusConfig: Record<string, { label: string; className: string }> = {
+   287→   287→      pending_activation: { label: 'En attente', className: 'bg-amber-100 dark:bg-blue-600/10 text-amber-700 dark:text-blue-500' },
+   288→   288→      active: { label: 'Actif', className: 'bg-emerald-100 dark:bg-blue-600/10 text-emerald-700 dark:text-blue-500' },
+   289→   289→      scanned: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
+   290→   290→      lost: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
+   291→   291→      found: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
+   292→   292→      blocked: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+   293→   293→    };
+   294→   294→
+   295→   295→    const config = statusConfig[status] || { label: status, className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' };
+   296→   296→
+   297→   297→    return (
+   298→   298→      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
+   299→   299→        {config.label}
+   300→   300→      </span>
+   301→   301→    );
+   302→   302→  };
+   303→   303→
+   304→   304→  const filterButtons = [
+   305→   305→    { id: 'all', label: 'Tous' },
+   306→   306→    { id: 'scanned', label: 'Scannés' },
+   307→   307→    { id: 'pending_activation', label: 'En attente' },
+   308→   308→    { id: 'lost', label: 'Perdus' },
+   309→   309→    { id: 'found', label: 'Retrouvés' },
+   310→   310→  ];
+   311→   311→
+   312→   312→  return (
+   313→   313→    <div className="max-w-7xl mx-auto">
+   314→   314→      {/* Header */}
+   315→   315→      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+   316→   316→        <div>
+   317→   317→          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Gestion des bagages</h1>
+   318→   318→          <p className="text-slate-500 dark:text-slate-400 mt-1">Liste complète des bagages de votre agence</p>
+   319→   319→        </div>
+   320→   320→        {/* Delete All Pending Button */}
+   321→   321→        {pendingBaggages.length > 0 && selectedIds.size === 0 && (
+   322→   322→          <button
+   323→   323→            onClick={handleDeleteAllPending}
+   324→   324→            disabled={deleteLoading}
+   325→   325→            className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-rose-500/20 disabled:opacity-50"
+   326→   326→          >
+   327→   327→            {deleteLoading ? (
+   328→   328→              <Loader2 className="w-4 h-4 animate-spin" />
+   329→   329→            ) : (
+   330→   330→              <Trash2 className="w-4 h-4" />
+   331→   331→            )}
+   332→   332→            Supprimer tous les QR en attente ({pendingBaggages.length})
+   333→   333→          </button>
+   334→   334→        )}
+   335→   335→      </div>
+   336→   336→
+   337→   337→      {/* Bulk Action Bar - Shows when items are selected */}
+   338→   338→      {selectedIds.size > 0 && (
+   339→   339→        <div className="mb-6 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-800 rounded-xl px-5 py-3 flex items-center justify-between flex-wrap gap-3">
+   340→   340→          <div className="flex items-center gap-3">
+   341→   341→            <div className="w-8 h-8 rounded-lg bg-rose-500 flex items-center justify-center">
+   342→   342→              <Trash2 className="w-4 h-4 text-white" />
+   343→   343→            </div>
+   344→   344→            <span className="text-rose-700 dark:text-rose-400 font-medium text-sm">
+   345→   345→              {selectedIds.size} QR code(s) sélectionné(s)
+   346→   346→            </span>
+   347→   347→          </div>
+   348→   348→          <div className="flex items-center gap-2">
+   349→   349→            <button
+   350→   350→              onClick={() => setSelectedIds(new Set())}
+   351→   351→              className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors"
+   352→   352→            >
+   353→   353→              Annuler
+   354→   354→            </button>
+   355→   355→            <button
+   356→   356→              onClick={handleBulkDelete}
+   357→   357→              disabled={deleteLoading}
+   358→   358→              className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+   359→   359→            >
+   360→   360→              {deleteLoading ? (
+   361→   361→                <Loader2 className="w-4 h-4 animate-spin" />
+   362→   362→              ) : (
+   363→   363→                <Trash2 className="w-4 h-4" />
+   364→   364→              )}
+   365→   365→              Supprimer la sélection
+   366→   366→            </button>
+   367→   367→          </div>
+   368→   368→        </div>
+   369→   369→      )}
+   370→   370→
+   371→   371→      {/* Stats Cards - Multicolored */}
+   372→   372→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+   373→   373→        <div className="kpi-card kpi-card-green p-5">
+   374→   374→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   375→   375→            <Luggage className="w-5 h-5 text-white" />
+   376→   376→          </div>
+   377→   377→          <p className="text-2xl font-bold text-white">{baggages.length}</p>
+   378→   378→          <p className="text-sm text-white/80">Total bagages</p>
+   379→   379→        </div>
+   380→   380→        <div className="kpi-card kpi-card-blue p-5">
+   381→   381→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   382→   382→            <CheckCircle className="w-5 h-5 text-white" />
+   383→   383→          </div>
+   384→   384→          <p className="text-2xl font-bold text-white">{baggages.filter(b => isActive(b.status)).length}</p>
+   385→   385→          <p className="text-sm text-white/80">Actifs</p>
+   386→   386→        </div>
+   387→   387→        <div className="kpi-card kpi-card-orange p-5">
+   388→   388→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   389→   389→            <Clock className="w-5 h-5 text-white" />
+   390→   390→          </div>
+   391→   391→          <p className="text-2xl font-bold text-white">{baggages.filter(b => isPending(b.status)).length}</p>
+   392→   392→          <p className="text-sm text-white/80">En attente</p>
+   393→   393→        </div>
+   394→   394→        <div className="kpi-card kpi-card-red p-5">
+   395→   395→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   396→   396→            <AlertTriangle className="w-5 h-5 text-white" />
+   397→   397→          </div>
+   398→   398→          <p className="text-2xl font-bold text-white">{baggages.filter(b => b.status === 'lost').length}</p>
+   399→   399→          <p className="text-sm text-white/80">Perdus</p>
+   400→   400→        </div>
+   401→   401→      </div>
+   402→   402→
+   403→   403→      {/* Search Bar */}
+   404→   404→      <div className="mb-6">
+   405→   405→        <div className="relative">
+   406→   406→          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+   407→   407→          <input
+   408→   408→            type="text"
+   409→   409→            placeholder="Rechercher par nom ou référence..."
+   410→   410→            value={search}
+   411→   411→            onChange={(e) => setSearch(e.target.value)}
+   412→   412→            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+   413→   413→          />
+   414→   414→        </div>
+   415→   415→      </div>
+   416→   416→
+   417→   417→      {/* Filter Buttons */}
+   418→   418→      <div className="flex flex-wrap gap-2 mb-6">
+   419→   419→        {filterButtons.map((btn) => (
+   420→   420→          <button
+   421→   421→            key={btn.id}
+   422→   422→            onClick={() => setStatusFilter(btn.id)}
+   423→   423→            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+   424→   424→              statusFilter === btn.id
+   425→   425→                ? 'bg-blue-600 text-white shadow-lg'
+   426→   426→                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+   427→   427→            }`}
+   428→   428→          >
+   429→   429→            {btn.label}
+   430→   430→          </button>
+   431→   431→        ))}
+   432→   432→      </div>
+   433→   433→
+   434→   434→      {/* Loading state */}
+   435→   435→      {loading ? (
+   436→   436→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   437→   437→          <div className="text-center py-12">
+   438→   438→            <div className="flex items-center justify-center gap-3">
+   439→   439→              <div className="w-6 h-6 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+   440→   440→              <span className="text-slate-500">Chargement...</span>
+   441→   441→            </div>
+   442→   442→          </div>
+   443→   443→        </div>
+   444→   444→      ) : filteredBaggages.length === 0 ? (
+   445→   445→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   446→   446→          <div className="text-center py-12">
+   447→   447→            <div className="flex flex-col items-center">
+   448→   448→              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+   449→   449→                <Luggage className="w-8 h-8 text-slate-400" />
+   450→   450→              </div>
+   451→   451→              <p className="text-slate-500 dark:text-slate-400">Aucun bagage trouvé</p>
+   452→   452→            </div>
+   453→   453→          </div>
+   454→   454→        </div>
+   455→   455→      ) : (
+   456→   456→        <>
+   457→   457→          {/* Section 1 — Bagages activés */}
+   458→   458→          {activatedBaggages.length > 0 && (
+   459→   459→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
+   460→   460→              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-blue-600/5">
+   461→   461→                <div className="flex items-center gap-2">
+   462→   462→                  <div className="w-3 h-3 rounded-full bg-blue-600" />
+   463→   463→                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   464→   464→                    Bagages activés ({activatedBaggages.length})
+   465→   465→                  </h2>
+   466→   466→                </div>
+   467→   467→              </div>
+   468→   468→              <div className="overflow-x-auto">
+   469→   469→                <table className="w-full">
+   470→   470→                  <thead>
+   471→   471→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   472→   472→                      <th className="text-left px-4 py-4 w-10">
+   473→   473→                        <input
+   474→   474→                          type="checkbox"
+   475→   475→                          checked={activatedBaggages.length > 0 && activatedBaggages.every(b => selectedIds.has(b.id))}
+   476→   476→                          onChange={() => toggleSelectAll(activatedBaggages)}
+   477→   477→                          className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   478→   478→                        />
+   479→   479→                      </th>
+   480→   480→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
+   481→   481→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   482→   482→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Dernier scan</th>
+   483→   483→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+   484→   484→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   485→   485→                    </tr>
+   486→   486→                  </thead>
+   487→   487→                  <tbody>
+   488→   488→                    {activatedBaggages.map((baggage) => (
+   489→   489→                      <tr
+   490→   490→                        key={baggage.id}
+   491→   491→                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+   492→   492→                          baggage.status === 'lost' ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
+   493→   493→                        } ${selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''}`}
+   494→   494→                      >
+   495→   495→                        <td className="px-4 py-4">
+   496→   496→                          <input
+   497→   497→                            type="checkbox"
+   498→   498→                            checked={selectedIds.has(baggage.id)}
+   499→   499→                            onChange={() => toggleSelect(baggage.id)}
+   500→   500→                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   501→   501→                          />
+   502→   502→                        </td>
+   503→   503→                        <td className="px-6 py-4">
+   504→   504→                          <div className="flex items-center gap-2">
+   505→   505→                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-blue-600/10 flex items-center justify-center">
+   506→   506→                              <QrCode className="w-4 h-4 text-blue-600" />
+   507→   507→                            </div>
+   508→   508→                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+   509→   509→                              {baggage.reference}
+   510→   510→                            </span>
+   511→   511→                          </div>
+   512→   512→                        </td>
+   513→   513→                        <td className="px-6 py-4">
+   514→   514→                          {baggage.travelerFirstName || baggage.travelerLastName ? (
+   515→   515→                            <span className="text-slate-800 dark:text-white font-medium">
+   516→   516→                              {baggage.travelerFirstName} {baggage.travelerLastName}
+   517→   517→                            </span>
+   518→   518→                          ) : (
+   519→   519→                            <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   520→   520→                              Non assigné
+   521→   521→                            </span>
+   522→   522→                          )}
+   523→   523→                        </td>
+   524→   524→                        <td className="px-6 py-4 hidden md:table-cell">
+   525→   525→                          {baggage.lastScanDate ? (
+   526→   526→                            <span className="text-slate-600 dark:text-slate-300">{formatDateTime(baggage.lastScanDate)}</span>
+   527→   527→                          ) : (
+   528→   528→                            <span className="text-slate-400 dark:text-slate-500">Jamais</span>
+   529→   529→                          )}
+   530→   530→                        </td>
+   531→   531→                        <td className="px-6 py-4">
+   532→   532→                          {getStatusBadge(baggage.status)}
+   533→   533→                        </td>
+   534→   534→                        <td className="px-6 py-4">
+   535→   535→                          <div className="flex items-center gap-2">
+   536→   536→                            {isActive(baggage.status) && (
+   537→   537→                              <button
+   538→   538→                                onClick={() => handleDeclareLost(baggage.id)}
+   539→   539→                                disabled={actionLoading === baggage.id}
+   540→   540→                                className="p-2 rounded-lg bg-rose-100 dark:bg-rose-500/10 hover:bg-rose-200 dark:hover:bg-rose-500/20 transition-colors group"
+   541→   541→                                title="Déclarer perdu"
+   542→   542→                              >
+   543→   543→                                {actionLoading === baggage.id ? (
+   544→   544→                                  <div className="w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+   545→   545→                                ) : (
+   546→   546→                                  <AlertOctagon className="w-4 h-4 text-rose-500" />
+   547→   547→                                )}
+   548→   548→                              </button>
+   549→   549→                            )}
+   550→   550→                            {baggage.status === 'lost' && (
+   551→   551→                              <button
+   552→   552→                                onClick={() => handleMarkFound(baggage.id)}
+   553→   553→                                disabled={actionLoading === baggage.id}
+   554→   554→                                className="p-2 rounded-lg bg-emerald-100 dark:bg-blue-600/10 hover:bg-emerald-200 dark:hover:bg-blue-600/20 transition-colors group"
+   555→   555→                                title="Marquer retrouvé"
+   556→   556→                              >
+   557→   557→                                {actionLoading === baggage.id ? (
+   558→   558→                                  <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+   559→   559→                                ) : (
+   560→   560→                                  <CheckCircle className="w-4 h-4 text-blue-600" />
+   561→   561→                                )}
+   562→   562→                              </button>
+   563→   563→                            )}
+   564→   564→                            <button
+   565→   565→                              onClick={() => {
+   566→   566→                                setSelectedBaggage(baggage);
+   567→   567→                                setShowDetailModal(true);
+   568→   568→                              }}
+   569→   569→                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   570→   570→                              title="Voir détails"
+   571→   571→                            >
+   572→   572→                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+   573→   573→                            </button>
+   574→   574→                          </div>
+   575→   575→                        </td>
+   576→   576→                      </tr>
+   577→   577→                    ))}
+   578→   578→                  </tbody>
+   579→   579→                </table>
+   580→   580→              </div>
+   581→   581→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+   582→   582→                <span className="text-slate-500 dark:text-slate-400 text-sm">
+   583→   583→                  {activatedBaggages.length} bagage(s) activé(s)
+   584→   584→                </span>
+   585→   585→              </div>
+   586→   586→            </div>
+   587→   587→          )}
+   588→   588→
+   589→   589→          {/* Section 2 — QR en attente d'activation */}
+   590→   590→          {pendingBaggages.length > 0 && (
+   591→   591→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
+   592→   592→              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-blue-600/5">
+   593→   593→                <div className="flex items-center justify-between">
+   594→   594→                  <div className="flex items-center gap-2">
+   595→   595→                    <div className="w-3 h-3 rounded-full bg-blue-600" />
+   596→   596→                    <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   597→   597→                      QR en attente d'activation ({pendingBaggages.length})
+   598→   598→                    </h2>
+   599→   599→                  </div>
+   600→   600→                  <button
+   601→   601→                    onClick={handleDeleteAllPending}
+   602→   602→                    disabled={deleteLoading}
+   603→   603→                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 border border-rose-200 dark:border-rose-800"
+   604→   604→                  >
+   605→   605→                    {deleteLoading ? (
+   606→   606→                      <Loader2 className="w-3 h-3 animate-spin" />
+   607→   607→                    ) : (
+   608→   608→                      <Trash2 className="w-3 h-3" />
+   609→   609→                    )}
+   610→   610→                    Supprimer tout
+   611→   611→                  </button>
+   612→   612→                </div>
+   613→   613→              </div>
+   614→   614→              <div className="overflow-x-auto">
+   615→   615→                <table className="w-full">
+   616→   616→                  <thead>
+   617→   617→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   618→   618→                      <th className="text-left px-4 py-4 w-10">
+   619→   619→                        <input
+   620→   620→                          type="checkbox"
+   621→   621→                          checked={pendingBaggages.length > 0 && pendingBaggages.every(b => selectedIds.has(b.id))}
+   622→   622→                          onChange={() => toggleSelectAll(pendingBaggages)}
+   623→   623→                          className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   624→   624→                        />
+   625→   625→                      </th>
+   626→   626→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
+   627→   627→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   628→   628→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Type</th>
+   629→   629→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
+   630→   630→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   631→   631→                    </tr>
+   632→   632→                  </thead>
+   633→   633→                  <tbody>
+   634→   634→                    {pendingBaggages.map((baggage) => (
+   635→   635→                      <tr
+   636→   636→                        key={baggage.id}
+   637→   637→                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+   638→   638→                          selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''
+   639→   639→                        }`}
+   640→   640→                      >
+   641→   641→                        <td className="px-4 py-4">
+   642→   642→                          <input
+   643→   643→                            type="checkbox"
+   644→   644→                            checked={selectedIds.has(baggage.id)}
+   645→   645→                            onChange={() => toggleSelect(baggage.id)}
+   646→   646→                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
+   647→   647→                          />
+   648→   648→                        </td>
+   649→   649→                        <td className="px-6 py-4">
+   650→   650→                          <div className="flex items-center gap-2">
+   651→   651→                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-blue-600/10 flex items-center justify-center">
+   652→   652→                              <QrCode className="w-4 h-4 text-blue-600" />
+   653→   653→                            </div>
+   654→   654→                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+   655→   655→                              {baggage.reference}
+   656→   656→                            </span>
+   657→   657→                          </div>
+   658→   658→                        </td>
+   659→   659→                        <td className="px-6 py-4">
+   660→   660→                          <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   661→   661→                            Non assigné
+   662→   662→                          </span>
+   663→   663→                        </td>
+   664→   664→                        <td className="px-6 py-4 hidden md:table-cell">
+   665→   665→                          <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
+   666→   666→                            {'Soute'}
+   667→   667→                          </span>
+   668→   668→                        </td>
+   669→   669→                        <td className="px-6 py-4 hidden md:table-cell">
+   670→   670→                          <span className="text-slate-400 dark:text-slate-500 text-sm">
+   671→   671→                            {formatDate(baggage.createdAt)}
+   672→   672→                          </span>
+   673→   673→                        </td>
+   674→   674→                        <td className="px-6 py-4">
+   675→   675→                          <div className="flex items-center gap-2">
+   676→   676→                            <button
+   677→   677→                              onClick={() => {
+   678→   678→                                setSelectedBaggage(baggage);
+   679→   679→                                setShowDetailModal(true);
+   680→   680→                              }}
+   681→   681→                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   682→   682→                              title="Voir détails"
+   683→   683→                            >
+   684→   684→                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+   685→   685→                            </button>
+   686→   686→                          </div>
+   687→   687→                        </td>
+   688→   688→                      </tr>
+   689→   689→                    ))}
+   690→   690→                  </tbody>
+   691→   691→                </table>
+   692→   692→              </div>
+   693→   693→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+   694→   694→                <span className="text-slate-500 dark:text-slate-400 text-sm">
+   695→   695→                  {pendingBaggages.length} QR en attente d'activation
+   696→   696→                </span>
+   697→   697→              </div>
+   698→   698→            </div>
+   699→   699→          )}
+   700→   700→
+   701→   701→          {/* Footer global */}
+   702→   702→          <div className="text-center">
+   703→   703→            <span className="text-slate-400 dark:text-slate-500 text-xs">
+   704→   704→              {filteredBaggages.length} bagage(s) affiché(s) sur {baggages.length}
+   705→   705→            </span>
+   706→   706→          </div>
+   707→   707→        </>
+   708→   708→      )}
+   709→   709→
+   710→   710→      {/* Delete Confirmation Modal */}
+   711→   711→      {showDeleteConfirm && (
+   712→   712→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+   713→   713→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-800">
+   714→   714→            <div className="p-6 text-center">
+   715→   715→              <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+   716→   716→                <Trash2 className="w-8 h-8 text-rose-500" />
+   717→   717→              </div>
+   718→   718→              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+   719→   719→                Confirmer la suppression
+   720→   720→              </h3>
+   721→   721→              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+   722→   722→                Vous allez supprimer <span className="font-bold text-rose-600">{selectedIds.size}</span> QR code(s). Cette action est irréversible.
+   723→   723→              </p>
+   724→   724→              <div className="flex gap-3">
+   725→   725→                <button
+   726→   726→                  onClick={() => setShowDeleteConfirm(false)}
+   727→   727→                  className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-medium text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+   728→   728→                >
+   729→   729→                  Annuler
+   730→   730→                </button>
+   731→   731→                <button
+   732→   732→                  onClick={confirmBulkDelete}
+   733→   733→                  disabled={deleteLoading}
+   734→   734→                  className="flex-1 py-2.5 bg-rose-500 text-white rounded-xl font-medium text-sm hover:bg-rose-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+   735→   735→                >
+   736→   736→                  {deleteLoading ? (
+   737→   737→                    <Loader2 className="w-4 h-4 animate-spin" />
+   738→   738→                  ) : (
+   739→   739→                    <Trash2 className="w-4 h-4" />
+   740→   740→                  )}
+   741→   741→                  Supprimer
+   742→   742→                </button>
+   743→   743→              </div>
+   744→   744→            </div>
+   745→   745→          </div>
+   746→   746→        </div>
+   747→   747→      )}
+   748→   748→
+   749→   749→      {/* Detail Modal */}
+   750→   750→      {showDetailModal && selectedBaggage && (
+   751→   751→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+   752→   752→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
+   753→   753→            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+   754→   754→              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Détails du bagage</h2>
+   755→   755→              <button
+   756→   756→                onClick={() => {
+   757→   757→                  setShowDetailModal(false);
+   758→   758→                  setSelectedBaggage(null);
+   759→   759→                }}
+   760→   760→                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+   761→   761→              >
+   762→   762→                <X className="w-5 h-5 text-slate-400" />
+   763→   763→              </button>
+   764→   764→            </div>
+   765→   765→            <div className="p-6 space-y-4">
+   766→   766→              <div className="flex items-center gap-3">
+   767→   767→                <div className="w-12 h-12 bg-amber-100 dark:bg-blue-600/10 rounded-xl flex items-center justify-center">
+   768→   768→                  <QrCode className="w-6 h-6 text-blue-600" />
+   769→   769→                </div>
+   770→   770→                <div>
+   771→   771→                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
+   772→   772→                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+   773→   773→                </div>
+   774→   774→              </div>
+   775→   775→
+   776→   776→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   777→   777→                <div>
+   778→   778→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
+   779→   779→                  {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
+   780→   780→                    <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
+   781→   781→                  ) : (
+   782→   782→                    <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
+   783→   783→                      À attribuer
+   784→   784→                    </span>
+   785→   785→                  )}
+   786→   786→                </div>
+   787→   787→                <div>
+   788→   788→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
+   789→   789→                  <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+   790→   790→                </div>
+   791→   791→              </div>
+   792→   792→
+   793→   793→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   794→   794→                <div>
+   795→   795→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
+   796→   796→                  {getStatusBadge(selectedBaggage.status)}
+   797→   797→                </div>
+   798→   798→                <div>
+   799→   799→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
+   800→   800→                  <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
+   801→   801→                </div>
+   802→   802→              </div>
+   803→   803→
+   804→   804→              <div>
+   805→   805→                <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
+   806→   806→                <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
+   807→   807→                {selectedBaggage.lastLocation && (
+   808→   808→                  <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
+   809→   809→                    <MapPin className="w-3 h-3" />
+   810→   810→                    {selectedBaggage.lastLocation}
+   811→   811→                  </p>
+   812→   812→                )}
+   813→   813→              </div>
+   814→   814→
+   815→   815→              {/* Attribuer edit form for unassigned baggages */}
+   816→   816→              {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && (
+   817→   817→                <div className="p-4 bg-amber-50 dark:bg-blue-600/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+   818→   818→                  <h4 className="text-amber-700 dark:text-blue-500 font-medium mb-3">Attribuer ce bagage</h4>
+   819→   819→                  <div className="space-y-3">
+   820→   820→                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+   821→   821→                      <input
+   822→   822→                        type="text"
+   823→   823→                        placeholder="Prénom"
+   824→   824→                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+   825→   825→                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerFirstName: e.target.value })}
+   826→   826→                      />
+   827→   827→                      <input
+   828→   828→                        type="text"
+   829→   829→                        placeholder="Nom"
+   830→   830→                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+   831→   831→                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerLastName: e.target.value })}
+   832→   832→                      />
+   833→   833→                    </div>
+   834→   834→                    <input
+   835→   835→                      type="tel"
+   836→   836→                      placeholder="WhatsApp (ex: +33612345678)"
+   837→   837→                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+   838→   838→                      onChange={(e) => setSelectedBaggage({ ...selectedBaggage, whatsappOwner: e.target.value })}
+   839→   839→                    />
+   840→   840→                    <button
+   841→   841→                      onClick={async () => {
+   842→   842→                        try {
+   843→   843→                          const res = await fetch(`/api/baggage/${selectedBaggage.id}`, {
+   844→   844→                            method: 'PUT',
+   845→   845→                            headers: { 'Content-Type': 'application/json' },
+   846→   846→                            body: JSON.stringify({
+   847→   847→                              travelerFirstName: selectedBaggage.travelerFirstName,
+   848→   848→                              travelerLastName: selectedBaggage.travelerLastName,
+   849→   849→                              whatsappOwner: selectedBaggage.whatsappOwner,
+   850→   850→                              status: 'active'
+   851→   851→                            }),
+   852→   852→                          });
+   853→   853→                          if (res.ok) {
+   854→   854→                            fetchBaggages();
+   855→   855→                            setShowDetailModal(false);
+   856→   856→                          }
+   857→   857→                        } catch (error) {
+   858→   858→                          console.error('Error updating baggage:', error);
+   859→   859→                        }
+   860→   860→                      }}
+   861→   861→                      className="w-full py-2 bg-[#2563EB] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
+   862→   862→                    >
+   863→   863→                      Enregistrer
+   864→   864→                    </button>
+   865→   865→                  </div>
+   866→   866→                </div>
+   867→   867→              )}
+   868→   868→
+   869→   869→              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+   870→   870→                {/* Action Buttons based on status */}
+   871→   871→                {isActive(selectedBaggage.status) && (
+   872→   872→                  <button
+   873→   873→                    onClick={() => handleDeclareLost(selectedBaggage.id)}
+   874→   874→                    disabled={actionLoading === selectedBaggage.id}
+   875→   875→                    className="w-full py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+   876→   876→                  >
+   877→   877→                    {actionLoading === selectedBaggage.id ? (
+   878→   878→                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+   879→   879→                    ) : (
+   880→   880→                      <>
+   881→   881→                        <AlertOctagon className="w-4 h-4" />
+   882→   882→                        Déclarer comme perdu
+   883→   883→                      </>
+   884→   884→                    )}
+   885→   885→                  </button>
+   886→   886→                )}
+   887→   887→
+   888→   888→                {isLost(selectedBaggage.status) && (
+   889→   889→                  <button
+   890→   890→                    onClick={() => handleMarkFound(selectedBaggage.id)}
+   891→   891→                    disabled={actionLoading === selectedBaggage.id}
+   892→   892→                    className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+   893→   893→                  >
+   894→   894→                    {actionLoading === selectedBaggage.id ? (
+   895→   895→                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+   896→   896→                    ) : (
+   897→   897→                      <>
+   898→   898→                        <CheckCircle className="w-4 h-4" />
+   899→   899→                        Marquer comme retrouvé
+   900→   900→                      </>
+   901→   901→                    )}
+   902→   902→                  </button>
+   903→   903→                )}
+   904→   904→
+   905→   905→                <Link
+   906→   906→                  href={`/found/${selectedBaggage.reference}`}
+   907→   907→                  className="block w-full text-center py-3 bg-blue-600 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium"
+   908→   908→                >
+   909→   909→                  Tester le scan
+   910→   910→                </Link>
+   911→   911→              </div>
+   912→   912→            </div>
+   913→   913→          </div>
+   914→   914→        </div>
+   915→   915→      )}
+   916→   916→    </div>
+   917→   917→  );
+   918→   918→}
+   919→   919→
