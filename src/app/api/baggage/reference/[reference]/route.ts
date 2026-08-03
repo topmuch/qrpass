@@ -135,6 +135,28 @@ function buildUpdateData(body: Record<string, unknown>): Record<string, unknown>
       : null;
   }
 
+  // --- Hotel/Accommodation fields ---
+  if (body.hotelName !== undefined) {
+    updateData.hotelName = typeof body.hotelName === 'string' && body.hotelName.trim() !== ''
+      ? body.hotelName.trim()
+      : null;
+  }
+  if (body.hotelAddress !== undefined) {
+    updateData.hotelAddress = typeof body.hotelAddress === 'string' && body.hotelAddress.trim() !== ''
+      ? body.hotelAddress.trim()
+      : null;
+  }
+  if (body.hotelPhone !== undefined) {
+    updateData.hotelPhone = typeof body.hotelPhone === 'string' && body.hotelPhone.trim() !== ''
+      ? body.hotelPhone.trim()
+      : null;
+  }
+  if (body.roomNumber !== undefined) {
+    updateData.roomNumber = typeof body.roomNumber === 'string' && body.roomNumber.trim() !== ''
+      ? body.roomNumber.trim()
+      : null;
+  }
+
   return updateData;
 }
 
@@ -170,6 +192,10 @@ function shapeBaggageResponse(baggage: Record<string, unknown>) {
     declaredLostAt: baggage.declaredLostAt,
     foundAt: baggage.foundAt,
     photoUrl: baggage.photoUrl,
+    hotelName: baggage.hotelName,
+    hotelAddress: baggage.hotelAddress,
+    hotelPhone: baggage.hotelPhone,
+    roomNumber: baggage.roomNumber,
   };
 }
 

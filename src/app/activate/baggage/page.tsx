@@ -232,6 +232,8 @@ function BaggageActivateContent() {
   const [departureDate, setDepartureDate] = useState('');
   const [departureTime, setDepartureTime] = useState('');
   const [hotelName, setHotelName] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelPhone, setHotelPhone] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -345,6 +347,8 @@ function BaggageActivateContent() {
           flightNumber: flightNumber.trim().toUpperCase(),
           destination,
           hotelName: hotelName.trim() || undefined,
+          hotelAddress: hotelAddress.trim() || undefined,
+          hotelPhone: hotelPhone.trim() || undefined,
           roomNumber: roomNumber.trim() || undefined,
           departureDate,
           departureTime: departureTime || undefined,
@@ -365,6 +369,8 @@ function BaggageActivateContent() {
           flightNumber,
           destination,
           hotelName,
+          hotelAddress,
+          hotelPhone,
           roomNumber,
           type: 'hajj',
           activatedAt: new Date().toISOString(),
@@ -546,6 +552,26 @@ function BaggageActivateContent() {
                 className={inputCls}
               />
             </div>
+          </div>
+
+          {/* Hotel Address & Phone */}
+          <div className="mb-5">
+            <Label className="text-[13px] font-semibold mb-1.5 block">Adresse de l'hôtel</Label>
+            <Input
+              value={hotelAddress}
+              onChange={(e) => setHotelAddress(e.target.value)}
+              placeholder="Ex: Ibrahim Al Jafri Street, La Mecque"
+              className={inputCls}
+            />
+          </div>
+          <div className="mb-5">
+            <Label className="text-[13px] font-semibold mb-1.5 block">Téléphone de l'hôtel</Label>
+            <Input
+              value={hotelPhone}
+              onChange={(e) => setHotelPhone(e.target.value)}
+              placeholder="Ex: +966 12 557 0000"
+              className={inputCls}
+            />
           </div>
 
           {/* Departure Date & Time */}

@@ -18,6 +18,7 @@ import {
   MapPin,
   Building2,
   BedDouble,
+  Navigation,
 } from "lucide-react";
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -72,7 +73,11 @@ const I18N: Record<string, Record<Language, string>> = {
   photoLabel: { fr: 'Photo du bagage', en: 'Bag Photo', ar: 'صورة الحقيبة' },
   hotelLabel: { fr: 'HÉBERGEMENT', en: 'ACCOMMODATION', ar: 'الإقامة' },
   hotelNameLabel: { fr: 'Hôtel actuel', en: 'Current Hotel', ar: 'الفندق الحالي' },
+  hotelAddressLabel: { fr: 'Adresse', en: 'Address', ar: 'العنوان' },
+  hotelPhoneLabel: { fr: 'Téléphone', en: 'Phone', ar: 'الهاتف' },
   roomLabel: { fr: 'Chambre', en: 'Room', ar: 'الغرفة' },
+  dropAtHotel: { fr: 'Déposer à l\'hôtel', en: 'Drop off at hotel', ar: 'تسليم في الفندق' },
+  dropAtHotelDesc: { fr: 'Ouvrir l\'itinéraire vers l\'hôtel', en: 'Open directions to hotel', ar: 'فتح الاتجاهات إلى الفندق' },
   flightLabel: { fr: 'DÉTAILS DU VOL', en: 'FLIGHT DETAILS', ar: 'تفاصيل الرحلة' },
   airlineLabel: { fr: 'Compagnie aérienne', en: 'Airline', ar: 'شركة الطيران' },
   flightNumLabel: { fr: 'Numéro de vol', en: 'Flight Number', ar: 'رقم الرحلة' },
@@ -134,6 +139,8 @@ interface BaggageData {
     photoUrl?: string | null;
     // HOTEL-FEATURE: Accommodation info
     hotelName?: string | null;
+    hotelAddress?: string | null;
+    hotelPhone?: string | null;
     roomNumber?: string | null;
   };
 }
@@ -438,6 +445,8 @@ export default function ScanPage() {
   const [editPhoneCountry, setEditPhoneCountry] = useState(countryCode);
   // Edit hotel fields
   const [editHotelName, setEditHotelName] = useState('');
+  const [editHotelAddress, setEditHotelAddress] = useState('');
+  const [editHotelPhone, setEditHotelPhone] = useState('');
   const [editRoomNumber, setEditRoomNumber] = useState('');
 
   // Finder form state
@@ -508,6 +517,8 @@ export default function ScanPage() {
       setEditBusLineNumber(b.busLineNumber || '');
       setEditDestination(b.destination || '');
       setEditHotelName(b.hotelName || '');
+      setEditHotelAddress(b.hotelAddress || '');
+      setEditHotelPhone(b.hotelPhone || '');
       setEditRoomNumber(b.roomNumber || '');
       // Format departureDate to YYYY-MM-DD for the date input
       if (b.departureDate) {
@@ -548,6 +559,8 @@ export default function ScanPage() {
           departureDate: editDepartureDate || null,
           departureTime: editDepartureTime.trim() || null,
           hotelName: editHotelName.trim() || null,
+          hotelAddress: editHotelAddress.trim() || null,
+          hotelPhone: editHotelPhone.trim() || null,
           roomNumber: editRoomNumber.trim() || null,
         }),
       });
@@ -576,6 +589,8 @@ export default function ScanPage() {
           departureDate: data.baggage.departureDate,
           departureTime: data.baggage.departureTime,
           hotelName: data.baggage.hotelName,
+          hotelAddress: data.baggage.hotelAddress,
+          hotelPhone: data.baggage.hotelPhone,
           roomNumber: data.baggage.roomNumber,
         },
       });
@@ -848,7 +863,7 @@ export default function ScanPage() {
       {/* ─── Container ─── */}
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
 
-        {/* ═══ HEADER: Green ✓ icon + "BAGAGE TROUVÉ" ═══ */}
+        {/* ═══ HEADER: Green ✓ icon + "BAGAGE TROUVÉ" + white thank-you text ═══ */}
         <div className="text-center mb-5 sm:mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500 mb-3 shadow-md">
             <CheckCircle className="w-8 h-8 text-white" />
@@ -858,7 +873,8 @@ export default function ScanPage() {
               ? `🚨 ${i18n('lostTitle', lang)}`
               : i18n('title', lang)}
           </h1>
-          <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto" style={{ color: MUTED }}>
+          {/* White text below "Bagage trouvé" — always visible */}
+          <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto font-semibold" style={{ color: '#ffffff' }}>
             {isDeclaredLost
               ? i18n('lostSubtitle', lang)
               : i18n('subtitle', lang)}
@@ -921,6 +937,30 @@ export default function ScanPage() {
               value={baggage.hotelName}
             />
 
+            {/* Hotel Address */}
+            {baggage.hotelAddress && (
+              <>
+                <div className="border-t border-gray-100 my-2" />
+                <InfoRow
+                  icon="📍"
+                  label={i18n('hotelAddressLabel', lang)}
+                  value={baggage.hotelAddress}
+                />
+              </>
+            )}
+
+            {/* Hotel Phone */}
+            {baggage.hotelPhone && (
+              <>
+                <div className="border-t border-gray-100 my-2" />
+                <InfoRow
+                  icon="📞"
+                  label={i18n('hotelPhoneLabel', lang)}
+                  value={baggage.hotelPhone}
+                />
+              </>
+            )}
+
             {/* Room Number */}
             {baggage.roomNumber && (
               <>
@@ -931,6 +971,23 @@ export default function ScanPage() {
                   value={baggage.roomNumber}
                 />
               </>
+            )}
+
+            {/* Déposer à l'hôtel — Google Maps directions button */}
+            {baggage.hotelAddress && (
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    const addr = encodeURIComponent(baggage.hotelAddress!);
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${addr}`, '_blank');
+                  }}
+                  className="w-full py-3.5 px-4 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base min-h-[48px]"
+                  title={i18n('dropAtHotelDesc', lang)}
+                >
+                  <Navigation className="w-5 h-5" />
+                  {i18n('dropAtHotel', lang)}
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -1097,6 +1154,30 @@ export default function ScanPage() {
                 value={editHotelName}
                 onChange={(e) => setEditHotelName(e.target.value)}
                 placeholder="Hilton, Mövenpick..."
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelAddressLabel', lang)}</label>
+              <input
+                type="text"
+                value={editHotelAddress}
+                onChange={(e) => setEditHotelAddress(e.target.value)}
+                placeholder="Ibrahim Al Jafri Street, Mecca"
+                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
+                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelPhoneLabel', lang)}</label>
+              <input
+                type="text"
+                value={editHotelPhone}
+                onChange={(e) => setEditHotelPhone(e.target.value)}
+                placeholder="+966 12 557 0000"
                 className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
                 style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
               />

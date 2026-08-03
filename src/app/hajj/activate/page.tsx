@@ -78,6 +78,8 @@ function HajjActivateContent() {
   const [flightNumber, setFlightNumber] = useState('');
   const [destination, setDestination] = useState('');
   const [hotelName, setHotelName] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelPhone, setHotelPhone] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -178,6 +180,8 @@ function HajjActivateContent() {
           flightNumber: flightNumber.trim().toUpperCase() || undefined,
           destination: destination.trim() || undefined,
           hotelName: hotelName.trim() || undefined,
+          hotelAddress: hotelAddress.trim() || undefined,
+          hotelPhone: hotelPhone.trim() || undefined,
           roomNumber: roomNumber.trim() || undefined,
           transportMode: 'flight',
           photoUrl: photoUrl || undefined,
@@ -197,6 +201,8 @@ function HajjActivateContent() {
           flightNumber,
           destination,
           hotelName,
+          hotelAddress,
+          hotelPhone,
           roomNumber,
           type: 'hajj',
           activatedAt: new Date().toISOString(),
@@ -463,6 +469,26 @@ function HajjActivateContent() {
                   className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
                 />
               </div>
+            </div>
+
+            {/* Hotel Address & Phone */}
+            <div className="mb-4">
+              <Label className="text-sm font-semibold mb-1.5 block">Adresse de l'hôtel</Label>
+              <Input
+                value={hotelAddress}
+                onChange={(e) => setHotelAddress(e.target.value)}
+                placeholder="Ex: Ibrahim Al Jafri Street, La Mecque"
+                className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
+              />
+            </div>
+            <div className="mb-4">
+              <Label className="text-sm font-semibold mb-1.5 block">Téléphone de l'hôtel</Label>
+              <Input
+                value={hotelPhone}
+                onChange={(e) => setHotelPhone(e.target.value)}
+                placeholder="Ex: +966 12 557 0000"
+                className="h-12 rounded-xl text-base bg-[#f8fafc] border-gray-300"
+              />
             </div>
 
             {/* Photo Upload */}

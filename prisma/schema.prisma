@@ -113,6 +113,8 @@ model Baggage {
 
   // Hotel/Accommodation (for Hajj — where to return the baggage)
   hotelName         String?   // ex: "Al Massa Grand Hotel"
+  hotelAddress      String?   // ex: "Ibrahim Al Jafri Street, Mecca"
+  hotelPhone        String?   // ex: "+966 12 557 0000"
   roomNumber        String?   // ex: "412"
 
   createdAt         DateTime  @default(now())

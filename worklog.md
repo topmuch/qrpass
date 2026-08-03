@@ -29,3 +29,33 @@ Stage Summary:
 - All i18n translations working (fr/en/ar with RTL)
 - No console errors
 - Hero image shows airport baggage scene
+---
+Task ID: 1
+Agent: main
+Task: Add hotelAddress and hotelPhone to finder page, activation pages, and all APIs
+
+Work Log:
+- Added hotelAddress and hotelPhone fields to Prisma Baggage model
+- Ran db:push to sync schema
+- Updated scan API to return hotelAddress and hotelPhone
+- Updated baggage reference API (buildUpdateData + shapeBaggageResponse) for hotel fields
+- Updated activate API schema and update logic for hotelAddress/hotelPhone
+- Updated finder page (/scan/[reference]/page.tsx):
+  - Added Navigation icon import
+  - Added i18n keys for hotelAddressLabel, hotelPhoneLabel, dropAtHotel, dropAtHotelDesc
+  - Updated BaggageData interface with hotelAddress, hotelPhone
+  - Added edit state for hotelAddress, hotelPhone
+  - Added pre-fill logic in useEffect
+  - Added save logic for hotelAddress, hotelPhone
+  - Updated hotel card (CARD 2) to display hotel address, phone
+  - Added "Déposer à l'hôtel" button that opens Google Maps directions
+  - Changed subtitle text to white color (font-semibold, color: '#ffffff')
+  - Added edit mode fields for hotelAddress, hotelPhone
+- Updated activation page (/activate/baggage/page.tsx) with hotel address and phone fields
+- Updated Hajj activation page (/hajj/activate/page.tsx) with hotel address and phone fields
+
+Stage Summary:
+- All database, API, and frontend changes completed
+- Finder page now shows hotel address, phone, and "Déposer à l'hôtel" Google Maps button
+- White thank-you text below "BAGAGE TROUVÉ" header
+- Activation pages include hotel address and phone input fields
