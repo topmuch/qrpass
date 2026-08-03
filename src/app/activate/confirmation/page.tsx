@@ -5,14 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Info } from 'lucide-react';
 
-// ─── Brand constants (from user's design) ───
-const BG = '#f4b400';
+// ─── Brand constants (Blue Navy + Gold) ───
+const BG = '#fbbf24';
 const CARD_BG = '#ffffff';
-const TEXT = '#1a1a1a';
+const TEXT = '#0f172a';
 const MUTED = '#6b7280';
 const SUCCESS = '#10b981';
-const BTN_PRIMARY = '#111827';
-const BTN_PRIMARY_HOVER = '#374151';
+const BTN_PRIMARY = '#1e3a8a';
+const BTN_PRIMARY_HOVER = '#3b82f6';
 const WHATSAPP = '#25D366';
 const WHATSAPP_HOVER = '#128C7E';
 

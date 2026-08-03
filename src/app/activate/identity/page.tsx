@@ -16,15 +16,15 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-// ─── Brand constants ───
-const BG = '#f4b400';
+// ─── Brand constants (Blue Navy + Gold) ───
+const BG = '#fbbf24';
 const CARD_BG = '#ffffff';
-const TEXT = '#1a1a1a';
+const TEXT = '#0f172a';
 const MUTED = '#6b7280';
-const INPUT_BG = '#f3f4f6';
-const INPUT_BORDER = '#d1d5db';
-const BTN_PRIMARY = '#111827';
-const BTN_PRIMARY_HOVER = '#374151';
+const INPUT_BG = '#f8fafc';
+const INPUT_BORDER = '#e2e8f0';
+const BTN_PRIMARY = '#1e3a8a';
+const BTN_PRIMARY_HOVER = '#3b82f6';
 const RADIUS = '20px';
 
 // ─── Blood type options ───
