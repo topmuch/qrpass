@@ -19,7 +19,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useAgency } from '../layout';
-import { isActive, isPending } from '@/lib/status';
+import { isActive, isPending, isLost } from '@/lib/status';
 
 interface Baggage {
   id: string;
@@ -95,10 +95,6 @@ export default function BaggagesPage() {
     setFilteredBaggages(filtered);
   };
 
-  // AGENCY-FIX: Split filtered baggages into activated and pending sections
-  const activatedBaggages = filteredBaggages.filter(b =>
-    isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked'
-  );
   const pendingBaggages = filteredBaggages.filter(b =>
     isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
   );
@@ -454,260 +450,125 @@ export default function BaggagesPage() {
         </div>
       ) : (
         <>
-          {/* Section 1 — Bagages activés */}
-          {activatedBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-blue-600/5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-600" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                    Bagages activés ({activatedBaggages.length})
-                  </h2>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-4 py-4 w-10">
-                        <input
-                          type="checkbox"
-                          checked={activatedBaggages.length > 0 && activatedBaggages.every(b => selectedIds.has(b.id))}
-                          onChange={() => toggleSelectAll(activatedBaggages)}
-                          className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
-                        />
-                      </th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Dernier scan</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activatedBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          baggage.status === 'lost' ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
-                        } ${selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''}`}
-                      >
-                        <td className="px-4 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.has(baggage.id)}
-                            onChange={() => toggleSelect(baggage.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <Link
-                            href={`/found/${baggage.reference}`}
-                            className="flex items-center gap-2 group/qr"
-                            title={`Scanner ${baggage.reference}`}
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-blue-600/10 flex items-center justify-center group-hover/qr:bg-emerald-200 dark:group-hover/qr:bg-blue-600/20 transition-colors">
-                              <QrCode className="w-4 h-4 text-blue-600" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-blue-600 dark:group-hover/qr:text-blue-400 transition-colors">
-                              {baggage.reference}
-                            </span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4">
-                          {baggage.travelerFirstName || baggage.travelerLastName ? (
-                            <span className="text-slate-800 dark:text-white font-medium">
-                              {baggage.travelerFirstName} {baggage.travelerLastName}
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
-                              Non assigné
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          {baggage.lastScanDate ? (
-                            <span className="text-slate-600 dark:text-slate-300">{formatDateTime(baggage.lastScanDate)}</span>
-                          ) : (
-                            <span className="text-slate-400 dark:text-slate-500">Jamais</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {getStatusBadge(baggage.status)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {isActive(baggage.status) && (
-                              <button
-                                onClick={() => handleDeclareLost(baggage.id)}
-                                disabled={actionLoading === baggage.id}
-                                className="p-2 rounded-lg bg-rose-100 dark:bg-rose-500/10 hover:bg-rose-200 dark:hover:bg-rose-500/20 transition-colors group"
-                                title="Déclarer perdu"
-                              >
-                                {actionLoading === baggage.id ? (
-                                  <div className="w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
-                                ) : (
-                                  <AlertOctagon className="w-4 h-4 text-rose-500" />
-                                )}
-                              </button>
-                            )}
-                            {baggage.status === 'lost' && (
-                              <button
-                                onClick={() => handleMarkFound(baggage.id)}
-                                disabled={actionLoading === baggage.id}
-                                className="p-2 rounded-lg bg-emerald-100 dark:bg-blue-600/10 hover:bg-emerald-200 dark:hover:bg-blue-600/20 transition-colors group"
-                                title="Marquer retrouvé"
-                              >
-                                {actionLoading === baggage.id ? (
-                                  <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
-                                ) : (
-                                  <CheckCircle className="w-4 h-4 text-blue-600" />
-                                )}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                setSelectedBaggage(baggage);
-                                setShowDetailModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                              title="Voir détails"
-                            >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {activatedBaggages.length} bagage(s) activé(s)
-                </span>
-              </div>
-            </div>
-          )}
+          {/* Card Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredBaggages.map((baggage) => {
+              const isBagActive = isActive(baggage.status) || baggage.travelerFirstName !== null || baggage.status === 'lost' || baggage.status === 'found' || baggage.status === 'blocked';
+              const isBagPending = isPending(baggage.status) && baggage.travelerFirstName === null && baggage.travelerLastName === null;
+              const topBarColor = baggage.status === 'lost' ? 'bg-rose-500' : isBagPending ? 'bg-amber-500' : 'bg-blue-600';
 
-          {/* Section 2 — QR en attente d'activation */}
-          {pendingBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
-              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-blue-600/5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-600" />
-                    <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                      QR en attente d'activation ({pendingBaggages.length})
-                    </h2>
-                  </div>
-                  <button
-                    onClick={handleDeleteAllPending}
-                    disabled={deleteLoading}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 border border-rose-200 dark:border-rose-800"
-                  >
-                    {deleteLoading ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-3 h-3" />
-                    )}
-                    Supprimer tout
-                  </button>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-4 py-4 w-10">
+              return (
+                <div
+                  key={baggage.id}
+                  className={`bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all ${
+                    selectedIds.has(baggage.id) ? 'ring-2 ring-rose-500 ring-offset-1' : ''
+                  }`}
+                >
+                  {/* Top colored bar */}
+                  <div className={`h-2 ${topBarColor}`} />
+                  <div className="p-5">
+                    {/* Checkbox + QR Code row + Status badge */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={pendingBaggages.length > 0 && pendingBaggages.every(b => selectedIds.has(b.id))}
-                          onChange={() => toggleSelectAll(pendingBaggages)}
+                          checked={selectedIds.has(baggage.id)}
+                          onChange={() => toggleSelect(baggage.id)}
                           className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
                         />
-                      </th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Type</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          selectedIds.has(baggage.id) ? 'bg-rose-50/30 dark:bg-rose-500/5' : ''
-                        }`}
+                        <Link
+                          href={`/found/${baggage.reference}`}
+                          className="flex items-center gap-1.5 font-mono text-sm font-semibold group/qr"
+                          title={isBagPending ? `Activer ${baggage.reference}` : `Scanner ${baggage.reference}`}
+                        >
+                          <QrCode className="w-4 h-4 text-blue-600 group-hover/qr:text-blue-700 transition-colors" />
+                          <span className="text-blue-600 group-hover/qr:text-blue-700 transition-colors">
+                            {baggage.reference}
+                          </span>
+                        </Link>
+                      </div>
+                      {getStatusBadge(baggage.status)}
+                    </div>
+
+                    {/* Traveler name */}
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                      {baggage.travelerFirstName || baggage.travelerLastName
+                        ? `${baggage.travelerFirstName || ''} ${baggage.travelerLastName || ''}`.trim()
+                        : 'Non assigné'}
+                    </h3>
+
+                    {/* Info rows */}
+                    <div className="space-y-1.5 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Type</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium capitalize">
+                          {baggage.baggageType || 'Soute'} #{baggage.baggageIndex}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Dernier scan</span>
+                        <span className="text-slate-700 dark:text-slate-200 text-right truncate ml-2">
+                          {baggage.lastScanDate ? formatDateTime(baggage.lastScanDate) : 'Jamais'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Créé le</span>
+                        <span className="text-slate-700 dark:text-slate-200">{formatDate(baggage.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center gap-2">
+                      {isBagActive && isActive(baggage.status) && (
+                        <button
+                          onClick={() => handleDeclareLost(baggage.id)}
+                          disabled={actionLoading === baggage.id}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-200 dark:hover:bg-rose-500/20 transition-colors disabled:opacity-50"
+                          title="Déclarer perdu"
+                        >
+                          {actionLoading === baggage.id ? (
+                            <div className="w-3.5 h-3.5 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+                          ) : (
+                            <AlertOctagon className="w-3.5 h-3.5" />
+                          )}
+                          Perdu
+                        </button>
+                      )}
+                      {baggage.status === 'lost' && (
+                        <button
+                          onClick={() => handleMarkFound(baggage.id)}
+                          disabled={actionLoading === baggage.id}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-blue-600/10 text-emerald-600 dark:text-blue-400 hover:bg-emerald-200 dark:hover:bg-blue-600/20 transition-colors disabled:opacity-50"
+                          title="Marquer retrouvé"
+                        >
+                          {actionLoading === baggage.id ? (
+                            <div className="w-3.5 h-3.5 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+                          ) : (
+                            <CheckCircle className="w-3.5 h-3.5" />
+                          )}
+                          Retrouvé
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedBaggage(baggage);
+                          setShowDetailModal(true);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        title="Voir détails"
                       >
-                        <td className="px-4 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.has(baggage.id)}
-                            onChange={() => toggleSelect(baggage.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500 cursor-pointer"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <Link
-                            href={`/found/${baggage.reference}`}
-                            className="flex items-center gap-2 group/qr"
-                            title={`Activer ${baggage.reference}`}
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-blue-600/10 flex items-center justify-center group-hover/qr:bg-amber-200 dark:group-hover/qr:bg-blue-600/20 transition-colors">
-                              <QrCode className="w-4 h-4 text-blue-600" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-blue-600 dark:group-hover/qr:text-blue-400 transition-colors">
-                              {baggage.reference}
-                            </span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
-                            Non assigné
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
-                            {'Soute'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-400 dark:text-slate-500 text-sm">
-                            {formatDate(baggage.createdAt)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedBaggage(baggage);
-                                setShowDetailModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                              title="Voir détails"
-                            >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {pendingBaggages.length} QR en attente d'activation
-                </span>
-              </div>
-            </div>
-          )}
+                        <Eye className="w-3.5 h-3.5" />
+                        Détails
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Footer global */}
-          <div className="text-center">
+          <div className="text-center mt-4">
             <span className="text-slate-400 dark:text-slate-500 text-xs">
               {filteredBaggages.length} bagage(s) affiché(s) sur {baggages.length}
             </span>

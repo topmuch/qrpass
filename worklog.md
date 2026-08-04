@@ -1,5 +1,32 @@
 ---
 Task ID: 1
+Agent: main
+Task: Add "Identity" tab to Superadmin Étiquettes page + display in grid mode
+
+Work Log:
+- Added `ShieldCheck` to lucide-react imports in `/src/app/admin/etiquettes/page.tsx`
+- Changed `activeTab` state type from `'hajj'` to `'hajj' | 'identity'`
+- Added `pilgrims` state (`any[]`) and `identityLoading` state (`boolean`)
+- Modified `useEffect` to branch: fetchSets() for hajj tab, fetchPilgrims() for identity tab
+- Added `fetchPilgrims()` function that calls `/api/pilgrims/identity` and sets pilgrim state
+- Added Identity tab button next to Hajj tab button with emerald accent color (#059669), ShieldCheck icon, and pilgrim count badge
+- When identity tab is active, renders a responsive grid of pilgrim cards (1/2/3 cols) instead of agency groups
+- Each card shows: QR code with QrCode icon, status badge (Actif/Inactif), bold name, nationality, blood type badge (red), agency name, and "Voir le profil" link to `/p/${qrCode}`
+- Search bar filters pilgrims by fullName, qrCode, and nationality when in identity tab
+- Empty state for identity tab shows ShieldCheck icon with appropriate message
+- Hajj tab functionality fully preserved — all existing code unchanged
+- Fixed `/api/pilgrims/identity/route.ts`: added fallback logic when Prisma `include: { agency }` fails due to stale client (manual agency lookup + map)
+- ESLint passes with no errors on both files
+- Dev server compiles successfully, page returns 200
+
+Stage Summary:
+- Identity tab added to Étiquettes page with emerald green accent
+- Pilgrims displayed in responsive card grid layout (not table)
+- Search filtering works across both tabs
+- API endpoint made resilient to stale Prisma client caching
+- Hajj tab completely preserved
+---
+Task ID: 1
 Agent: Main
 Task: Rebuild homepage with HAKK hero image and develop all sections
 
@@ -409,3 +436,34 @@ Stage Summary:
 - Clicking any QR code navigates to /found/[code] which smart-routes to the correct page
 - Detail modals also have clickable QR codes with "Cliquer pour scanner" helper text
 - All hover effects use Tailwind group-hover with smooth color transitions
+---
+Task ID: 2
+Agent: main
+Task: Convert agency listing pages + admin identity page from TABLE mode to GRID mode
+
+Work Log:
+- Updated `/src/app/agence/identity/page.tsx`:
+  - Replaced two separate table sections ("Bracelets activés" and "QR en attente d'activation") with a single responsive card grid
+  - Grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4`
+  - Each card has: colored top bar (emerald for active, amber for pending), QR code link, status badge, name, nationality, blood type, hotel, date, details button
+  - Kept stats cards, search bar, filter buttons, detail modal unchanged
+- Updated `/src/app/agence/baggages/page.tsx`:
+  - Replaced two separate table sections with a single responsive card grid
+  - Each card has: colored top bar (blue for active, amber for pending, rose for lost), checkbox for bulk selection, QR code link, status badge, traveler name, type, last scan, created date, action buttons (Perdu/Retrouvé/Détails)
+  - Kept stats cards, search bar, filter buttons, bulk action bar, delete confirmation modal, detail modal unchanged
+  - Added `isLost` to imports from `@/lib/status` (was missing, causing runtime error in detail modal)
+  - Removed unused `activatedBaggages` computed variable
+- Updated `/src/app/admin/identity/page.tsx`:
+  - Replaced single table with responsive card grid
+  - Each card has: colored top bar (emerald for active, amber for inactive), QR code link, status badge, name, nationality, blood type badge, agency name
+  - Kept search bar unchanged
+- All 3 files: zero `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` elements remain
+- Lint check passes (only pre-existing errors in scripts/create-admin.cjs)
+- All pages return 307 (redirect to login, as expected for auth-protected pages)
+
+Stage Summary:
+- All 3 pages converted from TABLE mode to GRID mode
+- Responsive card grid: 1 col (mobile) → 2 cols (sm) → 3 cols (lg) → 4 cols (xl)
+- Status-indicating colored top bars on each card
+- All existing functionality preserved: search, filters, modals, bulk actions, detail buttons
+- Fixed missing `isLost` import in baggages page

@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 // ─── Brand constants ───
-const BG = '#f4b400';
+const BG = '#059669';
 const CARD_BG = '#ffffff';
 const TEXT = '#1a1a1a';
 const MUTED = '#6b7280';
@@ -493,7 +493,7 @@ function IdentityActivateContent() {
             </div>
 
             {/* Langue parlée */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
                 Langue parlée
               </label>
@@ -505,6 +505,25 @@ function IdentityActivateContent() {
                 className={inputNormalClass}
                 style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />
+            </div>
+
+            {/* Allergies — also in Step 1 for quick access */}
+            <div className="mb-6">
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1.5" style={{ color: TEXT }}>
+                <AlertTriangle className="w-4 h-4" style={{ color: '#d97706' }} />
+                Allergies
+              </label>
+              <input
+                type="text"
+                value={allergies}
+                onChange={(e) => setAllergies(e.target.value)}
+                placeholder="Ex: Pénicilline, arachide, sulfamides..."
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+              <p className="text-xs mt-1" style={{ color: MUTED }}>
+                Ces infos seront visibles par les secours en cas d&apos;urgence
+              </p>
             </div>
 
             {/* Suivant button */}

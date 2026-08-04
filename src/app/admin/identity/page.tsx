@@ -74,7 +74,7 @@ export default function AdminIdentityPage() {
         />
       </div>
 
-      {/* Table */}
+      {/* Card Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
@@ -85,50 +85,62 @@ export default function AdminIdentityPage() {
           <p className="font-medium">Aucun bracelet Identity trouvé</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">QR Code</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nom</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nationalité</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Groupe Sanguin</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Agence</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Statut</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {filtered.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <Link href={`/p/${p.qrCode}`} className="flex items-center gap-2 font-mono text-sm font-semibold text-blue-600 hover:text-blue-800">
-                        <QrCode className="w-4 h-4" />
-                        {p.qrCode}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">{p.fullName}</td>
-                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{p.nationality}</td>
-                    <td className="px-4 py-3">
-                      {p.bloodType ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">{p.bloodType}</span>
-                      ) : (
-                        <span className="text-xs text-slate-400">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{p.agency?.name || '—'}</td>
-                    <td className="px-4 py-3">
-                      {p.isActive ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Actif</span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">Inactif</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((p) => (
+            <div
+              key={p.id}
+              className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all"
+            >
+              {/* Top colored bar */}
+              <div className={`h-2 ${p.isActive ? 'bg-emerald-600' : 'bg-amber-500'}`} />
+              <div className="p-5">
+                {/* QR Code row + Status badge */}
+                <div className="flex items-center justify-between mb-3">
+                  <Link
+                    href={`/p/${p.qrCode}`}
+                    className="flex items-center gap-2 font-mono text-sm font-semibold group/qr"
+                  >
+                    <QrCode className={`w-4 h-4 ${p.isActive ? 'text-emerald-600 group-hover/qr:text-emerald-700' : 'text-amber-500 group-hover/qr:text-amber-600'} transition-colors`} />
+                    <span className={`${p.isActive ? 'text-emerald-600 group-hover/qr:text-emerald-700' : 'text-amber-500 group-hover/qr:text-amber-600'} transition-colors`}>
+                      {p.qrCode}
+                    </span>
+                  </Link>
+                  {p.isActive ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Actif</span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">Inactif</span>
+                  )}
+                </div>
+
+                {/* Name */}
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                  {p.fullName || 'Non renseigné'}
+                </h3>
+
+                {/* Info rows */}
+                <div className="space-y-1.5 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Nationalité</span>
+                    <span className="text-slate-700 dark:text-slate-200 font-medium">{p.nationality}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Groupe sanguin</span>
+                    {p.bloodType ? (
+                      <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded-full text-xs font-bold">{p.bloodType}</span>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 dark:text-slate-400">Agence</span>
+                    <span className="text-slate-700 dark:text-slate-200 text-right truncate ml-2">
+                      {p.agency?.name || '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

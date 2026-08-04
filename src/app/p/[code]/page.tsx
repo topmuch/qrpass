@@ -41,7 +41,7 @@ function getPhotoDisplayUrl(photoUrl: string | null): string | null {
 }
 
 // ─── Brand constants ───
-const BG = '#f4b400';
+const BG = '#059669';
 const CARD_BG = '#ffffff';
 const TEXT = '#1a1a1a';
 const MUTED = '#6b7280';
@@ -640,8 +640,8 @@ export default function PilgrimScanPage() {
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
-              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#fff3cd' }}>
-                <AlertCircle className="w-10 h-10" style={{ color: '#f4b400' }} />
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: '#d1fae5' }}>
+                <AlertCircle className="w-10 h-10" style={{ color: '#059669' }} />
               </div>
               <h1 className="text-[22px] font-extrabold leading-tight mb-3">{t('notActivated')}</h1>
               <p className="text-[15px] leading-relaxed mb-6" style={{ color: MUTED }}>{t('notActivatedDesc')}</p>
@@ -825,7 +825,7 @@ export default function PilgrimScanPage() {
                 <div
                   className="py-5 px-6"
                   style={{
-                    background: 'linear-gradient(135deg, #f4b400 0%, #e8a300 50%, #d49200 100%)',
+                    background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
                   }}
                 >
                   {/* Photo — clickable for upload */}
@@ -1000,6 +1000,34 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
+                  1b. NUMÉROS D'URGENCE SAOUDIENS — directly below Alerte Santé
+              ═══════════════════════════════════════════════════════════ */}
+              <div
+                className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
+                style={{ background: '#fef2f2', boxShadow: SHADOW }}
+              >
+                <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
+                  {t('emerTitle')}
+                </h3>
+                <div className="flex justify-center gap-4">
+                  <a
+                    href="tel:997"
+                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+                  >
+                    🚑 997
+                  </a>
+                  <a
+                    href="tel:911"
+                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
+                  >
+                    👮 911
+                  </a>
+                </div>
+              </div>
+
+              {/* ═══════════════════════════════════════════════════════════
                   2. CONTACTS — 3 contact buttons
               ═══════════════════════════════════════════════════════════ */}
               <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4">
@@ -1170,34 +1198,6 @@ export default function PilgrimScanPage() {
                   </a>
                 </div>
               )}
-
-              {/* ═══════════════════════════════════════════════════════════
-                  5. NUMÉROS D'URGENCE SAOUDIENS
-              ═══════════════════════════════════════════════════════════ */}
-              <div
-                className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
-                style={{ background: '#fef2f2', boxShadow: SHADOW }}
-              >
-                <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
-                  {t('emerTitle')}
-                </h3>
-                <div className="flex justify-center gap-4">
-                  <a
-                    href="tel:997"
-                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
-                  >
-                    🚑 997
-                  </a>
-                  <a
-                    href="tel:911"
-                    className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
-                  >
-                    👮 911
-                  </a>
-                </div>
-              </div>
 
               {/* ═══════════════════════════════════════════════════════════
                   6. VOUS ÊTES PROTÉGÉ — Reassurance card

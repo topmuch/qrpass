@@ -207,166 +207,85 @@ export default function IdentityPage() {
         </div>
       ) : (
         <>
-          {/* Section 1 — Activated Pilgrims */}
-          {activePilgrims.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-600/5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-600" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                    Bracelets activés ({activePilgrims.length})
-                  </h2>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Code QR</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Groupe sanguin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden lg:table-cell">Hôtel Mecque</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activePilgrims.map((pilgrim) => (
-                      <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <Link
-                            href={`/found/${pilgrim.qrCode}`}
-                            className="flex items-center gap-2 group/qr"
-                            title={`Scanner ${pilgrim.qrCode}`}
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-600/10 flex items-center justify-center group-hover/qr:bg-emerald-200 dark:group-hover/qr:bg-emerald-600/20 transition-colors">
-                              <QrCode className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-emerald-600 dark:group-hover/qr:text-emerald-400 transition-colors">{pilgrim.qrCode}</span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div>
-                            <span className="text-slate-800 dark:text-white font-medium">
-                              {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? pilgrim.fullName : 'Non renseigné'}
-                            </span>
-                            {pilgrim.nationality && pilgrim.nationality.trim() !== '' && (
-                              <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">({pilgrim.nationality})</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          {pilgrim.bloodType ? (
-                            <span className="px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold">{pilgrim.bloodType}</span>
-                          ) : (
-                            <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 hidden lg:table-cell">
-                          {pilgrim.hotelMecca ? (
-                            <span className="text-slate-600 dark:text-slate-300 text-sm">{pilgrim.hotelMecca}</span>
-                          ) : (
-                            <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">Actif</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => { setSelectedPilgrim(pilgrim); setShowDetailModal(true); }}
-                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                            title="Voir détails"
-                          >
-                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">{activePilgrims.length} bracelet(s) activé(s)</span>
-              </div>
-            </div>
-          )}
+          {/* Card Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredPilgrims.map((pilgrim) => (
+              <div
+                key={pilgrim.id}
+                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all"
+              >
+                {/* Top colored bar */}
+                <div className={`h-2 ${pilgrim.isActive ? 'bg-emerald-600' : 'bg-amber-500'}`} />
+                <div className="p-5">
+                  {/* QR Code row + Status badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <Link
+                      href={`/found/${pilgrim.qrCode}`}
+                      className="flex items-center gap-2 font-mono text-sm font-semibold group/qr"
+                      title={pilgrim.isActive ? `Scanner ${pilgrim.qrCode}` : `Activer ${pilgrim.qrCode}`}
+                    >
+                      <QrCode className={`w-4 h-4 ${pilgrim.isActive ? 'text-emerald-600 group-hover/qr:text-emerald-700' : 'text-amber-500 group-hover/qr:text-amber-600'} transition-colors`} />
+                      <span className={`${pilgrim.isActive ? 'text-emerald-600 group-hover/qr:text-emerald-700' : 'text-amber-500 group-hover/qr:text-amber-600'} transition-colors`}>
+                        {pilgrim.qrCode}
+                      </span>
+                    </Link>
+                    {pilgrim.isActive ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">Actif</span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400">En attente</span>
+                    )}
+                  </div>
 
-          {/* Section 2 — Pending Pilgrims */}
-          {pendingPilgrims.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
-              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-600/5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                    QR en attente d&apos;activation ({pendingPilgrims.length})
-                  </h2>
+                  {/* Name */}
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                    {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? pilgrim.fullName : 'Non renseigné'}
+                  </h3>
+
+                  {/* Info rows */}
+                  <div className="space-y-1.5 text-sm">
+                    {pilgrim.nationality && pilgrim.nationality.trim() !== '' && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Nationalité</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">{pilgrim.nationality}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Groupe sanguin</span>
+                      {pilgrim.bloodType ? (
+                        <span className="px-2 py-0.5 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold">{pilgrim.bloodType}</span>
+                      ) : (
+                        <span className="text-slate-400 dark:text-slate-500">—</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 dark:text-slate-400">Hôtel Mecque</span>
+                      <span className="text-slate-700 dark:text-slate-200 text-right truncate ml-2">
+                        {pilgrim.hotelMecca || '—'}
+                      </span>
+                    </div>
+                    {!pilgrim.isActive && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Créé le</span>
+                        <span className="text-slate-700 dark:text-slate-200">{formatDate(pilgrim.createdAt)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action button */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700">
+                    <button
+                      onClick={() => { setSelectedPilgrim(pilgrim); setShowDetailModal(true); }}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-600/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                      title="Voir détails"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Détails
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Code QR</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Nationalité</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingPilgrims.map((pilgrim) => (
-                      <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <Link
-                            href={`/found/${pilgrim.qrCode}`}
-                            className="flex items-center gap-2 group/qr"
-                            title={`Activer ${pilgrim.qrCode}`}
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-600/10 flex items-center justify-center group-hover/qr:bg-amber-200 dark:group-hover/qr:bg-amber-600/20 transition-colors">
-                              <QrCode className="w-4 h-4 text-amber-600" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-amber-600 dark:group-hover/qr:text-amber-400 transition-colors">{pilgrim.qrCode}</span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4">
-                          {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? (
-                            <span className="text-slate-800 dark:text-white font-medium">{pilgrim.fullName}</span>
-                          ) : (
-                            <span className="px-2 py-1 bg-amber-100 dark:bg-amber-600/20 text-amber-600 dark:text-amber-500 rounded-full text-xs font-medium">Non activé</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-600 dark:text-slate-300 text-sm">
-                            {pilgrim.nationality && pilgrim.nationality.trim() !== '' ? pilgrim.nationality : '—'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-400 dark:text-slate-500 text-sm">{formatDate(pilgrim.createdAt)}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400">En attente</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => { setSelectedPilgrim(pilgrim); setShowDetailModal(true); }}
-                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                            title="Voir détails"
-                          >
-                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">{pendingPilgrims.length} QR en attente d&apos;activation</span>
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
 
           {/* Footer */}
           <div className="text-center mt-4">
