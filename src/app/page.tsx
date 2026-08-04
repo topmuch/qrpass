@@ -582,7 +582,7 @@ export default function HomePage() {
       <div className="hk">
         {/* ─── HEADER ─── */}
         <header className="hk-header">
-          <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain' }} priority />
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} priority />
           <div className="hk-nav">
             <button className="hk-lang" onClick={cycleLang} title="Switch language">
               🌐 {langLabels[lang]}
@@ -643,7 +643,7 @@ export default function HomePage() {
             </div>
             <div className="hk-hero-visual">
               <Image
-                src="/images/hero-products.png"
+                src="/images/hero-products-new.png"
                 alt="Pass Bagage & Pass Identity"
                 width={480}
                 height={274}
@@ -749,7 +749,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="hk-product-footer">
-                <Link href="/activate/baggage" className="hk-product-btn hk-product-btn--bagage">
+                <Link href="/select" className="hk-product-btn hk-product-btn--bagage">
                   {t('landing.products.bagageCta')} →
                 </Link>
               </div>
@@ -783,7 +783,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="hk-product-footer">
-                <Link href="/activate/identity" className="hk-product-btn hk-product-btn--identity">
+                <Link href="/select" className="hk-product-btn hk-product-btn--identity">
                   {t('landing.products.identityCta')} →
                 </Link>
               </div>
@@ -929,7 +929,7 @@ export default function HomePage() {
           <div className="hk-footer-grid">
             {/* Logo & tagline */}
             <div className="hk-footer-col">
-              <Image src="/logo.png" alt="PassHajj" width={140} height={54} style={{ objectFit: 'contain', background: 'rgba(255,255,255,0.95)', borderRadius: '12px', padding: '6px 10px', marginBottom: '12px' }} />
+              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)', marginBottom: '12px' }} />
               <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{t('landing.footer.tagline')}</p>
             </div>
             {/* Produit */}

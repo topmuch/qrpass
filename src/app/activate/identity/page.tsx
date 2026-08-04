@@ -54,9 +54,14 @@ function IdentityActivateContent() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [language, setLanguage] = useState('');
 
   // Step 2: Santé
   const [bloodType, setBloodType] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [diseases, setDiseases] = useState('');
   const [medicalInfo, setMedicalInfo] = useState('');
 
   // Step 3: Logement & Contacts
@@ -183,10 +188,17 @@ function IdentityActivateContent() {
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
       const payload: Record<string, unknown> = {
         fullName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         nationality: 'Non spécifié', // Required by API but not in form
         groupLeaderPhone: leaderPhone.trim(),
         bloodType: bloodType === 'Inconnu' ? 'Unknown' : bloodType,
+        allergies: allergies.trim() || undefined,
+        diseases: diseases.trim() || undefined,
         medicalInfo: medicalInfo.trim() || undefined,
+        address: address.trim() || undefined,
+        phone: phone.trim() || undefined,
+        language: language.trim() || undefined,
         familyContact: familyPhone.trim() || undefined,
       };
 
@@ -269,7 +281,7 @@ function IdentityActivateContent() {
       {/* ─── Header / Logo ─── */}
       <div className="w-full max-w-[420px] mb-5">
         <div className="text-2xl font-extrabold tracking-tight text-black">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
         </div>
         <p className="text-sm mt-1" style={{ color: MUTED }}>
           Bracelet d&apos;Urgence &amp; Identification
@@ -410,7 +422,7 @@ function IdentityActivateContent() {
             </div>
 
             {/* Âge */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
                 Âge
               </label>
@@ -427,6 +439,51 @@ function IdentityActivateContent() {
               <p className="text-xs mt-1" style={{ color: MUTED }}>
                 Optionnel
               </p>
+            </div>
+
+            {/* Adresse */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Adresse
+              </label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Ex: Rue 12, Médina Gounass, Dakar"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Numéro de téléphone */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Numéro de téléphone
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+221 77 123 45 67"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Langue parlée */}
+            <div className="mb-6">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Langue parlée
+              </label>
+              <input
+                type="text"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                placeholder="Ex: Français, Wolof, Arabe"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
             </div>
 
             {/* Suivant button */}
@@ -483,16 +540,46 @@ function IdentityActivateContent() {
               </select>
             </div>
 
-            {/* Allergies & Maladies Chroniques */}
+            {/* Allergies */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Allergies
+              </label>
+              <textarea
+                value={allergies}
+                onChange={(e) => setAllergies(e.target.value)}
+                placeholder="Ex: Pénicilline, arachide, sulfamides..."
+                rows={2}
+                className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Maladies chroniques */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Maladies chroniques
+              </label>
+              <textarea
+                value={diseases}
+                onChange={(e) => setDiseases(e.target.value)}
+                placeholder="Ex: Diabète type 2, hypertension, asthme..."
+                rows={2}
+                className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Autres infos médicales */}
             <div className="mb-6">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                Allergies &amp; Maladies Chroniques
+                Autres infos médicales
               </label>
               <textarea
                 value={medicalInfo}
                 onChange={(e) => setMedicalInfo(e.target.value)}
-                placeholder="Ex: Allergie à la pénicilline, diabète type 2, hypertension..."
-                rows={4}
+                placeholder="Ex: Médicaments en cours, port de lunettes..."
+                rows={2}
                 className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
                 style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />

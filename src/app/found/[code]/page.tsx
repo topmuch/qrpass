@@ -140,9 +140,9 @@ export default function FoundSelectorPage() {
             height={46}
             style={{
               objectFit: 'contain',
-              background: 'rgba(255,255,255,0.95)',
-              borderRadius: '10px',
-              padding: '4px 8px',
+              borderRadius: '12px',
+              padding: '4px',
+              background: 'rgba(255,255,255,0.85)',
             }}
           />
         </div>

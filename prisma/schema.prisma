@@ -557,15 +557,23 @@ model Pilgrim {
   id               String   @id @default(cuid())
   qrCode           String   @unique // ex: "PH-P-3M8N5"
   fullName         String
+  firstName        String?  // Prénom
+  lastName         String?  // Nom de famille
   nationality      String
+  language         String?  // Langue parlée (ex: "Français", "Arabe", "Wolof")
   photoUrl         String?
   bloodType        String?  // "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
-  medicalInfo      String?  // Allergies, chronic conditions, medications
+  allergies        String?  // Allergies spécifiques
+  diseases         String?  // Maladies chroniques
+  medicalInfo      String?  // Autres infos médicales (médicaments, etc.)
+  address          String?  // Adresse du pèlerin
+  phone            String?  // Numéro de téléphone du pèlerin
   hotelMecca       String?  // Hotel name in Mecca
   roomMecca        String?  // Room number in Mecca
   hotelMedina      String?  // Hotel name in Medina
   roomMedina       String?  // Room number in Medina
   hotelCoords      Json?    // { lat: number, lng: number }
+  hotelAddress     String?  // Adresse de l'hôtel
   groupLeaderPhone String?  // WhatsApp number of group leader
   agencyPhone      String?  // Agency contact number
   familyContact    String?  // Family emergency contact

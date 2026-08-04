@@ -96,11 +96,15 @@ function SelectPageInner() {
     setValidating(true);
     setError(null);
     try {
-      const res = await fetch(`/api/baggage/reference/${encodeURIComponent(qrReference.trim())}`);
+      // Use the unified lookup API that checks BOTH Baggage and Pilgrim tables
+      const res = await fetch(`/api/pilgrims/lookup/${encodeURIComponent(qrReference.trim())}`);
       if (res.ok) {
-        setRefValidated(true);
-      } else if (res.status === 404) {
-        setError('Référence QR non trouvée. Vérifiez votre code ou demandez-le à votre agence.');
+        const data = await res.json();
+        if (data.found) {
+          setRefValidated(true);
+        } else {
+          setError('Référence QR non trouvée. Vérifiez votre code ou demandez-le à votre agence.');
+        }
       } else {
         setError('Erreur de vérification. Réessayez.');
       }
@@ -123,7 +127,7 @@ function SelectPageInner() {
       {/* ─── Header ─── */}
       <header className="w-full px-4 pt-6 pb-2 anim-fade-in-down">
         <div className="max-w-3xl mx-auto flex items-center justify-center">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
         </div>
         <p className="text-center mt-2 text-sm font-medium anim-fade-in" style={{ color: '#64748b' }}>Activez votre protection</p>
       </header>

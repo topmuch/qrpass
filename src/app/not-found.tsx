@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="text-center text-white max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <img src="/logo.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+          <img src="/logo.png" alt="PassHajj" className="h-16 w-auto" style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
         </div>
 
         {/* 404 */}

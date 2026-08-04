@@ -22,6 +22,7 @@ import {
   Upload,
   ShieldCheck,
   HelpCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -45,15 +46,23 @@ interface PilgrimData {
   id: string;
   qrCode: string;
   fullName: string;
+  firstName: string | null;
+  lastName: string | null;
   nationality: string;
+  language: string | null;
   photoUrl: string | null;
   bloodType: string | null;
+  allergies: string | null;
+  diseases: string | null;
   medicalInfo: string | null;
+  address: string | null;
+  phone: string | null;
   hotelMecca: string | null;
   roomMecca: string | null;
   hotelMedina: string | null;
   roomMedina: string | null;
   hotelCoords: { lat: number; lng: number } | string | null;
+  hotelAddress: string | null;
   groupLeaderPhone: string | null;
   agencyPhone: string | null;
   familyContact: string | null;
@@ -63,6 +72,7 @@ interface PilgrimData {
   expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
+  agency?: { name: string } | null;
   reports: ReportData[];
 }
 
@@ -140,6 +150,16 @@ const translations = {
     healthAlertTitle: 'Alerte Santé',
     hotelSectionTitle: 'Hôtel',
     hotelItinerary: 'Itinéraire vers l\'hôtel',
+    reassureFamily: 'Rassurer la famille',
+    reassureMessage: 'Je vais bien, je suis à Jeddah',
+    allergiesLabel: 'Allergies',
+    diseasesLabel: 'Maladies',
+    otherMedicalLabel: 'Autres infos médicales',
+    languageLabel: 'Langue',
+    agencyLabel: 'Agence de voyage',
+    firstNameLabel: 'Prénom',
+    lastNameLabel: 'Nom',
+    nationalityLabel: 'Nationalité',
   },
   en: {
     helpLink: 'Help?',
@@ -189,6 +209,16 @@ const translations = {
     healthAlertTitle: 'Health Alert',
     hotelSectionTitle: 'Hotel',
     hotelItinerary: 'Route to hotel',
+    reassureFamily: 'Reassure family',
+    reassureMessage: 'I am fine, I am in Jeddah',
+    allergiesLabel: 'Allergies',
+    diseasesLabel: 'Diseases',
+    otherMedicalLabel: 'Other medical info',
+    languageLabel: 'Language',
+    agencyLabel: 'Travel agency',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    nationalityLabel: 'Nationality',
   },
   ar: {
     helpLink: 'مساعدة؟',
@@ -238,6 +268,16 @@ const translations = {
     healthAlertTitle: 'تنبيه صحي',
     hotelSectionTitle: 'الفندق',
     hotelItinerary: 'اتجاهات إلى الفندق',
+    reassureFamily: 'إطمئن العائلة',
+    reassureMessage: 'أنا بخير، أنا في جدة',
+    allergiesLabel: 'الحساسية',
+    diseasesLabel: 'الأمراض',
+    otherMedicalLabel: 'معلومات طبية أخرى',
+    languageLabel: 'اللغة',
+    agencyLabel: 'وكالة السفر',
+    firstNameLabel: 'الاسم الأول',
+    lastNameLabel: 'الاسم الأخير',
+    nationalityLabel: 'الجنسية',
   },
 };
 
@@ -583,7 +623,7 @@ export default function PilgrimScanPage() {
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
           <div className="flex items-center mb-8">
-            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
@@ -648,7 +688,7 @@ export default function PilgrimScanPage() {
           {/* ─── HEADER ─── */}
           <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -784,8 +824,11 @@ export default function PilgrimScanPage() {
                         style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                         onError={(e) => {
                           const target = e.currentTarget;
+                          // Prevent infinite loop if fallback also fails
+                          if (target.dataset.error) return;
+                          target.dataset.error = '1';
                           target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
+                          const fallback = target.nextElementSibling as HTMLElement | null;
                           if (fallback) fallback.style.display = 'flex';
                         }}
                       />
@@ -812,12 +855,46 @@ export default function PilgrimScanPage() {
                 {/* Name */}
                 <h2 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h2>
 
-                {/* Nationality */}
+                {/* Nationality badge */}
                 {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
                   <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold inline-block mt-1" style={{ color: MUTED }}>
                     {pilgrim.nationality}
                   </span>
                 )}
+
+                {/* Info list below name */}
+                <div className="mt-4 text-left space-y-2">
+                  {pilgrim.lastName && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('lastNameLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.lastName}</span>
+                    </div>
+                  )}
+                  {pilgrim.firstName && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('firstNameLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.firstName}</span>
+                    </div>
+                  )}
+                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('nationalityLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.nationality}</span>
+                    </div>
+                  )}
+                  {pilgrim.language && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('languageLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.language}</span>
+                    </div>
+                  )}
+                  {pilgrim.agency?.name && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('agencyLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.agency.name}</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* Edit button */}
                 <button
@@ -847,7 +924,7 @@ export default function PilgrimScanPage() {
                   {t('healthAlertTitle')}
                 </h3>
 
-                {/* Blood type */}
+                {/* Blood type — Droplets icon, red */}
                 {pilgrim.bloodType && (
                   <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
@@ -860,20 +937,46 @@ export default function PilgrimScanPage() {
                   </div>
                 )}
 
-                {/* Medical info */}
-                {pilgrim.medicalInfo && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
-                      <AlertCircle className="w-5 h-5 text-white" />
+                {/* Allergies — AlertTriangle icon, orange/amber */}
+                {pilgrim.allergies && (
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fffbeb' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#f59e0b' }}>
+                      <AlertTriangle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <span className="text-xs block" style={{ color: MUTED }}>Informations médicales</span>
-                      <span className="text-sm font-bold" style={{ color: DANGER }}>{pilgrim.medicalInfo}</span>
+                      <span className="text-xs block" style={{ color: MUTED }}>{t('allergiesLabel')}</span>
+                      <span className="text-sm font-bold" style={{ color: '#b45309' }}>{pilgrim.allergies}</span>
                     </div>
                   </div>
                 )}
 
-                {!pilgrim.bloodType && !pilgrim.medicalInfo && (
+                {/* Maladies — Heart icon (pulsing), red */}
+                {pilgrim.diseases && (
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
+                      <Heart className="w-5 h-5 text-white animate-pulse" />
+                    </div>
+                    <div>
+                      <span className="text-xs block" style={{ color: MUTED }}>{t('diseasesLabel')}</span>
+                      <span className="text-sm font-bold" style={{ color: DANGER }}>{pilgrim.diseases}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Autres infos médicales — AlertCircle icon, muted */}
+                {pilgrim.medicalInfo && (
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f9fafb' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: MUTED }}>
+                      <AlertCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-xs block" style={{ color: MUTED }}>{t('otherMedicalLabel')}</span>
+                      <span className="text-sm font-bold" style={{ color: TEXT }}>{pilgrim.medicalInfo}</span>
+                    </div>
+                  </div>
+                )}
+
+                {!pilgrim.bloodType && !pilgrim.allergies && !pilgrim.diseases && !pilgrim.medicalInfo && (
                   <p className="text-sm" style={{ color: MUTED }}>{t('noMedical')}</p>
                 )}
               </div>
@@ -1025,6 +1128,24 @@ export default function PilgrimScanPage() {
                   </div>
                 )}
               </div>
+
+              {/* ═══════════════════════════════════════════════════════════
+                  4b. RASSURER LA FAMILLE — WhatsApp reassurance button
+              ═══════════════════════════════════════════════════════════ */}
+              {pilgrim.familyContact && (
+                <div className="w-full max-w-[420px] mb-4">
+                  <a
+                    href={`https://wa.me/${cleanPhone(pilgrim.familyContact)}?text=${encodeURIComponent(t('reassureMessage'))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
+                  >
+                    <Heart className="w-5 h-5" />
+                    {t('reassureFamily')}
+                  </a>
+                </div>
+              )}
 
               {/* ═══════════════════════════════════════════════════════════
                   5. NUMÉROS D'URGENCE SAOUDIENS

@@ -27,7 +27,8 @@ import {
   TrendingUp,
   Newspaper,
   Activity,
-  MapPin
+  MapPin,
+  ShieldCheck
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -95,6 +96,9 @@ function Sidebar({
 
     // Voyageurs
     { label: "Voyageurs", icon: <Users className="w-5 h-5" />, href: "/admin/voyageurs", permission: PERMISSIONS.VIEW_BAGGAGES },
+
+    // Identity (Pass Identity bracelets)
+    { label: "Identity", icon: <ShieldCheck className="w-5 h-5" />, href: "/admin/identity", permission: PERMISSIONS.VIEW_BAGGAGES },
 
     // Messages Category
     { label: "MESSAGES", icon: null, isCategory: true },
