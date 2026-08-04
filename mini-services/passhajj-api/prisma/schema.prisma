@@ -1,0 +1,392 @@
+// ═══════════════════════════════════════════════════════════════
+//  PASSHAJJ MANAGER — Backend API Database Schema
+//  Express + Prisma ORM (SQLite → PostgreSQL-ready)
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 1: User — Admin, Agency staff, Group Leaders
+// ═══════════════════════════════════════════════════════════════
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String    // bcrypt hash
+  role          String    @default("agency") // "superadmin" | "admin" | "agent" | "agency" | "leader"
+  phone         String?   // WhatsApp number
+  avatarUrl     String?   // Profile photo URL
+
+  // Relations
+  agencyId      String?
+  agency        Agency?   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  // JWT session tracking
+  refreshTokens RefreshToken[]
+
+  // Owned pilgrim bracelets
+  pilgrims      Pilgrim[]
+
+  // Audit
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([agencyId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL: RefreshToken — JWT refresh token storage
+// ═══════════════════════════════════════════════════════════════
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 2: Agency — Pilgrimage travel agencies
+// ═══════════════════════════════════════════════════════════════
+model Agency {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  email       String?
+  phone       String?   // Main agency phone
+  whatsapp    String?   // WhatsApp business number
+  address     String?
+  country     String?   // Agency country
+  logoUrl     String?   // Agency logo
+  active      Boolean   @default(true)
+
+  // Subscription
+  plan        String    @default("free") // "free" | "starter" | "pro" | "enterprise"
+  maxPilgrims Int       @default(50)     // Max pilgrims per trip based on plan
+
+  // Relations
+  users       User[]
+  trips       Trip[]
+  groups      PilgrimGroup[]
+  pilgrims    Pilgrim[]
+  bags        Bag[]
+
+  // Audit
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([active])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 3: Trip — A pilgrimage trip managed by an agency
+// ═══════════════════════════════════════════════════════════════
+model Trip {
+  id            String    @id @default(cuid())
+  name          String    // ex: "Hajj 2025 - Groupe 12"
+  description   String?   // Trip description
+
+  // Agency ownership
+  agencyId      String
+  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  // OTP-based PWA login (4-digit code, 24h expiry)
+  otp           String    @unique // 4-digit OTP: "1234", "5678"
+  otpExpiry     DateTime  // When the OTP expires (24h after generation)
+  otpUsed       Boolean   @default(false) // Whether OTP has been consumed
+
+  // Trip details
+  status        String    @default("active") // "active" | "completed" | "cancelled"
+  departureDate DateTime? // Trip departure date
+  returnDate    DateTime? // Trip return date
+  destination   String?   // ex: "La Mecque", "Médine"
+  transportMode String    @default("flight") // "flight" | "bus" | "boat" | "train"
+  airline       String?   // Airline name
+  flightNumber  String?   // Flight number
+
+  // Hotel info
+  hotelMecca    String?   // Hotel in Mecca
+  hotelMedina   String?   // Hotel in Medina
+
+  // Denormalized counters (updated on scan sync)
+  totalPilgrims Int      @default(0)
+  totalBags     Int      @default(0)
+  scannedPilgrims Int    @default(0) // Pilgrims scanned at least once
+  scannedBags   Int      @default(0) // Bags scanned at least once
+
+  // Relations
+  pilgrims      Pilgrim[]
+  bags          Bag[]
+  groups        PilgrimGroup[]
+  scans         ScanRecord[]
+  incidents     Incident[]
+
+  // Audit
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([agencyId])
+  @@index([otp])
+  @@index([status])
+  @@index([createdAt])
+  @@index([otpExpiry])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 4: PilgrimGroup — Groups of pilgrims within a trip
+// ═══════════════════════════════════════════════════════════════
+model PilgrimGroup {
+  id          String    @id @default(cuid())
+  name        String    // ex: "Groupe 1", "Groupe A"
+  color       String?   // Group color hex for UI: "#f4b400"
+
+  // Leader info
+  leaderName  String?   // Name of the group leader
+  leaderPhone String?   // WhatsApp number of group leader
+
+  // Ownership
+  agencyId    String
+  agency      Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  tripId      String?
+  trip        Trip?     @relation(fields: [tripId], references: [id], onDelete: SetNull)
+
+  // Relations
+  pilgrims    Pilgrim[]
+
+  // Audit
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([agencyId])
+  @@index([tripId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 5: Pilgrim — Pass Identity bracelet wearer
+//  QR Code prefix: "ID-" (ex: ID-1234001)
+// ═══════════════════════════════════════════════════════════════
+model Pilgrim {
+  id           String    @id @default(cuid())
+  qrCode       String    @unique // "ID-1234001" — unique QR code
+
+  // Identity
+  fullName     String    // Full display name
+  firstName    String?   // First name
+  lastName     String?   // Last name
+  nationality  String?   // Country of origin
+  language     String?   // Spoken language
+  gender       String?   // "M" | "F"
+  birthDate    DateTime? // Date of birth
+  passportNo   String?   // Passport number
+
+  // Medical info (FLASH CARD — shown on scan)
+  bloodType    String?   // "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+  allergies    String?   // Allergies: "Pénicilline, Sulfamides"
+  diseases     String?   // Chronic diseases: "Diabète type 2"
+  medicalInfo  String?   // Other medical info/medications
+
+  // Contact
+  phone        String?   // Personal phone
+  familyContact String?  // Emergency family contact
+
+  // Accommodation
+  hotelMecca   String?   // Hotel in Mecca
+  roomMecca    String?   // Room number in Mecca
+  hotelMedina  String?   // Hotel in Medina
+  roomMedina   String?   // Room number in Medina
+
+  // Photo
+  photoUrl     String?   // Profile photo URL
+
+  // Activation
+  isActive     Boolean   @default(false) // Activated by owner
+  expiresAt    DateTime? // Bracelet expiry date
+
+  // Relations
+  agencyId     String?
+  agency       Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+
+  tripId       String?
+  trip         Trip?     @relation(fields: [tripId], references: [id], onDelete: SetNull)
+
+  groupId      String?
+  group        PilgrimGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  ownerId      String?   // User who activated this pilgrim bracelet
+  owner        User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+
+  // Audit
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([qrCode])
+  @@index([isActive])
+  @@index([agencyId])
+  @@index([tripId])
+  @@index([groupId])
+  @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 6: Bag — Luggage items linked to a trip
+//  QR Code prefix: "BG-" (ex: BG-12340011)
+// ═══════════════════════════════════════════════════════════════
+model Bag {
+  id            String    @id @default(cuid())
+  qrCode        String    @unique // "BG-12340011" — unique QR code
+
+  // Ownership
+  ownerName     String    // Name of the bag owner (denormalized from Pilgrim)
+  ownerId       String?   // Links to Pilgrim.id
+
+  // Bag details
+  baggageType   String    @default("cabine") // "cabine" | "soute"
+  baggageIndex  Int       @default(1)        // 1, 2, 3 (order within set)
+  color         String?   // Bag color for visual ID: "noir", "bleu"
+  description   String?   // Bag description
+
+  // Transport
+  airline       String?   // Airline name
+  flightNumber  String?   // Flight number
+  destination   String?   // Destination city
+  departureDate DateTime? // Departure date
+
+  // Accommodation
+  hotelName     String?   // Hotel in Saudi Arabia
+  roomNumber    String?   // Hotel room
+
+  // Photo
+  photoUrl      String?   // Bag photo URL
+
+  // Status
+  status        String    @default("pending") // "pending" | "active" | "scanned" | "lost" | "found"
+
+  // Relations
+  agencyId      String?
+  agency        Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+
+  tripId        String?
+  trip          Trip?     @relation(fields: [tripId], references: [id], onDelete: SetNull)
+
+  // Audit
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([qrCode])
+  @@index([agencyId])
+  @@index([tripId])
+  @@index([ownerId])
+  @@index([status])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 7: ScanRecord — QR scan records from PWA (offline-capable)
+//  synced=false means pending sync from offline PWA
+// ═══════════════════════════════════════════════════════════════
+model ScanRecord {
+  id          String    @id @default(cuid())
+  qrCode      String    // The scanned QR code value
+
+  // Type detection from prefix: "ID-" = identity, "BG-" = baggage
+  type        String    // "identity" | "baggage"
+
+  // Trip association
+  tripId      String
+  trip        Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  // Zone where scan occurred
+  zone        String    // "Aéroport" | "Bus" | "Hôtel" | "Haram"
+
+  // Timing (client-side timestamp for offline accuracy)
+  timestamp   DateTime  // When the scan happened on the device
+
+  // Status
+  status      String    @default("success") // "success" | "error" | "duplicate"
+
+  // Linked entity
+  pilgrimName String?   // Name of the scanned person (denormalized)
+  pilgrimId   String?   // Links to Pilgrim (if type="identity")
+  bagId       String?   // Links to Bag (if type="baggage")
+
+  // Offline sync
+  synced      Boolean   @default(false) // false = pending sync, true = synced to server
+  syncedAt    DateTime? // When it was successfully synced
+
+  // Device info
+  deviceInfo  String?   // JSON: { userAgent, deviceId, appVersion }
+
+  // Audit
+  createdAt   DateTime  @default(now())
+
+  @@index([tripId])
+  @@index([qrCode])
+  @@index([timestamp])
+  @@index([synced])
+  @@index([type])
+  @@index([zone])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL 8: Incident — Incidents reported by group leaders
+// ═══════════════════════════════════════════════════════════════
+model Incident {
+  id            String    @id @default(cuid())
+  type          String    // "pilgrim_sick" | "bag_damaged" | "bag_lost" | "pilgrim_missing" | "other"
+  description   String    // What happened
+
+  // Related entity
+  relatedQrCode String?   // QR code of the related item/person
+  relatedName   String?   // Name of the related person
+
+  // Trip association
+  tripId        String
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  // Location
+  zone          String    // Zone where incident occurred
+  latitude      Float?    // GPS latitude
+  longitude     Float?    // GPS longitude
+
+  // Photo evidence
+  photoUrl      String?   // Incident photo URL
+
+  // Timing
+  timestamp     DateTime  // When it happened (client-side for offline)
+
+  // Offline sync
+  synced        Boolean   @default(false) // false = pending sync
+  syncedAt      DateTime? // When it was synced
+
+  // Priority & resolution
+  priority      String    @default("normal") // "low" | "normal" | "high" | "critical"
+  resolved      Boolean   @default(false)
+  resolvedAt    DateTime?
+  resolvedBy    String?   // User ID who resolved it
+  resolution    String?   // Resolution notes
+
+  // Audit
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([tripId])
+  @@index([type])
+  @@index([timestamp])
+  @@index([synced])
+  @@index([priority])
+  @@index([resolved])
+}

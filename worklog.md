@@ -28,3 +28,28 @@ Stage Summary:
 - Verified working: OTP login, QR scanning (identity + baggage + out-of-group), zone selector, counters, list filters, incidents, sync manager
 - Sound feedback: beep-green.mp3 (pilgrim), beep-blue.mp3 (baggage), beep-red.mp3 (error)
 - Design system: Yellow #f4b400 theme, white cards, large readable typography, wide touch targets
+
+---
+Task ID: 2
+Agent: main
+Task: PROMPT 1 — Generate schema.prisma and server.ts for PassHajj Backend API
+
+Work Log:
+- Created mini-service at mini-services/passhajj-api/ with Express + TypeScript
+- Generated complete schema.prisma with 8 models: User, RefreshToken, Agency, Trip, PilgrimGroup, Pilgrim, Bag, ScanRecord, Incident
+- Generated server.ts with full middleware stack: CORS, Helmet, rate limiting, JWT auth (access+refresh), Multer (2MB max), role-based authorization, error handler, graceful shutdown
+- Created package.json with all dependencies (express, prisma, jwt, bcryptjs, multer, cors, helmet, zod)
+- Created .env with configuration (PORT=3002, JWT_SECRET, upload limits)
+- Created prisma/seed.ts with demo data: 3 agencies, 3 trips (OTP: 1234/5678/9999), 75 pilgrims, 126 bags
+- Pushed schema to SQLite database and seeded successfully
+- Verified server starts on port 3002 with healthy health check and API info endpoints
+
+Stage Summary:
+- Backend API server running at http://localhost:3002
+- Database: SQLite at mini-services/passhajj-api/prisma/passhajj-api.db
+- Schema: 8 models (User, RefreshToken, Agency, Trip, PilgrimGroup, Pilgrim, Bag, ScanRecord, Incident)
+- Auth: JWT with bcrypt, access token (24h) + refresh token (7d)
+- Upload: Multer with 2MB max, image-only filter (JPEG/PNG/WebP/GIF)
+- Security: Helmet, CORS, rate limiting (global 200/15min, auth 20/15min, OTP 10/5min)
+- Route stubs ready for implementation (auth, trips, pilgrims, bags, scans, incidents, agencies, leader, finder, webhooks)
+- Waiting for user validation before implementing routes
