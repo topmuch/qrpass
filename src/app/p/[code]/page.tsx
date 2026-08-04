@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -14,14 +14,9 @@ import {
   Send,
   Heart,
   Building2,
-  Globe,
-  Pencil,
   Check,
-  RotateCcw,
   Droplets,
-  Upload,
   ShieldCheck,
-  HelpCircle,
   AlertTriangle,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -348,23 +343,7 @@ export default function PilgrimScanPage() {
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
 
-  // ─── Edit state ───
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [editFullName, setEditFullName] = useState('');
-  const [editNationality, setEditNationality] = useState('');
-  const [editBloodType, setEditBloodType] = useState('');
-  const [editMedicalInfo, setEditMedicalInfo] = useState('');
-  const [editHotelMecca, setEditHotelMecca] = useState('');
-  const [editRoomMecca, setEditRoomMecca] = useState('');
-  const [editHotelMedina, setEditHotelMedina] = useState('');
-  const [editRoomMedina, setEditRoomMedina] = useState('');
-  const [editGroupLeaderPhone, setEditGroupLeaderPhone] = useState('');
-  const [editFamilyContact, setEditFamilyContact] = useState('');
-
-  // ─── Photo upload state ───
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  // NOTE: Edit functionality removed from public page — only agency dashboard can edit
 
   // ─── i18n helper ───
   const t = (key: string): string => {
@@ -396,16 +375,7 @@ export default function PilgrimScanPage() {
           setPilgrim(data.pilgrim);
           setState('active');
           const p = data.pilgrim;
-          setEditFullName(p.fullName || '');
-          setEditNationality(p.nationality || '');
-          setEditBloodType(p.bloodType || '');
-          setEditMedicalInfo(p.medicalInfo || '');
-          setEditHotelMecca(p.hotelMecca || '');
-          setEditRoomMecca(p.roomMecca || '');
-          setEditHotelMedina(p.hotelMedina || '');
-          setEditRoomMedina(p.roomMedina || '');
-          setEditGroupLeaderPhone(p.groupLeaderPhone || '');
-          setEditFamilyContact(p.familyContact || '');
+          // Edit state removed — read-only public page
           return;
         }
 
@@ -440,89 +410,11 @@ export default function PilgrimScanPage() {
     );
   }, [state]);
 
-  // ─── Save handler ───
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const res = await fetch(`/api/pilgrims/${code}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: editFullName.trim(),
-          nationality: editNationality.trim(),
-          bloodType: editBloodType || null,
-          medicalInfo: editMedicalInfo || null,
-          hotelMecca: editHotelMecca || null,
-          roomMecca: editRoomMecca || null,
-          hotelMedina: editHotelMedina || null,
-          roomMedina: editRoomMedina || null,
-          groupLeaderPhone: editGroupLeaderPhone || null,
-          familyContact: editFamilyContact || null,
-        }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
-      const data = await res.json();
-      setPilgrim(data.pilgrim);
-      setIsEditing(false);
-      toast({ title: 'Informations mises à jour !' });
-    } catch {
-      toast({ title: 'Erreur lors de la sauvegarde', variant: 'destructive' });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  // NOTE: Save handler removed — public page is read-only
 
-  // ─── Cancel edit ───
-  const handleCancelEdit = () => {
-    if (pilgrim) {
-      setEditFullName(pilgrim.fullName || '');
-      setEditNationality(pilgrim.nationality || '');
-      setEditBloodType(pilgrim.bloodType || '');
-      setEditMedicalInfo(pilgrim.medicalInfo || '');
-      setEditHotelMecca(pilgrim.hotelMecca || '');
-      setEditRoomMecca(pilgrim.roomMecca || '');
-      setEditHotelMedina(pilgrim.hotelMedina || '');
-      setEditRoomMedina(pilgrim.roomMedina || '');
-      setEditGroupLeaderPhone(pilgrim.groupLeaderPhone || '');
-      setEditFamilyContact(pilgrim.familyContact || '');
-    }
-    setIsEditing(false);
-  };
+  // NOTE: Cancel edit removed — public page is read-only
 
-  // ─── Photo upload handler ───
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !code) return;
-
-    setIsUploadingPhoto(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const uploadRes = await fetch('/api/pilgrims/upload-photo', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!uploadRes.ok) throw new Error('Upload failed');
-      const uploadData = await uploadRes.json();
-      const photoUrl = uploadData.photoUrl;
-
-      const updateRes = await fetch(`/api/pilgrims/${code}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ photoUrl }),
-      });
-      if (!updateRes.ok) throw new Error('Update failed');
-      const updateData = await updateRes.json();
-
-      setPilgrim(updateData.pilgrim);
-      toast({ title: 'Photo mise à jour !' });
-    } catch {
-      toast({ title: 'Erreur lors du téléchargement de la photo', variant: 'destructive' });
-    } finally {
-      setIsUploadingPhoto(false);
-      if (photoInputRef.current) photoInputRef.current.value = '';
-    }
-  };
+  // NOTE: Photo upload handler removed — public page is read-only
 
   // ─── Submit report ───
   const handleSubmitReport = useCallback(async () => {
@@ -732,76 +624,9 @@ export default function PilgrimScanPage() {
           )}
 
           {/* ═══════════════════════════════════════════════════════════
-              EDIT MODE
+              READ-ONLY MODE — Public page is read-only for security
+              Only agency dashboard can edit pilgrim information
           ═══════════════════════════════════════════════════════════ */}
-          {isEditing ? (
-            <div className="w-full max-w-[420px] space-y-4">
-              <div className="rounded-[20px] p-5" style={{ background: CARD_BG, boxShadow: SHADOW }}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2">
-                    <Pencil className="w-5 h-5" style={{ color: '#059669' }} />
-                    Identité
-                  </h3>
-                  <div className="flex gap-2">
-                    <button onClick={handleCancelEdit} className="px-3 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 bg-white text-black hover:bg-gray-50 transition-colors">
-                      <RotateCcw className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleSave} disabled={isSaving} className="px-4 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-1 disabled:opacity-50" style={{ background: '#059669' }}>
-                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                      {t('save')}
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Nom complet *</label>
-                    <input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Nationalité *</label>
-                    <input type="text" value={editNationality} onChange={(e) => setEditNationality(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Groupe Sanguin</label>
-                    <select value={editBloodType} onChange={(e) => setEditBloodType(e.target.value)} className={inputClass} style={{ ...inputStyle, appearance: 'none' }}>
-                      <option value="">—</option>
-                      {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bt) => (
-                        <option key={bt} value={bt}>{bt}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Infos Médicales</label>
-                    <textarea value={editMedicalInfo} onChange={(e) => setEditMedicalInfo(e.target.value)} placeholder="Allergies, maladies chroniques..." rows={3} className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none" style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Hôtel (La Mecque)</label>
-                    <input type="text" value={editHotelMecca} onChange={(e) => setEditHotelMecca(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Chambre (La Mecque)</label>
-                    <input type="text" value={editRoomMecca} onChange={(e) => setEditRoomMecca(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Hôtel (Médine)</label>
-                    <input type="text" value={editHotelMedina} onChange={(e) => setEditHotelMedina(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Chambre (Médine)</label>
-                    <input type="text" value={editRoomMedina} onChange={(e) => setEditRoomMedina(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">WhatsApp Chef de Groupe</label>
-                    <input type="tel" value={editGroupLeaderPhone} onChange={(e) => setEditGroupLeaderPhone(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold mb-1 block">Téléphone Famille</label>
-                    <input type="tel" value={editFamilyContact} onChange={(e) => setEditFamilyContact(e.target.value)} className={inputClass} style={inputStyle} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
             <>
               {/* ─── "IDENTITÉ PÈLERIN" BIG TITLE ─── */}
               <div className="w-full max-w-[420px] text-center mb-2">
@@ -828,14 +653,8 @@ export default function PilgrimScanPage() {
                     background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
                   }}
                 >
-                  {/* Photo — clickable for upload */}
-                  <div className="relative inline-block mx-auto mb-3">
-                    <button
-                      onClick={() => photoInputRef.current?.click()}
-                      disabled={isUploadingPhoto}
-                      className="relative group cursor-pointer disabled:opacity-50"
-                      type="button"
-                    >
+                  {/* Photo — read-only, no upload on public page */}
+                  <div className="inline-block mx-auto mb-3">
                       {pilgrim.photoUrl ? (
                         <img
                           src={getPhotoDisplayUrl(pilgrim.photoUrl)}
@@ -864,11 +683,6 @@ export default function PilgrimScanPage() {
                       >
                         {getInitials(pilgrim.fullName)}
                       </div>
-                      <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        {isUploadingPhoto ? <Loader2 className="w-6 h-6 animate-spin text-white" /> : <Upload className="w-5 h-5 text-white" />}
-                      </div>
-                    </button>
-                    <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoChange} className="hidden" />
                   </div>
 
                   {/* Name */}
@@ -916,15 +730,6 @@ export default function PilgrimScanPage() {
                   )}
                 </div>
 
-                {/* Edit button */}
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 hover:bg-gray-200 transition-colors"
-                  style={{ color: TEXT }}
-                >
-                  <Pencil className="w-4 h-4" />
-                  {t('edit')}
-                </button>
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
@@ -1226,7 +1031,6 @@ export default function PilgrimScanPage() {
                 </ul>
               </div>
             </>
-          )}
 
           {/* ─── FOOTER ─── */}
           <footer className="mt-auto pt-4 pb-4 text-center text-xs" style={{ color: 'rgba(0,0,0,0.5)' }}>
