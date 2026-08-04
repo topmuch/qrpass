@@ -234,12 +234,16 @@ export default function IdentityPage() {
                     {activePilgrims.map((pilgrim) => (
                       <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-600/10 flex items-center justify-center">
+                          <Link
+                            href={`/found/${pilgrim.qrCode}`}
+                            className="flex items-center gap-2 group/qr"
+                            title={`Scanner ${pilgrim.qrCode}`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-600/10 flex items-center justify-center group-hover/qr:bg-emerald-200 dark:group-hover/qr:bg-emerald-600/20 transition-colors">
                               <QrCode className="w-4 h-4 text-emerald-600" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">{pilgrim.qrCode}</span>
-                          </div>
+                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-emerald-600 dark:group-hover/qr:text-emerald-400 transition-colors">{pilgrim.qrCode}</span>
+                          </Link>
                         </td>
                         <td className="px-6 py-4">
                           <div>
@@ -315,12 +319,16 @@ export default function IdentityPage() {
                     {pendingPilgrims.map((pilgrim) => (
                       <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-600/10 flex items-center justify-center">
+                          <Link
+                            href={`/found/${pilgrim.qrCode}`}
+                            className="flex items-center gap-2 group/qr"
+                            title={`Activer ${pilgrim.qrCode}`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-600/10 flex items-center justify-center group-hover/qr:bg-amber-200 dark:group-hover/qr:bg-amber-600/20 transition-colors">
                               <QrCode className="w-4 h-4 text-amber-600" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">{pilgrim.qrCode}</span>
-                          </div>
+                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-amber-600 dark:group-hover/qr:text-amber-400 transition-colors">{pilgrim.qrCode}</span>
+                          </Link>
                         </td>
                         <td className="px-6 py-4">
                           {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? (
@@ -387,15 +395,18 @@ export default function IdentityPage() {
             </div>
             <div className="p-6 space-y-4">
               {/* QR Code Info */}
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-600/10 rounded-xl flex items-center justify-center">
+              <Link
+                href={`/found/${selectedPilgrim.qrCode}`}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-600/5 transition-colors group/qrlink"
+              >
+                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-600/10 rounded-xl flex items-center justify-center group-hover/qrlink:bg-emerald-200 dark:group-hover/qrlink:bg-emerald-600/20 transition-colors">
                   <QrCode className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedPilgrim.qrCode}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pass Identity Hajj</p>
+                  <p className="text-slate-800 dark:text-white font-mono font-bold group-hover/qrlink:text-emerald-600 dark:group-hover/qrlink:text-emerald-400 transition-colors">{selectedPilgrim.qrCode}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pass Identity Hajj — Cliquer pour scanner</p>
                 </div>
-              </div>
+              </Link>
 
               {/* Name & Nationality */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

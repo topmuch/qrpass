@@ -376,3 +376,36 @@ Stage Summary:
 - Pass Bagage card only shows when baggage data exists
 - Agency dashboard now shows all 3 Pass Identity QR codes in a dedicated section with full detail modal
 - All browser tests pass: /found/PH-P-G6ZE5 → /activate/identity, /found/HAJJ26-TEST01 → /scan/..., agency baggages page shows Identity section
+---
+Task ID: 2
+Agent: Main
+Task: Make Identity QR codes clickable - open modal/inscription page like baggage QR codes do
+
+Work Log:
+- Updated `/src/app/agence/identity/page.tsx`:
+  - Changed activated pilgrims table QR code from plain `<span>` to clickable `<Link href={/found/${pilgrim.qrCode}}>`
+  - Added hover effects: emerald color transition on QR icon and text (group-hover/qr)
+  - Added tooltip: "Scanner [code]"
+  - Changed pending pilgrims table QR code from plain `<span>` to clickable `<Link href={/found/${pilgrim.qrCode}}>`
+  - Added hover effects: amber color transition on QR icon and text (group-hover/qr)
+  - Added tooltip: "Activer [code]"
+  - Made detail modal QR code section clickable: wrapped in Link with group-hover/qrlink
+  - Added "Cliquer pour scanner" helper text in modal
+- Updated `/src/app/agence/baggages/page.tsx` for consistency:
+  - Changed activated baggages table QR code from plain `<div>` to clickable `<Link href={/found/${baggage.reference}}>`
+  - Added hover effects: blue color transition (group-hover/qr)
+  - Changed pending baggages table QR code from plain `<div>` to clickable `<Link>`
+  - Made detail modal QR code section clickable with "Cliquer pour scanner" helper text
+- Both pages compile successfully with no errors (verified via curl + dev log)
+- Smart routing via /found/[code] handles all cases:
+  - Activated pilgrim → redirects to /p/[qrCode] (public profile)
+  - Non-activated pilgrim → redirects to /activate/identity?code=[qrCode] (activation page)
+  - Baggage only → redirects to /scan/[code] (finder page)
+  - Both types → shows selector page
+
+Stage Summary:
+- Identity QR codes in agency dashboard are now clickable links with hover effects
+- Baggages QR codes also made clickable for consistency
+- Clicking any QR code navigates to /found/[code] which smart-routes to the correct page
+- Detail modals also have clickable QR codes with "Cliquer pour scanner" helper text
+- All hover effects use Tailwind group-hover with smooth color transitions

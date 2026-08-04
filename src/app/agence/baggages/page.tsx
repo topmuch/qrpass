@@ -501,14 +501,18 @@ export default function BaggagesPage() {
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-blue-600/10 flex items-center justify-center">
+                          <Link
+                            href={`/found/${baggage.reference}`}
+                            className="flex items-center gap-2 group/qr"
+                            title={`Scanner ${baggage.reference}`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-blue-600/10 flex items-center justify-center group-hover/qr:bg-emerald-200 dark:group-hover/qr:bg-blue-600/20 transition-colors">
                               <QrCode className="w-4 h-4 text-blue-600" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-blue-600 dark:group-hover/qr:text-blue-400 transition-colors">
                               {baggage.reference}
                             </span>
-                          </div>
+                          </Link>
                         </td>
                         <td className="px-6 py-4">
                           {baggage.travelerFirstName || baggage.travelerLastName ? (
@@ -647,14 +651,18 @@ export default function BaggagesPage() {
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-blue-600/10 flex items-center justify-center">
+                          <Link
+                            href={`/found/${baggage.reference}`}
+                            className="flex items-center gap-2 group/qr"
+                            title={`Activer ${baggage.reference}`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-blue-600/10 flex items-center justify-center group-hover/qr:bg-amber-200 dark:group-hover/qr:bg-blue-600/20 transition-colors">
                               <QrCode className="w-4 h-4 text-blue-600" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-blue-600 dark:group-hover/qr:text-blue-400 transition-colors">
                               {baggage.reference}
                             </span>
-                          </div>
+                          </Link>
                         </td>
                         <td className="px-6 py-4">
                           <span className="px-2 py-1 bg-amber-100 dark:bg-blue-600/20 text-amber-600 dark:text-blue-500 rounded-full text-xs font-medium">
@@ -763,15 +771,18 @@ export default function BaggagesPage() {
               </button>
             </div>
             <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-100 dark:bg-blue-600/10 rounded-xl flex items-center justify-center">
+              <Link
+                href={`/found/${selectedBaggage.reference}`}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-600/5 transition-colors group/qrlink"
+              >
+                <div className="w-12 h-12 bg-amber-100 dark:bg-blue-600/10 rounded-xl flex items-center justify-center group-hover/qrlink:bg-amber-200 dark:group-hover/qrlink:bg-blue-600/20 transition-colors">
                   <QrCode className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+                  <p className="text-slate-800 dark:text-white font-mono font-bold group-hover/qrlink:text-blue-600 dark:group-hover/qrlink:text-blue-400 transition-colors">{selectedBaggage.reference}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'} — Cliquer pour scanner</p>
                 </div>
-              </div>
+              </Link>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
