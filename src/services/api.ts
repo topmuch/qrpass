@@ -16,6 +16,42 @@ import type {
 // ─── Backend ports ───
 const EXPRESS_PORT = 3002; // Express backend (mini-service)
 
+// ─── JWT Token Management (for Express backend agency auth) ───
+const TOKEN_KEY = 'passhajj_agency_token';
+const REFRESH_TOKEN_KEY = 'passhajj_agency_refresh_token';
+const USER_KEY = 'passhajj_agency_user';
+
+export function getAgencyToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setAgencyTokens(accessToken: string, refreshToken?: string): void {
+  localStorage.setItem(TOKEN_KEY, accessToken);
+  if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
+export function setAgencyUser(user: any): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+export function getAgencyUser(): any | null {
+  if (typeof window === 'undefined') return null;
+  const raw = localStorage.getItem(USER_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+export function clearAgencyAuth(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function isAgencyAuthenticated(): boolean {
+  return !!getAgencyToken();
+}
+
 // ─── Express API Instance (via Caddy gateway → port 3002) ───
 const expressApi = axios.create({
   baseURL: '/api',
@@ -36,11 +72,18 @@ const nextApi = axios.create({
 
 // ─── Request Interceptors ───
 
-// Express: Add XTransformPort for Caddy gateway
+// Express: Add XTransformPort for Caddy gateway + JWT token
 expressApi.interceptors.request.use((config) => {
   const separator = config.url?.includes('?') ? '&' : '?';
   config.url = `${config.url}${separator}XTransformPort=${EXPRESS_PORT}`;
   config.headers['X-Request-ID'] = `pwa-e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  // Attach JWT token if available
+  const token = getAgencyToken();
+  if (token && !config.headers?.['No-Auth']) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  // Remove custom No-Auth header before sending
+  delete config.headers?.['No-Auth'];
   return config;
 });
 
@@ -50,7 +93,7 @@ nextApi.interceptors.request.use((config) => {
   return config;
 });
 
-// ─── Response Interceptors: Offline error handling ───
+// ─── Response Interceptors: Offline error handling + 401 auto-logout ───
 const offlineInterceptor = (error: any) => {
   if (!error.response) {
     const isOffline = !navigator.onLine;
@@ -58,6 +101,14 @@ const offlineInterceptor = (error: any) => {
     error.offlineMessage = isOffline
       ? 'Pas de connexion internet. Vos données seront synchronisées plus tard.'
       : 'Erreur réseau. Veuillez réessayer.';
+  }
+  // Auto-logout on 401 from Express backend
+  if (error.response?.status === 401 && error.config?.url?.includes('XTransformPort')) {
+    clearAgencyAuth();
+    // Redirect to login if not already there
+    if (typeof window !== 'undefined' && !window.location.pathname.includes('/agency/login')) {
+      window.location.href = '/agency/login';
+    }
   }
   return Promise.reject(error);
 };
@@ -234,6 +285,238 @@ function transformExpressVerifyResponse(expressData: any): VerifyOtpResponse {
       })),
     },
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  AGENCY AUTH — Login via Express backend JWT
+// ═══════════════════════════════════════════════════════════════
+
+export interface AgencyLoginResponse {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    phone?: string | null;
+    agencyId?: string | null;
+    avatarUrl?: string | null;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
+
+/** Agency login → POST /api/auth/login (Express JWT) */
+export async function agencyLogin(email: string, password: string): Promise<AgencyLoginResponse> {
+  const { data } = await expressApi.post<AgencyLoginResponse>('/auth/login', { email, password }, {
+    headers: { 'No-Auth': 'true' }, // Don't attach existing token
+  });
+  // Store tokens
+  setAgencyTokens(data.accessToken, data.refreshToken);
+  setAgencyUser(data.user);
+  return data;
+}
+
+/** Agency logout → POST /api/auth/logout (Express) */
+export async function agencyLogout(): Promise<void> {
+  const refreshToken = typeof window !== 'undefined' ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
+  try {
+    await expressApi.post('/auth/logout', { refreshToken });
+  } catch {
+    // Ignore logout errors
+  } finally {
+    clearAgencyAuth();
+  }
+}
+
+/** Get current user profile → GET /api/auth/me (Express) */
+export async function agencyGetMe(): Promise<{ user: any }> {
+  const { data } = await expressApi.get('/auth/me');
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TRIPS — CRUD via Express backend
+// ═══════════════════════════════════════════════════════════════
+
+export interface TripListItem {
+  id: string;
+  name: string;
+  description?: string;
+  status: string;
+  otp: string;
+  otpExpiry: string;
+  otpUsed: boolean;
+  agencyId: string;
+  departureDate?: string | null;
+  returnDate?: string | null;
+  destination?: string | null;
+  transportMode?: string | null;
+  airline?: string | null;
+  flightNumber?: string | null;
+  hotelMecca?: string | null;
+  hotelMedina?: string | null;
+  totalPilgrims: number;
+  totalBags: number;
+  pilgrimCount: number;
+  bagCount: number;
+  createdAt: string;
+  updatedAt: string;
+  agency: { id: string; name: string; slug: string };
+}
+
+export interface TripDetail extends TripListItem {
+  groups: Array<{
+    id: string;
+    name: string;
+    color?: string | null;
+    leaderName?: string | null;
+    _count: { pilgrims: number };
+  }>;
+}
+
+export interface TripsListResponse {
+  data: TripListItem[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+/** List trips → GET /api/trips */
+export async function listTrips(params?: { page?: number; limit?: number; agencyId?: string; status?: string }): Promise<TripsListResponse> {
+  const { data } = await expressApi.get<TripsListResponse>('/trips', { params });
+  return data;
+}
+
+/** Get trip by ID → GET /api/trips/:id */
+export async function getTrip(id: string): Promise<TripDetail> {
+  const { data } = await expressApi.get<TripDetail>(`/trips/${id}`);
+  return data;
+}
+
+/** Create trip → POST /api/trips */
+export async function createTrip(tripData: {
+  name: string;
+  description?: string;
+  agencyId: string;
+  departureDate?: string;
+  returnDate?: string;
+  destination?: string;
+  transportMode?: 'flight' | 'bus' | 'boat' | 'train';
+  airline?: string;
+  flightNumber?: string;
+  hotelMecca?: string;
+  hotelMedina?: string;
+  pilgrims?: any[];
+  bags?: any[];
+}): Promise<any> {
+  const { data } = await expressApi.post('/trips', tripData);
+  return data;
+}
+
+/** Update trip → PUT /api/trips/:id */
+export async function updateTrip(id: string, tripData: any): Promise<any> {
+  const { data } = await expressApi.put(`/trips/${id}`, tripData);
+  return data;
+}
+
+/** Cancel trip → DELETE /api/trips/:id */
+export async function cancelTrip(id: string): Promise<any> {
+  const { data } = await expressApi.delete(`/trips/${id}`);
+  return data;
+}
+
+/** Regenerate OTP → POST /api/trips/:id/regenerate-otp */
+export async function regenerateOTP(tripId: string): Promise<{ message: string; otp: string; otpExpiry: string; tripId: string; tripName: string }> {
+  const { data } = await expressApi.post(`/trips/${tripId}/regenerate-otp`);
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCANS — Statistics via Express backend
+// ═══════════════════════════════════════════════════════════════
+
+export interface ScanStats {
+  tripId: string;
+  total: number;
+  byType: Record<string, number>;
+  byZone: Record<string, number>;
+  byStatus: Record<string, number>;
+  sync: { synced: number; unsynced: number };
+  timeline: Record<string, number>;
+}
+
+/** Get scan stats → GET /api/scans/stats?tripId= */
+export async function getScanStats(tripId: string): Promise<ScanStats> {
+  const { data } = await expressApi.get<ScanStats>('/scans/stats', { params: { tripId } });
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FINDER — Public QR code lookup (no auth required)
+// ═══════════════════════════════════════════════════════════════
+
+export interface FinderIdentityResult {
+  type: 'identity';
+  qrCode: string;
+  fullName: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  nationality?: string | null;
+  gender?: string | null;
+  bloodType?: string | null;
+  allergies?: string | null;
+  diseases?: string | null;
+  medicalInfo?: string | null;
+  hotelMecca?: string | null;
+  roomMecca?: string | null;
+  hotelMedina?: string | null;
+  roomMedina?: string | null;
+  photoUrl?: string | null;
+  isActive: boolean;
+  group: { name: string; color?: string | null } | null;
+  activeIncidents: any[];
+}
+
+export interface FinderBaggageResult {
+  type: 'baggage';
+  qrCode: string;
+  ownerName: string;
+  baggageType?: string | null;
+  baggageIndex?: number | null;
+  color?: string | null;
+  description?: string | null;
+  airline?: string | null;
+  flightNumber?: string | null;
+  destination?: string | null;
+  hotelName?: string | null;
+  roomNumber?: string | null;
+  status?: string | null;
+  photoUrl?: string | null;
+  activeIncidents: any[];
+}
+
+export type FinderResult = FinderIdentityResult | FinderBaggageResult;
+
+/** Finder lookup → GET /api/finder/:qrCode (PUBLIC) */
+export async function finderLookup(qrCode: string): Promise<FinderResult> {
+  const { data } = await expressApi.get<FinderResult>(`/finder/${qrCode}`, {
+    headers: { 'No-Auth': 'true' }, // Public endpoint, no token needed
+  });
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PILGRIMS & BAGS — Agency-scoped queries
+// ═══════════════════════════════════════════════════════════════
+
+/** List pilgrims → GET /api/pilgrims */
+export async function listPilgrims(params?: { agencyId?: string; tripId?: string; page?: number; limit?: number }): Promise<any> {
+  const { data } = await expressApi.get('/pilgrims', { params });
+  return data;
+}
+
+/** List bags → GET /api/bags */
+export async function listBags(params?: { agencyId?: string; tripId?: string; page?: number; limit?: number }): Promise<any> {
+  const { data } = await expressApi.get('/bags', { params });
+  return data;
 }
 
 // Export both instances for custom calls

@@ -150,3 +150,25 @@ Stage Summary:
 - StatusBadge component for online/offline indicator
 - Sync pending scans/incidents when network returns
 - Express backend tried first (XTransformPort=3002), Next.js API as fallback
+---
+Task ID: 1-8
+Agent: Main
+Task: Build Agency Dashboard + Finder pages for PassHajj
+
+Work Log:
+- Explored existing codebase: found 25+ models, 50 shadcn/ui components, existing agency pages at /agence/, existing finder at /p/[code] and /found/[code]
+- Updated src/services/api.ts with: JWT token management, agency auth methods (agencyLogin, agencyLogout, agencyGetMe), trip CRUD methods (listTrips, getTrip, createTrip, updateTrip, cancelTrip, regenerateOTP), scan stats method (getScanStats), finder lookup method (finderLookup), pilgrim/bag list methods
+- Created src/app/agency/layout.tsx: auth guard using JWT, collapsible sidebar (Bleu Marine #1e3a5f), header with LiveClock, auto-redirect logic
+- Created src/app/agency/login/page.tsx: split layout (branding left, form right), email/password login, password visibility toggle, framer-motion animations, responsive design
+- Created src/app/agency/dashboard/page.tsx: stats cards, trips table with status badges, search/filter, create trip dialog with OTP display, regenerate OTP, pagination, auto-refresh
+- Created src/app/agency/trips/[id]/page.tsx: trip detail with stats, OTP countdown, scan breakdown (by type/zone/status), groups section, timeline, action buttons (cancel/complete)
+- Created src/app/finder/[type]/[code]/page.tsx: identity view (photo, medical info, hotel, actions), baggage view (owner, flight, status, actions), skeleton loading, error states, framer-motion animations
+- Created src/components/finder/GPSButton.tsx: geolocation via navigator.geolocation, WhatsApp integration, Maps fallback, error handling
+
+Stage Summary:
+- All 6 new files created with full production code
+- API service updated with 15+ new methods
+- Pages compile successfully: GET /agency/login 200, GET /finder/identity/ID-TEST123 200
+- Lint passes (only pre-existing errors in scripts/)
+- Theme: Jaune #f4b400 / Blanc / Bleu Marine #1e3a5f
+- Backend API running on port 3002 (healthy)
