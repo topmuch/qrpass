@@ -127,7 +127,7 @@ function SelectPageInner() {
       {/* ─── Header ─── */}
       <header className="w-full px-4 pt-6 pb-2 anim-fade-in-down">
         <div className="max-w-3xl mx-auto flex items-center justify-center">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+          <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
         </div>
         <p className="text-center mt-2 text-sm font-medium anim-fade-in" style={{ color: '#64748b' }}>Activez votre protection</p>
       </header>

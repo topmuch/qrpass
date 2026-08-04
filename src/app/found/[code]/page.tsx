@@ -136,13 +136,13 @@ export default function FoundSelectorPage() {
           <Image
             src="/logo.png"
             alt="PassHajj"
-            width={120}
-            height={46}
+            width={150}
+            height={58}
             style={{
               objectFit: 'contain',
-              borderRadius: '12px',
-              padding: '4px',
-              background: 'rgba(255,255,255,0.85)',
+              borderRadius: '14px',
+              padding: '5px',
+              background: 'rgba(255,255,255,0.9)',
             }}
           />
         </div>

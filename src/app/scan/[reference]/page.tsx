@@ -215,7 +215,7 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="flex items-center">
-              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="text-sm mt-1" style={{ color: MUTED }}>
               {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}

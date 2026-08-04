@@ -304,7 +304,7 @@ function IdentityActivateContent() {
       {/* ─── Header / Logo ─── */}
       <div className="w-full max-w-[420px] mb-5">
         <div className="text-2xl font-extrabold tracking-tight text-black">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+          <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
         </div>
         <p className="text-sm mt-1" style={{ color: MUTED }}>
           Bracelet d&apos;Urgence &amp; Identification

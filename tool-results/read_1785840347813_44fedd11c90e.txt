@@ -1,0 +1,721 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useRef, Suspense } from 'react';
+     4→import { useRouter, useSearchParams } from 'next/navigation';
+     5→import { Input } from '@/components/ui/input';
+     6→import { Label } from '@/components/ui/label';
+     7→import PhoneInput from '@/components/ui/PhoneInput';
+     8→import { Camera, Globe, CheckCircle, Loader2, Luggage } from 'lucide-react';
+     9→import { toast } from '@/hooks/use-toast';
+    10→import Image from 'next/image';
+    11→
+    12→// ─── Brand constants (original yellow) ───
+    13→const BG = '#f4b400';
+    14→const CARD_BG = '#ffffff';
+    15→const TEXT = '#1a1a1a';
+    16→const MUTED = '#6b7280';
+    17→const INPUT_BG = '#f8fafc';
+    18→const INPUT_BORDER = '#e2e8f0';
+    19→const BTN_PRIMARY = '#111827';
+    20→const BTN_PRIMARY_HOVER = '#374151';
+    21→const RADIUS = '20px';
+    22→
+    23→// ─── Airlines (select dropdown) ───
+    24→const AIRLINES = [
+    25→  'Saudia Airlines',
+    26→  'Air France',
+    27→  'Emirates',
+    28→  'Qatar Airways',
+    29→  'Turkish Airlines',
+    30→  'Ethiopian Airlines',
+    31→  'Royal Air Maroc',
+    32→  'Air Algérie',
+    33→  'Tunisair',
+    34→  'EgyptAir',
+    35→  'Kenya Airways',
+    36→  'Lufthansa',
+    37→  'British Airways',
+    38→  'KLM',
+    39→  'Air Sénégal',
+    40→  'Royal Jordanian',
+    41→  'Kuwait Airways',
+    42→  'Oman Air',
+    43→  'Gulf Air',
+    44→  'Flynas',
+    45→  'flydubai',
+    46→  'Wizz Air',
+    47→  'Mauritania Airlines',
+    48→  "Air Côte d'Ivoire",
+    49→  'Camair-Co',
+    50→];
+    51→
+    52→// ─── Destinations ───
+    53→const DESTINATIONS = [
+    54→  { value: 'Jeddah', label: '🕌 Djeddah (La Mecque)' },
+    55→  { value: 'Medina', label: '🕋 Médine' },
+    56→  { value: 'Riyadh', label: '🏙️ Riyad' },
+    57→];
+    58→
+    59→// ─── Language support ───
+    60→type Lang = 'fr' | 'en' | 'ar';
+    61→const LANG_NAMES: Record<Lang, string> = { fr: 'Français', en: 'English', ar: 'العربية' };
+    62→
+    63→function LangSelector({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
+    64→  const [open, setOpen] = useState(false);
+    65→  return (
+    66→    <div className="relative">
+    67→      <button
+    68→        type="button"
+    69→        onClick={() => setOpen(!open)}
+    70→        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-black/10 rounded-full text-sm font-medium hover:bg-white transition-colors"
+    71→      >
+    72→        <Globe className="w-4 h-4" />
+    73→        {LANG_NAMES[lang]}
+    74→      </button>
+    75→      {open && (
+    76→        <div className="absolute top-full right-0 mt-1 bg-white border border-black/10 rounded-xl shadow-lg overflow-hidden z-50 min-w-[140px]">
+    77→          {(['fr', 'en', 'ar'] as Lang[]).map((l) => (
+    78→            <button
+    79→              key={l}
+    80→              type="button"
+    81→              onClick={() => { setLang(l); setOpen(false); }}
+    82→              className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+    83→                lang === l ? 'bg-[#f4b400] text-black' : 'text-black hover:bg-[#f4b400]/30'
+    84→              }`}
+    85→            >
+    86→              {LANG_NAMES[l]}
+    87→            </button>
+    88→          ))}
+    89→        </div>
+    90→      )}
+    91→    </div>
+    92→  );
+    93→}
+    94→
+    95→// ─── Translations ───
+    96→const T = {
+    97→  fr: {
+    98→    title: '🧳 Informations du Bagage',
+    99→    subtitle: 'Activez votre bagage en 1 minute',
+   100→    qrCode: 'Code QR',
+   101→    qrDetected: '✅ Code détecté depuis l\'URL',
+   102→    qrPlaceholder: 'Détection automatique...',
+   103→    fullName: 'Votre nom complet *',
+   104→    fullNamePlaceholder: 'Ex: Ahmed Ndiaye',
+   105→    whatsapp: 'WhatsApp (Chef de groupe) *',
+   106→    whatsappHint: 'Ce numéro recevra les alertes si le bagage est trouvé',
+   107→    phonePlaceholder: '+221 77 123 45 67',
+   108→    email: 'Email (optionnel)',
+   109→    emailPlaceholder: 'email@exemple.com',
+   110→    airline: 'Compagnie aérienne *',
+   111→    airlinePlaceholder: 'Choisir une compagnie...',
+   112→    flightNumber: 'Numéro de vol *',
+   113→    flightPlaceholder: 'Ex: SV1234',
+   114→    destination: 'Destination *',
+   115→    destinationPlaceholder: 'Choisir...',
+   116→    departure: 'Date et heure de départ *',
+   117→    photo: 'Photo du bagage (recommandé)',
+   118→    photoClick: '📸 Cliquez pour ajouter une photo',
+   119→    photoHint: 'Aide le trouveur à identifier votre valise',
+   120→    activate: '✅ Activer mon Bagage',
+   121→    activating: '⏳ Activation en cours...',
+   122→    errorTitle: 'Erreur d\'activation',
+   123→    errorMsg: 'Vérifiez votre connexion et réessayez.',
+   124→    footer: 'Propulsé par',
+   125→    changeProduct: 'Changer de produit',
+   126→    help: 'Aide',
+   127→    infoTitle: '2 bagages soute seront activés',
+   128→    infoDesc: 'Protection de 2 mois (60 jours) à partir de la date d\'activation',
+   129→    deferred: 'Activation différée',
+   130→    deferredHint: 'Choisir une date d\'activation future',
+   131→    deferredDate: 'Date d\'activation *',
+   132→    deferredDateHint: 'Les 60 jours commenceront à partir de cette date',
+   133→  },
+   134→  en: {
+   135→    title: '🧳 Baggage Information',
+   136→    subtitle: 'Activate your baggage in 1 minute',
+   137→    qrCode: 'QR Code',
+   138→    qrDetected: '✅ Code detected from URL',
+   139→    qrPlaceholder: 'Automatic detection...',
+   140→    fullName: 'Your full name *',
+   141→    fullNamePlaceholder: 'Ex: Ahmed Ndiaye',
+   142→    whatsapp: 'WhatsApp (Group leader) *',
+   143→    whatsappHint: 'This number will receive alerts if baggage is found',
+   144→    phonePlaceholder: '+221 77 123 45 67',
+   145→    email: 'Email (optional)',
+   146→    emailPlaceholder: 'email@example.com',
+   147→    airline: 'Airline *',
+   148→    airlinePlaceholder: 'Choose an airline...',
+   149→    flightNumber: 'Flight number *',
+   150→    flightPlaceholder: 'Ex: SV1234',
+   151→    destination: 'Destination *',
+   152→    destinationPlaceholder: 'Choose...',
+   153→    departure: 'Departure date and time *',
+   154→    photo: 'Baggage photo (recommended)',
+   155→    photoClick: '📸 Click to add a photo',
+   156→    photoHint: 'Helps the finder identify your luggage',
+   157→    activate: '✅ Activate my Baggage',
+   158→    activating: '⏳ Activating...',
+   159→    errorTitle: 'Activation error',
+   160→    errorMsg: 'Check your connection and try again.',
+   161→    footer: 'Powered by',
+   162→    changeProduct: 'Change product',
+   163→    help: 'Help',
+   164→    infoTitle: '2 checked baggages will be activated',
+   165→    infoDesc: '2-month protection (60 days) from activation date',
+   166→    deferred: 'Deferred activation',
+   167→    deferredHint: 'Choose a future activation date',
+   168→    deferredDate: 'Activation date *',
+   169→    deferredDateHint: '60 days will start from this date',
+   170→  },
+   171→  ar: {
+   172→    title: '🧳 معلومات الأمتعة',
+   173→    subtitle: 'فعّل أمتعتك في دقيقة واحدة',
+   174→    qrCode: 'رمز QR',
+   175→    qrDetected: '✅ تم اكتشاف الرمز من الرابط',
+   176→    qrPlaceholder: 'اكتشاف تلقائي...',
+   177→    fullName: 'الاسم الكامل *',
+   178→    fullNamePlaceholder: 'مثال: أحمد نداي',
+   179→    whatsapp: 'واتساب (قائد المجموعة) *',
+   180→    whatsappHint: 'سيستقبل هذا الرقم التنبيهات إذا وُجدت الحقيبة',
+   181→    phonePlaceholder: '+221 77 123 45 67',
+   182→    email: 'البريد الإلكتروني (اختياري)',
+   183→    emailPlaceholder: 'email@example.com',
+   184→    airline: 'شركة الطيران *',
+   185→    airlinePlaceholder: 'اختر شركة...',
+   186→    flightNumber: 'رقم الرحلة *',
+   187→    flightPlaceholder: 'مثال: SV1234',
+   188→    destination: 'الوجهة *',
+   189→    destinationPlaceholder: 'اختر...',
+   190→    departure: 'تاريخ ووقت المغادرة *',
+   191→    photo: 'صورة الأمتعة (موصى بها)',
+   192→    photoClick: '📸 انقر لإضافة صورة',
+   193→    photoHint: 'يساعد من وجد الحقيبة في التعرف عليها',
+   194→    activate: '✅ تفعيل أمتعتي',
+   195→    activating: '⏳ جاري التفعيل...',
+   196→    errorTitle: 'خطأ في التفعيل',
+   197→    errorMsg: 'تحقق من اتصالك وحاول مرة أخرى.',
+   198→    footer: 'بدعم من',
+   199→    changeProduct: 'تغيير المنتج',
+   200→    help: 'مساعدة',
+   201→    infoTitle: 'سيتم تفعيل 2 حقائب سجع',
+   202→    infoDesc: 'حماية لمدة شهرين (60 يوماً) من تاريخ التفعيل',
+   203→    deferred: 'تفعيل مؤجل',
+   204→    deferredHint: 'اختر تاريخ تفعيل مستقبلي',
+   205→    deferredDate: 'تاريخ التفعيل *',
+   206→    deferredDateHint: 'ستبدأ الـ 60 يوماً من هذا التاريخ',
+   207→  },
+   208→};
+   209→
+   210→// ─── Shared input classes ───
+   211→const inputCls = `h-[52px] rounded-xl text-[15px] bg-[#f8fafc] border-[#e2e8f0] focus:border-[#111827] focus:bg-white focus:ring-2 focus:ring-[#111827]/10`;
+   212→
+   213→// ─── Main Component ───
+   214→function BaggageActivateContent() {
+   215→  const router = useRouter();
+   216→  const searchParams = useSearchParams();
+   217→  const qrFromUrl = searchParams.get('code') || searchParams.get('qr') || '';
+   218→
+   219→  // Language
+   220→  const [lang, setLang] = useState<Lang>('fr');
+   221→  const dir = lang === 'ar' ? 'rtl' : 'ltr';
+   222→  const t = T[lang];
+   223→
+   224→  // Form state
+   225→  const [reference, setReference] = useState('');
+   226→  const [fullName, setFullName] = useState('');
+   227→  const [phone, setPhone] = useState('');
+   228→  const [phoneCountry, setPhoneCountry] = useState('SN'); // default Senegal
+   229→  const [email, setEmail] = useState('');
+   230→  const [airline, setAirline] = useState('');
+   231→  const [flightNumber, setFlightNumber] = useState('');
+   232→  const [destination, setDestination] = useState('');
+   233→  const [departureDate, setDepartureDate] = useState('');
+   234→  const [departureTime, setDepartureTime] = useState('');
+   235→  const [hotelName, setHotelName] = useState('');
+   236→  const [hotelAddress, setHotelAddress] = useState('');
+   237→  const [hotelPhone, setHotelPhone] = useState('');
+   238→  const [roomNumber, setRoomNumber] = useState('');
+   239→  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+   240→  const [photoFile, setPhotoFile] = useState<File | null>(null);
+   241→  const [loading, setLoading] = useState(false);
+   242→
+   243→  // Deferred activation
+   244→  const [deferredActivation, setDeferredActivation] = useState(false);
+   245→  const [activationDate, setActivationDate] = useState('');
+   246→
+   247→  // Pre-fill QR from URL
+   248→  useEffect(() => {
+   249→    if (qrFromUrl) {
+   250→      setReference(qrFromUrl.toUpperCase());
+   251→    }
+   252→  }, [qrFromUrl]);
+   253→
+   254→  // Detect country from IP for phone input
+   255→  useEffect(() => {
+   256→    fetch('/api/ip-country')
+   257→      .then(res => res.json())
+   258→      .then(data => {
+   259→        if (data.country) setPhoneCountry(data.country);
+   260→      })
+   261→      .catch(() => {}); // silent fallback to SN
+   262→  }, []);
+   263→
+   264→  // Photo preview
+   265→  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   266→    const file = e.target.files?.[0];
+   267→    if (file) {
+   268→      setPhotoFile(file);
+   269→      const reader = new FileReader();
+   270→      reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
+   271→      reader.readAsDataURL(file);
+   272→    }
+   273→  };
+   274→
+   275→  // Form validation
+   276→  const validate = (): boolean => {
+   277→    if (!reference.trim()) {
+   278→      toast({ title: 'Code QR requis', variant: 'destructive' });
+   279→      return false;
+   280→    }
+   281→    if (!fullName.trim()) {
+   282→      toast({ title: 'Nom complet requis', variant: 'destructive' });
+   283→      return false;
+   284→    }
+   285→    if (!phone.trim()) {
+   286→      toast({ title: 'Numéro WhatsApp requis', variant: 'destructive' });
+   287→      return false;
+   288→    }
+   289→    if (!airline) {
+   290→      toast({ title: 'Compagnie aérienne requise', variant: 'destructive' });
+   291→      return false;
+   292→    }
+   293→    if (!flightNumber.trim()) {
+   294→      toast({ title: 'Numéro de vol requis', variant: 'destructive' });
+   295→      return false;
+   296→    }
+   297→    if (!destination) {
+   298→      toast({ title: 'Destination requise', variant: 'destructive' });
+   299→      return false;
+   300→    }
+   301→    if (!departureDate) {
+   302→      toast({ title: 'Date de départ requise', variant: 'destructive' });
+   303→      return false;
+   304→    }
+   305→    return true;
+   306→  };
+   307→
+   308→  // Submit
+   309→  const handleSubmit = async (e: React.FormEvent) => {
+   310→    e.preventDefault();
+   311→    if (!validate()) return;
+   312→
+   313→    setLoading(true);
+   314→    try {
+   315→      // Split fullName into firstName and lastName for API compatibility
+   316→      const nameParts = fullName.trim().split(/\s+/);
+   317→      const firstName = nameParts[0] || '';
+   318→      const lastName = nameParts.slice(1).join(' ') || firstName;
+   319→
+   320→      // Upload photo first if selected
+   321→      let photoUrl: string | null = null;
+   322→      if (photoFile) {
+   323→        try {
+   324→          const photoFormData = new FormData();
+   325→          photoFormData.append('file', photoFile);
+   326→          const uploadRes = await fetch('/api/baggage/upload-photo', {
+   327→            method: 'POST',
+   328→            body: photoFormData,
+   329→          });
+   330→          if (uploadRes.ok) {
+   331→            const uploadData = await uploadRes.json();
+   332→            photoUrl = uploadData.photoUrl;
+   333→          }
+   334→        } catch {
+   335→          // Non-blocking, continue without photo
+   336→        }
+   337→      }
+   338→
+   339→      const response = await fetch('/api/activate', {
+   340→        method: 'POST',
+   341→        headers: { 'Content-Type': 'application/json' },
+   342→        body: JSON.stringify({
+   343→          reference: reference.toUpperCase(),
+   344→          travelerFirstName: firstName,
+   345→          travelerLastName: lastName,
+   346→          whatsappOwner: phone.trim(),
+   347→          airlineName: airline,
+   348→          flightNumber: flightNumber.trim().toUpperCase(),
+   349→          destination,
+   350→          hotelName: hotelName.trim() || undefined,
+   351→          hotelAddress: hotelAddress.trim() || undefined,
+   352→          hotelPhone: hotelPhone.trim() || undefined,
+   353→          roomNumber: roomNumber.trim() || undefined,
+   354→          departureDate,
+   355→          departureTime: departureTime || undefined,
+   356→          transportMode: 'flight',
+   357→          photoUrl: photoUrl || undefined,
+   358→          activationDate: deferredActivation && activationDate ? activationDate : undefined,
+   359→        }),
+   360→      });
+   361→
+   362→      if (response.ok) {
+   363→        const data = await response.json();
+   364→        sessionStorage.setItem('activationData', JSON.stringify({
+   365→          reference: reference.toUpperCase(),
+   366→          firstName,
+   367→          lastName,
+   368→          whatsapp: phone.trim(),
+   369→          airlineName: airline,
+   370→          flightNumber,
+   371→          destination,
+   372→          hotelName,
+   373→          hotelAddress,
+   374→          hotelPhone,
+   375→          roomNumber,
+   376→          type: 'hajj',
+   377→          activatedAt: new Date().toISOString(),
+   378→          expiresAt: data.baggage?.expiresAt,
+   379→          photoUrl: photoUrl || data.baggage?.photoUrl || null,
+   380→          // Store base64 preview for instant display on confirmation page (no server request needed)
+   381→          photoPreview: photoPreview || null,
+   382→        }));
+   383→
+   384→        const params = new URLSearchParams({
+   385→          code: reference.toUpperCase(),
+   386→          firstName,
+   387→          lastName,
+   388→          flight: flightNumber,
+   389→          destination,
+   390→          chefPhone: phone.trim(),
+   391→        });
+   392→        if (photoUrl) params.set('photo', photoUrl);
+   393→        router.push(`/activate/confirmation?${params.toString()}`);
+   394→      } else {
+   395→        const error = await response.json();
+   396→        toast({ title: error.message || t.errorTitle, variant: 'destructive' });
+   397→      }
+   398→    } catch {
+   399→      toast({ title: t.errorMsg, variant: 'destructive' });
+   400→    } finally {
+   401→      setLoading(false);
+   402→    }
+   403→  };
+   404→
+   405→  // Min date = today
+   406→  const today = new Date().toISOString().split('T')[0];
+   407→
+   408→  return (
+   409→    <main dir={dir} className="min-h-screen flex flex-col items-center" style={{ background: BG, color: TEXT, padding: '16px' }}>
+   410→
+   411→      {/* ─── Header ─── */}
+   412→      <div className="w-full max-w-[480px] flex items-center justify-between mb-6 animate-[fadeInDown_0.5s_ease]">
+   413→        <div>
+   414→          <div className="text-[28px] font-extrabold tracking-tight text-black">
+   415→            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+   416→          </div>
+   417→          <div className="text-sm mt-1 text-black/60">{t.subtitle}</div>
+   418→        </div>
+   419→        <LangSelector lang={lang} setLang={setLang} />
+   420→      </div>
+   421→
+   422→      {/* ─── Progress Bar ─── */}
+   423→      <div className="w-full max-w-[480px] mb-5">
+   424→        <div className="h-1 bg-white/40 rounded-full overflow-hidden">
+   425→          <div className="h-full bg-black rounded-full" style={{ width: '50%' }} />
+   426→        </div>
+   427→      </div>
+   428→
+   429→      {/* ─── Form Card ─── */}
+   430→      <form onSubmit={handleSubmit} className="w-full max-w-[480px]">
+   431→        <div
+   432→          className="rounded-[20px] p-7 shadow-[0_8px_24px_rgba(0,0,0,0.12)] mb-4 animate-[fadeInUp_0.5s_ease_0.2s_both]"
+   433→          style={{ background: CARD_BG }}
+   434→        >
+   435→          <div className="text-lg font-bold mb-5 flex items-center gap-2">
+   436→            {t.title}
+   437→          </div>
+   438→
+   439→          {/* QR Code (Auto-détecté) */}
+   440→          <div className="mb-5">
+   441→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.qrCode}</Label>
+   442→            <Input
+   443→              value={reference}
+   444→              onChange={(e) => setReference(e.target.value.toUpperCase())}
+   445→              readOnly={!!qrFromUrl}
+   446→              placeholder={t.qrPlaceholder}
+   447→              className={`h-[52px] rounded-xl text-[15px] ${qrFromUrl ? 'bg-[#f1f5f9] cursor-not-allowed text-gray-600' : 'bg-[#f8fafc]'} border-[#e2e8f0]`}
+   448→            />
+   449→            {qrFromUrl && (
+   450→              <p className="text-xs mt-1.5 text-gray-500">{t.qrDetected}</p>
+   451→            )}
+   452→          </div>
+   453→
+   454→          {/* Full Name */}
+   455→          <div className="mb-5">
+   456→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.fullName}</Label>
+   457→            <Input
+   458→              value={fullName}
+   459→              onChange={(e) => setFullName(e.target.value)}
+   460→              placeholder={t.fullNamePlaceholder}
+   461→              required
+   462→              className={inputCls}
+   463→            />
+   464→          </div>
+   465→
+   466→          {/* WhatsApp - PhoneInput with country flag & auto IP detection */}
+   467→          <div className="mb-5">
+   468→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.whatsapp}</Label>
+   469→            <PhoneInput
+   470→              countryCode={phoneCountry}
+   471→              onCountryChange={setPhoneCountry}
+   472→              value={phone}
+   473→              onChange={setPhone}
+   474→              placeholder="77 123 45 67"
+   475→              required
+   476→            />
+   477→            <p className="text-xs mt-1.5 text-gray-500">{t.whatsappHint}</p>
+   478→          </div>
+   479→
+   480→          {/* Email (optional) */}
+   481→          <div className="mb-5">
+   482→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.email}</Label>
+   483→            <Input
+   484→              type="email"
+   485→              value={email}
+   486→              onChange={(e) => setEmail(e.target.value)}
+   487→              placeholder={t.emailPlaceholder}
+   488→              className={inputCls}
+   489→            />
+   490→          </div>
+   491→
+   492→          {/* Airline - SELECT DROPDOWN */}
+   493→          <div className="mb-5">
+   494→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.airline}</Label>
+   495→            <select
+   496→              value={airline}
+   497→              onChange={(e) => setAirline(e.target.value)}
+   498→              required
+   499→              className={`w-full ${inputCls} appearance-none cursor-pointer`}
+   500→            >
+   501→              <option value="">{t.airlinePlaceholder}</option>
+   502→              {AIRLINES.map((a) => (
+   503→                <option key={a} value={a}>{a}</option>
+   504→              ))}
+   505→            </select>
+   506→          </div>
+   507→
+   508→          {/* Flight Number */}
+   509→          <div className="mb-5">
+   510→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.flightNumber}</Label>
+   511→            <Input
+   512→              value={flightNumber}
+   513→              onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
+   514→              placeholder={t.flightPlaceholder}
+   515→              required
+   516→              className={`${inputCls} font-mono tracking-wider`}
+   517→            />
+   518→          </div>
+   519→
+   520→          {/* Destination */}
+   521→          <div className="mb-5">
+   522→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.destination}</Label>
+   523→            <select
+   524→              value={destination}
+   525→              onChange={(e) => setDestination(e.target.value)}
+   526→              required
+   527→              className={`w-full ${inputCls} appearance-none cursor-pointer`}
+   528→            >
+   529→              <option value="">{t.destinationPlaceholder}</option>
+   530→              {DESTINATIONS.map((d) => (
+   531→                <option key={d.value} value={d.value}>{d.label}</option>
+   532→              ))}
+   533→            </select>
+   534→          </div>
+   535→
+   536→          {/* Hotel & Room */}
+   537→          <div className="grid grid-cols-3 gap-3 mb-5">
+   538→            <div className="col-span-2">
+   539→              <Label className="text-[13px] font-semibold mb-1.5 block">Hôtel à La Mecque *</Label>
+   540→              <Input
+   541→                value={hotelName}
+   542→                onChange={(e) => setHotelName(e.target.value)}
+   543→                placeholder="Ex: Al Massa Grand Hotel"
+   544→                className={inputCls}
+   545→              />
+   546→            </div>
+   547→            <div>
+   548→              <Label className="text-[13px] font-semibold mb-1.5 block">Chambre</Label>
+   549→              <Input
+   550→                value={roomNumber}
+   551→                onChange={(e) => setRoomNumber(e.target.value)}
+   552→                placeholder="412"
+   553→                className={inputCls}
+   554→              />
+   555→            </div>
+   556→          </div>
+   557→
+   558→          {/* Hotel Address & Phone */}
+   559→          <div className="mb-5">
+   560→            <Label className="text-[13px] font-semibold mb-1.5 block">Adresse de l'hôtel</Label>
+   561→            <Input
+   562→              value={hotelAddress}
+   563→              onChange={(e) => setHotelAddress(e.target.value)}
+   564→              placeholder="Ex: Ibrahim Al Jafri Street, La Mecque"
+   565→              className={inputCls}
+   566→            />
+   567→          </div>
+   568→          <div className="mb-5">
+   569→            <Label className="text-[13px] font-semibold mb-1.5 block">Téléphone de l'hôtel</Label>
+   570→            <Input
+   571→              value={hotelPhone}
+   572→              onChange={(e) => setHotelPhone(e.target.value)}
+   573→              placeholder="Ex: +966 12 557 0000"
+   574→              className={inputCls}
+   575→            />
+   576→          </div>
+   577→
+   578→          {/* Departure Date & Time */}
+   579→          <div className="mb-5">
+   580→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.departure}</Label>
+   581→            <div className="grid grid-cols-2 gap-3">
+   582→              <Input
+   583→                type="date"
+   584→                value={departureDate}
+   585→                onChange={(e) => setDepartureDate(e.target.value)}
+   586→                min={today}
+   587→                required
+   588→                className={inputCls}
+   589→              />
+   590→              <Input
+   591→                type="time"
+   592→                value={departureTime}
+   593→                onChange={(e) => setDepartureTime(e.target.value)}
+   594→                className={inputCls}
+   595→              />
+   596→            </div>
+   597→          </div>
+   598→
+   599→          {/* Info Box */}
+   600→          <div className="bg-[#f8fafc] rounded-xl p-3.5 mb-5 flex items-start gap-2.5">
+   601→            <Luggage className="w-5 h-5 text-gray-500 mt-0.5 shrink-0" />
+   602→            <div>
+   603→              <p className="text-sm font-semibold">{t.infoTitle}</p>
+   604→              <p className="text-xs text-gray-500">{t.infoDesc}</p>
+   605→            </div>
+   606→          </div>
+   607→
+   608→          {/* Deferred Activation */}
+   609→          <div className="mb-5">
+   610→            <div className="flex items-center gap-3 mb-1">
+   611→              <label className="relative inline-flex items-center cursor-pointer">
+   612→                <input
+   613→                  type="checkbox"
+   614→                  checked={deferredActivation}
+   615→                  onChange={(e) => setDeferredActivation(e.target.checked)}
+   616→                  className="sr-only peer"
+   617→                />
+   618→                <div className="w-9 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-black/20 rounded-full peer peer-checked:bg-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+   619→              </label>
+   620→              <div>
+   621→                <p className="text-sm font-semibold" style={{ color: TEXT }}>{t.deferred}</p>
+   622→                <p className="text-xs text-gray-500">{t.deferredHint}</p>
+   623→              </div>
+   624→            </div>
+   625→            {deferredActivation && (
+   626→              <div className="mt-3">
+   627→                <Label className="text-[13px] font-semibold mb-1.5 block">{t.deferredDate}</Label>
+   628→                <Input
+   629→                  type="date"
+   630→                  value={activationDate}
+   631→                  onChange={(e) => setActivationDate(e.target.value)}
+   632→                  min={today}
+   633→                  className={inputCls}
+   634→                />
+   635→                <p className="text-xs mt-1.5 text-gray-500">{t.deferredDateHint}</p>
+   636→              </div>
+   637→            )}
+   638→          </div>
+   639→
+   640→          {/* Photo Upload */}
+   641→          <div className="mb-6">
+   642→            <Label className="text-[13px] font-semibold mb-1.5 block">{t.photo}</Label>
+   643→            <label className="block border-2 border-dashed border-[#e2e8f0] rounded-2xl p-6 text-center bg-[#fafafa] cursor-pointer hover:border-black hover:bg-white transition-colors">
+   644→              {photoPreview ? (
+   645→                <img src={photoPreview} alt="Aperçu" className="max-w-[150px] max-h-[150px] rounded-xl mx-auto" />
+   646→              ) : (
+   647→                <div className="flex flex-col items-center gap-2">
+   648→                  <Camera className="w-8 h-8 text-gray-400" />
+   649→                  <span className="text-sm font-medium text-gray-500">{t.photoClick}</span>
+   650→                </div>
+   651→              )}
+   652→              <input
+   653→                type="file"
+   654→                accept="image/*"
+   655→                onChange={handlePhotoChange}
+   656→                className="hidden"
+   657→              />
+   658→            </label>
+   659→            <p className="text-xs mt-1.5 text-gray-500">{t.photoHint}</p>
+   660→          </div>
+   661→
+   662→          {/* Submit Button */}
+   663→          <button
+   664→            type="submit"
+   665→            disabled={loading}
+   666→            className="w-full py-4 rounded-[14px] text-white font-bold text-[15px] flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+   667→            style={{ background: BTN_PRIMARY }}
+   668→          >
+   669→            {loading ? (
+   670→              <>
+   671→                <Loader2 className="w-5 h-5 animate-spin" />
+   672→                {t.activating}
+   673→              </>
+   674→            ) : (
+   675→              <>
+   676→                <CheckCircle className="w-5 h-5" />
+   677→                {t.activate}
+   678→              </>
+   679→            )}
+   680→          </button>
+   681→        </div>
+   682→      </form>
+   683→
+   684→      {/* ─── Footer ─── */}
+   685→      <div className="mt-auto pt-6 text-center text-xs text-black/50">
+   686→        {t.footer} <strong>PassHajj</strong> ·{' '}
+   687→        <a href="/select" className="text-black font-semibold underline">{t.changeProduct}</a> ·{' '}
+   688→        <a href="/contact" className="text-black font-semibold underline">{t.help}</a>
+   689→      </div>
+   690→
+   691→      {/* ─── Keyframe animations ─── */}
+   692→      <style jsx global>{`
+   693→        @keyframes fadeInDown {
+   694→          from { opacity: 0; transform: translateY(-15px); }
+   695→          to { opacity: 1; transform: translateY(0); }
+   696→        }
+   697→        @keyframes fadeInUp {
+   698→          from { opacity: 0; transform: translateY(20px); }
+   699→          to { opacity: 1; transform: translateY(0); }
+   700→        }
+   701→      `}</style>
+   702→    </main>
+   703→  );
+   704→}
+   705→
+   706→// ─── Page Export with Suspense ───
+   707→export default function ActivateBaggagePage() {
+   708→  return (
+   709→    <Suspense fallback={
+   710→      <main className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
+   711→        <div className="text-center">
+   712→          <div className="animate-spin w-12 h-12 border-4 border-black/20 border-t-black rounded-full mx-auto mb-4" />
+   713→          <p className="text-black font-medium">Chargement...</p>
+   714→        </div>
+   715→      </main>
+   716→    }>
+   717→      <BaggageActivateContent />
+   718→    </Suspense>
+   719→  );
+   720→}
+   721→

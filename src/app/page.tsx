@@ -582,7 +582,7 @@ export default function HomePage() {
       <div className="hk">
         {/* ─── HEADER ─── */}
         <header className="hk-header">
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} priority />
+          <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} priority />
           <div className="hk-nav">
             <button className="hk-lang" onClick={cycleLang} title="Switch language">
               🌐 {langLabels[lang]}
@@ -929,7 +929,7 @@ export default function HomePage() {
           <div className="hk-footer-grid">
             {/* Logo & tagline */}
             <div className="hk-footer-col">
-              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)', marginBottom: '12px' }} />
+              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)', marginBottom: '12px' }} />
               <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{t('landing.footer.tagline')}</p>
             </div>
             {/* Produit */}

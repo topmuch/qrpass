@@ -636,7 +636,7 @@ export default function PilgrimScanPage() {
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
           <div className="flex items-center mb-8">
-            <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+            <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
@@ -701,7 +701,7 @@ export default function PilgrimScanPage() {
           {/* ─── HEADER ─── */}
           <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -816,67 +816,74 @@ export default function PilgrimScanPage() {
                 </span>
               </div>
 
-              {/* ─── PROFILE CARD ─── */}
+              {/* ─── PROFILE CARD — Enhanced visual ─── */}
               <div
-                className="w-full max-w-[420px] rounded-[20px] p-6 text-center mb-4"
+                className="w-full max-w-[420px] rounded-[20px] text-center mb-4 overflow-hidden"
                 style={{ background: CARD_BG, boxShadow: SHADOW }}
               >
-                {/* Photo — clickable for upload */}
-                <div className="relative inline-block mx-auto mb-4">
-                  <button
-                    onClick={() => photoInputRef.current?.click()}
-                    disabled={isUploadingPhoto}
-                    className="relative group cursor-pointer disabled:opacity-50"
-                    type="button"
-                  >
-                    {pilgrim.photoUrl ? (
-                      <img
-                        src={getPhotoDisplayUrl(pilgrim.photoUrl)}
-                        alt={pilgrim.fullName}
-                        className="w-[100px] h-[100px] rounded-full object-cover border-4 border-white"
-                        style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          // Prevent infinite loop if fallback also fails
-                          if (target.dataset.error) return;
-                          target.dataset.error = '1';
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement | null;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="w-[100px] h-[100px] rounded-full border-4 border-white items-center justify-center text-2xl font-bold"
-                      style={{
-                        background: '#eee',
-                        color: TEXT,
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        display: pilgrim.photoUrl ? 'none' : 'flex',
-                        margin: pilgrim.photoUrl ? undefined : '0 auto',
-                      }}
+                {/* Top gradient banner */}
+                <div
+                  className="py-5 px-6"
+                  style={{
+                    background: 'linear-gradient(135deg, #f4b400 0%, #e8a300 50%, #d49200 100%)',
+                  }}
+                >
+                  {/* Photo — clickable for upload */}
+                  <div className="relative inline-block mx-auto mb-3">
+                    <button
+                      onClick={() => photoInputRef.current?.click()}
+                      disabled={isUploadingPhoto}
+                      className="relative group cursor-pointer disabled:opacity-50"
+                      type="button"
                     >
-                      {getInitials(pilgrim.fullName)}
-                    </div>
-                    <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      {isUploadingPhoto ? <Loader2 className="w-6 h-6 animate-spin text-white" /> : <Upload className="w-5 h-5 text-white" />}
-                    </div>
-                  </button>
-                  <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoChange} className="hidden" />
+                      {pilgrim.photoUrl ? (
+                        <img
+                          src={getPhotoDisplayUrl(pilgrim.photoUrl)}
+                          alt={pilgrim.fullName}
+                          className="w-[110px] h-[110px] rounded-full object-cover border-4 border-white"
+                          style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.25)' }}
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.dataset.error) return;
+                            target.dataset.error = '1';
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement | null;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className="w-[110px] h-[110px] rounded-full border-4 border-white items-center justify-center text-3xl font-bold"
+                        style={{
+                          background: 'rgba(255,255,255,0.3)',
+                          color: '#fff',
+                          boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
+                          display: pilgrim.photoUrl ? 'none' : 'flex',
+                          margin: pilgrim.photoUrl ? undefined : '0 auto',
+                        }}
+                      >
+                        {getInitials(pilgrim.fullName)}
+                      </div>
+                      <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        {isUploadingPhoto ? <Loader2 className="w-6 h-6 animate-spin text-white" /> : <Upload className="w-5 h-5 text-white" />}
+                      </div>
+                    </button>
+                    <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoChange} className="hidden" />
+                  </div>
+
+                  {/* Name */}
+                  <h2 className="text-[24px] font-extrabold mb-1 text-white drop-shadow-sm">{pilgrim.fullName}</h2>
+
+                  {/* Nationality badge */}
+                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
+                    <span className="bg-white/25 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold inline-block mt-1 text-white">
+                      {pilgrim.nationality}
+                    </span>
+                  )}
                 </div>
 
-                {/* Name */}
-                <h2 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h2>
-
-                {/* Nationality badge */}
-                {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
-                  <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold inline-block mt-1" style={{ color: MUTED }}>
-                    {pilgrim.nationality}
-                  </span>
-                )}
-
                 {/* Info list below name */}
-                <div className="mt-4 text-left space-y-2">
+                <div className="p-5 pt-4 text-left space-y-2">
                   {pilgrim.lastName && (
                     <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
                       <span className="text-xs font-medium" style={{ color: MUTED }}>{t('lastNameLabel')}</span>
@@ -921,76 +928,74 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  1. ALERTE SANTÉ — Prominent health card
+                  1. ALERTE SANTÉ — RED BACKGROUND, WHITE TEXT — Very prominent
               ═══════════════════════════════════════════════════════════ */}
               <div
                 className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
                 style={{
-                  background: CARD_BG,
-                  boxShadow: SHADOW,
-                  borderLeft: lang === 'ar' ? 'none' : '5px solid #dc2626',
-                  borderRight: lang === 'ar' ? '5px solid #dc2626' : 'none',
+                  background: '#dc2626',
+                  boxShadow: '0 8px 24px rgba(220,38,38,0.35)',
                 }}
               >
-                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: DANGER }}>
-                  <Heart className="w-5 h-5" />
+                <h3 className="text-[18px] font-extrabold mb-4 flex items-center gap-2 text-white">
+                  <Heart className="w-6 h-6 animate-pulse" />
                   {t('healthAlertTitle')}
                 </h3>
 
-                {/* Blood type — Droplets icon, red */}
+                {/* Blood type — White on red */}
                 {pilgrim.bloodType && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
-                      <Droplets className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
+                      <Droplets className="w-5 h-5" style={{ color: '#dc2626' }} />
                     </div>
                     <div>
-                      <span className="text-xs block" style={{ color: MUTED }}>Groupe sanguin</span>
-                      <span className="text-lg font-extrabold" style={{ color: DANGER }}>{pilgrim.bloodType}</span>
+                      <span className="text-xs block text-white/70">Groupe sanguin</span>
+                      <span className="text-xl font-extrabold text-white">{pilgrim.bloodType}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Allergies — AlertTriangle icon, orange/amber */}
+                {/* Allergies — White on red */}
                 {pilgrim.allergies && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fffbeb' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#f59e0b' }}>
-                      <AlertTriangle className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
+                      <AlertTriangle className="w-5 h-5" style={{ color: '#dc2626' }} />
                     </div>
-                    <div>
-                      <span className="text-xs block" style={{ color: MUTED }}>{t('allergiesLabel')}</span>
-                      <span className="text-sm font-bold" style={{ color: '#b45309' }}>{pilgrim.allergies}</span>
+                    <div className="text-left">
+                      <span className="text-xs block text-white/70">{t('allergiesLabel')}</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.allergies}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Maladies — Heart icon (pulsing), red */}
+                {/* Maladies — White on red */}
                 {pilgrim.diseases && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
-                      <Heart className="w-5 h-5 text-white animate-pulse" />
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
+                      <Heart className="w-5 h-5" style={{ color: '#dc2626' }} />
                     </div>
-                    <div>
-                      <span className="text-xs block" style={{ color: MUTED }}>{t('diseasesLabel')}</span>
-                      <span className="text-sm font-bold" style={{ color: DANGER }}>{pilgrim.diseases}</span>
+                    <div className="text-left">
+                      <span className="text-xs block text-white/70">{t('diseasesLabel')}</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.diseases}</span>
                     </div>
                   </div>
                 )}
 
-                {/* Autres infos médicales — AlertCircle icon, muted */}
+                {/* Autres infos médicales — White on red */}
                 {pilgrim.medicalInfo && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f9fafb' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: MUTED }}>
-                      <AlertCircle className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
+                      <AlertCircle className="w-5 h-5" style={{ color: '#dc2626' }} />
                     </div>
-                    <div>
-                      <span className="text-xs block" style={{ color: MUTED }}>{t('otherMedicalLabel')}</span>
-                      <span className="text-sm font-bold" style={{ color: TEXT }}>{pilgrim.medicalInfo}</span>
+                    <div className="text-left">
+                      <span className="text-xs block text-white/70">{t('otherMedicalLabel')}</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.medicalInfo}</span>
                     </div>
                   </div>
                 )}
 
                 {!pilgrim.bloodType && !pilgrim.allergies && !pilgrim.diseases && !pilgrim.medicalInfo && (
-                  <p className="text-sm" style={{ color: MUTED }}>{t('noMedical')}</p>
+                  <p className="text-sm text-white/70">{t('noMedical')}</p>
                 )}
               </div>
 
@@ -1143,12 +1148,18 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  4b. RASSURER LA FAMILLE — WhatsApp reassurance button
+                  4b. RASSURER LA FAMILLE — Pre-recorded message + location link
               ═══════════════════════════════════════════════════════════ */}
               {pilgrim.familyContact && (
                 <div className="w-full max-w-[420px] mb-4">
                   <a
-                    href={`https://wa.me/${cleanPhone(pilgrim.familyContact)}?text=${encodeURIComponent(t('reassureMessage'))}`}
+                    href={`https://wa.me/${cleanPhone(pilgrim.familyContact)}?text=${encodeURIComponent(
+                      lang === 'ar'
+                        ? `مرحبا بالعائلة، أنا بخير، كل شيء على ما يرام، أنا في جدة${finderLat && finderLng ? `\n\n📍 موقعي: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
+                        : lang === 'en'
+                          ? `Hello family, I am fine, everything is going well, I am in Jeddah${finderLat && finderLng ? `\n\n📍 My location: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
+                          : `Bonjour la famille, je vais bien, tout se passe bien, je suis à Jeddah${finderLat && finderLng ? `\n\n📍 Ma localisation: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
