@@ -53,3 +53,42 @@ Stage Summary:
 - Security: Helmet, CORS, rate limiting (global 200/15min, auth 20/15min, OTP 10/5min)
 - Route stubs ready for implementation (auth, trips, pilgrims, bags, scans, incidents, agencies, leader, finder, webhooks)
 - Waiting for user validation before implementing routes
+
+---
+Task ID: 3
+Agent: main
+Task: PROMPT 1 — Implement all route files and controllers with full business logic
+
+Work Log:
+- Created src/utils/qrGenerator.ts — generateIdentityQR(), generateBaggageQR(), generateOTP(), detectQRType()
+- Created src/utils/validators.ts — Zod schemas for all endpoints (auth, agency, trip, pilgrim, bag, scan, incident, finder)
+- Created src/lib.ts — Shared exports to break circular deps (prisma, JWT, rate limiters, multer, authenticate/authorize)
+- Created src/controllers/auth.controller.ts — register, login, refreshToken, logout, me
+- Created src/routes/auth.routes.ts — POST /register, /login, /refresh, /logout; GET /me
+- Created src/controllers/agency.controller.ts — list, getById, getBySlug, create, update, remove
+- Created src/routes/agency.routes.ts — CRUD with role-based access
+- Created src/controllers/trips.controller.ts — list, getById, create (with OTP generation + pilgrims/bags), update, remove, regenerateOTP
+- Created src/routes/trips.routes.ts — CRUD + POST /:id/regenerate-otp
+- Created src/controllers/leader.controller.ts — verifyOTP (returns full trip data for PWA offline cache), syncScans (with dedup), syncIncidents, getTripStatus, getPendingSync
+- Created src/routes/leader.routes.ts — POST /verify-otp, /sync-scans, /sync-incidents; GET /trip/:tripId/status, /trip/:tripId/pending
+- Created src/controllers/pilgrim.controller.ts — list, getById, getByQR, create (auto QR), update, remove, uploadPhoto
+- Created src/routes/pilgrim.routes.ts — CRUD + QR lookup + photo upload
+- Created src/controllers/bag.controller.ts — list, getById, getByQR, create (auto QR), update, remove, uploadPhoto, markLost, markFound
+- Created src/routes/bag.routes.ts — CRUD + QR lookup + photo + mark-lost/found
+- Created src/controllers/scan.controller.ts — list, getById, getStats, getUnsynced
+- Created src/routes/scan.routes.ts — GET /, /stats, /unsynced, /:id
+- Created src/controllers/incident.controller.ts — list, getById, create, update (resolve), uploadPhoto
+- Created src/routes/incident.routes.ts — CRUD + photo upload
+- Created src/controllers/finder.controller.ts — lookup (public, no auth)
+- Created src/routes/finder.routes.ts — GET /:qrCode (public)
+- Updated src/server.ts — wired all 9 route groups, uses lib.ts for shared exports
+- Tested all critical flows: Login ✅, Agencies ✅, Trips ✅, OTP Verify ✅, Finder ✅
+
+Stage Summary:
+- 9 route groups mounted: auth, agencies, trips, pilgrims, bags, scans, incidents, leader, finder
+- 18 controller functions + 9 route files + 2 util files created
+- QR generation: ID-XXXXX (identity), BG-XXXXXX (baggage), 4-digit OTP
+- Auth: bcrypt hashing, JWT access (24h) + refresh (7d), role-based authorization
+- Leader PWA: OTP verify returns ALL trip data for offline cache, scan sync with dedup
+- Finder: public QR lookup (no auth), medical flash card for identity, bag info for baggage
+- Server running on port 3002, all critical flows verified
