@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { validateOtp } from '@/lib/passhajj-utils';
 
-// Demo OTP codes mapped to agency data
+// Demo OTP codes for testing
 const DEMO_OTPS: Record<string, { agencyName: string; tripName: string }> = {
   '1234': { agencyName: 'Al Baraka Voyages', tripName: 'Hajj 2025 - Groupe 12' },
   '5678': { agencyName: 'Sénégal Hajj Services', tripName: 'Hajj 2025 - Groupe 7' },
@@ -14,45 +14,70 @@ export async function POST(request: NextRequest) {
     const { otp } = body;
 
     if (!otp || typeof otp !== 'string' || otp.length !== 4 || !/^\d{4}$/.test(otp)) {
-      return NextResponse.json(
-        { error: 'Code OTP invalide. Entrez 4 chiffres.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Code OTP invalide. Entrez 4 chiffres.' }, { status: 400 });
     }
 
-    // Check demo OTPs first
+    // Try real DB first (graceful fallback if models not yet available)
+    try {
+      const result = await validateOtp(otp);
+      if (result.valid && result.trip) {
+        const trip = result.trip;
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            tripId: trip.id,
+            tripName: trip.name,
+            agencyName: (trip.agency as { name: string }).name,
+            pilgrims: trip.pilgrims.map((p: { id: string; qrCode: string; fullName: string; bloodType: string | null; allergies: string | null; group: { name: string } | null }) => ({
+              id: p.id,
+              qrCode: p.qrCode,
+              fullName: p.fullName,
+              bloodType: p.bloodType || undefined,
+              allergies: p.allergies || undefined,
+              group: p.group?.name,
+            })),
+            bags: trip.bags.map((b: { id: string; qrCode: string; ownerName: string; ownerId: string | null }) => ({
+              id: b.id,
+              qrCode: b.qrCode,
+              ownerName: b.ownerName,
+              ownerId: b.ownerId || undefined,
+            })),
+          },
+        });
+      }
+      // If OTP not found in DB but it's a demo code, fall through
+      if (!DEMO_OTPS[otp]) {
+        return NextResponse.json(
+          { error: result.error || 'Code OTP non reconnu' },
+          { status: 401 }
+        );
+      }
+    } catch (dbError) {
+      // DB models not available yet — fall through to demo OTPs
+      console.warn('[Leader Verify] DB not available, using demo fallback');
+    }
+
+    // Fall back to demo OTPs for testing
     const demoData = DEMO_OTPS[otp];
-    
     if (demoData) {
-      // Generate mock trip data for demo
       const tripId = `TRIP-${otp}-${Date.now().toString(36).toUpperCase()}`;
       const pilgrims = generateMockPilgrims(otp);
       const bags = generateMockBags(otp, pilgrims);
-      
+
       return NextResponse.json({
         success: true,
-        data: {
-          tripId,
-          tripName: demoData.tripName,
-          agencyName: demoData.agencyName,
-          pilgrims,
-          bags,
-        },
+        data: { tripId, tripName: demoData.tripName, agencyName: demoData.agencyName, pilgrims, bags },
       });
     }
 
-    // Try to find a real agency with this OTP (future: add otp field to Agency model)
-    // For now, return error for non-demo codes
     return NextResponse.json(
-      { error: 'Code OTP non reconnu. Vérifiez et réessayez.' },
+      { error: result.error || 'Code OTP non reconnu' },
       { status: 401 }
     );
   } catch (error) {
     console.error('[Leader Verify] Error:', error);
-    return NextResponse.json(
-      { error: 'Erreur serveur. Réessayez.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
 
@@ -61,10 +86,10 @@ function generateMockPilgrims(otp: string) {
   const lastNames = ['Diallo', 'Ndiaye', 'Sow', 'Balde', 'Diop', 'Ba', 'Sy', 'Faye', 'Mbaye', 'Kane', 'Thiam', 'Gueye', 'Sarr', 'Lo', 'Diatta', 'Cisse', 'Tambadou', 'Drame', 'Silla', 'Camara', 'Touray', 'Jallow', 'Bah', 'Wally', 'Coly'];
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   const allergies = [null, null, null, null, 'Pénicilline', 'Sulfamides', 'Aspirine', 'Iode', null, null, 'Arachides'];
-  
-  const count = 20 + Math.floor(Math.random() * 30); // 20-50 pilgrims
+
+  const count = 20 + Math.floor(Math.random() * 30);
   const pilgrims = [];
-  
+
   for (let i = 0; i < count; i++) {
     const idx = (parseInt(otp) * 7 + i * 13) % firstNames.length;
     const lidx = (parseInt(otp) * 3 + i * 17) % lastNames.length;
@@ -78,13 +103,12 @@ function generateMockPilgrims(otp: string) {
       group: `Groupe ${Math.floor(i / 10) + 1}`,
     });
   }
-  
+
   return pilgrims;
 }
 
 function generateMockBags(otp: string, pilgrims: Array<{ id: string; qrCode: string; fullName: string }>) {
   const bags = [];
-  // 1-2 bags per pilgrim
   for (let i = 0; i < pilgrims.length; i++) {
     const num = String(i + 1).padStart(3, '0');
     bags.push({
@@ -93,7 +117,6 @@ function generateMockBags(otp: string, pilgrims: Array<{ id: string; qrCode: str
       ownerName: pilgrims[i].fullName,
       ownerId: pilgrims[i].id,
     });
-    // 70% chance of second bag
     if (Math.random() > 0.3) {
       bags.push({
         id: `B-${otp}-${num}-2`,

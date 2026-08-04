@@ -59,6 +59,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/auth',
   '/api/scan',
   '/api/activate',
+  '/api/activation',
   '/api/identity',
   '/api/detect-country',
   '/api/init-demo',
@@ -67,6 +68,8 @@ const PUBLIC_API_PREFIXES = [
   '/api/route',  // health check
   '/api/pilgrims/lookup',  // QR code lookup (public - called when scanning QR)
   '/api/serve-upload',  // Uploaded files (public - baggage photos)
+  '/api/leader',  // PassHajj Manager PWA (uses OTP auth, not session)
+  '/api/finder',  // Finder lookup (public - anyone who finds a QR code)
 ];
 
 // Known protected sub-routes under /api/pilgrims (everything else under /api/pilgrims/ is a public QR code lookup)
@@ -120,16 +123,17 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // ─── 3. API protégées → vérifier session ───
+  // ─── 3. API protégées → vérifier session ou Bearer token ───
   if (PROTECTED_API_PREFIXES.some((p) => pathname.startsWith(p))) {
-    if (!hasSession) {
+    const hasBearerToken = req.headers.get('authorization')?.startsWith('Bearer ');
+    if (!hasSession && !hasBearerToken) {
       return NextResponse.json(
         { error: 'Non autorisé — Connexion requise', code: 'UNAUTHORIZED' },
         { status: 401 }
       );
     }
-    // Session cookie présente → laisser passer.
-    // La vérification complète (session valide, rôle) est faite dans le handler API.
+    // Session cookie or Bearer token present → let through.
+    // Full verification (session valid, role, JWT valid) is done in the API handler.
     return NextResponse.next();
   }
 

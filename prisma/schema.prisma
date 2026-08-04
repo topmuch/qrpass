@@ -67,10 +67,13 @@ model Agency {
   address   String?
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
-  baggages  Baggage[]
-  pilgrims  Pilgrim[]
-  users     User[]
-  invoices  Invoice[]
+  baggages     Baggage[]
+  pilgrims     Pilgrim[]
+  users        User[]
+  invoices     Invoice[]
+  trips        Trip[]
+  groups       PilgrimGroup[]
+  bags         Bag[]
 }
 
 // Baggage model - main entity for luggage tracking
@@ -585,7 +588,12 @@ model Pilgrim {
   owner            User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   agencyId         String?  // Direct link to agency (set at generation time)
   agency           Agency?  @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  groupId          String?  // Group assignment for PWA leader
+  group            PilgrimGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  tripId           String?  // Trip assignment
+  trip             Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
   reports          PilgrimReport[]
+  leaderScans      LeaderScan[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -593,6 +601,8 @@ model Pilgrim {
   @@index([isActive])
   @@index([createdAt])
   @@index([agencyId])
+  @@index([tripId])
+  @@index([groupId])
 }
 
 // PilgrimReport model - someone found/reported a pilgrim in need
@@ -609,4 +619,131 @@ model PilgrimReport {
 
   @@index([pilgrimId])
   @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASSHAJJ MANAGER PWA — Trip, Group, LeaderScan models (NEW)
+// ═══════════════════════════════════════════════════════════════
+
+// Trip model - a pilgrimage trip managed by an agency
+model Trip {
+  id            String        @id @default(cuid())
+  name          String        // ex: "Hajj 2025 - Groupe 12"
+  agencyId      String
+  agency        Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  otp           String        @unique // 4-digit OTP for leader PWA login
+  otpExpiry     DateTime      // When the OTP expires
+  isUsed        Boolean       @default(false) // Whether OTP has been used (one-time optional)
+  status        String        @default("active") // "active" | "completed" | "cancelled"
+  departureDate DateTime?     // Trip departure date
+  returnDate    DateTime?     // Trip return date
+  destination   String?       // ex: "La Mecque"
+  transportMode String        @default("flight") // "flight" | "bus" | "boat" | "train"
+  // Trip stats (denormalized for quick access)
+  totalPilgrims Int           @default(0)
+  totalBags     Int           @default(0)
+  // Relations
+  pilgrims      Pilgrim[]
+  bags          Bag[]
+  groups        PilgrimGroup[]
+  leaderScans   LeaderScan[]
+  incidents     LeaderIncident[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([agencyId])
+  @@index([otp])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// PilgrimGroup model - groups of pilgrims within a trip
+model PilgrimGroup {
+  id          String    @id @default(cuid())
+  name        String    // ex: "Groupe 1", "Groupe A"
+  leaderName  String?   // Name of the group leader
+  leaderPhone String?   // WhatsApp number of group leader
+  agencyId    String
+  agency      Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  tripId      String?
+  trip        Trip?     @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  pilgrims    Pilgrim[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([agencyId])
+  @@index([tripId])
+}
+
+// Bag model - luggage items linked to a trip (PWA-specific, separate from main Baggage)
+model Bag {
+  id              String    @id @default(cuid())
+  qrCode          String    @unique // ex: "BG-12340011"
+  ownerName       String    // Name of the bag owner
+  ownerId         String?   // Links to Pilgrim.id
+  airline         String?   // Airline name
+  flightNumber    String?   // Flight number
+  destination     String?   // Destination city
+  departureDate   DateTime? // Departure date
+  photoUrl        String?   // Bag photo
+  hotelName       String?   // Hotel in Saudi Arabia
+  roomNumber      String?   // Hotel room
+  baggageType     String    @default("cabine") // "cabine" | "soute"
+  baggageIndex    Int       @default(1) // 1, 2, 3 (order within set)
+  agencyId        String?
+  agency          Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  tripId          String?
+  trip            Trip?     @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  leaderScans     LeaderScan[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([qrCode])
+  @@index([agencyId])
+  @@index([tripId])
+}
+
+// LeaderScan model - scan records from the PWA (offline-capable)
+model LeaderScan {
+  id          String    @id @default(cuid())
+  qrCode      String    // The scanned QR code value
+  type        String    // "identity" | "baggage"
+  tripId      String
+  trip        Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  zone        String    // "Aéroport" | "Bus" | "Hôtel" | "Haram"
+  timestamp   DateTime  // When the scan happened (client-side time for offline)
+  status      String    @default("success") // "success" | "error" | "duplicate"
+  pilgrimName String?   // Name of the scanned person/bag owner
+  pilgrimId   String?   // Links to Pilgrim
+  pilgrim     Pilgrim?  @relation(fields: [pilgrimId], references: [id], onDelete: SetNull)
+  bagId       String?   // Links to Bag
+  bag         Bag?      @relation(fields: [bagId], references: [id], onDelete: SetNull)
+  synced      Boolean   @default(true) // true if synced from PWA, false if pending
+  syncedAt    DateTime? // When it was synced to server
+  createdAt   DateTime  @default(now())
+
+  @@index([tripId])
+  @@index([qrCode])
+  @@index([timestamp])
+  @@index([synced])
+}
+
+// LeaderIncident model - incidents reported by group leaders
+model LeaderIncident {
+  id            String    @id @default(cuid())
+  type          String    // "pilgrim_sick" | "bag_damaged" | "bag_lost" | "pilgrim_missing" | "other"
+  description   String    // What happened
+  relatedQrCode String?   // QR code of the related item/person
+  relatedName   String?   // Name of the related person
+  tripId        String
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  zone          String    // Zone where incident occurred
+  timestamp     DateTime  // When it happened
+  synced        Boolean   @default(true) // true if synced from PWA
+  syncedAt      DateTime? // When it was synced
+  createdAt     DateTime  @default(now())
+
+  @@index([tripId])
+  @@index([timestamp])
+  @@index([synced])
 }

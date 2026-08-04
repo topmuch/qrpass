@@ -12,11 +12,17 @@ const createPrismaClient = () => {
   })
 }
 
-export const db = globalForPrisma.prisma ?? createPrismaClient()
+// Always create fresh client to pick up schema changes
+// In production, use cached instance for performance
+const db = process.env.NODE_ENV === 'production' 
+  ? (globalForPrisma.prisma ?? createPrismaClient())
+  : createPrismaClient()
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'production') {
   globalForPrisma.prisma = db
 }
+
+export { db }
 
 // Export type for TypeScript support
 export type { PrismaClient }
