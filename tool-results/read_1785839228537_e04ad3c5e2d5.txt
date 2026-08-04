@@ -1,0 +1,540 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import Link from 'next/link';
+     5→import {
+     6→  UserRound,
+     7→  Search,
+     8→  Eye,
+     9→  QrCode,
+    10→  X,
+    11→  Clock,
+    12→  CheckCircle,
+    13→  Heart,
+    14→  Phone,
+    15→} from "lucide-react";
+    16→import { useAgency } from '../layout';
+    17→
+    18→interface Pilgrim {
+    19→  id: string;
+    20→  qrCode: string;
+    21→  fullName: string;
+    22→  nationality: string;
+    23→  photoUrl: string | null;
+    24→  bloodType: string | null;
+    25→  medicalInfo: string | null;
+    26→  hotelMecca: string | null;
+    27→  roomMecca: string | null;
+    28→  hotelMedina: string | null;
+    29→  roomMedina: string | null;
+    30→  groupLeaderPhone: string | null;
+    31→  agencyPhone: string | null;
+    32→  familyContact: string | null;
+    33→  isActive: boolean;
+    34→  duration: string;
+    35→  expiresAt: string | null;
+    36→  createdAt: string;
+    37→}
+    38→
+    39→export default function IdentityPage() {
+    40→  const { agencyId, agencyName } = useAgency();
+    41→  const [pilgrims, setPilgrims] = useState<Pilgrim[]>([]);
+    42→  const [filteredPilgrims, setFilteredPilgrims] = useState<Pilgrim[]>([]);
+    43→  const [loading, setLoading] = useState(true);
+    44→  const [search, setSearch] = useState('');
+    45→  const [statusFilter, setStatusFilter] = useState('all');
+    46→  const [selectedPilgrim, setSelectedPilgrim] = useState<Pilgrim | null>(null);
+    47→  const [showDetailModal, setShowDetailModal] = useState(false);
+    48→
+    49→  useEffect(() => {
+    50→    fetchPilgrims();
+    51→  }, [agencyId]);
+    52→
+    53→  useEffect(() => {
+    54→    filterPilgrims();
+    55→  }, [pilgrims, search, statusFilter]);
+    56→
+    57→  const fetchPilgrims = async () => {
+    58→    try {
+    59→      const params = new URLSearchParams({ agencyId });
+    60→      const response = await fetch(`/api/agency/pilgrims?${params}`);
+    61→      const data = await response.json();
+    62→      setPilgrims(data.pilgrims || []);
+    63→    } catch (error) {
+    64→      console.error('Error fetching pilgrims:', error);
+    65→    } finally {
+    66→      setLoading(false);
+    67→    }
+    68→  };
+    69→
+    70→  const filterPilgrims = () => {
+    71→    let filtered = [...pilgrims];
+    72→
+    73→    if (statusFilter === 'active') {
+    74→      filtered = filtered.filter(p => p.isActive);
+    75→    } else if (statusFilter === 'pending') {
+    76→      filtered = filtered.filter(p => !p.isActive);
+    77→    }
+    78→
+    79→    if (search.trim()) {
+    80→      const searchLower = search.toLowerCase();
+    81→      filtered = filtered.filter(p =>
+    82→        p.qrCode.toLowerCase().includes(searchLower) ||
+    83→        p.fullName.toLowerCase().includes(searchLower) ||
+    84→        p.nationality.toLowerCase().includes(searchLower)
+    85→      );
+    86→    }
+    87→
+    88→    setFilteredPilgrims(filtered);
+    89→  };
+    90→
+    91→  const formatDate = (dateString: string | null) => {
+    92→    if (!dateString) return '—';
+    93→    const date = new Date(dateString);
+    94→    return date.toLocaleDateString('fr-FR', {
+    95→      day: '2-digit',
+    96→      month: '2-digit',
+    97→      year: 'numeric'
+    98→    });
+    99→  };
+   100→
+   101→  const activePilgrims = filteredPilgrims.filter(p => p.isActive);
+   102→  const pendingPilgrims = filteredPilgrims.filter(p => !p.isActive);
+   103→
+   104→  const filterButtons = [
+   105→    { id: 'all', label: 'Tous' },
+   106→    { id: 'active', label: 'Activés' },
+   107→    { id: 'pending', label: 'En attente' },
+   108→  ];
+   109→
+   110→  return (
+   111→    <div className="max-w-7xl mx-auto">
+   112→      {/* Header */}
+   113→      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+   114→        <div>
+   115→          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+   116→            <UserRound className="w-7 h-7 text-emerald-600" />
+   117→            Pass Identity
+   118→          </h1>
+   119→          <p className="text-slate-500 dark:text-slate-400 mt-1">Bracelets d&apos;identification des pèlerins Hajj</p>
+   120→        </div>
+   121→      </div>
+   122→
+   123→      {/* Stats Cards */}
+   124→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+   125→        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl p-5 text-white">
+   126→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   127→            <UserRound className="w-5 h-5 text-white" />
+   128→          </div>
+   129→          <p className="text-2xl font-bold">{pilgrims.length}</p>
+   130→          <p className="text-sm text-white/80">Total Identity</p>
+   131→        </div>
+   132→        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
+   133→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   134→            <CheckCircle className="w-5 h-5 text-white" />
+   135→          </div>
+   136→          <p className="text-2xl font-bold">{pilgrims.filter(p => p.isActive).length}</p>
+   137→          <p className="text-sm text-white/80">Activés</p>
+   138→        </div>
+   139→        <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-5 text-white">
+   140→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   141→            <Clock className="w-5 h-5 text-white" />
+   142→          </div>
+   143→          <p className="text-2xl font-bold">{pilgrims.filter(p => !p.isActive).length}</p>
+   144→          <p className="text-sm text-white/80">En attente</p>
+   145→        </div>
+   146→        <div className="bg-gradient-to-r from-rose-500 to-rose-600 rounded-2xl p-5 text-white">
+   147→          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+   148→            <Heart className="w-5 h-5 text-white" />
+   149→          </div>
+   150→          <p className="text-2xl font-bold">{pilgrims.filter(p => p.bloodType).length}</p>
+   151→          <p className="text-sm text-white/80">Groupe sanguin</p>
+   152→        </div>
+   153→      </div>
+   154→
+   155→      {/* Search Bar */}
+   156→      <div className="mb-6">
+   157→        <div className="relative">
+   158→          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+   159→          <input
+   160→            type="text"
+   161→            placeholder="Rechercher par code QR, nom ou nationalité..."
+   162→            value={search}
+   163→            onChange={(e) => setSearch(e.target.value)}
+   164→            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
+   165→          />
+   166→        </div>
+   167→      </div>
+   168→
+   169→      {/* Filter Buttons */}
+   170→      <div className="flex flex-wrap gap-2 mb-6">
+   171→        {filterButtons.map((btn) => (
+   172→          <button
+   173→            key={btn.id}
+   174→            onClick={() => setStatusFilter(btn.id)}
+   175→            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+   176→              statusFilter === btn.id
+   177→                ? 'bg-emerald-600 text-white shadow-lg'
+   178→                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+   179→            }`}
+   180→          >
+   181→            {btn.label}
+   182→          </button>
+   183→        ))}
+   184→      </div>
+   185→
+   186→      {/* Loading state */}
+   187→      {loading ? (
+   188→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   189→          <div className="text-center py-12">
+   190→            <div className="flex items-center justify-center gap-3">
+   191→              <div className="w-6 h-6 border-2 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin" />
+   192→              <span className="text-slate-500">Chargement des Pass Identity...</span>
+   193→            </div>
+   194→          </div>
+   195→        </div>
+   196→      ) : filteredPilgrims.length === 0 ? (
+   197→        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+   198→          <div className="text-center py-12">
+   199→            <div className="flex flex-col items-center">
+   200→              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+   201→                <UserRound className="w-8 h-8 text-slate-400" />
+   202→              </div>
+   203→              <p className="text-slate-500 dark:text-slate-400">Aucun Pass Identity trouvé</p>
+   204→              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">Les QR codes Identity sont générés par le SuperAdmin</p>
+   205→            </div>
+   206→          </div>
+   207→        </div>
+   208→      ) : (
+   209→        <>
+   210→          {/* Section 1 — Activated Pilgrims */}
+   211→          {activePilgrims.length > 0 && (
+   212→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
+   213→              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-600/5">
+   214→                <div className="flex items-center gap-2">
+   215→                  <div className="w-3 h-3 rounded-full bg-emerald-600" />
+   216→                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   217→                    Bracelets activés ({activePilgrims.length})
+   218→                  </h2>
+   219→                </div>
+   220→              </div>
+   221→              <div className="overflow-x-auto">
+   222→                <table className="w-full">
+   223→                  <thead>
+   224→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   225→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Code QR</th>
+   226→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   227→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Groupe sanguin</th>
+   228→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden lg:table-cell">Hôtel Mecque</th>
+   229→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+   230→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   231→                    </tr>
+   232→                  </thead>
+   233→                  <tbody>
+   234→                    {activePilgrims.map((pilgrim) => (
+   235→                      <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+   236→                        <td className="px-6 py-4">
+   237→                          <Link
+   238→                            href={`/found/${pilgrim.qrCode}`}
+   239→                            className="flex items-center gap-2 group/qr"
+   240→                            title={`Scanner ${pilgrim.qrCode}`}
+   241→                          >
+   242→                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-600/10 flex items-center justify-center group-hover/qr:bg-emerald-200 dark:group-hover/qr:bg-emerald-600/20 transition-colors">
+   243→                              <QrCode className="w-4 h-4 text-emerald-600" />
+   244→                            </div>
+   245→                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-emerald-600 dark:group-hover/qr:text-emerald-400 transition-colors">{pilgrim.qrCode}</span>
+   246→                          </Link>
+   247→                        </td>
+   248→                        <td className="px-6 py-4">
+   249→                          <div>
+   250→                            <span className="text-slate-800 dark:text-white font-medium">
+   251→                              {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? pilgrim.fullName : 'Non renseigné'}
+   252→                            </span>
+   253→                            {pilgrim.nationality && pilgrim.nationality.trim() !== '' && (
+   254→                              <span className="text-slate-400 dark:text-slate-500 text-xs ml-2">({pilgrim.nationality})</span>
+   255→                            )}
+   256→                          </div>
+   257→                        </td>
+   258→                        <td className="px-6 py-4 hidden md:table-cell">
+   259→                          {pilgrim.bloodType ? (
+   260→                            <span className="px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold">{pilgrim.bloodType}</span>
+   261→                          ) : (
+   262→                            <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
+   263→                          )}
+   264→                        </td>
+   265→                        <td className="px-6 py-4 hidden lg:table-cell">
+   266→                          {pilgrim.hotelMecca ? (
+   267→                            <span className="text-slate-600 dark:text-slate-300 text-sm">{pilgrim.hotelMecca}</span>
+   268→                          ) : (
+   269→                            <span className="text-slate-400 dark:text-slate-500 text-sm">—</span>
+   270→                          )}
+   271→                        </td>
+   272→                        <td className="px-6 py-4">
+   273→                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">Actif</span>
+   274→                        </td>
+   275→                        <td className="px-6 py-4">
+   276→                          <button
+   277→                            onClick={() => { setSelectedPilgrim(pilgrim); setShowDetailModal(true); }}
+   278→                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   279→                            title="Voir détails"
+   280→                          >
+   281→                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
+   282→                          </button>
+   283→                        </td>
+   284→                      </tr>
+   285→                    ))}
+   286→                  </tbody>
+   287→                </table>
+   288→              </div>
+   289→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   290→                <span className="text-slate-500 dark:text-slate-400 text-sm">{activePilgrims.length} bracelet(s) activé(s)</span>
+   291→              </div>
+   292→            </div>
+   293→          )}
+   294→
+   295→          {/* Section 2 — Pending Pilgrims */}
+   296→          {pendingPilgrims.length > 0 && (
+   297→            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
+   298→              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-600/5">
+   299→                <div className="flex items-center gap-2">
+   300→                  <div className="w-3 h-3 rounded-full bg-amber-500" />
+   301→                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+   302→                    QR en attente d&apos;activation ({pendingPilgrims.length})
+   303→                  </h2>
+   304→                </div>
+   305→              </div>
+   306→              <div className="overflow-x-auto">
+   307→                <table className="w-full">
+   308→                  <thead>
+   309→                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   310→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Code QR</th>
+   311→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
+   312→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Nationalité</th>
+   313→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
+   314→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+   315→                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+   316→                    </tr>
+   317→                  </thead>
+   318→                  <tbody>
+   319→                    {pendingPilgrims.map((pilgrim) => (
+   320→                      <tr key={pilgrim.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+   321→                        <td className="px-6 py-4">
+   322→                          <Link
+   323→                            href={`/found/${pilgrim.qrCode}`}
+   324→                            className="flex items-center gap-2 group/qr"
+   325→                            title={`Activer ${pilgrim.qrCode}`}
+   326→                          >
+   327→                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-600/10 flex items-center justify-center group-hover/qr:bg-amber-200 dark:group-hover/qr:bg-amber-600/20 transition-colors">
+   328→                              <QrCode className="w-4 h-4 text-amber-600" />
+   329→                            </div>
+   330→                            <span className="text-slate-800 dark:text-white font-mono font-medium group-hover/qr:text-amber-600 dark:group-hover/qr:text-amber-400 transition-colors">{pilgrim.qrCode}</span>
+   331→                          </Link>
+   332→                        </td>
+   333→                        <td className="px-6 py-4">
+   334→                          {pilgrim.fullName && pilgrim.fullName.trim() !== '' ? (
+   335→                            <span className="text-slate-800 dark:text-white font-medium">{pilgrim.fullName}</span>
+   336→                          ) : (
+   337→                            <span className="px-2 py-1 bg-amber-100 dark:bg-amber-600/20 text-amber-600 dark:text-amber-500 rounded-full text-xs font-medium">Non activé</span>
+   338→                          )}
+   339→                        </td>
+   340→                        <td className="px-6 py-4 hidden md:table-cell">
+   341→                          <span className="text-slate-600 dark:text-slate-300 text-sm">
+   342→                            {pilgrim.nationality && pilgrim.nationality.trim() !== '' ? pilgrim.nationality : '—'}
+   343→                          </span>
+   344→                        </td>
+   345→                        <td className="px-6 py-4 hidden md:table-cell">
+   346→                          <span className="text-slate-400 dark:text-slate-500 text-sm">{formatDate(pilgrim.createdAt)}</span>
+   347→                        </td>
+   348→                        <td className="px-6 py-4">
+   349→                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400">En attente</span>
+   350→                        </td>
+   351→                        <td className="px-6 py-4">
+   352→                          <button
+   353→                            onClick={() => { setSelectedPilgrim(pilgrim); setShowDetailModal(true); }}
+   354→                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+   355→                            title="Voir détails"
+   356→                          >
+   357→                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-emerald-600" />
+   358→                          </button>
+   359→                        </td>
+   360→                      </tr>
+   361→                    ))}
+   362→                  </tbody>
+   363→                </table>
+   364→              </div>
+   365→              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+   366→                <span className="text-slate-500 dark:text-slate-400 text-sm">{pendingPilgrims.length} QR en attente d&apos;activation</span>
+   367→              </div>
+   368→            </div>
+   369→          )}
+   370→
+   371→          {/* Footer */}
+   372→          <div className="text-center mt-4">
+   373→            <span className="text-slate-400 dark:text-slate-500 text-xs">
+   374→              {filteredPilgrims.length} Pass Identity affiché(s) sur {pilgrims.length}
+   375→            </span>
+   376→          </div>
+   377→        </>
+   378→      )}
+   379→
+   380→      {/* Detail Modal */}
+   381→      {showDetailModal && selectedPilgrim && (
+   382→        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+   383→          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
+   384→            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+   385→              <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+   386→                <UserRound className="w-5 h-5 text-emerald-600" />
+   387→                Pass Identity
+   388→              </h2>
+   389→              <button
+   390→                onClick={() => { setShowDetailModal(false); setSelectedPilgrim(null); }}
+   391→                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+   392→              >
+   393→                <X className="w-5 h-5 text-slate-400" />
+   394→              </button>
+   395→            </div>
+   396→            <div className="p-6 space-y-4">
+   397→              {/* QR Code Info */}
+   398→              <Link
+   399→                href={`/found/${selectedPilgrim.qrCode}`}
+   400→                className="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-600/5 transition-colors group/qrlink"
+   401→              >
+   402→                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-600/10 rounded-xl flex items-center justify-center group-hover/qrlink:bg-emerald-200 dark:group-hover/qrlink:bg-emerald-600/20 transition-colors">
+   403→                  <QrCode className="w-6 h-6 text-emerald-600" />
+   404→                </div>
+   405→                <div>
+   406→                  <p className="text-slate-800 dark:text-white font-mono font-bold group-hover/qrlink:text-emerald-600 dark:group-hover/qrlink:text-emerald-400 transition-colors">{selectedPilgrim.qrCode}</p>
+   407→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pass Identity Hajj — Cliquer pour scanner</p>
+   408→                </div>
+   409→              </Link>
+   410→
+   411→              {/* Name & Nationality */}
+   412→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   413→                <div>
+   414→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Nom complet</p>
+   415→                  <p className="text-slate-800 dark:text-white font-medium">
+   416→                    {selectedPilgrim.fullName && selectedPilgrim.fullName.trim() !== '' ? selectedPilgrim.fullName : 'Non renseigné'}
+   417→                  </p>
+   418→                </div>
+   419→                <div>
+   420→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Nationalité</p>
+   421→                  <p className="text-slate-800 dark:text-white font-medium">
+   422→                    {selectedPilgrim.nationality && selectedPilgrim.nationality.trim() !== '' ? selectedPilgrim.nationality : 'Non renseignée'}
+   423→                  </p>
+   424→                </div>
+   425→              </div>
+   426→
+   427→              {/* Blood Type & Status */}
+   428→              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   429→                <div>
+   430→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Groupe sanguin</p>
+   431→                  {selectedPilgrim.bloodType ? (
+   432→                    <span className="inline-block px-2.5 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-xs font-bold mt-1">{selectedPilgrim.bloodType}</span>
+   433→                  ) : (
+   434→                    <p className="text-slate-400">—</p>
+   435→                  )}
+   436→                </div>
+   437→                <div>
+   438→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
+   439→                  {selectedPilgrim.isActive ? (
+   440→                    <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 mt-1">Actif</span>
+   441→                  ) : (
+   442→                    <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-600/10 text-amber-700 dark:text-amber-400 mt-1">En attente d&apos;activation</span>
+   443→                  )}
+   444→                </div>
+   445→              </div>
+   446→
+   447→              {/* Medical Info */}
+   448→              {selectedPilgrim.medicalInfo && (
+   449→                <div>
+   450→                  <p className="text-slate-500 dark:text-slate-400 text-sm">Informations médicales</p>
+   451→                  <p className="text-slate-800 dark:text-white text-sm mt-1">{selectedPilgrim.medicalInfo}</p>
+   452→                </div>
+   453→              )}
+   454→
+   455→              {/* Accommodation */}
+   456→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+   457→                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-3">Hébergement</p>
+   458→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   459→                  <div>
+   460→                    <p className="text-slate-500 dark:text-slate-400 text-xs">Mecque</p>
+   461→                    <p className="text-slate-800 dark:text-white text-sm font-medium">
+   462→                      {selectedPilgrim.hotelMecca || '—'}{selectedPilgrim.roomMecca ? ` (Ch. ${selectedPilgrim.roomMecca})` : ''}
+   463→                    </p>
+   464→                  </div>
+   465→                  <div>
+   466→                    <p className="text-slate-500 dark:text-slate-400 text-xs">Médine</p>
+   467→                    <p className="text-slate-800 dark:text-white text-sm font-medium">
+   468→                      {selectedPilgrim.hotelMedina || '—'}{selectedPilgrim.roomMedina ? ` (Ch. ${selectedPilgrim.roomMedina})` : ''}
+   469→                    </p>
+   470→                  </div>
+   471→                </div>
+   472→              </div>
+   473→
+   474→              {/* Contacts */}
+   475→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+   476→                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-3">Contacts</p>
+   477→                <div className="space-y-2">
+   478→                  {selectedPilgrim.groupLeaderPhone && (
+   479→                    <div className="flex items-center gap-2">
+   480→                      <Phone className="w-4 h-4 text-slate-400" />
+   481→                      <span className="text-sm text-slate-600 dark:text-slate-300">Chef de groupe: {selectedPilgrim.groupLeaderPhone}</span>
+   482→                    </div>
+   483→                  )}
+   484→                  {selectedPilgrim.familyContact && (
+   485→                    <div className="flex items-center gap-2">
+   486→                      <Heart className="w-4 h-4 text-slate-400" />
+   487→                      <span className="text-sm text-slate-600 dark:text-slate-300">Famille: {selectedPilgrim.familyContact}</span>
+   488→                    </div>
+   489→                  )}
+   490→                  {selectedPilgrim.agencyPhone && (
+   491→                    <div className="flex items-center gap-2">
+   492→                      <Phone className="w-4 h-4 text-slate-400" />
+   493→                      <span className="text-sm text-slate-600 dark:text-slate-300">Agence: {selectedPilgrim.agencyPhone}</span>
+   494→                    </div>
+   495→                  )}
+   496→                </div>
+   497→              </div>
+   498→
+   499→              {/* Dates */}
+   500→              <div className="border-t border-slate-200 dark:border-slate-800 pt-4">
+   501→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   502→                  <div>
+   503→                    <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
+   504→                    <p className="text-slate-800 dark:text-white text-sm">{formatDate(selectedPilgrim.createdAt)}</p>
+   505→                  </div>
+   506→                  <div>
+   507→                    <p className="text-slate-500 dark:text-slate-400 text-sm">Expiration</p>
+   508→                    <p className="text-slate-800 dark:text-white text-sm">{selectedPilgrim.expiresAt ? formatDate(selectedPilgrim.expiresAt) : '—'}</p>
+   509→                  </div>
+   510→                </div>
+   511→              </div>
+   512→
+   513→              {/* Action Buttons */}
+   514→              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+   515→                {/* Tester le scan - opens the /found/ page */}
+   516→                <Link
+   517→                  href={`/found/${selectedPilgrim.qrCode}`}
+   518→                  className="block w-full text-center py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-medium"
+   519→                >
+   520→                  📱 Tester le scan
+   521→                </Link>
+   522→
+   523→                {/* View public profile (only if activated) */}
+   524→                {selectedPilgrim.isActive && (
+   525→                  <Link
+   526→                    href={`/p/${selectedPilgrim.qrCode}`}
+   527→                    className="block w-full text-center py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium"
+   528→                  >
+   529→                    👤 Voir le profil public
+   530→                  </Link>
+   531→                )}
+   532→              </div>
+   533→            </div>
+   534→          </div>
+   535→        </div>
+   536→      )}
+   537→    </div>
+   538→  );
+   539→}
+   540→

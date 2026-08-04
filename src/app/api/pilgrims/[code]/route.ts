@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 
 // URL validation helper
 function isValidUrl(value: string): boolean {
+  // Allow relative paths for uploaded files (served via /api/serve-upload)
+  if (value.startsWith('/uploads/')) return true;
   try {
     const url = new URL(value);
     return url.protocol === 'http:' || url.protocol === 'https:';

@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from '@/hooks/use-toast';
+import PhoneInput from '@/components/ui/PhoneInput';
+import { COUNTRY_MAP } from '@/lib/phone';
 import {
   ChevronRight,
   ChevronLeft,
@@ -70,6 +72,26 @@ function IdentityActivateContent() {
   const [roomNumber, setRoomNumber] = useState('');
   const [leaderPhone, setLeaderPhone] = useState('');
   const [familyPhone, setFamilyPhone] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
+
+  // Country codes for PhoneInput (detected from IP on mount)
+  const [phoneCountry, setPhoneCountry] = useState('SN');
+  const [leaderCountry, setLeaderCountry] = useState('SN');
+  const [familyCountry, setFamilyCountry] = useState('SN');
+
+  // IP-based country detection on mount
+  useEffect(() => {
+    fetch('/api/ip-country')
+      .then(r => r.json())
+      .then(data => {
+        if (data.country && COUNTRY_MAP[data.country.toUpperCase()]) {
+          setPhoneCountry(data.country.toUpperCase());
+          setLeaderCountry(data.country.toUpperCase());
+          setFamilyCountry(data.country.toUpperCase());
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -200,6 +222,7 @@ function IdentityActivateContent() {
         phone: phone.trim() || undefined,
         language: language.trim() || undefined,
         familyContact: familyPhone.trim() || undefined,
+        hotelAddress: hotelAddress.trim() || undefined,
       };
 
       if (photoUrl) {
@@ -458,16 +481,14 @@ function IdentityActivateContent() {
 
             {/* Numéro de téléphone */}
             <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                Numéro de téléphone
-              </label>
-              <input
-                type="tel"
+              <PhoneInput
+                countryCode={phoneCountry}
+                onCountryChange={setPhoneCountry}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+221 77 123 45 67"
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                onChange={setPhone}
+                placeholder="77 123 45 67"
+                label="Numéro de téléphone"
+                dark={false}
               />
             </div>
 
@@ -679,18 +700,32 @@ function IdentityActivateContent() {
               />
             </div>
 
-            {/* WhatsApp Chef de Groupe */}
+            {/* Adresse de l'Hôtel */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                WhatsApp Chef de Groupe *
+                Adresse de l&apos;Hôtel
               </label>
               <input
-                type="tel"
+                type="text"
+                value={hotelAddress}
+                onChange={(e) => setHotelAddress(e.target.value)}
+                placeholder="Ex: Ibrahim Al Jafri Street, Mecca"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* WhatsApp Chef de Groupe */}
+            <div className="mb-4">
+              <PhoneInput
+                countryCode={leaderCountry}
+                onCountryChange={setLeaderCountry}
                 value={leaderPhone}
-                onChange={(e) => setLeaderPhone(e.target.value)}
-                placeholder="+221 77 123 45 67"
-                className={errors.leaderPhone ? inputErrorClass : inputNormalClass}
-                style={errors.leaderPhone ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                onChange={setLeaderPhone}
+                placeholder="77 123 45 67"
+                label="WhatsApp Chef de Groupe *"
+                required
+                dark={false}
               />
               <p className="text-xs mt-1.5" style={{ color: MUTED }}>
                 Ce numéro recevra les alertes d&apos;urgence
@@ -736,16 +771,14 @@ function IdentityActivateContent() {
 
             {/* Téléphone Famille */}
             <div className="mb-6">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                Téléphone Famille (Pays)
-              </label>
-              <input
-                type="tel"
+              <PhoneInput
+                countryCode={familyCountry}
+                onCountryChange={setFamilyCountry}
                 value={familyPhone}
-                onChange={(e) => setFamilyPhone(e.target.value)}
-                placeholder="+221 33 800 00 00"
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                onChange={setFamilyPhone}
+                placeholder="33 800 00 00"
+                label="Téléphone Famille (Pays)"
+                dark={false}
               />
               <p className="text-xs mt-1" style={{ color: MUTED }}>
                 Optionnel

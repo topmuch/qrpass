@@ -27,6 +27,19 @@ import {
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
+// ─── Helper: Convert a stored photoUrl to a displayable URL ───
+// Photos uploaded via /api/pilgrims/upload-photo are stored as /uploads/pilgrim-photos/xxx.jpg
+// but the Next.js dev server doesn't serve dynamically created files from public/.
+// The /api/serve-upload API serves them, so we rewrite the path.
+function getPhotoDisplayUrl(photoUrl: string | null): string | null {
+  if (!photoUrl) return null;
+  // If it's a relative path under /uploads/, route through the serve-upload API
+  if (photoUrl.startsWith('/uploads/')) {
+    return `/api/serve-upload/${photoUrl.slice('/uploads/'.length)}`;
+  }
+  return photoUrl;
+}
+
 // ─── Brand constants ───
 const BG = '#f4b400';
 const CARD_BG = '#ffffff';
@@ -818,7 +831,7 @@ export default function PilgrimScanPage() {
                   >
                     {pilgrim.photoUrl ? (
                       <img
-                        src={pilgrim.photoUrl}
+                        src={getPhotoDisplayUrl(pilgrim.photoUrl)}
                         alt={pilgrim.fullName}
                         className="w-[100px] h-[100px] rounded-full object-cover border-4 border-white"
                         style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
