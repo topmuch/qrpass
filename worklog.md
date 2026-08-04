@@ -172,3 +172,27 @@ Stage Summary:
 - Lint passes (only pre-existing errors in scripts/)
 - Theme: Jaune #f4b400 / Blanc / Bleu Marine #1e3a5f
 - Backend API running on port 3002 (healthy)
+---
+Task ID: PWA-1-7
+Agent: Main
+Task: Transform PassHajj into installable Offline-First PWA
+
+Work Log:
+- Explored existing PWA setup: found custom sw.js (v2), manifest.json, pwa-registration.tsx, all icons (72-512 + maskable)
+- Identified missing pieces: Update prompt UI, Install prompt UI, offline fallback, background sync
+- Upgraded public/sw.js from v2 → v3: added offline.html precache, finder API caching (network-first), background sync for pending scans, push notification placeholder, SKIP_WAITING message handler
+- Created public/offline.html: self-contained offline page with PassHajj branding, auto-detect online, retry button
+- Created src/hooks/usePWAUpdate.ts: hook detecting SW updates via custom event + fallback, periodic 60s check, updateApp() with skipWaiting + reload
+- Created src/components/InstallPWA.tsx: beforeinstallprompt banner (Jaune #f4b400), iOS Safari instructions, 24h dismissal, framer-motion slide-up, useInstallPrompt hook
+- Created src/components/PWAUpdateNotifier.tsx: toast notification on update available, "Recharger" button
+- Updated src/components/pwa-registration.tsx: dispatches 'pwa-update-available' custom event, triggers background sync on online, periodic 60s update check
+- Updated src/app/layout.tsx: integrated InstallPWA + PWAUpdateNotifier
+- Updated public/manifest.json: start_url → /?source=pwa, background_color → #ffffff
+
+Stage Summary:
+- 7 files modified/created, all lint clean
+- Service Worker v3 with offline fallback, background sync, push notifications, finder API cache
+- Install prompt with Android + iOS support
+- Update notification with toast + reload
+- Offline page with auto-recovery
+- Background sync for pending scans on connectivity restore

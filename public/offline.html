@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4b400">
+  <title>PassHajj Manager — Hors-ligne</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --jaune: #f4b400;
+      --jaune-light: #fcd966;
+      --jaune-dark: #c99200;
+      --blanc: #ffffff;
+      --gris-50: #fafafa;
+      --gris-100: #f5f5f5;
+      --gris-200: #e5e5e5;
+      --gris-400: #a3a3a3;
+      --gris-600: #525252;
+      --gris-800: #262626;
+      --gris-900: #171717;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--blanc);
+      color: var(--gris-900);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 24px;
+      text-align: center;
+    }
+
+    /* ── Animated background shapes ── */
+    .bg-shapes {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-shapes .circle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--jaune);
+      opacity: 0.06;
+      animation: floatShape 12s ease-in-out infinite;
+    }
+
+    .bg-shapes .circle:nth-child(1) {
+      width: 340px; height: 340px;
+      top: -80px; right: -60px;
+      animation-delay: 0s;
+    }
+
+    .bg-shapes .circle:nth-child(2) {
+      width: 260px; height: 260px;
+      bottom: -40px; left: -50px;
+      animation-delay: -4s;
+    }
+
+    .bg-shapes .circle:nth-child(3) {
+      width: 180px; height: 180px;
+      top: 40%; left: 60%;
+      animation-delay: -8s;
+    }
+
+    @keyframes floatShape {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(20px, -30px) scale(1.05); }
+      66% { transform: translate(-15px, 20px) scale(0.95); }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: var(--blanc);
+      border: 1px solid var(--gris-200);
+      border-radius: 20px;
+      padding: 48px 40px 40px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 40px -10px rgba(0, 0, 0, 0.08);
+      animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ── Shield Icon ── */
+    .icon-wrap {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 28px;
+      background: linear-gradient(135deg, var(--jaune-light), var(--jaune));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px -4px rgba(244, 180, 0, 0.35);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 6px 20px -4px rgba(244, 180, 0, 0.35); }
+      50% { box-shadow: 0 6px 30px -2px rgba(244, 180, 0, 0.5); }
+    }
+
+    .icon-wrap svg {
+      width: 42px;
+      height: 42px;
+      fill: var(--blanc);
+    }
+
+    /* ── Offline indicator ── */
+    .offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gris-100);
+      color: var(--gris-600);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+      animation: badgeIn 0.5s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes badgeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .offline-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: dotBlink 2s ease-in-out infinite;
+    }
+
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── Typography ── */
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gris-900);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+      animation: textIn 0.5s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .headline {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--gris-900);
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+      animation: textIn 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--gris-600);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      animation: textIn 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes textIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Retry Button ── */
+    .btn-retry {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--jaune);
+      color: var(--gris-900);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      animation: textIn 0.5s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .btn-retry:hover {
+      background: var(--jaune-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px -2px rgba(244, 180, 0, 0.4);
+    }
+
+    .btn-retry:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-retry svg {
+      width: 18px;
+      height: 18px;
+      animation: spin 1.5s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-retry:not(.loading) svg {
+      animation: none;
+    }
+
+    /* ── Back Online Banner ── */
+    .back-online {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 24px;
+      background: #22c55e;
+      color: var(--blanc);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: default;
+      animation: textIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .back-online svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .back-online .countdown {
+      font-weight: 400;
+      opacity: 0.85;
+      font-size: 14px;
+    }
+
+    .back-online.visible {
+      display: inline-flex;
+    }
+
+    .btn-retry.hidden {
+      display: none;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 32px;
+      font-size: 13px;
+      color: var(--gris-400);
+      animation: textIn 0.5s 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .footer span {
+      color: var(--jaune-dark);
+      font-weight: 600;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card {
+        padding: 40px 24px 32px;
+        border-radius: 16px;
+      }
+
+      .headline {
+        font-size: 26px;
+      }
+
+      .subtitle {
+        font-size: 15px;
+      }
+
+      .icon-wrap {
+        width: 68px;
+        height: 68px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+      }
+
+      .icon-wrap svg {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background decorative shapes -->
+  <div class="bg-shapes">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <!-- Shield / Pilgrimage Icon -->
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 2.18l7 3.89v4.93c0 4.67-3.13 9.02-7 10.18-3.87-1.16-7-5.51-7-10.18V8.07l7-3.89zM11 7v2h2V7h-2zm0 4v6h2v-6h-2z"/>
+      </svg>
+    </div>
+
+    <!-- Offline badge -->
+    <div class="offline-badge" id="offlineBadge">
+      <span class="dot"></span>
+      Hors-ligne
+    </div>
+
+    <!-- Title -->
+    <div class="title">PassHajj Manager</div>
+    <div class="headline">Vous êtes hors-ligne</div>
+    <div class="subtitle">Vérifiez votre connexion internet et réessayez.</div>
+
+    <!-- Retry Button -->
+    <button class="btn-retry" id="retryBtn" onclick="handleRetry()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+      </svg>
+      Réessayer
+    </button>
+
+    <!-- Back Online Banner (hidden by default) -->
+    <div class="back-online" id="backOnline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Connexion rétablie !
+      <span class="countdown" id="countdown"></span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>PassHajj</span> Manager — Protection &amp; Suivi des Pèlerins
+  </div>
+
+  <script>
+    var retryBtn = document.getElementById('retryBtn');
+    var backOnline = document.getElementById('backOnline');
+    var offlineBadge = document.getElementById('offlineBadge');
+    var countdownEl = document.getElementById('countdown');
+
+    function handleRetry() {
+      retryBtn.classList.add('loading');
+      location.reload();
+    }
+
+    // Auto-detect when back online
+    function onBackOnline() {
+      // Show "back online" banner, hide retry button
+      retryBtn.classList.add('hidden');
+      backOnline.classList.add('visible');
+
+      // Update badge to green
+      offlineBadge.innerHTML = '<span class="dot" style="background:#22c55e;animation:none;"></span> En ligne';
+      offlineBadge.style.background = '#f0fdf4';
+      offlineBadge.style.color = '#16a34a';
+
+      // Countdown and auto-reload
+      var seconds = 3;
+      countdownEl.textContent = '(' + seconds + 's)';
+
+      var interval = setInterval(function() {
+        seconds--;
+        if (seconds > 0) {
+          countdownEl.textContent = '(' + seconds + 's)';
+        } else {
+          clearInterval(interval);
+          countdownEl.textContent = '';
+          location.reload();
+        }
+      }, 1000);
+    }
+
+    window.addEventListener('online', onBackOnline);
+
+    // Also poll in case the online event doesn't fire
+    if (navigator.onLine) {
+      onBackOnline();
+    }
+  </script>
+</body>
+</html>

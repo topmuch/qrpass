@@ -2,92 +2,108 @@
 
 import { useEffect } from 'react';
 
+// ═══════════════════════════════════════════════════════════════
+//  PASSHAJJ — PWA Service Worker Registration
+//  Registers the SW, dispatches update events, handles online/offline
+// ═══════════════════════════════════════════════════════════════
+
 export function ServiceWorkerRegistration() {
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then((registration) => {
-            console.log('SW registered:', registration.scope);
+    if (!('serviceWorker' in navigator)) return;
 
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              if (newWorker) {
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New content available, show refresh prompt
-                    console.log('New content available, please refresh.');
-                  }
-                });
-              }
-            });
-          })
-          .catch((error) => {
-            console.log('SW registration failed:', error);
+    let registration: ServiceWorkerRegistration | null = null;
+
+    const registerSW = async () => {
+      try {
+        registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/',
+        });
+        console.log('[PassHajj] SW registered:', registration.scope);
+
+        // ─── Listen for SW updates ───
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration!.installing;
+          if (!newWorker) return;
+
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content available — dispatch custom event for usePWAUpdate hook
+              console.log('[PassHajj] New SW version available');
+              window.dispatchEvent(
+                new CustomEvent('pwa-update-available', {
+                  detail: { registration: registration },
+                })
+              );
+            }
           });
-      });
+        });
 
-      // Handle offline/online status
-      const handleOnline = () => {
-        console.log('Back online');
-      };
-      const handleOffline = () => {
-        console.log('Gone offline');
-      };
+        // ─── Periodic update check (every 60s) ───
+        const updateInterval = setInterval(() => {
+          registration?.update().catch(() => {});
+        }, 60_000);
 
-      window.addEventListener('online', handleOnline);
-      window.addEventListener('offline', handleOffline);
+        // ─── Check for waiting worker on load ───
+        if (registration.waiting) {
+          window.dispatchEvent(
+            new CustomEvent('pwa-update-available', {
+              detail: { registration },
+            })
+          );
+        }
 
-      return () => {
-        window.removeEventListener('online', handleOnline);
-        window.removeEventListener('offline', handleOffline);
-      };
-    }
+        return () => clearInterval(updateInterval);
+      } catch (error) {
+        console.error('[PassHajj] SW registration failed:', error);
+      }
+    };
+
+    window.addEventListener('load', registerSW);
+
+    // ─── Handle online/offline status ───
+    const handleOnline = () => {
+      console.log('[PassHajj] Back online');
+      window.dispatchEvent(new Event('pwa-online'));
+      // Trigger background sync if available
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then((reg) => {
+          return reg.sync.register('sync-pending-scans');
+        }).catch(() => {});
+      }
+    };
+
+    const handleOffline = () => {
+      console.log('[PassHajj] Gone offline');
+      window.dispatchEvent(new Event('pwa-offline'));
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('load', registerSW);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   return null;
 }
 
-// Hook to check PWA install status
+// ═══════════════════════════════════════════════════════════════
+//  Hook: Check if app is running as installed PWA
+// ═══════════════════════════════════════════════════════════════
+
 export function usePWAInstall() {
   useEffect(() => {
-    // Check if app is installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const isInWebAppiOS = ('standalone' in window.navigator) && (window.navigator as Navigator & { standalone: boolean }).standalone;
+    const isInWebAppiOS =
+      'standalone' in window.navigator &&
+      (window.navigator as Navigator & { standalone: boolean }).standalone;
 
     if (isStandalone || isInWebAppiOS) {
-      console.log('App is running as PWA');
+      console.log('[PassHajj] Running as PWA');
       document.body.classList.add('pwa-mode');
     }
   }, []);
-}
-
-// Component to prompt PWA installation
-export function PWAInstallPrompt() {
-  useEffect(() => {
-    let deferredPrompt: BeforeInstallPromptEvent | null = null;
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      deferredPrompt = e as BeforeInstallPromptEvent;
-      // Show install button or prompt
-      console.log('PWA install prompt available');
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-    };
-  }, []);
-
-  return null;
-}
-
-// Type for beforeinstallprompt event
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }

@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ServiceWorkerRegistration } from "@/components/pwa-registration";
+import InstallPWA from "@/components/InstallPWA";
+import { PWAUpdateNotifier } from "@/components/PWAUpdateNotifier";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -394,6 +396,8 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <ServiceWorkerRegistration />
+            <InstallPWA />
+            <PWAUpdateNotifier />
             {children}
             <Toaster />
           </AuthProvider>
