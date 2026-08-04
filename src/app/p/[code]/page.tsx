@@ -136,6 +136,10 @@ const translations = {
     reassurance1: 'Votre chef de groupe reçoit une alerte si ce QR est scanné',
     reassurance2: 'Vos infos médicales sont accessibles aux secours en 1 clic',
     reassurance3: 'Vous pouvez modifier votre hôtel à tout moment',
+    identityTitle: 'Identité Pèlerin',
+    healthAlertTitle: 'Alerte Santé',
+    hotelSectionTitle: 'Hôtel',
+    hotelItinerary: 'Itinéraire vers l\'hôtel',
   },
   en: {
     helpLink: 'Help?',
@@ -181,6 +185,10 @@ const translations = {
     reassurance1: 'Your group leader receives an alert if this QR is scanned',
     reassurance2: 'Your medical info is accessible to emergency services in 1 click',
     reassurance3: 'You can change your hotel at any time',
+    identityTitle: 'Pilgrim Identity',
+    healthAlertTitle: 'Health Alert',
+    hotelSectionTitle: 'Hotel',
+    hotelItinerary: 'Route to hotel',
   },
   ar: {
     helpLink: 'مساعدة؟',
@@ -226,6 +234,10 @@ const translations = {
     reassurance1: 'يتلقى قائد مجموعتك تنبيهًا عند مسح هذا الرمز',
     reassurance2: 'معلوماتك الطبية متاحة لخدمات الطوارئ بنقرة واحدة',
     reassurance3: 'يمكنك تغيير فندقك في أي وقت',
+    identityTitle: 'هوية الحاج',
+    healthAlertTitle: 'تنبيه صحي',
+    hotelSectionTitle: 'الفندق',
+    hotelItinerary: 'اتجاهات إلى الفندق',
   },
 };
 
@@ -738,6 +750,19 @@ export default function PilgrimScanPage() {
             </div>
           ) : (
             <>
+              {/* ─── "IDENTITÉ PÈLERIN" BIG TITLE ─── */}
+              <div className="w-full max-w-[420px] text-center mb-2">
+                <h1 className="text-[28px] font-extrabold tracking-tight" style={{ color: TEXT }}>
+                  {t('identityTitle')}
+                </h1>
+                <span
+                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold mt-1"
+                  style={{ background: '#f3f4f6', color: MUTED }}
+                >
+                  {t('identityTag')}
+                </span>
+              </div>
+
               {/* ─── PROFILE CARD ─── */}
               <div
                 className="w-full max-w-[420px] rounded-[20px] p-6 text-center mb-4"
@@ -785,30 +810,14 @@ export default function PilgrimScanPage() {
                 </div>
 
                 {/* Name */}
-                <h1 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h1>
+                <h2 className="text-[22px] font-extrabold mb-1">{pilgrim.fullName}</h2>
 
-                {/* Tag */}
-                <span
-                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
-                  style={{ background: '#f3f4f6', color: MUTED }}
-                >
-                  {t('identityTag')}
-                </span>
-
-                {/* Badges */}
-                <div className="flex justify-center gap-2 flex-wrap mt-3">
-                  {pilgrim.bloodType && (
-                    <span className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <Droplets className="w-3 h-3" />
-                      {pilgrim.bloodType}
-                    </span>
-                  )}
-                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
-                    <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold" style={{ color: MUTED }}>
-                      {pilgrim.nationality}
-                    </span>
-                  )}
-                </div>
+                {/* Nationality */}
+                {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
+                  <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold inline-block mt-1" style={{ color: MUTED }}>
+                    {pilgrim.nationality}
+                  </span>
+                )}
 
                 {/* Edit button */}
                 <button
@@ -821,81 +830,59 @@ export default function PilgrimScanPage() {
                 </button>
               </div>
 
-              {/* ─── INFO GRID (2 columns) ─── */}
-              <div className="w-full max-w-[420px] grid grid-cols-2 gap-3 mb-4">
-                {/* Health */}
-                <div
-                  className="rounded-[16px] p-4 text-center"
-                  style={{
-                    background: '#fef2f2',
-                    boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '4px solid #dc2626',
-                    borderRight: lang === 'ar' ? '4px solid #dc2626' : 'none',
-                  }}
-                >
-                  <span className="text-xl block mb-2">🏥</span>
-                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('healthLabel')}</span>
-                  <span className="text-sm font-bold block" style={{ color: DANGER }}>
-                    {pilgrim.medicalInfo || t('noMedical')}
-                  </span>
-                  {pilgrim.bloodType && (
-                    <span className="text-xs font-bold block mt-1" style={{ color: DANGER }}>
-                      🩸 {pilgrim.bloodType}
-                    </span>
-                  )}
-                </div>
-
-                {/* Hotel */}
-                <div
-                  className="rounded-[16px] p-4 text-center"
-                  style={{
-                    background: '#eff6ff',
-                    boxShadow: SHADOW,
-                    borderLeft: lang === 'ar' ? 'none' : '4px solid #3b82f6',
-                    borderRight: lang === 'ar' ? '4px solid #3b82f6' : 'none',
-                  }}
-                >
-                  <span className="text-xl block mb-2">🏨</span>
-                  <span className="text-xs block mb-1" style={{ color: MUTED }}>{t('hotelLabel')}</span>
-                  <span className="text-sm font-bold block" style={{ color: TEXT }}>
-                    {activeHotel || t('noHotel')}
-                  </span>
-                  {activeRoom && activeCity && (
-                    <span className="text-xs block mt-1" style={{ color: MUTED }}>
-                      {t('room')} {activeRoom} • {activeCity}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* ─── REASSURANCE SECTION ─── */}
+              {/* ═══════════════════════════════════════════════════════════
+                  1. ALERTE SANTÉ — Prominent health card
+              ═══════════════════════════════════════════════════════════ */}
               <div
-                className="w-full max-w-[420px] rounded-[16px] p-4 mb-4"
-                style={{ background: 'rgba(255,255,255,0.5)' }}
+                className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
+                style={{
+                  background: CARD_BG,
+                  boxShadow: SHADOW,
+                  borderLeft: lang === 'ar' ? 'none' : '5px solid #dc2626',
+                  borderRight: lang === 'ar' ? '5px solid #dc2626' : 'none',
+                }}
               >
-                <h3 className="text-[15px] font-extrabold mb-2.5 flex items-center gap-2" style={{ color: TEXT }}>
-                  <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
-                  {t('reassuranceTitle')}
+                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: DANGER }}>
+                  <Heart className="w-5 h-5" />
+                  {t('healthAlertTitle')}
                 </h3>
-                <ul className="space-y-1.5 text-[13px]" style={{ color: TEXT }}>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
-                    {t('reassurance1')}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
-                    {t('reassurance2')}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
-                    {t('reassurance3')}
-                  </li>
-                </ul>
+
+                {/* Blood type */}
+                {pilgrim.bloodType && (
+                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
+                      <Droplets className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-xs block" style={{ color: MUTED }}>Groupe sanguin</span>
+                      <span className="text-lg font-extrabold" style={{ color: DANGER }}>{pilgrim.bloodType}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Medical info */}
+                {pilgrim.medicalInfo && (
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#fef2f2' }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#dc2626' }}>
+                      <AlertCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-xs block" style={{ color: MUTED }}>Informations médicales</span>
+                      <span className="text-sm font-bold" style={{ color: DANGER }}>{pilgrim.medicalInfo}</span>
+                    </div>
+                  </div>
+                )}
+
+                {!pilgrim.bloodType && !pilgrim.medicalInfo && (
+                  <p className="text-sm" style={{ color: MUTED }}>{t('noMedical')}</p>
+                )}
               </div>
 
-              {/* ─── ACTION BUTTONS ─── */}
+              {/* ═══════════════════════════════════════════════════════════
+                  2. CONTACTS — 3 contact buttons
+              ═══════════════════════════════════════════════════════════ */}
               <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4">
-                {/* WhatsApp — Contacter le chef */}
+                {/* WhatsApp — Contacter le chef de groupe */}
                 {whatsappLeaderUrl && (
                   <a
                     href={whatsappLeaderUrl}
@@ -909,7 +896,7 @@ export default function PilgrimScanPage() {
                   </a>
                 )}
 
-                {/* Call Chef */}
+                {/* Appel chef de groupe */}
                 {pilgrim.groupLeaderPhone && (
                   <a
                     href={`tel:+${cleanPhone(pilgrim.groupLeaderPhone)}`}
@@ -921,7 +908,7 @@ export default function PilgrimScanPage() {
                   </a>
                 )}
 
-                {/* Call Family */}
+                {/* Appel famille */}
                 {pilgrim.familyContact && (
                   <a
                     href={`tel:+${cleanPhone(pilgrim.familyContact)}`}
@@ -932,22 +919,65 @@ export default function PilgrimScanPage() {
                     {t('callFamily')}
                   </a>
                 )}
+              </div>
 
-                {/* Itinéraire vers l'hôtel */}
+              {/* ═══════════════════════════════════════════════════════════
+                  3. HÔTEL — Hotel card with address + itinerary button
+              ═══════════════════════════════════════════════════════════ */}
+              <div
+                className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
+                style={{
+                  background: CARD_BG,
+                  boxShadow: SHADOW,
+                  borderLeft: lang === 'ar' ? 'none' : '5px solid #3b82f6',
+                  borderRight: lang === 'ar' ? '5px solid #3b82f6' : 'none',
+                }}
+              >
+                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: BLUE }}>
+                  <Building2 className="w-5 h-5" />
+                  {t('hotelSectionTitle')}
+                </h3>
+
+                {/* Hotel name */}
+                {activeHotel ? (
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-start gap-3 p-3 rounded-xl" style={{ background: '#eff6ff' }}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#3b82f6' }}>
+                        <MapPin className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold block" style={{ color: TEXT }}>{activeHotel}</span>
+                        {activeRoom && (
+                          <span className="text-xs block" style={{ color: MUTED }}>{t('room')} {activeRoom}</span>
+                        )}
+                        {activeCity && (
+                          <span className="text-xs block" style={{ color: MUTED }}>{activeCity}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm mb-4" style={{ color: MUTED }}>{t('noHotel')}</p>
+                )}
+
+                {/* Itinéraire vers l'hôtel button */}
                 {activeHotel && (
                   <a
                     href={hotelMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-all"
+                    className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: BLUE, boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
                   >
                     <Navigation className="w-4 h-4" />
-                    {t('routeToHotel')}
+                    {t('hotelItinerary')}
                   </a>
                 )}
               </div>
 
-              {/* ─── REPORT SECTION ─── */}
+              {/* ═══════════════════════════════════════════════════════════
+                  4. CE PÈLERIN EST PERDU — Report section
+              ═══════════════════════════════════════════════════════════ */}
               <div className="w-full max-w-[420px] mb-4">
                 <button
                   onClick={() => setShowReport(!showReport)}
@@ -996,9 +1026,11 @@ export default function PilgrimScanPage() {
                 )}
               </div>
 
-              {/* ─── EMERGENCY NUMBERS ─── */}
+              {/* ═══════════════════════════════════════════════════════════
+                  5. NUMÉROS D'URGENCE SAOUDIENS
+              ═══════════════════════════════════════════════════════════ */}
               <div
-                className="w-full max-w-[420px] rounded-[16px] p-5 mb-6"
+                className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
                 style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
                 <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
@@ -1020,6 +1052,33 @@ export default function PilgrimScanPage() {
                     👮 911
                   </a>
                 </div>
+              </div>
+
+              {/* ═══════════════════════════════════════════════════════════
+                  6. VOUS ÊTES PROTÉGÉ — Reassurance card
+              ═══════════════════════════════════════════════════════════ */}
+              <div
+                className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
+                style={{ background: CARD_BG, boxShadow: SHADOW }}
+              >
+                <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
+                  <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
+                  {t('reassuranceTitle')}
+                </h3>
+                <ul className="space-y-2 text-[13px]" style={{ color: TEXT }}>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+                    {t('reassurance1')}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+                    {t('reassurance2')}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: SUCCESS }} />
+                    {t('reassurance3')}
+                  </li>
+                </ul>
               </div>
             </>
           )}
