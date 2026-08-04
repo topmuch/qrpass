@@ -1,11 +1,11 @@
 {
-  "name": "QRPass - Protection intelligente des bagages",
-  "short_name": "QRPass",
-  "description": "Protégez vos bagages avec un autocollant QR intelligent. Sans application, sans batterie, sans GPS. Un seul scan pour la tranquillité d'esprit.",
+  "name": "PassHajj Manager – Gestion Pèlerins & Bagages",
+  "short_name": "PassHajj",
+  "description": "Application offline-first pour les Chefs de Groupe Hajj. Gestion des pèlerins et bagages par scan QR en temps réel.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FDFBF7",
-  "theme_color": "#c5a643",
+  "background_color": "#f4b400",
+  "theme_color": "#f4b400",
   "orientation": "portrait-primary",
   "scope": "/",
   "prefer_related_applications": false,
@@ -72,47 +72,14 @@
     {
       "name": "Scanner un QR",
       "short_name": "Scanner",
-      "description": "Scanner un code QR de bagage",
+      "description": "Scanner un bracelet ou bagage",
       "url": "/?action=scan",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Activer Hajj",
-      "short_name": "Hajj",
-      "description": "Activer un bagage Hajj",
-      "url": "/hajj/activate",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Inscription Voyageur",
-      "short_name": "Voyageur",
-      "description": "Inscrire un bagage voyageur",
-      "url": "/inscrire",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/images/landing-v2/hero.jpg",
-      "sizes": "1920x1080",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "Page d'accueil QRPass - Protection intelligente des bagages"
-    },
-    {
-      "src": "/images/landing-v2/step-activate.jpg",
-      "sizes": "1280x720",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "Activation d'un bagage en un scan"
     }
   ],
   "related_applications": [],
   "handle_links": "preferred",
   "launch_handler": {
     "client_mode": "navigate-existing"
-  },
-  "edge_side_panel": {
-    "preferred_width": 400
   }
 }
