@@ -28,7 +28,7 @@ export const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 // ═══════════════════════════════════════════════════════════════
 export const prisma = new PrismaClient({
   log: NODE_ENV === 'development'
-    ? ['query', 'info', 'warn', 'error']
+    ? ['warn', 'error']
     : ['warn', 'error'],
 });
 
