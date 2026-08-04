@@ -26,12 +26,17 @@ export default function PassHajjManager() {
   // Show loading screen while initializing
   if (loading || !initialized) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f4b400]">
-        <div className="w-16 h-16 mb-4 bg-white rounded-2xl flex items-center justify-center shadow-lg animate-pulse">
-          <span className="text-3xl">🕋</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#f4b400] to-[#d49b00]">
+        <div className="w-20 h-20 mb-4 bg-white rounded-3xl flex items-center justify-center shadow-xl animate-pulse">
+          <span className="text-4xl">🕋</span>
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">PassHajj</h1>
-        <p className="text-white/70 text-sm">Chargement...</p>
+        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">PassHajj</h1>
+        <p className="text-white/70 text-sm font-light">Chargement des données hors ligne...</p>
+        <div className="mt-4 flex gap-1">
+          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
       </div>
     );
   }

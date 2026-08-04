@@ -2,80 +2,88 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePassHajjStore } from '@/lib/passhajj-store';
-import { Cloud, CloudOff, Loader2, Check } from 'lucide-react';
+import { syncService } from '@/services/SyncService';
+import type { SyncEvent } from '@/services/SyncService';
+import { Cloud, CloudOff, Loader2, Check, AlertCircle } from 'lucide-react';
 
 export default function SyncManager() {
   const { syncStatus, setSyncStatus, syncQueue, markSynced, pendingCount } = usePassHajjStore();
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [justSynced, setJustSynced] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const initRef = useRef(false);
 
-  // Monitor online/offline status
+  // Initialize SyncService and listen for events
   useEffect(() => {
-    const handleOnline = () => setSyncStatus('online');
-    const handleOffline = () => setSyncStatus('offline');
+    if (initRef.current) return;
+    initRef.current = true;
 
-    setSyncStatus(navigator.onLine ? 'online' : 'offline');
+    // Subscribe to sync events
+    const unsubscribe = syncService.subscribe((event: SyncEvent) => {
+      switch (event.type) {
+        case 'online':
+          setSyncStatus('online');
+          break;
+        case 'offline':
+          setSyncStatus('offline');
+          break;
+        case 'sync-started':
+        case 'sync-progress':
+          setSyncStatus('syncing');
+          break;
+        case 'sync-completed':
+          setSyncStatus('online');
+          if (event.syncedCount && event.syncedCount > 0) {
+            setJustSynced(true);
+            setTimeout(() => setJustSynced(false), 2000);
+          }
+          setSyncError(null);
+          break;
+        case 'sync-error':
+          setSyncStatus(navigator.onLine ? 'online' : 'offline');
+          setSyncError(event.error || null);
+          break;
+      }
+    });
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    // Initialize sync service (network listeners + auto-sync)
+    const cleanup = syncService.init();
+
+    // Start auto-sync
+    if (navigator.onLine) {
+      syncService.startAutoSync();
+    }
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      unsubscribe();
+      cleanup();
+      syncService.stopAutoSync();
     };
   }, [setSyncStatus]);
 
-  // Auto-sync when online
-  const performSync = useCallback(async () => {
-    if (syncQueue.length === 0) return;
+  // Manual sync trigger
+  const handleManualSync = useCallback(async () => {
     if (!navigator.onLine) return;
-
     setSyncStatus('syncing');
+    setSyncError(null);
 
     try {
-      const res = await fetch('/api/leader/trips/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scans: syncQueue.map((s) => ({
-            id: s.id,
-            qrCode: s.qrCode,
-            type: s.type,
-            timestamp: s.timestamp,
-            zone: s.zone,
-            status: s.status,
-          })),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.success && data.synced) {
-        markSynced(data.synced);
+      const result = await syncService.performSync();
+      if (result.syncedScans > 0 || result.syncedIncidents > 0) {
+        // Mark items as synced in the store
+        const syncedIds = syncQueue
+          .slice(0, result.syncedScans)
+          .map((s) => s.id);
+        if (syncedIds.length > 0) {
+          markSynced(syncedIds);
+        }
         setJustSynced(true);
         setTimeout(() => setJustSynced(false), 2000);
       }
+      setSyncStatus('online');
     } catch {
-      // Will retry next interval
-    } finally {
       setSyncStatus(navigator.onLine ? 'online' : 'offline');
     }
   }, [syncQueue, markSynced, setSyncStatus]);
-
-  // Set up sync interval
-  useEffect(() => {
-    if (syncStatus === 'online' && syncQueue.length > 0) {
-      performSync();
-      syncIntervalRef.current = setInterval(performSync, 30000);
-    }
-
-    return () => {
-      if (syncIntervalRef.current) {
-        clearInterval(syncIntervalRef.current);
-        syncIntervalRef.current = null;
-      }
-    };
-  }, [syncStatus, syncQueue.length, performSync]);
 
   return (
     <div className="flex items-center gap-1.5 text-sm">
@@ -92,10 +100,13 @@ export default function SyncManager() {
         </>
       )}
       {syncStatus === 'online' && pendingCount > 0 && !justSynced && (
-        <>
+        <button
+          onClick={handleManualSync}
+          className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+        >
           <Cloud className="w-4 h-4 text-amber-600" />
           <span className="text-amber-700 font-medium">{pendingCount} en attente</span>
-        </>
+        </button>
       )}
       {syncStatus === 'syncing' && (
         <>
@@ -111,6 +122,11 @@ export default function SyncManager() {
             <span className="text-xs text-amber-600 ml-1">({pendingCount})</span>
           )}
         </>
+      )}
+      {syncError && (
+        <span className="text-xs text-red-500 flex items-center gap-1" title={syncError}>
+          <AlertCircle className="w-3 h-3" />
+        </span>
       )}
     </div>
   );

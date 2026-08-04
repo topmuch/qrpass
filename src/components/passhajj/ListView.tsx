@@ -15,7 +15,6 @@ export default function ListView() {
     setView,
   } = usePassHajjStore();
 
-  // Build enriched pilgrim list - hooks must be called unconditionally
   const pilgrimList = useMemo(() => {
     if (!trip) return [];
     return trip.pilgrims.map((p) => {
@@ -27,11 +26,11 @@ export default function ListView() {
         isPresent,
         scanTime: scan?.timestamp,
         scanZone: scan?.zone,
+        groupName: p.group?.name || trip.groups.find((g) => g.id === p.groupId)?.name,
       };
     });
   }, [trip, scans, scannedPilgrimIds]);
 
-  // Build enriched bag list
   const bagList = useMemo(() => {
     if (!trip) return [];
     return trip.bags.map((b) => {
@@ -47,7 +46,6 @@ export default function ListView() {
     });
   }, [trip, scans, scannedBagIds]);
 
-  // Filter and search
   const filteredPilgrims = useMemo(() => {
     let list = pilgrimList;
     if (listFilter === 'present') list = list.filter((p) => p.isPresent);
@@ -83,7 +81,6 @@ export default function ListView() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-[#f4b400] text-white px-4 py-3 shadow-md sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button onClick={() => setView('dashboard')} className="p-1 rounded-lg hover:bg-white/20">
@@ -97,7 +94,6 @@ export default function ListView() {
       </header>
 
       <main className="flex-1 max-w-lg mx-auto w-full">
-        {/* Stats bar */}
         <div className="flex gap-2 p-4 overflow-x-auto">
           <div className="flex items-center gap-1.5 bg-white px-3 py-2 rounded-xl shadow-sm shrink-0">
             <Users className="w-4 h-4 text-green-600" />
@@ -115,7 +111,6 @@ export default function ListView() {
           )}
         </div>
 
-        {/* Search */}
         <div className="px-4 mb-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -128,7 +123,6 @@ export default function ListView() {
           </div>
         </div>
 
-        {/* Filter tabs */}
         <div className="flex gap-2 px-4 mb-3">
           {[
             { key: 'all' as const, label: 'Tous', count: totalPilgrims },
@@ -150,7 +144,6 @@ export default function ListView() {
           ))}
         </div>
 
-        {/* List */}
         <div className="px-4 pb-24 space-y-2">
           {listFilter !== 'bags' ? (
             filteredPilgrims.length === 0 ? (
@@ -173,7 +166,7 @@ export default function ListView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-semibold text-gray-900 truncate">{p.fullName}</p>
-                    <p className="text-xs text-gray-400">{p.qrCode} {p.group && `· ${p.group}`}</p>
+                    <p className="text-xs text-gray-400">{p.qrCode} {p.groupName && `\u00B7 ${p.groupName}`}</p>
                   </div>
                   <div className="text-right shrink-0">
                     {p.isPresent ? (
@@ -181,7 +174,7 @@ export default function ListView() {
                         <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-xs">
                           <CheckCircle2 className="w-3 h-3 mr-1" /> Présent
                         </Badge>
-                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(p.scanTime)} · {p.scanZone}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(p.scanTime)} &middot; {p.scanZone}</p>
                       </>
                     ) : (
                       <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 text-xs">
@@ -213,7 +206,7 @@ export default function ListView() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-semibold text-gray-900 truncate">{b.ownerName}</p>
-                    <p className="text-xs text-gray-400">{b.qrCode}</p>
+                    <p className="text-xs text-gray-400">{b.qrCode}{b.baggageType && ` \u00B7 ${b.baggageType}`}</p>
                   </div>
                   <div className="text-right shrink-0">
                     {b.isScanned ? (
@@ -221,7 +214,7 @@ export default function ListView() {
                         <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs">
                           <CheckCircle2 className="w-3 h-3 mr-1" /> Scanné
                         </Badge>
-                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(b.scanTime)} · {b.scanZone}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(b.scanTime)} &middot; {b.scanZone}</p>
                       </>
                     ) : (
                       <Badge className="bg-gray-100 text-gray-500 hover:bg-gray-100 text-xs">

@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { usePassHajjStore } from '@/lib/passhajj-store';
 import { Input } from '@/components/ui/input';
-import { Camera, CameraOff, AlertTriangle, CheckCircle2, XCircle, Package, Keyboard } from 'lucide-react';
+import { Camera, CameraOff, AlertTriangle, CheckCircle2, XCircle, Package, Keyboard, User } from 'lucide-react';
 import type { ZoneType } from '@/lib/passhajj-types';
 
 const SCANNER_ID = 'passhajj-qr-reader';
@@ -13,6 +13,7 @@ interface ScanFeedback {
   type: 'success' | 'error' | 'duplicate' | 'baggage';
   message: string;
   name?: string;
+  qrPrefix?: 'ID' | 'BG';
   visible: boolean;
 }
 
@@ -47,12 +48,13 @@ export default function QRScanner() {
 
     const now = new Date().toISOString();
 
+    // ─── ID- prefix = Pèlerin (Identity) ───
     if (decodedText.startsWith('ID-')) {
       const pilgrim = trip.pilgrims.find((p) => p.qrCode === decodedText);
 
       if (!pilgrim) {
         playSound('red');
-        showFeedbackFn({ type: 'error', message: 'HORS GROUPE!', name: decodedText });
+        showFeedbackFn({ type: 'error', message: 'HORS GROUPE!', name: decodedText, qrPrefix: 'ID' });
         addScan({
           qrCode: decodedText,
           type: 'identity',
@@ -70,6 +72,7 @@ export default function QRScanner() {
         type: isDuplicate ? 'duplicate' : 'success',
         message: isDuplicate ? 'Déjà scanné' : 'Pèlerin présent',
         name: pilgrim.fullName,
+        qrPrefix: 'ID',
       });
 
       addScan({
@@ -81,17 +84,20 @@ export default function QRScanner() {
         pilgrimName: pilgrim.fullName,
       });
 
+      // Show medical flash card for identity scans
       showFlashCard({
         fullName: pilgrim.fullName,
         bloodType: pilgrim.bloodType,
         allergies: pilgrim.allergies,
       });
+
+    // ─── BG- prefix = Bagage ───
     } else if (decodedText.startsWith('BG-')) {
       const bag = trip.bags.find((b) => b.qrCode === decodedText);
 
       if (!bag) {
         playSound('red');
-        showFeedbackFn({ type: 'error', message: 'HORS GROUPE!', name: decodedText });
+        showFeedbackFn({ type: 'error', message: 'HORS GROUPE!', name: decodedText, qrPrefix: 'BG' });
         addScan({
           qrCode: decodedText,
           type: 'baggage',
@@ -109,6 +115,7 @@ export default function QRScanner() {
         type: isDuplicate ? 'duplicate' : 'baggage',
         message: isDuplicate ? 'Déjà scanné' : 'Bagage scanné',
         name: bag.ownerName,
+        qrPrefix: 'BG',
       });
 
       addScan({
@@ -119,6 +126,8 @@ export default function QRScanner() {
         status: 'success',
         pilgrimName: bag.ownerName,
       });
+
+    // ─── Unknown QR format ───
     } else {
       playSound('red');
       showFeedbackFn({ type: 'error', message: 'QR non reconnu', name: decodedText });
@@ -201,6 +210,13 @@ export default function QRScanner() {
     baggage: <Package className="w-6 h-6 text-white" />,
   };
 
+  // QR prefix icon
+  const prefixIcon = feedback.qrPrefix === 'ID'
+    ? <User className="w-6 h-6 text-white" />
+    : feedback.qrPrefix === 'BG'
+      ? <Package className="w-6 h-6 text-white" />
+      : null;
+
   return (
     <div className="relative">
       {/* Scanner viewport */}
@@ -265,6 +281,7 @@ export default function QRScanner() {
                 onClick={() => handleScan(p.qrCode)}
                 className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-mono"
               >
+                <User className="w-3 h-3 inline mr-0.5" />
                 {p.qrCode}
               </button>
             ))}
@@ -274,6 +291,7 @@ export default function QRScanner() {
                 onClick={() => handleScan(b.qrCode)}
                 className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-mono"
               >
+                <Package className="w-3 h-3 inline mr-0.5" />
                 {b.qrCode}
               </button>
             ))}
@@ -302,10 +320,15 @@ export default function QRScanner() {
           style={{ zIndex: 50 }}
         >
           <div className="text-center text-white">
-            {feedbackIcons[feedback.type]}
+            {prefixIcon || feedbackIcons[feedback.type]}
             <p className="text-xl font-bold mt-2">{feedback.message}</p>
             {feedback.name && (
               <p className="text-lg font-medium mt-1 opacity-90">{feedback.name}</p>
+            )}
+            {feedback.qrPrefix && (
+              <p className="text-sm mt-1 opacity-75">
+                {feedback.qrPrefix === 'ID' ? '🪪 Pèlerin' : '🧳 Bagage'}
+              </p>
             )}
           </div>
         </div>

@@ -5,11 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import SyncManager from './SyncManager';
 import QRScanner from './QRScanner';
+import StatusBadge from './StatusBadge';
 import {
   Plane, Bus, Hotel, Landmark,
   Users, Package, List, AlertCircle,
   LogOut, ChevronDown,
-  Heart, ShieldAlert,
+  Heart, ShieldAlert, Phone,
 } from 'lucide-react';
 import type { ZoneType } from '@/lib/passhajj-types';
 import { useState } from 'react';
@@ -26,7 +27,7 @@ export default function Dashboard() {
     trip, zone, setZone, view, setView,
     scannedPilgrimIds, scannedBagIds,
     flashCard, hideFlashCard,
-    clearTrip,
+    clearTrip, syncStatus,
   } = usePassHajjStore();
 
   const [zoneOpen, setZoneOpen] = useState(false);
@@ -49,11 +50,11 @@ export default function Dashboard() {
       {/* Header */}
       <header className="bg-[#f4b400] text-white px-4 py-3 shadow-md">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold leading-tight">{trip.tripName}</h1>
-            <p className="text-sm text-white/80">{trip.agencyName}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold leading-tight truncate">{trip.tripName}</h1>
+            <p className="text-sm text-white/80 truncate">{trip.agencyName}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <SyncManager />
             <button
               onClick={clearTrip}
@@ -64,9 +65,35 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+        {/* Trip info strip */}
+        <div className="flex items-center gap-3 mt-2 text-xs text-white/70">
+          {trip.destination && (
+            <span>📍 {trip.destination}</span>
+          )}
+          {trip.airline && (
+            <span>✈️ {trip.airline} {trip.flightNumber}</span>
+          )}
+          {trip.hotelMecca && (
+            <span>🏨 {trip.hotelMecca}</span>
+          )}
+        </div>
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-lg mx-auto w-full">
+        {/* Online/Offline Status Badge */}
+        <div className="flex items-center justify-between">
+          <StatusBadge syncStatus={syncStatus} pendingCount={missingPilgrims + missingBags > 0 ? 0 : 0} compact />
+          {trip.agencyPhone && (
+            <a
+              href={`tel:${trip.agencyPhone}`}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#f4b400] transition-colors"
+            >
+              <Phone className="w-3 h-3" />
+              Appeler l&apos;agence
+            </a>
+          )}
+        </div>
+
         {/* Zone Selector */}
         <div className="relative">
           <button

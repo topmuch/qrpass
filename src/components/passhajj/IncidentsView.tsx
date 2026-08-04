@@ -14,12 +14,12 @@ const INCIDENT_TYPES = [
   { value: 'pilgrim_sick' as const, label: 'Pèlerin malade', icon: <Heart className="w-5 h-5 text-red-500" />, color: 'bg-red-100' },
   { value: 'bag_damaged' as const, label: 'Valise déchirée', icon: <Package className="w-5 h-5 text-orange-500" />, color: 'bg-orange-100' },
   { value: 'bag_lost' as const, label: 'Bagage perdu', icon: <AlertTriangle className="w-5 h-5 text-amber-500" />, color: 'bg-amber-100' },
-  { value: 'pilgrim_missing' as const, label: 'Pèliner disparu', icon: <UserX className="w-5 h-5 text-purple-500" />, color: 'bg-purple-100' },
+  { value: 'pilgrim_missing' as const, label: 'Pèlerin disparu', icon: <UserX className="w-5 h-5 text-purple-500" />, color: 'bg-purple-100' },
   { value: 'other' as const, label: 'Autre', icon: <FileQuestion className="w-5 h-5 text-gray-500" />, color: 'bg-gray-100' },
 ];
 
 export default function IncidentsView() {
-  const { incidents, addIncident, zone, setView } = usePassHajjStore();
+  const { incidents, addIncident, zone, setView, syncStatus } = usePassHajjStore();
   const [showForm, setShowForm] = useState(false);
   const [incType, setIncType] = useState<'pilgrim_sick' | 'bag_damaged' | 'bag_lost' | 'pilgrim_missing' | 'other'>('other');
   const [description, setDescription] = useState('');
@@ -55,7 +55,6 @@ export default function IncidentsView() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-[#f4b400] text-white px-4 py-3 shadow-md sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <button onClick={() => setView('dashboard')} className="p-1 rounded-lg hover:bg-white/20">
@@ -75,13 +74,20 @@ export default function IncidentsView() {
       </header>
 
       <main className="flex-1 max-w-lg mx-auto w-full p-4 space-y-4">
+        {/* Offline notice */}
+        {syncStatus === 'offline' && (
+          <div className="flex items-center gap-2 p-3 bg-amber-50 text-amber-700 text-sm rounded-xl">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>Hors ligne — les incidents seront synchronisés automatiquement.</span>
+          </div>
+        )}
+
         {/* Add incident form */}
         {showForm && (
           <Card className="rounded-xl border-0 shadow-md">
             <CardContent className="p-4 space-y-4">
               <h3 className="text-lg font-bold text-gray-900">Signaler un incident</h3>
 
-              {/* Type selection */}
               <div className="grid grid-cols-2 gap-2">
                 {INCIDENT_TYPES.map((t) => (
                   <button
@@ -99,7 +105,6 @@ export default function IncidentsView() {
                 ))}
               </div>
 
-              {/* Related name */}
               <Input
                 value={relatedName}
                 onChange={(e) => setRelatedName(e.target.value)}
@@ -107,7 +112,6 @@ export default function IncidentsView() {
                 className="h-12 rounded-xl text-base"
               />
 
-              {/* Description */}
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -158,7 +162,7 @@ export default function IncidentsView() {
                         <p className="text-xs text-gray-500 mt-1">Concerne: {inc.relatedName}</p>
                       )}
                       <p className="text-xs text-gray-400 mt-1">
-                        {formatTime(inc.timestamp)} · {inc.zone}
+                        {formatTime(inc.timestamp)} &middot; {inc.zone}
                       </p>
                     </div>
                   </div>

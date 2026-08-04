@@ -1,14 +1,31 @@
-import { create } from 'zustand';
-import localforage from 'localforage';
-import type {
-  TripData, ScanRecord, IncidentRecord, ZoneType, SyncStatus, AppView
-} from './passhajj-types';
+// ═══════════════════════════════════════════════════════════════
+//  PASSHAJJ MANAGER — Zustand Store
+//  Offline-first state management with localforage persistence
+// ═══════════════════════════════════════════════════════════════
 
-// Configure localforage
-const store = localforage.createInstance({
-  name: 'passhajj-manager',
-  storeName: 'app_data',
-});
+import { create } from 'zustand';
+import {
+  saveTripData,
+  loadTripData,
+  clearTripData,
+  saveScans,
+  loadScans,
+  savePendingScans,
+  loadPendingScans,
+  saveIncidents,
+  loadIncidents,
+  savePendingIncidents,
+  loadPendingIncidents,
+  saveOfflineCredentials,
+  loadOfflineCredentials,
+  saveZone,
+  loadZone,
+  clearAllData,
+} from '@/services/storage';
+import type {
+  TripData, ScanRecord, IncidentRecord, ZoneType, SyncStatus, AppView, OfflineCredentials,
+} from './passhajj-types';
+import { syncService } from '@/services/SyncService';
 
 interface FlashCard {
   fullName: string;
@@ -75,18 +92,28 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
   trip: null,
   setTrip: (trip) => {
     set({ trip });
-    store.setItem('trip', trip);
+    saveTripData(trip);
+    // Tell sync service which trip we're syncing for
+    syncService.setTripId(trip.tripId);
+    // Save offline credentials for re-auth
+    saveOfflineCredentials({
+      otp: '',
+      tripId: trip.tripId,
+      lastVerified: new Date().toISOString(),
+    });
   },
   clearTrip: () => {
     set({ trip: null, scans: [], incidents: [], syncQueue: [], scannedPilgrimIds: new Set(), scannedBagIds: new Set() });
-    store.removeItem('trip');
-    store.removeItem('scans');
-    store.removeItem('incidents');
+    clearTripData();
+    syncService.setTripId(null);
   },
 
   // Zone
   zone: 'Aéroport',
-  setZone: (zone) => set({ zone }),
+  setZone: (zone) => {
+    set({ zone });
+    saveZone(zone);
+  },
 
   // Scans
   scans: [],
@@ -101,7 +128,6 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
     );
 
     if (isDuplicate && scan.status === 'success') {
-      // Mark as duplicate instead
       scan.status = 'duplicate';
     }
 
@@ -126,7 +152,9 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
       pendingCount: newSyncQueue.length,
     });
 
-    store.setItem('scans', newScans);
+    saveScans(newScans);
+    // Also persist pending scans for SyncService
+    savePendingScans(newSyncQueue);
   },
 
   // Incidents
@@ -136,7 +164,10 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
     const incident: IncidentRecord = { ...incidentData, id, synced: false };
     const newIncidents = [incident, ...get().incidents];
     set({ incidents: newIncidents });
-    store.setItem('incidents', newIncidents);
+    saveIncidents(newIncidents);
+    // Also persist pending incidents for SyncService
+    const pendingIncidents = newIncidents.filter(i => !i.synced);
+    savePendingIncidents(pendingIncidents);
   },
 
   // Flash card
@@ -163,7 +194,8 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
       syncQueue: newSyncQueue,
       pendingCount: newSyncQueue.length,
     });
-    store.setItem('scans', newScans);
+    saveScans(newScans);
+    savePendingScans(newSyncQueue);
   },
   pendingCount: 0,
 
@@ -177,21 +209,23 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
   scannedPilgrimIds: new Set<string>(),
   scannedBagIds: new Set<string>(),
 
-  // Init
+  // Init — load all persisted data from localforage
   initialized: false,
   initialize: async () => {
     if (get().initialized) return;
     try {
-      const [trip, scans, incidents] = await Promise.all([
-        store.getItem<TripData | null>('trip'),
-        store.getItem<ScanRecord[]>('scans'),
-        store.getItem<IncidentRecord[]>('incidents'),
+      const [trip, scans, incidents, pendingScans, zone] = await Promise.all([
+        loadTripData(),
+        loadScans(),
+        loadIncidents(),
+        loadPendingScans(),
+        loadZone(),
       ]);
 
       const safeScans = Array.isArray(scans) ? scans : [];
       const safeIncidents = Array.isArray(incidents) ? incidents : [];
 
-      // Rebuild scanned sets
+      // Rebuild scanned sets from successful scans
       const pilgrimIds = new Set<string>();
       const bagIds = new Set<string>();
       const syncQueueItems: ScanRecord[] = [];
@@ -202,14 +236,23 @@ export const usePassHajjStore = create<PassHajjState>((set, get) => ({
         if (!s.synced && s.status === 'success') syncQueueItems.push(s);
       }
 
+      // Use pending scans from storage if available, otherwise derive from scans
+      const effectiveSyncQueue = pendingScans.length > 0 ? pendingScans : syncQueueItems;
+
+      // Set sync service trip ID
+      if (trip) {
+        syncService.setTripId(trip.tripId);
+      }
+
       set({
         trip,
         scans: safeScans,
         incidents: safeIncidents,
         scannedPilgrimIds: pilgrimIds,
         scannedBagIds: bagIds,
-        syncQueue: syncQueueItems,
-        pendingCount: syncQueueItems.length,
+        syncQueue: effectiveSyncQueue,
+        pendingCount: effectiveSyncQueue.length,
+        zone: (zone as ZoneType) || 'Aéroport',
         view: trip ? 'dashboard' : 'login',
         initialized: true,
       });

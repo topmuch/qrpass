@@ -2,16 +2,27 @@
 
 import { useState, useCallback } from 'react';
 import { usePassHajjStore } from '@/lib/passhajj-store';
+import { verifyOTP } from '@/services/api';
+import { loadTripData, saveOfflineCredentials } from '@/services/storage';
+import { transformVerifyResponse } from '@/lib/passhajj-types';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { WifiOff, Wifi, Loader2, LogIn, AlertCircle } from 'lucide-react';
+import { WifiOff, Wifi, Loader2, LogIn, AlertCircle, Plane, Bus, Ship, Train } from 'lucide-react';
 import type { TripData } from '@/lib/passhajj-types';
+
+const TRANSPORT_ICONS: Record<string, React.ReactNode> = {
+  flight: <Plane className="w-4 h-4" />,
+  bus: <Bus className="w-4 h-4" />,
+  boat: <Ship className="w-4 h-4" />,
+  train: <Train className="w-4 h-4" />,
+};
 
 export default function LoginScreen() {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [offlineMode, setOfflineMode] = useState(false);
   const { setTrip, setView, syncStatus, trip } = usePassHajjStore();
 
   const isOnline = syncStatus !== 'offline';
@@ -23,50 +34,67 @@ export default function LoginScreen() {
     }
     setLoading(true);
     setError('');
+    setOfflineMode(false);
 
     try {
-      const res = await fetch('/api/leader/trips/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ otp }),
-      });
+      // Call the real backend API via gateway
+      const response = await verifyOTP(otp);
 
-      const data = await res.json();
+      if (response.success && response.data) {
+        // Transform API response to local TripData format
+        const tripData: TripData = transformVerifyResponse(response);
 
-      if (data.success && data.data) {
-        setTrip(data.data as TripData);
+        // Save to Zustand store (which also persists to localforage)
+        setTrip(tripData);
+
+        // Save offline credentials for re-auth when offline
+        await saveOfflineCredentials({
+          otp,
+          tripId: response.data.tripId,
+          lastVerified: new Date().toISOString(),
+        });
+
+        // Navigate to dashboard
         setView('dashboard');
       } else {
-        setError(data.error || 'Code invalide');
+        setError(response.error || 'Code OTP invalide ou expiré');
       }
-    } catch (err) {
-      // Network error - try offline mode
-      if (trip) {
+    } catch (err: unknown) {
+      // Network error — try offline fallback
+      console.warn('[LoginScreen] Network error, trying offline fallback:', err);
+
+      // Try loading cached trip data from localforage
+      const cachedTrip = await loadTripData();
+      if (cachedTrip) {
+        setOfflineMode(true);
         setError('Pas de connexion. Données locales chargées.');
+        setTrip(cachedTrip);
         setView('dashboard');
       } else {
-        setError('Pas de connexion et aucune donnée locale. Connectez-vous d\'abord.');
+        setError('Pas de connexion et aucune donnée locale. Connectez-vous d\'abord en ligne.');
       }
     } finally {
       setLoading(false);
     }
-  }, [otp, trip, setTrip, setView, syncStatus]);
+  }, [otp, trip, setTrip, setView]);
 
-  const handleOfflineAccess = useCallback(() => {
-    if (trip) {
+  const handleOfflineAccess = useCallback(async () => {
+    const cachedTrip = await loadTripData();
+    if (cachedTrip) {
+      setTrip(cachedTrip);
       setView('dashboard');
     }
-  }, [trip, setView]);
+  }, [setTrip, setView]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#f4b400]">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#f4b400] to-[#d49b00]">
       {/* Logo & Title */}
       <div className="text-center mb-8">
-        <div className="w-20 h-20 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-          <span className="text-4xl">🕋</span>
+        <div className="w-24 h-24 mx-auto mb-4 bg-white rounded-3xl flex items-center justify-center shadow-xl">
+          <span className="text-5xl">🕋</span>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-1">PassHajj</h1>
-        <p className="text-white/80 text-lg">Manager</p>
+        <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">PassHajj</h1>
+        <p className="text-white/80 text-lg font-light">Manager</p>
       </div>
 
       {/* Connection indicator */}
@@ -116,7 +144,11 @@ export default function LoginScreen() {
 
           {/* Error message */}
           {error && (
-            <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-xl">
+            <div className={`flex items-center gap-2 text-sm p-3 rounded-xl ${
+              offlineMode
+                ? 'text-amber-700 bg-amber-50'
+                : 'text-red-600 bg-red-50'
+            }`}>
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -126,7 +158,7 @@ export default function LoginScreen() {
           <Button
             onClick={handleVerify}
             disabled={loading || otp.length !== 4}
-            className="w-full h-14 text-lg font-bold rounded-xl bg-[#f4b400] hover:bg-[#daa000] text-white shadow-md"
+            className="w-full h-14 text-lg font-bold rounded-xl bg-[#f4b400] hover:bg-[#daa000] text-white shadow-md transition-all active:scale-[0.98]"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -138,8 +170,8 @@ export default function LoginScreen() {
             )}
           </Button>
 
-          {/* Offline access */}
-          {!isOnline && trip && (
+          {/* Offline access button */}
+          {!isOnline && (
             <Button
               onClick={handleOfflineAccess}
               variant="outline"
@@ -149,6 +181,13 @@ export default function LoginScreen() {
               Accès hors ligne
             </Button>
           )}
+
+          {/* Transport icons decoration */}
+          <div className="flex justify-center gap-3 text-gray-300">
+            {Object.values(TRANSPORT_ICONS).map((icon, i) => (
+              <div key={i}>{icon}</div>
+            ))}
+          </div>
 
           {/* Demo hint */}
           <div className="text-center text-xs text-gray-400 pt-2 border-t border-gray-100">

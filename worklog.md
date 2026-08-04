@@ -118,3 +118,35 @@ Stage Summary:
 - 9 route groups: auth, agencies, trips, pilgrims, bags, scans, incidents, leader, finder
 - 18 controller functions with full business logic
 - No stubs - all implementations are complete
+---
+Task ID: 1
+Agent: Main Agent
+Task: Build PassHajj Manager PWA Frontend (Offline-First) with services, screens, and sync
+
+Work Log:
+- Explored existing project structure: passhajj components already existed in src/components/passhajj/
+- Read backend API routes (Express on port 3002): /api/leader/verify-otp, /api/leader/sync-scans, /api/leader/sync-incidents
+- Installed axios dependency
+- Created src/services/storage.ts: Typed localforage wrapper with functions for trip data, scans, pending scans, incidents, offline credentials, zone, and last sync timestamp
+- Created src/services/api.ts: Dual-backend Axios client that tries Express backend (via XTransformPort=3002) first, then falls back to Next.js API routes. Includes offline interceptor and request tracing.
+- Created src/services/SyncService.ts: Singleton sync service that monitors network status (online/offline events), auto-syncs every 30 seconds, and provides manual sync trigger. Syncs both scans and incidents.
+- Created src/components/passhajj/StatusBadge.tsx: Online/Offline/Syncing badge component with compact and full modes
+- Updated src/lib/passhajj-types.ts: Added richer types matching backend response (VerifyOtpResponse, SyncScansResponse, SyncIncidentsResponse, TripStatusResponse, OfflineCredentials, GroupData, transformVerifyResponse)
+- Updated src/lib/passhajj-store.ts: Refactored to use storage service functions instead of inline localforage, persists pending scans/incidents separately for SyncService
+- Updated src/components/passhajj/LoginScreen.tsx: Connects to real backend API via verifyOTP(), with offline fallback loading from localforage
+- Updated src/components/passhajj/Dashboard.tsx: Integrated StatusBadge, shows trip info strip (destination, airline, hotel), agency phone call link
+- Updated src/components/passhajj/QRScanner.tsx: Shows QR prefix icon (User for ID-, Package for BG-) in feedback overlay
+- Updated src/components/passhajj/SyncManager.tsx: Uses SyncService singleton for network monitoring and auto-sync, manual sync button
+- Updated src/components/passhajj/ListView.tsx: Shows group names from enriched data, baggage type labels
+- Updated src/components/passhajj/IncidentsView.tsx: Offline notice banner, incident sync status
+- Updated src/app/page.tsx: Improved loading animation
+- Verified all files pass ESLint
+- Browser-verified: Login (OTP 1234), Dashboard, Scan (pilgrim counter updates), List view (filter tabs), Incidents (add form), Sync (pending count), Mobile responsive
+
+Stage Summary:
+- Full PWA frontend built with offline-first architecture
+- Services: storage.ts (localforage), api.ts (dual-backend Axios), SyncService.ts (auto-sync)
+- All screens functional: Login, Dashboard, Scanner, List, Incidents
+- StatusBadge component for online/offline indicator
+- Sync pending scans/incidents when network returns
+- Express backend tried first (XTransformPort=3002), Next.js API as fallback
