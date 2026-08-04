@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   LayoutDashboard,
+  Smartphone,
   LogOut,
   Menu,
   X,
@@ -30,6 +31,11 @@ const NAV_ITEMS = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     href: '/agency/dashboard',
+  },
+  {
+    label: 'Application',
+    icon: Smartphone,
+    href: '/agency/pwa',
   },
 ] as const;
 

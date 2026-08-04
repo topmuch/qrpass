@@ -196,3 +196,25 @@ Stage Summary:
 - Update notification with toast + reload
 - Offline page with auto-recovery
 - Background sync for pending scans on connectivity restore
+---
+Task ID: 5
+Agent: Main
+Task: Add "Application PWA" tab to Agency Dashboard with QR code for PWA install
+
+Work Log:
+- Created src/app/agency/pwa/page.tsx: full PWA install page with QR code (qrcode.react), Android/iOS install instructions, copy link button, offline mode info card
+- Updated src/app/agency/layout.tsx: added "Application" nav item (Smartphone icon, /agency/pwa) to NAV_ITEMS, imported Smartphone from lucide-react
+- PWA URL: uses process.env.NEXT_PUBLIC_PWA_URL with fallback https://passhajj.com/manager
+- QR code: QRCodeSVG 256x256px, Bleu Marine foreground, white background, level M
+- Install cards: Android (5 steps with Chrome instructions), iOS (5 steps with Safari instructions)
+- Copy link: navigator.clipboard.writeText with fallback for older browsers, success toast, 2.5s reset
+- Animations: framer-motion entrance animations on all sections
+- Design: bg-white rounded-xl shadow-md p-6 main card, Jaune #f4b400 buttons with #d97706 hover
+- Verified: GET /agency/pwa 200, sidebar shows Dashboard + Application, copy button works with toast, all 5 deliverables complete
+
+Stage Summary:
+- 2 files modified/created (pwa/page.tsx + layout.tsx sidebar)
+- PWA tab fully functional with QR code, install instructions, copy link, offline info
+- Sidebar navigation updated with Smartphone icon + "Application" label
+- Browser-verified: login → dashboard → Application sidebar → PWA page renders correctly
+- No new lint errors, responsive on mobile/tablet/desktop

@@ -26,7 +26,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
     }
 
-    const token = generateToken({
+    const accessToken = generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      agencyId: user.agencyId || undefined,
+    });
+
+    // Generate a simple refresh token (matches Express backend response format)
+    const refreshToken = generateToken({
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -34,8 +42,6 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      success: true,
-      token,
       user: {
         id: user.id,
         email: user.email,
@@ -43,6 +49,8 @@ export async function POST(request: NextRequest) {
         role: user.role,
         agencyId: user.agencyId,
       },
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.error('[Auth Login] Error:', error);
