@@ -24,6 +24,9 @@ import {
   Train,
   Hotel,
   Building2,
+  KeyRound,
+  Share2,
+  Smartphone,
 } from 'lucide-react';
 import { listTrips, createTrip, regenerateOTP, getAgencyUser } from '@/services/api';
 import type { TripListItem, TripsListResponse } from '@/services/api';
@@ -359,6 +362,28 @@ export default function AgencyDashboardPage() {
     }
   };
 
+  // ─── Share OTP via Web Share API ───
+  const shareOtp = async (otp: string, tripName: string) => {
+    const pwaLink = typeof window !== 'undefined'
+      ? `${window.location.origin}/manager`
+      : '/manager';
+    const shareData = {
+      title: `Code OTP - ${tripName}`,
+      text: `Assalamou Alaikoum,\n\nVoici votre code OTP pour le voyage « ${tripName} » :\n\n🔑 ${otp}\n\nEntrez ce code dans l'application PassHajj Manager pour accéder aux données du voyage.\n\n📲 Lien de l'application : ${pwaLink}\n\nCe code est valide 24h. Ne le partagez qu'avec les chefs de groupe.`,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await copyToClipboard(shareData.text, 'Message OTP');
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        await copyToClipboard(shareData.text, 'Message OTP');
+      }
+    }
+  };
+
   // ─── Pagination controls ───
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -384,8 +409,21 @@ export default function AgencyDashboardPage() {
           </p>
         </div>
 
-        {/* Create Trip Button */}
-        <Dialog open={createDialogOpen} onOpenChange={(open) => {
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
+          {/* Quick Generate OTP Button */}
+          <Button
+            variant="outline"
+            className="gap-2 font-semibold border-2 transition-all"
+            style={{ borderColor: BLEU_MARINE, color: BLEU_MARINE }}
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            <KeyRound className="w-4 h-4" />
+            <span className="hidden sm:inline">Générer OTP</span>
+          </Button>
+
+          {/* Create Trip Button */}
+          <Dialog open={createDialogOpen} onOpenChange={(open) => {
           setCreateDialogOpen(open);
           if (!open) {
             setCreatedOTP(null);
@@ -436,21 +474,39 @@ export default function AgencyDashboardPage() {
                     {createdOTP}
                   </div>
                 </div>
+                <p className="text-sm text-slate-500 text-center max-w-sm">
+                  Partagez ce code avec le chef de groupe. Il l&apos;entrera dans l&apos;application PassHajj Manager.
+                </p>
                 <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                  <Button
+                    className="flex-1 gap-2 text-white font-semibold"
+                    style={{ backgroundColor: JAUNE }}
+                    onClick={() => shareOtp(createdOTP, createForm.name || 'Voyage')}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Partager l&apos;OTP
+                  </Button>
                   <Button
                     variant="outline"
                     className="flex-1 gap-2"
                     onClick={() => copyToClipboard(createdOTP, 'OTP')}
                   >
                     <Copy className="w-4 h-4" />
-                    Copier l&apos;OTP
+                    Copier
                   </Button>
+                </div>
+                <div className="flex items-center gap-2 w-full max-w-sm">
                   <Button
                     variant="outline"
                     className="flex-1 gap-2"
-                    onClick={() => copyToClipboard('https://passhajj.com/manager', 'Lien PWA')}
+                    onClick={() => {
+                      const pwaLink = typeof window !== 'undefined'
+                        ? `${window.location.origin}/manager`
+                        : '/manager';
+                      copyToClipboard(pwaLink, 'Lien PWA');
+                    }}
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <Smartphone className="w-4 h-4" />
                     Copier le lien PWA
                   </Button>
                 </div>
@@ -655,6 +711,7 @@ export default function AgencyDashboardPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* ─── Stats Cards ─── */}
@@ -981,6 +1038,19 @@ export default function AgencyDashboardPage() {
                               <RefreshCw className="w-3.5 h-3.5" />
                             )}
                             <span className="hidden sm:inline">OTP</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1 text-xs h-8"
+                            style={{ color: BLEU_MARINE }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareOtp(trip.otp, trip.name);
+                            }}
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                            <span className="hidden md:inline">Partager</span>
                           </Button>
                         </div>
                       </TableCell>

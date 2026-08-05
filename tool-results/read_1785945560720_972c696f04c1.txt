@@ -1,0 +1,1056 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+     4→import { useRouter } from 'next/navigation';
+     5→import {
+     6→  Plane,
+     7→  Users,
+     8→  Luggage,
+     9→  CheckCircle,
+    10→  Search,
+    11→  Plus,
+    12→  Eye,
+    13→  RefreshCw,
+    14→  Copy,
+    15→  ExternalLink,
+    16→  ChevronLeft,
+    17→  ChevronRight,
+    18→  X,
+    19→  Loader2,
+    20→  Calendar,
+    21→  MapPin,
+    22→  Bus,
+    23→  Ship,
+    24→  Train,
+    25→  Hotel,
+    26→  Building2,
+    27→} from 'lucide-react';
+    28→import { listTrips, createTrip, regenerateOTP, getAgencyUser } from '@/services/api';
+    29→import type { TripListItem, TripsListResponse } from '@/services/api';
+    30→import { Button } from '@/components/ui/button';
+    31→import { Input } from '@/components/ui/input';
+    32→import { Label } from '@/components/ui/label';
+    33→import { Textarea } from '@/components/ui/textarea';
+    34→import { Badge } from '@/components/ui/badge';
+    35→import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+    36→import {
+    37→  Dialog,
+    38→  DialogContent,
+    39→  DialogHeader,
+    40→  DialogTitle,
+    41→  DialogTrigger,
+    42→  DialogFooter,
+    43→  DialogDescription,
+    44→} from '@/components/ui/dialog';
+    45→import {
+    46→  Select,
+    47→  SelectContent,
+    48→  SelectItem,
+    49→  SelectTrigger,
+    50→  SelectValue,
+    51→} from '@/components/ui/select';
+    52→import {
+    53→  Table,
+    54→  TableBody,
+    55→  TableCell,
+    56→  TableHead,
+    57→  TableHeader,
+    58→  TableRow,
+    59→} from '@/components/ui/table';
+    60→import { Skeleton } from '@/components/ui/skeleton';
+    61→import { toast } from 'sonner';
+    62→
+    63→// ─── Brand colors ───
+    64→const JAUNE = '#f4b400';
+    65→const BLEU_MARINE = '#1e3a5f';
+    66→
+    67→// ─── Status helpers ───
+    68→type TripStatus = 'active' | 'completed' | 'cancelled' | 'pending';
+    69→
+    70→function getStatusBadge(status: string) {
+    71→  const s = status?.toLowerCase() as TripStatus;
+    72→  switch (s) {
+    73→    case 'active':
+    74→      return (
+    75→        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100">
+    76→          Actif
+    77→        </Badge>
+    78→      );
+    79→    case 'completed':
+    80→      return (
+    81→        <Badge className="bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100">
+    82→          Terminé
+    83→        </Badge>
+    84→      );
+    85→    case 'cancelled':
+    86→      return (
+    87→        <Badge className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100">
+    88→          Annulé
+    89→        </Badge>
+    90→      );
+    91→    case 'pending':
+    92→      return (
+    93→        <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100">
+    94→          En attente
+    95→        </Badge>
+    96→      );
+    97→    default:
+    98→      return <Badge variant="secondary">{status}</Badge>;
+    99→  }
+   100→}
+   101→
+   102→function getTransportIcon(mode: string | null | undefined) {
+   103→  switch (mode?.toLowerCase()) {
+   104→    case 'flight':
+   105→    case 'avion':
+   106→      return <Plane className="w-4 h-4" />;
+   107→    case 'bus':
+   108→      return <Bus className="w-4 h-4" />;
+   109→    case 'boat':
+   110→    case 'bateau':
+   111→      return <Ship className="w-4 h-4" />;
+   112→    case 'train':
+   113→      return <Train className="w-4 h-4" />;
+   114→    default:
+   115→      return <Plane className="w-4 h-4" />;
+   116→  }
+   117→}
+   118→
+   119→function formatDate(dateStr: string | null | undefined): string {
+   120→  if (!dateStr) return '—';
+   121→  try {
+   122→    const d = new Date(dateStr);
+   123→    return d.toLocaleDateString('fr-FR', {
+   124→      day: '2-digit',
+   125→      month: 'short',
+   126→      year: 'numeric',
+   127→    });
+   128→  } catch {
+   129→    return '—';
+   130→  }
+   131→}
+   132→
+   133→// ─── Create Trip Form State ───
+   134→interface CreateTripForm {
+   135→  name: string;
+   136→  description: string;
+   137→  departureDate: string;
+   138→  returnDate: string;
+   139→  destination: string;
+   140→  transportMode: 'flight' | 'bus' | 'boat' | 'train' | '';
+   141→  airline: string;
+   142→  flightNumber: string;
+   143→  hotelMecca: string;
+   144→  hotelMedina: string;
+   145→}
+   146→
+   147→const EMPTY_FORM: CreateTripForm = {
+   148→  name: '',
+   149→  description: '',
+   150→  departureDate: '',
+   151→  returnDate: '',
+   152→  destination: '',
+   153→  transportMode: '',
+   154→  airline: '',
+   155→  flightNumber: '',
+   156→  hotelMecca: '',
+   157→  hotelMedina: '',
+   158→};
+   159→
+   160→// ═══════════════════════════════════════════════════════════════
+   161→//  Main Page Component
+   162→// ═══════════════════════════════════════════════════════════════
+   163→
+   164→export default function AgencyDashboardPage() {
+   165→  const router = useRouter();
+   166→
+   167→  // ─── State ───
+   168→  const [trips, setTrips] = useState<TripListItem[]>([]);
+   169→  const [loading, setLoading] = useState(true);
+   170→  const [agencyId, setAgencyId] = useState<string>('');
+   171→  const [searchQuery, setSearchQuery] = useState('');
+   172→  const [statusFilter, setStatusFilter] = useState<string>('all');
+   173→  const [currentPage, setCurrentPage] = useState(1);
+   174→  const [totalPages, setTotalPages] = useState(1);
+   175→  const [totalTrips, setTotalTrips] = useState(0);
+   176→  const pageSize = 10;
+   177→
+   178→  // Create trip dialog
+   179→  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+   180→  const [createForm, setCreateForm] = useState<CreateTripForm>(EMPTY_FORM);
+   181→  const [creating, setCreating] = useState(false);
+   182→  const [createdOTP, setCreatedOTP] = useState<string | null>(null);
+   183→  const [otpCountdown, setOtpCountdown] = useState<number | null>(null);
+   184→
+   185→  // Regenerate OTP
+   186→  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+   187→
+   188→  // Auto-refresh
+   189→  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+   190→
+   191→  // ─── Load agency user ───
+   192→  useEffect(() => {
+   193→    const user = getAgencyUser();
+   194→    if (user?.agencyId) {
+   195→      setAgencyId(user.agencyId);
+   196→    } else if (user?.agency?.id) {
+   197→      setAgencyId(user.agency.id);
+   198→    }
+   199→  }, []);
+   200→
+   201→  // ─── Fetch trips ───
+   202→  const fetchTrips = useCallback(async () => {
+   203→    try {
+   204→      const params: Record<string, any> = {
+   205→        page: currentPage,
+   206→        limit: pageSize,
+   207→      };
+   208→      if (agencyId) params.agencyId = agencyId;
+   209→      if (statusFilter && statusFilter !== 'all') params.status = statusFilter;
+   210→
+   211→      const response = await listTrips(params);
+   212→
+   213→      let filteredData = response.data || [];
+   214→
+   215→      // Client-side search filter
+   216→      if (searchQuery.trim()) {
+   217→        const q = searchQuery.toLowerCase().trim();
+   218→        filteredData = filteredData.filter(
+   219→          (t) =>
+   220→            t.name?.toLowerCase().includes(q) ||
+   221→            t.description?.toLowerCase().includes(q) ||
+   222→            t.otp?.toLowerCase().includes(q)
+   223→        );
+   224→      }
+   225→
+   226→      setTrips(filteredData);
+   227→      setTotalPages(response.pagination?.totalPages || 1);
+   228→      setTotalTrips(response.pagination?.total || 0);
+   229→    } catch (err: any) {
+   230→      console.error('Failed to fetch trips:', err);
+   231→      if (!err?.isOffline) {
+   232→        toast.error('Erreur lors du chargement des voyages');
+   233→      }
+   234→    } finally {
+   235→      setLoading(false);
+   236→    }
+   237→  }, [agencyId, currentPage, statusFilter, searchQuery]);
+   238→
+   239→  // Initial fetch + auto-refresh every 30s
+   240→  useEffect(() => {
+   241→    fetchTrips();
+   242→    refreshIntervalRef.current = setInterval(fetchTrips, 30000);
+   243→    return () => {
+   244→      if (refreshIntervalRef.current) clearInterval(refreshIntervalRef.current);
+   245→    };
+   246→  }, [fetchTrips]);
+   247→
+   248→  // ─── OTP countdown (auto-close dialog after 5s) ───
+   249→  useEffect(() => {
+   250→    if (otpCountdown === null) return;
+   251→    if (otpCountdown <= 0) {
+   252→      setCreatedOTP(null);
+   253→      setOtpCountdown(null);
+   254→      setCreateDialogOpen(false);
+   255→      setCreateForm(EMPTY_FORM);
+   256→      return;
+   257→    }
+   258→    const timer = setTimeout(() => setOtpCountdown(otpCountdown - 1), 1000);
+   259→    return () => clearTimeout(timer);
+   260→  }, [otpCountdown]);
+   261→
+   262→  // ─── Stats ───
+   263→  const stats = useMemo(() => {
+   264→    const totalVoyages = totalTrips || trips.length;
+   265→    const totalPilgrims = trips.reduce((sum, t) => sum + (t.pilgrimCount || t.totalPilgrims || 0), 0);
+   266→    const totalBags = trips.reduce((sum, t) => sum + (t.bagCount || t.totalBags || 0), 0);
+   267→    const activeVoyages = trips.filter((t) => t.status?.toLowerCase() === 'active').length;
+   268→    return { totalVoyages, totalPilgrims, totalBags, activeVoyages };
+   269→  }, [trips, totalTrips]);
+   270→
+   271→  // ─── Create Trip ───
+   272→  const handleCreateTrip = async () => {
+   273→    if (!createForm.name.trim()) {
+   274→      toast.error('Le nom du voyage est requis');
+   275→      return;
+   276→    }
+   277→    if (!agencyId) {
+   278→      toast.error('Identifiant agence introuvable. Reconnectez-vous.');
+   279→      return;
+   280→    }
+   281→
+   282→    setCreating(true);
+   283→    try {
+   284→      const payload: Record<string, any> = {
+   285→        name: createForm.name.trim(),
+   286→        agencyId,
+   287→      };
+   288→      if (createForm.description.trim()) payload.description = createForm.description.trim();
+   289→      if (createForm.departureDate) payload.departureDate = createForm.departureDate;
+   290→      if (createForm.returnDate) payload.returnDate = createForm.returnDate;
+   291→      if (createForm.destination.trim()) payload.destination = createForm.destination.trim();
+   292→      if (createForm.transportMode) payload.transportMode = createForm.transportMode;
+   293→      if (createForm.airline.trim()) payload.airline = createForm.airline.trim();
+   294→      if (createForm.flightNumber.trim()) payload.flightNumber = createForm.flightNumber.trim();
+   295→      if (createForm.hotelMecca.trim()) payload.hotelMecca = createForm.hotelMecca.trim();
+   296→      if (createForm.hotelMedina.trim()) payload.hotelMedina = createForm.hotelMedina.trim();
+   297→
+   298→      const result = await createTrip(payload);
+   299→
+   300→      const newOtp = result?.otp || result?.data?.otp || '';
+   301→      setCreatedOTP(newOtp);
+   302→      setOtpCountdown(5);
+   303→
+   304→      // Add new trip to list
+   305→      if (result?.data || result?.id) {
+   306→        const newTrip = result.data || result;
+   307→        setTrips((prev) => [newTrip, ...prev]);
+   308→      }
+   309→
+   310→      toast.success('Voyage créé avec succès !');
+   311→      // Refresh list in background
+   312→      fetchTrips();
+   313→    } catch (err: any) {
+   314→      console.error('Failed to create trip:', err);
+   315→      toast.error(err?.response?.data?.message || 'Erreur lors de la création du voyage');
+   316→    } finally {
+   317→      setCreating(false);
+   318→    }
+   319→  };
+   320→
+   321→  // ─── Regenerate OTP ───
+   322→  const handleRegenerateOTP = async (tripId: string, tripName: string) => {
+   323→    setRegeneratingId(tripId);
+   324→    try {
+   325→      const result = await regenerateOTP(tripId);
+   326→      const newOtp = result.otp;
+   327→
+   328→      // Update trip in list
+   329→      setTrips((prev) =>
+   330→        prev.map((t) =>
+   331→          t.id === tripId
+   332→            ? { ...t, otp: newOtp, otpExpiry: result.otpExpiry }
+   333→            : t
+   334→        )
+   335→      );
+   336→
+   337→      toast.success(
+   338→        <div className="flex flex-col gap-1">
+   339→          <span className="font-semibold">OTP régénéré pour {tripName}</span>
+   340→          <span className="font-mono text-lg tracking-widest">{newOtp}</span>
+   341→        </div>,
+   342→        { duration: 6000 }
+   343→      );
+   344→    } catch (err: any) {
+   345→      console.error('Failed to regenerate OTP:', err);
+   346→      toast.error(err?.response?.data?.message || 'Erreur lors de la régénération de l\'OTP');
+   347→    } finally {
+   348→      setRegeneratingId(null);
+   349→    }
+   350→  };
+   351→
+   352→  // ─── Copy to clipboard ───
+   353→  const copyToClipboard = async (text: string, label: string) => {
+   354→    try {
+   355→      await navigator.clipboard.writeText(text);
+   356→      toast.success(`${label} copié !`);
+   357→    } catch {
+   358→      toast.error('Impossible de copier');
+   359→    }
+   360→  };
+   361→
+   362→  // ─── Pagination controls ───
+   363→  const goToPage = (page: number) => {
+   364→    if (page >= 1 && page <= totalPages) {
+   365→      setCurrentPage(page);
+   366→      setLoading(true);
+   367→    }
+   368→  };
+   369→
+   370→  // ═══════════════════════════════════════════════════════════════
+   371→  //  RENDER
+   372→  // ═══════════════════════════════════════════════════════════════
+   373→
+   374→  return (
+   375→    <div className="space-y-6">
+   376→      {/* ─── Header ─── */}
+   377→      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+   378→        <div>
+   379→          <h1 className="text-2xl font-bold" style={{ color: BLEU_MARINE }}>
+   380→            Tableau de bord
+   381→          </h1>
+   382→          <p className="text-slate-500 text-sm mt-1">
+   383→            Gérez vos voyages et suivez l&apos;activité en temps réel
+   384→          </p>
+   385→        </div>
+   386→
+   387→        {/* Create Trip Button */}
+   388→        <Dialog open={createDialogOpen} onOpenChange={(open) => {
+   389→          setCreateDialogOpen(open);
+   390→          if (!open) {
+   391→            setCreatedOTP(null);
+   392→            setOtpCountdown(null);
+   393→            setCreateForm(EMPTY_FORM);
+   394→          }
+   395→        }}>
+   396→          <DialogTrigger asChild>
+   397→            <Button
+   398→              className="gap-2 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+   399→              style={{ backgroundColor: JAUNE }}
+   400→            >
+   401→              <Plus className="w-4 h-4" />
+   402→              Nouveau Voyage
+   403→            </Button>
+   404→          </DialogTrigger>
+   405→
+   406→          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+   407→            <DialogHeader>
+   408→              <DialogTitle className="flex items-center gap-2" style={{ color: BLEU_MARINE }}>
+   409→                <Plane className="w-5 h-5" />
+   410→                Créer un nouveau voyage
+   411→              </DialogTitle>
+   412→              <DialogDescription>
+   413→                Remplissez les informations du voyage. Un OTP sera généré automatiquement.
+   414→              </DialogDescription>
+   415→            </DialogHeader>
+   416→
+   417→            {/* OTP Display (after creation) */}
+   418→            {createdOTP ? (
+   419→              <div className="flex flex-col items-center gap-4 py-8">
+   420→                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: `${JAUNE}20` }}>
+   421→                  <CheckCircle className="w-8 h-8" style={{ color: JAUNE }} />
+   422→                </div>
+   423→                <h3 className="text-lg font-semibold" style={{ color: BLEU_MARINE }}>
+   424→                  Voyage créé avec succès !
+   425→                </h3>
+   426→                <div className="text-center">
+   427→                  <p className="text-sm text-slate-500 mb-2">Code OTP du voyage</p>
+   428→                  <div
+   429→                    className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-3xl font-bold tracking-[0.3em] font-mono"
+   430→                    style={{
+   431→                      backgroundColor: `${BLEU_MARINE}10`,
+   432→                      color: BLEU_MARINE,
+   433→                      border: `2px solid ${BLEU_MARINE}30`,
+   434→                    }}
+   435→                  >
+   436→                    {createdOTP}
+   437→                  </div>
+   438→                </div>
+   439→                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+   440→                  <Button
+   441→                    variant="outline"
+   442→                    className="flex-1 gap-2"
+   443→                    onClick={() => copyToClipboard(createdOTP, 'OTP')}
+   444→                  >
+   445→                    <Copy className="w-4 h-4" />
+   446→                    Copier l&apos;OTP
+   447→                  </Button>
+   448→                  <Button
+   449→                    variant="outline"
+   450→                    className="flex-1 gap-2"
+   451→                    onClick={() => copyToClipboard('https://passhajj.com/manager', 'Lien PWA')}
+   452→                  >
+   453→                    <ExternalLink className="w-4 h-4" />
+   454→                    Copier le lien PWA
+   455→                  </Button>
+   456→                </div>
+   457→                <p className="text-xs text-slate-400">
+   458→                  Fermeture automatique dans {otpCountdown}s...
+   459→                </p>
+   460→              </div>
+   461→            ) : (
+   462→              /* Create Trip Form */
+   463→              <div className="grid gap-4 py-4">
+   464→                {/* Name */}
+   465→                <div className="grid gap-2">
+   466→                  <Label htmlFor="trip-name" className="font-medium" style={{ color: BLEU_MARINE }}>
+   467→                    Nom du voyage <span className="text-red-500">*</span>
+   468→                  </Label>
+   469→                  <Input
+   470→                    id="trip-name"
+   471→                    placeholder="Ex: Hajj 2026 - Groupe A"
+   472→                    value={createForm.name}
+   473→                    onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
+   474→                    className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   475→                  />
+   476→                </div>
+   477→
+   478→                {/* Description */}
+   479→                <div className="grid gap-2">
+   480→                  <Label htmlFor="trip-desc" style={{ color: BLEU_MARINE }}>
+   481→                    Description
+   482→                  </Label>
+   483→                  <Textarea
+   484→                    id="trip-desc"
+   485→                    placeholder="Détails supplémentaires sur ce voyage..."
+   486→                    value={createForm.description}
+   487→                    onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
+   488→                    rows={3}
+   489→                    className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   490→                  />
+   491→                </div>
+   492→
+   493→                {/* Dates row */}
+   494→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   495→                  <div className="grid gap-2">
+   496→                    <Label htmlFor="departure-date" style={{ color: BLEU_MARINE }}>
+   497→                      <Calendar className="w-3.5 h-3.5 inline mr-1" />
+   498→                      Date de départ
+   499→                    </Label>
+   500→                    <Input
+   501→                      id="departure-date"
+   502→                      type="date"
+   503→                      value={createForm.departureDate}
+   504→                      onChange={(e) => setCreateForm((f) => ({ ...f, departureDate: e.target.value }))}
+   505→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   506→                    />
+   507→                  </div>
+   508→                  <div className="grid gap-2">
+   509→                    <Label htmlFor="return-date" style={{ color: BLEU_MARINE }}>
+   510→                      <Calendar className="w-3.5 h-3.5 inline mr-1" />
+   511→                      Date de retour
+   512→                    </Label>
+   513→                    <Input
+   514→                      id="return-date"
+   515→                      type="date"
+   516→                      value={createForm.returnDate}
+   517→                      onChange={(e) => setCreateForm((f) => ({ ...f, returnDate: e.target.value }))}
+   518→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   519→                    />
+   520→                  </div>
+   521→                </div>
+   522→
+   523→                {/* Destination */}
+   524→                <div className="grid gap-2">
+   525→                  <Label htmlFor="destination" style={{ color: BLEU_MARINE }}>
+   526→                    <MapPin className="w-3.5 h-3.5 inline mr-1" />
+   527→                    Destination
+   528→                  </Label>
+   529→                  <Input
+   530→                    id="destination"
+   531→                    placeholder="Ex: Arabie Saoudite"
+   532→                    value={createForm.destination}
+   533→                    onChange={(e) => setCreateForm((f) => ({ ...f, destination: e.target.value }))}
+   534→                    className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   535→                  />
+   536→                </div>
+   537→
+   538→                {/* Transport */}
+   539→                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+   540→                  <div className="grid gap-2">
+   541→                    <Label style={{ color: BLEU_MARINE }}>Transport</Label>
+   542→                    <Select
+   543→                      value={createForm.transportMode}
+   544→                      onValueChange={(v) =>
+   545→                        setCreateForm((f) => ({ ...f, transportMode: v as CreateTripForm['transportMode'] }))
+   546→                      }
+   547→                    >
+   548→                      <SelectTrigger className="border-slate-300 focus:border-[#f4b400]">
+   549→                        <SelectValue placeholder="Choisir..." />
+   550→                      </SelectTrigger>
+   551→                      <SelectContent>
+   552→                        <SelectItem value="flight">
+   553→                          <span className="flex items-center gap-2">
+   554→                            <Plane className="w-4 h-4" /> Avion
+   555→                          </span>
+   556→                        </SelectItem>
+   557→                        <SelectItem value="bus">
+   558→                          <span className="flex items-center gap-2">
+   559→                            <Bus className="w-4 h-4" /> Bus
+   560→                          </span>
+   561→                        </SelectItem>
+   562→                        <SelectItem value="boat">
+   563→                          <span className="flex items-center gap-2">
+   564→                            <Ship className="w-4 h-4" /> Bateau
+   565→                          </span>
+   566→                        </SelectItem>
+   567→                        <SelectItem value="train">
+   568→                          <span className="flex items-center gap-2">
+   569→                            <Train className="w-4 h-4" /> Train
+   570→                          </span>
+   571→                        </SelectItem>
+   572→                      </SelectContent>
+   573→                    </Select>
+   574→                  </div>
+   575→                  <div className="grid gap-2">
+   576→                    <Label htmlFor="airline" style={{ color: BLEU_MARINE }}>
+   577→                      <Building2 className="w-3.5 h-3.5 inline mr-1" />
+   578→                      Compagnie
+   579→                    </Label>
+   580→                    <Input
+   581→                      id="airline"
+   582→                      placeholder="Ex: Saudia Airlines"
+   583→                      value={createForm.airline}
+   584→                      onChange={(e) => setCreateForm((f) => ({ ...f, airline: e.target.value }))}
+   585→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   586→                    />
+   587→                  </div>
+   588→                  <div className="grid gap-2">
+   589→                    <Label htmlFor="flight-number" style={{ color: BLEU_MARINE }}>
+   590→                      N° Vol
+   591→                    </Label>
+   592→                    <Input
+   593→                      id="flight-number"
+   594→                      placeholder="Ex: SV123"
+   595→                      value={createForm.flightNumber}
+   596→                      onChange={(e) => setCreateForm((f) => ({ ...f, flightNumber: e.target.value }))}
+   597→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   598→                    />
+   599→                  </div>
+   600→                </div>
+   601→
+   602→                {/* Hotels */}
+   603→                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   604→                  <div className="grid gap-2">
+   605→                    <Label htmlFor="hotel-mecca" style={{ color: BLEU_MARINE }}>
+   606→                      <Hotel className="w-3.5 h-3.5 inline mr-1" />
+   607→                      Hôtel La Mecque
+   608→                    </Label>
+   609→                    <Input
+   610→                      id="hotel-mecca"
+   611→                      placeholder="Nom de l'hôtel"
+   612→                      value={createForm.hotelMecca}
+   613→                      onChange={(e) => setCreateForm((f) => ({ ...f, hotelMecca: e.target.value }))}
+   614→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   615→                    />
+   616→                  </div>
+   617→                  <div className="grid gap-2">
+   618→                    <Label htmlFor="hotel-medina" style={{ color: BLEU_MARINE }}>
+   619→                      <Hotel className="w-3.5 h-3.5 inline mr-1" />
+   620→                      Hôtel Médine
+   621→                    </Label>
+   622→                    <Input
+   623→                      id="hotel-medina"
+   624→                      placeholder="Nom de l'hôtel"
+   625→                      value={createForm.hotelMedina}
+   626→                      onChange={(e) => setCreateForm((f) => ({ ...f, hotelMedina: e.target.value }))}
+   627→                      className="border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   628→                    />
+   629→                  </div>
+   630→                </div>
+   631→              </div>
+   632→            )}
+   633→
+   634→            <DialogFooter>
+   635→              {!createdOTP && (
+   636→                <Button
+   637→                  onClick={handleCreateTrip}
+   638→                  disabled={creating || !createForm.name.trim()}
+   639→                  className="gap-2 text-white font-semibold"
+   640→                  style={{ backgroundColor: JAUNE }}
+   641→                >
+   642→                  {creating ? (
+   643→                    <>
+   644→                      <Loader2 className="w-4 h-4 animate-spin" />
+   645→                      Création...
+   646→                    </>
+   647→                  ) : (
+   648→                    <>
+   649→                      <Plus className="w-4 h-4" />
+   650→                      Créer le voyage
+   651→                    </>
+   652→                  )}
+   653→                </Button>
+   654→              )}
+   655→            </DialogFooter>
+   656→          </DialogContent>
+   657→        </Dialog>
+   658→      </div>
+   659→
+   660→      {/* ─── Stats Cards ─── */}
+   661→      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+   662→        {loading ? (
+   663→          <>
+   664→            {Array.from({ length: 4 }).map((_, i) => (
+   665→              <Card key={i} className="shadow-sm">
+   666→                <CardContent className="p-4">
+   667→                  <Skeleton className="h-4 w-24 mb-2" />
+   668→                  <Skeleton className="h-8 w-16" />
+   669→                </CardContent>
+   670→              </Card>
+   671→            ))}
+   672→          </>
+   673→        ) : (
+   674→          <>
+   675→            {/* Total Voyages */}
+   676→            <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4" style={{ borderLeftColor: JAUNE }}>
+   677→              <CardContent className="p-4">
+   678→                <div className="flex items-center justify-between">
+   679→                  <div>
+   680→                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+   681→                      Total Voyages
+   682→                    </p>
+   683→                    <p className="text-2xl font-bold mt-1" style={{ color: BLEU_MARINE }}>
+   684→                      {stats.totalVoyages}
+   685→                    </p>
+   686→                  </div>
+   687→                  <div
+   688→                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+   689→                    style={{ backgroundColor: `${JAUNE}15` }}
+   690→                  >
+   691→                    <Plane className="w-5 h-5" style={{ color: JAUNE }} />
+   692→                  </div>
+   693→                </div>
+   694→              </CardContent>
+   695→            </Card>
+   696→
+   697→            {/* Pèlerins Total */}
+   698→            <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4" style={{ borderLeftColor: JAUNE }}>
+   699→              <CardContent className="p-4">
+   700→                <div className="flex items-center justify-between">
+   701→                  <div>
+   702→                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+   703→                      Pèlerins Total
+   704→                    </p>
+   705→                    <p className="text-2xl font-bold mt-1" style={{ color: BLEU_MARINE }}>
+   706→                      {stats.totalPilgrims}
+   707→                    </p>
+   708→                  </div>
+   709→                  <div
+   710→                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+   711→                    style={{ backgroundColor: `${JAUNE}15` }}
+   712→                  >
+   713→                    <Users className="w-5 h-5" style={{ color: JAUNE }} />
+   714→                  </div>
+   715→                </div>
+   716→              </CardContent>
+   717→            </Card>
+   718→
+   719→            {/* Bagages Total */}
+   720→            <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4" style={{ borderLeftColor: JAUNE }}>
+   721→              <CardContent className="p-4">
+   722→                <div className="flex items-center justify-between">
+   723→                  <div>
+   724→                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+   725→                      Bagages Total
+   726→                    </p>
+   727→                    <p className="text-2xl font-bold mt-1" style={{ color: BLEU_MARINE }}>
+   728→                      {stats.totalBags}
+   729→                    </p>
+   730→                  </div>
+   731→                  <div
+   732→                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+   733→                    style={{ backgroundColor: `${JAUNE}15` }}
+   734→                  >
+   735→                    <Luggage className="w-5 h-5" style={{ color: JAUNE }} />
+   736→                  </div>
+   737→                </div>
+   738→              </CardContent>
+   739→            </Card>
+   740→
+   741→            {/* Voyages Actifs */}
+   742→            <Card className="shadow-sm hover:shadow-md transition-shadow border-l-4" style={{ borderLeftColor: JAUNE }}>
+   743→              <CardContent className="p-4">
+   744→                <div className="flex items-center justify-between">
+   745→                  <div>
+   746→                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+   747→                      Voyages Actifs
+   748→                    </p>
+   749→                    <p className="text-2xl font-bold mt-1" style={{ color: BLEU_MARINE }}>
+   750→                      {stats.activeVoyages}
+   751→                    </p>
+   752→                  </div>
+   753→                  <div
+   754→                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+   755→                    style={{ backgroundColor: `${JAUNE}15` }}
+   756→                  >
+   757→                    <CheckCircle className="w-5 h-5" style={{ color: JAUNE }} />
+   758→                  </div>
+   759→                </div>
+   760→              </CardContent>
+   761→            </Card>
+   762→          </>
+   763→        )}
+   764→      </div>
+   765→
+   766→      {/* ─── Filters & Search ─── */}
+   767→      <Card className="shadow-sm">
+   768→        <CardHeader className="pb-3">
+   769→          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+   770→            <CardTitle className="text-lg" style={{ color: BLEU_MARINE }}>
+   771→              Liste des voyages
+   772→            </CardTitle>
+   773→            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+   774→              {/* Search */}
+   775→              <div className="relative flex-1 sm:flex-initial">
+   776→                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+   777→                <Input
+   778→                  placeholder="Rechercher un voyage..."
+   779→                  value={searchQuery}
+   780→                  onChange={(e) => {
+   781→                    setSearchQuery(e.target.value);
+   782→                    setCurrentPage(1);
+   783→                  }}
+   784→                  className="pl-9 w-full sm:w-64 border-slate-300 focus:border-[#f4b400] focus:ring-[#f4b400]/20"
+   785→                />
+   786→              </div>
+   787→              {/* Status filter */}
+   788→              <Select
+   789→                value={statusFilter}
+   790→                onValueChange={(v) => {
+   791→                  setStatusFilter(v);
+   792→                  setCurrentPage(1);
+   793→                  setLoading(true);
+   794→                }}
+   795→              >
+   796→                <SelectTrigger className="w-full sm:w-40 border-slate-300">
+   797→                  <SelectValue placeholder="Statut" />
+   798→                </SelectTrigger>
+   799→                <SelectContent>
+   800→                  <SelectItem value="all">Tous les statuts</SelectItem>
+   801→                  <SelectItem value="active">Actif</SelectItem>
+   802→                  <SelectItem value="completed">Terminé</SelectItem>
+   803→                  <SelectItem value="cancelled">Annulé</SelectItem>
+   804→                  <SelectItem value="pending">En attente</SelectItem>
+   805→                </SelectContent>
+   806→              </Select>
+   807→            </div>
+   808→          </div>
+   809→        </CardHeader>
+   810→
+   811→        <CardContent className="p-0">
+   812→          {/* ─── Table ─── */}
+   813→          <div className="overflow-x-auto">
+   814→            <Table>
+   815→              <TableHeader>
+   816→                <TableRow className="bg-slate-50 hover:bg-slate-50">
+   817→                  <TableHead className="font-semibold" style={{ color: BLEU_MARINE }}>
+   818→                    Voyage
+   819→                  </TableHead>
+   820→                  <TableHead className="font-semibold" style={{ color: BLEU_MARINE }}>
+   821→                    Statut
+   822→                  </TableHead>
+   823→                  <TableHead className="font-semibold" style={{ color: BLEU_MARINE }}>
+   824→                    OTP
+   825→                  </TableHead>
+   826→                  <TableHead className="font-semibold text-center" style={{ color: BLEU_MARINE }}>
+   827→                    Pèlerins
+   828→                  </TableHead>
+   829→                  <TableHead className="font-semibold text-center" style={{ color: BLEU_MARINE }}>
+   830→                    Bagages
+   831→                  </TableHead>
+   832→                  <TableHead className="font-semibold" style={{ color: BLEU_MARINE }}>
+   833→                    Départ
+   834→                  </TableHead>
+   835→                  <TableHead className="font-semibold text-right" style={{ color: BLEU_MARINE }}>
+   836→                    Actions
+   837→                  </TableHead>
+   838→                </TableRow>
+   839→              </TableHeader>
+   840→
+   841→              <TableBody>
+   842→                {loading ? (
+   843→                  /* Skeleton rows */
+   844→                  Array.from({ length: 5 }).map((_, i) => (
+   845→                    <TableRow key={i}>
+   846→                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+   847→                      <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+   848→                      <TableCell><Skeleton className="h-5 w-16 font-mono" /></TableCell>
+   849→                      <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
+   850→                      <TableCell><Skeleton className="h-4 w-8 mx-auto" /></TableCell>
+   851→                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+   852→                      <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+   853→                    </TableRow>
+   854→                  ))
+   855→                ) : trips.length === 0 ? (
+   856→                  /* Empty state */
+   857→                  <TableRow>
+   858→                    <TableCell colSpan={7} className="h-32 text-center">
+   859→                      <div className="flex flex-col items-center gap-2 text-slate-400">
+   860→                        <Plane className="w-8 h-8 opacity-50" />
+   861→                        <p className="font-medium">Aucun voyage trouvé</p>
+   862→                        <p className="text-xs">
+   863→                          Créez votre premier voyage en cliquant sur &quot;Nouveau Voyage&quot;
+   864→                        </p>
+   865→                      </div>
+   866→                    </TableCell>
+   867→                  </TableRow>
+   868→                ) : (
+   869→                  /* Trip rows */
+   870→                  trips.map((trip, idx) => (
+   871→                    <TableRow
+   872→                      key={trip.id}
+   873→                      className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+   874→                        idx % 2 === 1 ? 'bg-slate-50/50' : ''
+   875→                      }`}
+   876→                      onClick={() => router.push(`/agency/trips/${trip.id}`)}
+   877→                    >
+   878→                      {/* Voyage name + description */}
+   879→                      <TableCell>
+   880→                        <div className="flex items-center gap-2">
+   881→                          <div
+   882→                            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+   883→                            style={{ backgroundColor: `${JAUNE}15` }}
+   884→                          >
+   885→                            {getTransportIcon(trip.transportMode)}
+   886→                          </div>
+   887→                          <div className="min-w-0">
+   888→                            <p className="font-medium text-sm truncate" style={{ color: BLEU_MARINE }}>
+   889→                              {trip.name}
+   890→                            </p>
+   891→                            {trip.description && (
+   892→                              <p className="text-xs text-slate-400 truncate max-w-[200px]">
+   893→                                {trip.description}
+   894→                              </p>
+   895→                            )}
+   896→                          </div>
+   897→                        </div>
+   898→                      </TableCell>
+   899→
+   900→                      {/* Status */}
+   901→                      <TableCell>{getStatusBadge(trip.status)}</TableCell>
+   902→
+   903→                      {/* OTP */}
+   904→                      <TableCell>
+   905→                        <div className="flex items-center gap-1.5">
+   906→                          <span
+   907→                            className="font-mono text-sm font-bold tracking-widest px-2 py-0.5 rounded"
+   908→                            style={{
+   909→                              backgroundColor: `${BLEU_MARINE}08`,
+   910→                              color: BLEU_MARINE,
+   911→                            }}
+   912→                          >
+   913→                            {trip.otp}
+   914→                          </span>
+   915→                          <button
+   916→                            onClick={(e) => {
+   917→                              e.stopPropagation();
+   918→                              copyToClipboard(trip.otp, 'OTP');
+   919→                            }}
+   920→                            className="p-1 rounded hover:bg-slate-200 transition-colors text-slate-400 hover:text-slate-600"
+   921→                            title="Copier l'OTP"
+   922→                          >
+   923→                            <Copy className="w-3.5 h-3.5" />
+   924→                          </button>
+   925→                        </div>
+   926→                      </TableCell>
+   927→
+   928→                      {/* Pèlerins */}
+   929→                      <TableCell className="text-center">
+   930→                        <span className="inline-flex items-center gap-1 text-sm font-medium">
+   931→                          <Users className="w-3.5 h-3.5 text-slate-400" />
+   932→                          {trip.pilgrimCount || trip.totalPilgrims || 0}
+   933→                        </span>
+   934→                      </TableCell>
+   935→
+   936→                      {/* Bagages */}
+   937→                      <TableCell className="text-center">
+   938→                        <span className="inline-flex items-center gap-1 text-sm font-medium">
+   939→                          <Luggage className="w-3.5 h-3.5 text-slate-400" />
+   940→                          {trip.bagCount || trip.totalBags || 0}
+   941→                        </span>
+   942→                      </TableCell>
+   943→
+   944→                      {/* Départ */}
+   945→                      <TableCell>
+   946→                        <span className="text-sm text-slate-600">
+   947→                          {formatDate(trip.departureDate)}
+   948→                        </span>
+   949→                      </TableCell>
+   950→
+   951→                      {/* Actions */}
+   952→                      <TableCell className="text-right">
+   953→                        <div className="flex items-center justify-end gap-1">
+   954→                          <Button
+   955→                            variant="ghost"
+   956→                            size="sm"
+   957→                            className="gap-1 text-xs h-8"
+   958→                            style={{ color: BLEU_MARINE }}
+   959→                            onClick={(e) => {
+   960→                              e.stopPropagation();
+   961→                              router.push(`/agency/trips/${trip.id}`);
+   962→                            }}
+   963→                          >
+   964→                            <Eye className="w-3.5 h-3.5" />
+   965→                            <span className="hidden sm:inline">Voir</span>
+   966→                          </Button>
+   967→                          <Button
+   968→                            variant="ghost"
+   969→                            size="sm"
+   970→                            className="gap-1 text-xs h-8"
+   971→                            style={{ color: JAUNE }}
+   972→                            disabled={regeneratingId === trip.id}
+   973→                            onClick={(e) => {
+   974→                              e.stopPropagation();
+   975→                              handleRegenerateOTP(trip.id, trip.name);
+   976→                            }}
+   977→                          >
+   978→                            {regeneratingId === trip.id ? (
+   979→                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+   980→                            ) : (
+   981→                              <RefreshCw className="w-3.5 h-3.5" />
+   982→                            )}
+   983→                            <span className="hidden sm:inline">OTP</span>
+   984→                          </Button>
+   985→                        </div>
+   986→                      </TableCell>
+   987→                    </TableRow>
+   988→                  ))
+   989→                )}
+   990→              </TableBody>
+   991→            </Table>
+   992→          </div>
+   993→
+   994→          {/* ─── Pagination ─── */}
+   995→          {!loading && totalPages > 1 && (
+   996→            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+   997→              <p className="text-xs text-slate-500">
+   998→                Page {currentPage} sur {totalPages} · {totalTrips} voyage{totalTrips > 1 ? 's' : ''}
+   999→              </p>
+  1000→              <div className="flex items-center gap-1">
+  1001→                <Button
+  1002→                  variant="outline"
+  1003→                  size="sm"
+  1004→                  className="h-8 w-8 p-0"
+  1005→                  disabled={currentPage <= 1}
+  1006→                  onClick={() => goToPage(currentPage - 1)}
+  1007→                >
+  1008→                  <ChevronLeft className="w-4 h-4" />
+  1009→                </Button>
+  1010→                {/* Page numbers */}
+  1011→                {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+  1012→                  let page: number;
+  1013→                  if (totalPages <= 5) {
+  1014→                    page = i + 1;
+  1015→                  } else if (currentPage <= 3) {
+  1016→                    page = i + 1;
+  1017→                  } else if (currentPage >= totalPages - 2) {
+  1018→                    page = totalPages - 4 + i;
+  1019→                  } else {
+  1020→                    page = currentPage - 2 + i;
+  1021→                  }
+  1022→                  return (
+  1023→                    <Button
+  1024→                      key={page}
+  1025→                      variant={currentPage === page ? 'default' : 'outline'}
+  1026→                      size="sm"
+  1027→                      className="h-8 w-8 p-0 text-xs"
+  1028→                      style={
+  1029→                        currentPage === page
+  1030→                          ? { backgroundColor: JAUNE, color: 'white' }
+  1031→                          : {}
+  1032→                      }
+  1033→                      onClick={() => goToPage(page)}
+  1034→                    >
+  1035→                      {page}
+  1036→                    </Button>
+  1037→                  );
+  1038→                })}
+  1039→                <Button
+  1040→                  variant="outline"
+  1041→                  size="sm"
+  1042→                  className="h-8 w-8 p-0"
+  1043→                  disabled={currentPage >= totalPages}
+  1044→                  onClick={() => goToPage(currentPage + 1)}
+  1045→                >
+  1046→                  <ChevronRight className="w-4 h-4" />
+  1047→                </Button>
+  1048→              </div>
+  1049→            </div>
+  1050→          )}
+  1051→        </CardContent>
+  1052→      </Card>
+  1053→    </div>
+  1054→  );
+  1055→}
+  1056→

@@ -14,12 +14,14 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   LayoutDashboard,
   Smartphone,
+  Plane,
   LogOut,
   Menu,
   X,
   Clock,
   ChevronLeft,
   ChevronRight,
+  QrCode,
 } from 'lucide-react';
 
 /* ══════════════════════════════════════════════════════════
@@ -30,6 +32,11 @@ const NAV_ITEMS = [
   {
     label: 'Dashboard',
     icon: LayoutDashboard,
+    href: '/agency/dashboard',
+  },
+  {
+    label: 'Voyages',
+    icon: Plane,
     href: '/agency/dashboard',
   },
   {
@@ -205,7 +212,7 @@ function Sidebar({
               const Icon = item.icon;
 
               return (
-                <li key={item.href}>
+                <li key={item.label}>
                   <Link
                     href={item.href}
                     className={`
@@ -476,9 +483,19 @@ export default function AgencyLayout({
         <footer className="border-t border-slate-200 px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between text-xs text-slate-400">
             <span>&copy; {new Date().getFullYear()} PassHajj — Espace Agence</span>
-            <span className="hidden sm:inline">
-              Tous droits réservés
-            </span>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/agency/pwa"
+                className="flex items-center gap-1.5 hover:text-[#f4b400] transition-colors font-medium"
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">QR Code PWA</span>
+                <span className="sm:hidden">PWA</span>
+              </Link>
+              <span className="hidden sm:inline">
+                Tous droits réservés
+              </span>
+            </div>
           </div>
         </footer>
       </div>

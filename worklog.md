@@ -218,3 +218,29 @@ Stage Summary:
 - Sidebar navigation updated with Smartphone icon + "Application" label
 - Browser-verified: login → dashboard → Application sidebar → PWA page renders correctly
 - No new lint errors, responsive on mobile/tablet/desktop
+
+---
+Task ID: 1-4
+Agent: Main Agent
+Task: Fix PWA QR code, add OTP button, add Voyage sidebar tab, add QR code footer link
+
+Work Log:
+- Fixed PWA QR code URL: Changed from hardcoded `https://passhajj.com/manager` to dynamic `${window.location.origin}/manager` so QR code works in any environment
+- Added `useMemo` for dynamic PWA URL computation in `/src/app/agency/pwa/page.tsx`
+- Added dedicated "Générer OTP" button in dashboard header with `KeyRound` icon
+- Added `shareOtp()` function using Web Share API (falls back to clipboard) that formats a complete WhatsApp/SMS-ready message with OTP, trip name, and PWA link
+- Added "Partager l'OTP" button in OTP success dialog (primary action, yellow)
+- Added "Copier" and "Copier le lien PWA" buttons in OTP success dialog
+- Added "Partager" button in each trip's table row actions (uses `Share2` icon)
+- Fixed PWA link URL in OTP dialog (was hardcoded, now dynamic)
+- Added "Voyages" tab in agency sidebar with `Plane` icon (links to `/agency/dashboard`)
+- Added QR Code PWA link in footer with `QrCode` icon (links to `/agency/pwa`)
+- Added `Plane`, `QrCode`, `KeyRound`, `Share2`, `Smartphone` icons to respective imports
+- Verified all changes with Agent Browser (sidebar, buttons, footer, PWA page all working)
+
+Stage Summary:
+- PWA QR code now generates correct dynamic URL based on current host
+- Dashboard has prominent "Générer OTP" quick-action button
+- OTP sharing via Web Share API (WhatsApp, SMS, etc.) with formatted message
+- Agency sidebar has 3 items: Dashboard, Voyages, Application
+- Footer has QR Code PWA link for quick access to install page
