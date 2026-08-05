@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyPassword, generateToken, loginSchema } from '@/lib/passhajj-utils';
+import { createSession, logLoginAttempt } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,15 +17,26 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = parsed.data;
 
-    const user = await db.user.findUnique({ where: { email } });
+    const user = await db.user.findUnique({
+      where: { email },
+      include: { agency: { select: { id: true, name: true, slug: true, email: true, phone: true, address: true } } },
+    });
     if (!user || !user.password) {
+      await logLoginAttempt({ email, success: false, failureReason: 'User not found' });
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
     }
 
     const valid = await verifyPassword(password, user.password);
     if (!valid) {
+      await logLoginAttempt({ userId: user.id, email, success: false, failureReason: 'Invalid password' });
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
     }
+
+    // Create server-side session (sets HTTP-only cookie)
+    await createSession(user.id);
+
+    // Log successful login
+    await logLoginAttempt({ userId: user.id, email, success: true });
 
     const accessToken = generateToken({
       userId: user.id,
@@ -33,7 +45,6 @@ export async function POST(request: NextRequest) {
       agencyId: user.agencyId || undefined,
     });
 
-    // Generate a simple refresh token (matches Express backend response format)
     const refreshToken = generateToken({
       userId: user.id,
       email: user.email,
@@ -49,6 +60,7 @@ export async function POST(request: NextRequest) {
         name: user.name,
         role: user.role,
         agencyId: user.agencyId,
+        agency: user.agency,
       },
       accessToken,
       refreshToken,
