@@ -305,33 +305,30 @@ export interface AgencyLoginResponse {
   refreshToken: string;
 }
 
-/** Agency login → POST /api/auth/login (Express JWT) */
+/** Agency login → POST /api/auth/agency-login (Next.js API route) */
 export async function agencyLogin(email: string, password: string): Promise<AgencyLoginResponse> {
-  const { data } = await expressApi.post<AgencyLoginResponse>('/auth/login', { email, password }, {
-    headers: { 'No-Auth': 'true' }, // Don't attach existing token
-  });
+  const { data } = await nextApi.post('/auth/agency-login', { email, password });
+  // Adapt Next.js API response format to match AgencyLoginResponse
+  const result: AgencyLoginResponse = {
+    user: data.user,
+    accessToken: data.token,
+    refreshToken: data.token, // Next.js route returns a single JWT token
+  };
   // Store tokens
-  setAgencyTokens(data.accessToken, data.refreshToken);
-  setAgencyUser(data.user);
-  return data;
+  setAgencyTokens(result.accessToken, result.refreshToken);
+  setAgencyUser(result.user);
+  return result;
 }
 
-/** Agency logout → POST /api/auth/logout (Express) */
+/** Agency logout → Clear local tokens */
 export async function agencyLogout(): Promise<void> {
-  const refreshToken = typeof window !== 'undefined' ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
-  try {
-    await expressApi.post('/auth/logout', { refreshToken });
-  } catch {
-    // Ignore logout errors
-  } finally {
-    clearAgencyAuth();
-  }
+  clearAgencyAuth();
 }
 
-/** Get current user profile → GET /api/auth/me (Express) */
+/** Get current user profile → from stored user data */
 export async function agencyGetMe(): Promise<{ user: any }> {
-  const { data } = await expressApi.get('/auth/me');
-  return data;
+  const user = getAgencyUser();
+  return { user };
 }
 
 // ═══════════════════════════════════════════════════════════════
