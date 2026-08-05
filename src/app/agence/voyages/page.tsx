@@ -25,6 +25,7 @@ import {
   ChevronLeft,
   Hotel,
   CheckSquare,
+  Trash2,
   Square,
   AlertCircle,
 } from 'lucide-react';
@@ -216,6 +217,7 @@ export default function VoyagesPage() {
 
   // ── Regenerate state ─────────────────────────────────
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // ── Fetch trips ──────────────────────────────────────
   const fetchTrips = useCallback(async () => {
@@ -448,6 +450,29 @@ export default function VoyagesPage() {
       toast.error('Erreur réseau');
     } finally {
       setRegeneratingId(null);
+    }
+  }
+
+  // ── Delete trip ───────────────────────────────────────
+  async function handleDeleteTrip(tripId: string, tripName: string) {
+    if (!confirm(`Supprimer le voyage \u00AB ${tripName} \u00BB ? Cette action est irréversible.`)) return;
+    setDeletingId(tripId);
+    try {
+      const response = await fetch(`/api/agency/trips/${tripId}?agencyId=${agencyId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        toast.error(data.error || 'Erreur lors de la suppression');
+        return;
+      }
+      toast.success(`Voyage \u00AB ${tripName} \u00BB supprimé`);
+      fetchTrips();
+    } catch {
+      toast.error('Erreur réseau');
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -1187,7 +1212,7 @@ export default function VoyagesPage() {
                           className="h-8 gap-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                           asChild
                         >
-                          <a href={`/agency/trips/${trip.id}`}>
+                          <a href={`/agence/voyages/${trip.id}`}>
                             <Eye className="w-3.5 h-3.5" />
                             <span className="hidden sm:inline">Voir</span>
                           </a>
@@ -1218,6 +1243,22 @@ export default function VoyagesPage() {
                         >
                           <Share2 className="w-3.5 h-3.5" />
                           <span className="hidden lg:inline">Partager</span>
+                        </Button>
+
+                        {/* Supprimer */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1 hover:text-red-600"
+                          onClick={() => handleDeleteTrip(trip.id, trip.name)}
+                          disabled={deletingId === trip.id}
+                        >
+                          {deletingId === trip.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                          <span className="hidden lg:inline">Supprimer</span>
                         </Button>
                       </div>
                     </TableCell>

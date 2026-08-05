@@ -140,3 +140,37 @@ export async function PATCH(
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
+
+// DELETE - Delete a trip and unassign its pilgrims
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const result = await resolveAgencyId(request);
+    if (result instanceof Response) return result;
+    const { agencyId } = result;
+
+    const { id } = await params;
+
+    // Check trip exists and belongs to this agency
+    const existing = await db.trip.findFirst({ where: { id, agencyId } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Voyage non trouvé' }, { status: 404 });
+    }
+
+    // Unassign pilgrims from this trip (set tripId to null)
+    await db.pilgrim.updateMany({
+      where: { tripId: id },
+      data: { tripId: null },
+    });
+
+    // Delete the trip (cascading will handle bags, groups, scans, incidents)
+    await db.trip.delete({ where: { id } });
+
+    return NextResponse.json({ success: true, message: 'Voyage supprimé' });
+  } catch (error) {
+    console.error('[Agency Trip DELETE] Error:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}
