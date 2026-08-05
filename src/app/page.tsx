@@ -110,7 +110,7 @@ function HeroSection() {
     <section className="relative min-h-[100svh] flex items-center overflow-hidden">
       {/* Background image */}
       <Image
-        src="/images/landing-v2/hero.jpg"
+        src="/hajj-airport.png"
         alt=""
         fill
         className="object-cover"
@@ -130,7 +130,7 @@ function HeroSection() {
         <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: JAUNE_LIGHT }} />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
         <div className="max-w-2xl">
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} custom={0}>
@@ -218,7 +218,7 @@ function AboutSection() {
     <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_LIGHT }}>
       <BlurOrb size="h-40 w-40" color={JAUNE} opacity={0.15} position="-top-20 -right-20" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Image */}
           <motion.div
@@ -330,7 +330,7 @@ function SolutionsSection() {
     <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
       <BlurOrb size="h-64 w-64" color={JAUNE} opacity={0.1} position="-bottom-24 -left-24" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -460,7 +460,7 @@ function FeaturesGrid() {
 
   return (
     <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_LIGHT }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -530,7 +530,7 @@ function HowItWorksSection() {
     <section id="comment" className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
       <BlurOrb size="h-40 w-40" color={NAVY} opacity={0.08} position="-top-20 -left-20" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="text-center mb-16">
           <Overline>Comment ça marche</Overline>
           <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`} style={{ color: INK }}>
@@ -577,7 +577,7 @@ function TransportSection() {
 
   return (
     <section className="py-10 border-y" style={{ backgroundColor: BG_LIGHT, borderColor: '#d7dfe5' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <p className="text-center text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: MUTED }}>
           Compatible avec tous les modes de transport
         </p>
@@ -605,7 +605,7 @@ function PricingSection() {
     <section id="tarifs" className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
       <BlurOrb size="h-64 w-64" color={JAUNE} opacity={0.08} position="-bottom-24 -right-24" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="text-center mb-16">
           <Overline>Nos offres</Overline>
           <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`} style={{ color: INK }}>
@@ -730,7 +730,7 @@ function TestimonialsSection() {
     <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_LIGHT }}>
       <BlurOrb size="h-40 w-40" color={NAVY} opacity={0.08} position="-top-20 -right-20" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="text-center mb-16">
           <Overline>Témoignages</Overline>
           <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`} style={{ color: INK }}>
@@ -778,7 +778,7 @@ function CTASection() {
       <BlurOrb size="h-96 w-96" color={JAUNE} opacity={0.12} position="top-0 right-0 translate-x-1/3 -translate-y-1/4" />
       <BlurOrb size="h-72 w-72" color={JAUNE_LIGHT} opacity={0.08} position="bottom-0 left-0 -translate-x-1/3 translate-y-1/4" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
           <motion.div variants={fadeUp}>
             <Overline color={JAUNE_LIGHT}>Prêt ?</Overline>

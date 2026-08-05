@@ -528,16 +528,18 @@ export default function AgencyRootLayout({
             {children}
           </main>
 
-          {/* Footer avec lien QR Code PWA */}
+          {/* Footer avec QR Code PWA visible */}
           <footer className="border-t border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3">
             <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
               <span>&copy; {new Date().getFullYear()} PassHajj — Espace Agence</span>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <Link
                   href="/agence/application"
-                  className="flex items-center gap-1.5 hover:text-[#f4b400] transition-colors font-medium"
+                  className="flex items-center gap-2 hover:text-[#f4b400] transition-colors font-medium"
                 >
-                  <QrCode className="w-3.5 h-3.5" />
+                  <div className="bg-white dark:bg-slate-800 rounded p-1 shadow-sm">
+                    <QrCode className="w-5 h-5 text-[#1e3a5f] dark:text-[#f4b400]" />
+                  </div>
                   <span className="hidden sm:inline">QR Code PWA</span>
                   <span className="sm:hidden">PWA</span>
                 </Link>

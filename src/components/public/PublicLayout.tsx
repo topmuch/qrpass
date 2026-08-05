@@ -13,6 +13,7 @@ import {
   Instagram,
   MapPin,
   Play,
+  Smartphone,
 } from "lucide-react";
 import RGPDConsent from './RGPDConsent';
 
@@ -29,11 +30,11 @@ export function PublicNavigation() {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm border-b border-slate-100' : 'bg-white/70 backdrop-blur-lg'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} priority />
+            <Image src="/logo.png" alt="PassHajj" width={210} height={81} style={{ objectFit: 'contain', borderRadius: '16px', padding: '6px', background: 'rgba(255,255,255,0.9)' }} priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -96,12 +97,12 @@ export function PublicNavigation() {
 export function PublicFooter() {
   return (
     <footer className="bg-slate-900 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1600px] mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Logo */}
           <div>
             <div className="mb-4">
-              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/logo.png" alt="PassHajj" width={210} height={81} style={{ objectFit: 'contain', borderRadius: '16px', padding: '6px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <p className="text-white/50 text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
@@ -156,6 +157,20 @@ export function PublicFooter() {
             </a>
             <a href="#" className="w-9 h-9 bg-white/[0.05] hover:bg-white/[0.1] rounded-lg flex items-center justify-center transition-all">
               <Twitter className="w-4 h-4 text-white/50 hover:text-white transition-colors" />
+            </a>
+          </div>
+
+          {/* PWA QR Code */}
+          <div className="flex items-center gap-3">
+            <div className="bg-white rounded-lg p-1.5">
+              <QrCode className="w-5 h-5 text-slate-900" />
+            </div>
+            <a
+              href="/manager"
+              className="text-white/40 hover:text-white text-sm flex items-center gap-1 transition-colors"
+            >
+              <Smartphone className="w-4 h-4" />
+              PWA Manager
             </a>
           </div>
 
