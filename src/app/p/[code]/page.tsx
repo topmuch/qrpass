@@ -132,6 +132,7 @@ const translations = {
     reportSuccess: 'Signalement envoyé !',
     // Emergency
     emerTitle: 'Urgence Médicale',
+    emerDirect: 'Appel direct',
     // Footer
     footer: 'PassHajj — Protection intelligente Hajj & Omrah',
     // States
@@ -198,6 +199,7 @@ const translations = {
     reportMsg: 'Message (optional)',
     reportSuccess: 'Report sent!',
     emerTitle: 'Medical Emergency',
+    emerDirect: 'Direct call',
     footer: 'PassHajj — Smart Hajj & Umrah Protection',
     notFound: 'QR code not recognized',
     notFoundDesc: 'This code does not match any registered Pass Identity bracelet.',
@@ -260,6 +262,7 @@ const translations = {
     reportMsg: 'رسالة (اختياري)',
     reportSuccess: 'تم إرسال البلاغ!',
     emerTitle: 'طوارئ طبية',
+    emerDirect: 'اتصال مباشر',
     footer: 'PassHajj — حماية ذكية للحج والعمرة',
     notFound: 'رمز QR غير معروف',
     notFoundDesc: 'هذا الرمز لا يتطابق مع أي سوار Pass Identity مسجل.',
@@ -854,11 +857,11 @@ export default function PilgrimScanPage() {
                 className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
                 style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
-                <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
-                  🚑 {t('emerTitle')}
+                <h3 className="text-xl font-extrabold mb-2 text-center flex items-center justify-center gap-2" style={{ color: TEXT }}>
+                  <span className="text-3xl">🚑</span> {t('emerTitle')}
                 </h3>
-                <p className="text-xs text-center mb-3" style={{ color: MUTED }}>
-                  Appel direct vers le 997 / 911
+                <p className="text-base font-bold text-center mb-4" style={{ color: DANGER }}>
+                  {t('emerDirect')}
                 </p>
                 <div className="flex justify-center gap-4">
                   <a
@@ -1053,43 +1056,39 @@ export default function PilgrimScanPage() {
                     let buttonLabel: string;
                     let waMessage: string;
 
+                    buttonLabel = t('reassureFamily');
+
                     if (holySite === 'medina') {
-                      buttonLabel = t('reassureMedina');
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، أنا في المدينة المنورة، كل شيء على ما يرام، أستريح قبل الحج، أراكم قريباً إن شاء الله'
                         : lang === 'en'
                           ? 'Hello family, I am in Medina, everything is going well, I am resting before Hajj, see you soon insha\'Allah'
                           : 'Bonjour la famille, je suis à Médine, tout se passe bien, je me repose avant le Hajj, à très bientôt inch\'Allah';
                     } else if (holySite === 'mina') {
-                      buttonLabel = t('reassureMina');
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، حالياً أنا في منى لأداء الحج، المرحلة التالية هي عرفات، كل شيء على ما يرام والحمد لله'
                         : lang === 'en'
                           ? 'Hello family, I am currently performing Hajj at Mina, the next step is Arafat, everything is going well alhamdulillah'
                           : 'Bonjour la famille, actuellement je suis en train de faire le Hajj à Mina, la prochaine étape c\'est Arafat, sinon tout se passe bien je vais super bien merci';
                     } else if (holySite === 'arafat') {
-                      buttonLabel = lang === 'ar' ? '💬 أنا في عرفات — أخبر العائلة' : lang === 'en' ? '💬 I\'m at Arafat — Tell family' : '💬 Je suis à Arafat — Dire à la famille';
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، حالياً أنا في عرفات في أهم يوم من الحج، المرحلة التالية هي مزدلفة، كل شيء على ما يرام والحمد لله'
                         : lang === 'en'
                           ? 'Hello family, I am at Arafat for the most important day of Hajj, the next step is Muzdalifah, everything is going well alhamdulillah'
                           : 'Bonjour la famille, actuellement je suis à Arafat pour le jour le plus important du Hajj, la prochaine étape c\'est Muzdalifah, tout se passe bien alhamdulillah';
                     } else if (holySite === 'muzdalifah') {
-                      buttonLabel = lang === 'ar' ? '💬 أنا في مزدلفة — أخبر العائلة' : lang === 'en' ? '💬 I\'m at Muzdalifah — Tell family' : '💬 Je suis à Muzdalifah — Dire à la famille';
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، أنا في مزدلفة، المرحلة التالية هي العودة إلى منى لرمي الجمرات، كل شيء على ما يرام شكراً'
                         : lang === 'en'
                           ? 'Hello family, I am at Muzdalifah, the next step is returning to Mina for the stoning, everything is going well thank you'
                           : 'Bonjour la famille, je suis à Muzdalifah, la prochaine étape c\'est le retour à Mina pour le lancer de pierres, tout se passe bien merci';
                     } else if (holySite === 'mecca') {
-                      buttonLabel = lang === 'ar' ? '💬 مرحبا أنا في مكة للطواف' : lang === 'en' ? '💬 I\'m in Mecca for Tawaf' : '💬 Je suis à la Mecque pour le Tawaf';
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، أنا في مكة المكرمة للطواف، كل شيء على ما يرام والحمد لله، أراكم قريباً إن شاء الله'
                         : lang === 'en'
                           ? 'Hello family, I am in Mecca for the Tawaf, everything is going well alhamdulillah, see you soon insha\'Allah'
                           : 'Bonjour la famille, je suis à la Mecque pour le Tawaf, tout se passe bien alhamdulillah, à très bientôt inch\'Allah';
                     } else {
-                      buttonLabel = t('reassureDefault');
                       waMessage = lang === 'ar'
                         ? 'مرحبا بالعائلة، كل شيء على ما يرام، أنا بخير جداً شكراً، أراكم قريباً إن شاء الله'
                         : lang === 'en'
