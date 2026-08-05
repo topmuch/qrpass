@@ -26,7 +26,8 @@ import {
   Copy,
   ShoppingCart,
   MoreVertical,
-  UserRound
+  UserRound,
+  Smartphone
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -80,6 +81,7 @@ function Sidebar({ isOpen, setIsOpen, unreadMessages, onLogout, userName, agency
     { label: "Trouvailles", icon: <CheckCircle className="w-5 h-5" />, href: "/agence/trouvailles" },
     { label: "Perdus", icon: <AlertTriangle className="w-5 h-5" />, href: "/agence/perdus" },
     { label: "Rapports", icon: <BarChart3 className="w-5 h-5" />, href: "/agence/rapports" },
+    { label: "Application", icon: <Smartphone className="w-5 h-5" />, href: "/agence/application" },
     { label: "Profil", icon: <User className="w-5 h-5" />, href: "/agence/profil" },
   ];
 
