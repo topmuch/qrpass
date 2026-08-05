@@ -72,3 +72,4 @@ db/*.db-journal
 
 # OS
 Thumbs.dbtool-results/
+tool-results/

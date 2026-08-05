@@ -86,6 +86,9 @@ export async function POST(request: NextRequest) {
     const otp = await generateUniqueOtp();
     const otpExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
 
+    // Extract pilgrimIds from body (not part of zod schema)
+    const pilgrimIds: string[] = Array.isArray(body.pilgrimIds) ? body.pilgrimIds : [];
+
     const trip = await db.trip.create({
       data: {
         name: data.name,
@@ -96,12 +99,37 @@ export async function POST(request: NextRequest) {
         returnDate: data.returnDate ? new Date(data.returnDate) : null,
         destination: data.destination || null,
         transportMode: data.transportMode,
+        totalPilgrims: pilgrimIds.length,
       },
+    });
+
+    // Assign pilgrims to this trip (only if they belong to the same agency and are not already in a trip)
+    if (pilgrimIds.length > 0) {
+      const assignedPilgrims = await db.pilgrim.updateMany({
+        where: {
+          id: { in: pilgrimIds },
+          agencyId,
+          tripId: null, // Only unassigned pilgrims
+        },
+        data: { tripId: trip.id },
+      });
+
+      // Update totalPilgrims with actual count of assigned pilgrims
+      await db.trip.update({
+        where: { id: trip.id },
+        data: { totalPilgrims: assignedPilgrims.count },
+      });
+    }
+
+    // Fetch the trip with counts for the response
+    const createdTrip = await db.trip.findUnique({
+      where: { id: trip.id },
+      include: { _count: { select: { pilgrims: true, bags: true } } },
     });
 
     return NextResponse.json({
       success: true,
-      trip,
+      trip: createdTrip || trip,
       otp, // Return OTP so agency can share it with group leader
     }, { status: 201 });
   } catch (error) {

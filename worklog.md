@@ -244,3 +244,29 @@ Stage Summary:
 - OTP sharing via Web Share API (WhatsApp, SMS, etc.) with formatted message
 - Agency sidebar has 3 items: Dashboard, Voyages, Application
 - Footer has QR Code PWA link for quick access to install page
+
+---
+Task ID: 1
+Agent: main
+Task: Implement simplified voyage creation flow (3-step wizard)
+
+Work Log:
+- Modified /api/agency/pilgrims/route.ts to include tripId in response and support onlyActive=true & unassigned=true filters
+- Modified /api/agency/trips/route.ts POST to accept pilgrimIds array and auto-assign pilgrims to new trip
+- Rewrote /agence/voyages/page.tsx with new 3-step wizard flow:
+  - Step 1: Select activated QR codes grouped by hotel (hotelMecca + hotelMedina)
+  - Step 2: Trip details (name, dates, destination, transport mode)
+  - Step 3: Confirmation with ORP/OTP display, share, and copy buttons
+- Renamed OTP to ORP throughout the UI for consistency
+- Replaced "Générer OTP + Nouveau Voyage" button with simpler "Créer le Voyage" button
+- Added step indicator with visual progress
+- Added group-by-hotel UI with expand/collapse and select-all functionality
+- Added validation: requires trip name and departure date
+- Tested with Agent Browser - all elements render correctly, no console errors
+
+Stage Summary:
+- New 3-step wizard flow implemented: Sélection → Détails → Confirmation
+- Pilgrims grouped automatically by hotel (Option 1: YES)
+- Only unassigned pilgrims shown (Option 2: YES)
+- ORP generated per voyage (Option 3: YES - PAR VOYAGE)
+- API endpoints updated to support pilgrim assignment during trip creation

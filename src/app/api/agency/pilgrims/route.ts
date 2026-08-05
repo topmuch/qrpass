@@ -41,11 +41,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Build filter
+    const filter: Record<string, unknown> = { agencyId: agencyId };
+
+    // Support filtering: onlyActive=true → isActive=true, tripId=null (activated but not yet in a trip)
+    const onlyActive = searchParams.get('onlyActive') === 'true';
+    const unassigned = searchParams.get('unassigned') === 'true';
+    if (onlyActive) filter.isActive = true;
+    if (unassigned) filter.tripId = null;
+
     // Find pilgrims directly by agencyId (set at generation time)
     const pilgrims = await db.pilgrim.findMany({
-      where: {
-        agencyId: agencyId,
-      },
+      where: filter,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -54,6 +61,8 @@ export async function GET(request: NextRequest) {
         id: p.id,
         qrCode: p.qrCode,
         fullName: p.fullName,
+        firstName: p.firstName,
+        lastName: p.lastName,
         nationality: p.nationality,
         photoUrl: p.photoUrl,
         bloodType: p.bloodType,
@@ -69,6 +78,7 @@ export async function GET(request: NextRequest) {
         isActive: p.isActive,
         duration: p.duration,
         expiresAt: p.expiresAt?.toISOString() || null,
+        tripId: p.tripId,
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
       })),
