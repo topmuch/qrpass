@@ -108,6 +108,7 @@ export async function GET(
           roomMedina: pilgrim.roomMedina,
           hotelCoords: pilgrim.hotelCoords,
           hotelAddress: pilgrim.hotelAddress,
+          hotelPhone: pilgrim.hotelPhone,
           groupLeaderPhone: pilgrim.groupLeaderPhone,
           agencyPhone: pilgrim.agencyPhone,
           familyContact: pilgrim.familyContact,
@@ -170,6 +171,8 @@ export async function PUT(
     if (body.hotelMedina !== undefined) updateData.hotelMedina = body.hotelMedina || null;
     if (body.roomMedina !== undefined) updateData.roomMedina = body.roomMedina || null;
     if (body.hotelCoords !== undefined) updateData.hotelCoords = body.hotelCoords || null;
+    if (body.hotelAddress !== undefined) updateData.hotelAddress = body.hotelAddress || null;
+    if (body.hotelPhone !== undefined) updateData.hotelPhone = body.hotelPhone || null;
     if (body.groupLeaderPhone !== undefined) updateData.groupLeaderPhone = body.groupLeaderPhone || null;
     if (body.agencyPhone !== undefined) updateData.agencyPhone = body.agencyPhone || null;
     if (body.familyContact !== undefined) updateData.familyContact = body.familyContact || null;
@@ -250,6 +253,7 @@ export async function PUT(
           roomMedina: updated.roomMedina,
           hotelCoords: updated.hotelCoords,
           hotelAddress: updated.hotelAddress,
+          hotelPhone: updated.hotelPhone,
           groupLeaderPhone: updated.groupLeaderPhone,
           agencyPhone: updated.agencyPhone,
           familyContact: updated.familyContact,

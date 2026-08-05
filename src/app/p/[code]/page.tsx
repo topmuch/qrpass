@@ -73,6 +73,7 @@ interface PilgrimData {
   hotelAddress: string | null;
   groupLeaderPhone: string | null;
   agencyPhone: string | null;
+  hotelPhone: string | null;
   familyContact: string | null;
   alNusukDocUrl: string | null;
   isActive: boolean;
@@ -130,7 +131,7 @@ const translations = {
     reportMsg: 'Message (optionnel)',
     reportSuccess: 'Signalement envoyé !',
     // Emergency
-    emerTitle: 'Numéros d\'Urgence Saoudiens',
+    emerTitle: 'Urgence Médicale',
     // Footer
     footer: 'PassHajj — Protection intelligente Hajj & Omrah',
     // States
@@ -160,6 +161,9 @@ const translations = {
     hotelItinerary: 'Itinéraire vers l\'hôtel',
     reassureFamily: 'Rassurer la famille',
     reassureMessage: 'Je vais bien, je suis à Jeddah',
+    reassureMedina: '💬 Bonjour je vais bien je suis à Médine',
+    reassureMina: '💬 Dire à la famille que je suis à Mina',
+    reassureDefault: '💬 Bonjour la famille je vais bien tout se passe bien à bientôt',
     allergiesLabel: 'Allergies',
     diseasesLabel: 'Maladies',
     otherMedicalLabel: 'Autres infos médicales',
@@ -193,7 +197,7 @@ const translations = {
     reportPhone: 'Your WhatsApp',
     reportMsg: 'Message (optional)',
     reportSuccess: 'Report sent!',
-    emerTitle: 'Saudi Emergency Numbers',
+    emerTitle: 'Medical Emergency',
     footer: 'PassHajj — Smart Hajj & Umrah Protection',
     notFound: 'QR code not recognized',
     notFoundDesc: 'This code does not match any registered Pass Identity bracelet.',
@@ -219,6 +223,9 @@ const translations = {
     hotelItinerary: 'Route to hotel',
     reassureFamily: 'Reassure family',
     reassureMessage: 'I am fine, I am in Jeddah',
+    reassureMedina: '💬 Hello, I am fine, I am in Medina',
+    reassureMina: '💬 Tell family I am in Mina',
+    reassureDefault: '💬 Hello family, I am fine, everything is going well, see you soon',
     allergiesLabel: 'Allergies',
     diseasesLabel: 'Diseases',
     otherMedicalLabel: 'Other medical info',
@@ -252,7 +259,7 @@ const translations = {
     reportPhone: 'الواتساب الخاص بك',
     reportMsg: 'رسالة (اختياري)',
     reportSuccess: 'تم إرسال البلاغ!',
-    emerTitle: 'أرقام الطوارئ السعودية',
+    emerTitle: 'طوارئ طبية',
     footer: 'PassHajj — حماية ذكية للحج والعمرة',
     notFound: 'رمز QR غير معروف',
     notFoundDesc: 'هذا الرمز لا يتطابق مع أي سوار Pass Identity مسجل.',
@@ -278,6 +285,9 @@ const translations = {
     hotelItinerary: 'اتجاهات إلى الفندق',
     reassureFamily: 'إطمئن العائلة',
     reassureMessage: 'أنا بخير، أنا في جدة',
+    reassureMedina: '💬 مرحبا، أنا بخير، أنا في المدينة المنورة',
+    reassureMina: '💬 أخبر العائلة أنني في منى',
+    reassureDefault: '💬 مرحبا بالعائلة، أنا بخير، كل شيء على ما يرام، أراكم قريباً',
     allergiesLabel: 'الحساسية',
     diseasesLabel: 'الأمراض',
     otherMedicalLabel: 'معلومات طبية أخرى',
@@ -321,6 +331,39 @@ function cleanPhone(phone: string): string {
 // ─── Default Mecca coords (Kaaba) ───
 const DEFAULT_LAT = 21.4225;
 const DEFAULT_LNG = 39.8262;
+
+// ─── Holy site coordinates for Caméléon button ───
+const HOLY_SITES = {
+  medina:  { lat: 24.4687, lng: 39.6142, radiusKm: 15 },  // Medina city center
+  mina:    { lat: 21.4133, lng: 39.8933, radiusKm: 5 },    // Mina tent city
+  arafat:  { lat: 21.3544, lng: 39.9844, radiusKm: 5 },    // Arafat
+  muzdalifah: { lat: 21.3866, lng: 39.9227, radiusKm: 4 }, // Muzdalifah
+  mecca:   { lat: 21.4225, lng: 39.8262, radiusKm: 10 },   // Mecca/Kaaba
+} as const;
+
+type HolySiteKey = keyof typeof HOLY_SITES;
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/** Detect the nearest holy site from GPS coordinates */
+function detectHolySite(lat: number, lng: number): HolySiteKey | null {
+  let closest: HolySiteKey | null = null;
+  let closestDist = Infinity;
+  for (const [key, site] of Object.entries(HOLY_SITES)) {
+    const dist = haversineKm(lat, lng, site.lat, site.lng);
+    if (dist < site.radiusKm && dist < closestDist) {
+      closest = key as HolySiteKey;
+      closestDist = dist;
+    }
+  }
+  return closest;
+}
 
 export default function PilgrimScanPage() {
   const { code } = useParams<{ code: string }>();
@@ -805,15 +848,18 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  1b. NUMÉROS D'URGENCE SAOUDIENS — directly below Alerte Santé
+                  1b. URGENCE MÉDICALE — direct call buttons (997 + 911)
               ═══════════════════════════════════════════════════════════ */}
               <div
                 className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
                 style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
                 <h3 className="text-sm font-bold mb-3 text-center" style={{ color: TEXT }}>
-                  {t('emerTitle')}
+                  🚑 {t('emerTitle')}
                 </h3>
+                <p className="text-xs text-center mb-3" style={{ color: MUTED }}>
+                  Appel direct vers le 997 / 911
+                </p>
                 <div className="flex justify-center gap-4">
                   <a
                     href="tel:997"
@@ -916,16 +962,29 @@ export default function PilgrimScanPage() {
 
                 {/* Itinéraire vers l'hôtel button */}
                 {activeHotel && (
-                  <a
-                    href={hotelMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: BLUE, boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
-                  >
-                    <Navigation className="w-4 h-4" />
-                    {t('hotelItinerary')}
-                  </a>
+                  <div className="space-y-2">
+                    <a
+                      href={hotelMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                      style={{ background: BLUE, boxShadow: '0 4px 12px rgba(59,130,246,0.3)' }}
+                    >
+                      <Navigation className="w-4 h-4" />
+                      {t('hotelItinerary')}
+                    </a>
+
+                    {/* 🏨 Appeler l'Hôtel button */}
+                    {(pilgrim.hotelPhone || pilgrim.agencyPhone) && (
+                      <a
+                        href={`tel:${cleanPhone(pilgrim.hotelPhone || pilgrim.agencyPhone || '')}`}
+                        className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                        style={{ background: '#0ea5e9', boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }}
+                      >
+                        🏨 Appeler l&apos;Hôtel
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -981,26 +1040,69 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  4b. RASSURER LA FAMILLE — Pre-recorded message + location link
+                  4b. RASSURER LA FAMILLE — Caméléon Button (GPS-aware)
+                  Uses geolocation to adapt the message automatically:
+                  - Medina → "💬 Bonjour je vais bien je suis à Médine"
+                  - Mina → "💬 Dire à la famille que je suis à Mina"
+                  - Unknown → "💬 Bonjour la famille je vais bien tout se passe bien à bientôt"
               ═══════════════════════════════════════════════════════════ */}
               {pilgrim.familyContact && (
                 <div className="w-full max-w-[420px] mb-4">
-                  <a
-                    href={`https://wa.me/${cleanPhone(pilgrim.familyContact)}?text=${encodeURIComponent(
-                      lang === 'ar'
-                        ? `مرحبا بالعائلة، أنا بخير، كل شيء على ما يرام، أنا في جدة${finderLat && finderLng ? `\n\n📍 موقعي: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
+                  {(() => {
+                    // ─── Caméléon: detect holy site from GPS ───
+                    const holySite = (finderLat && finderLng) ? detectHolySite(finderLat, finderLng) : null;
+
+                    // Button label & WhatsApp message based on location
+                    let buttonLabel: string;
+                    let waMessage: string;
+
+                    if (holySite === 'medina') {
+                      buttonLabel = t('reassureMedina');
+                      waMessage = lang === 'ar'
+                        ? 'مرحبا، أنا بخير، أنا في المدينة المنورة'
                         : lang === 'en'
-                          ? `Hello family, I am fine, everything is going well, I am in Jeddah${finderLat && finderLng ? `\n\n📍 My location: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
-                          : `Bonjour la famille, je vais bien, tout se passe bien, je suis à Jeddah${finderLat && finderLng ? `\n\n📍 Ma localisation: https://maps.google.com/?q=${finderLat},${finderLng}` : ''}`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                    style={{ background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
-                  >
-                    <Heart className="w-5 h-5" />
-                    {t('reassureFamily')}
-                  </a>
+                          ? 'Hello, I am fine, I am in Medina'
+                          : 'Bonjour je vais bien je suis à Médine';
+                    } else if (holySite === 'mina') {
+                      buttonLabel = t('reassureMina');
+                      waMessage = lang === 'ar'
+                        ? 'أخبر العائلة أنني في منى'
+                        : lang === 'en'
+                          ? 'Tell family I am in Mina'
+                          : 'Dire à la famille que je suis à Mina';
+                    } else if (holySite === 'arafat') {
+                      buttonLabel = lang === 'ar' ? '💬 أخبر العائلة أنني في عرفات' : lang === 'en' ? '💬 Tell family I am at Arafat' : '💬 Dire à la famille que je suis à Arafat';
+                      waMessage = lang === 'ar' ? 'أخبر العائلة أنني في عرفات' : lang === 'en' ? 'Tell family I am at Arafat' : 'Dire à la famille que je suis à Arafat';
+                    } else if (holySite === 'mecca') {
+                      buttonLabel = lang === 'ar' ? '💬 مرحبا أنا بخير أنا في مكة' : lang === 'en' ? '💬 Hello I am fine I am in Mecca' : '💬 Bonjour je vais bien je suis à la Mecque';
+                      waMessage = lang === 'ar' ? 'مرحبا، أنا بخير، أنا في مكة المكرمة' : lang === 'en' ? 'Hello, I am fine, I am in Mecca' : 'Bonjour je vais bien je suis à la Mecque';
+                    } else {
+                      buttonLabel = t('reassureDefault');
+                      waMessage = lang === 'ar'
+                        ? 'مرحبا بالعائلة، أنا بخير، كل شيء على ما يرام، أراكم قريباً'
+                        : lang === 'en'
+                          ? 'Hello family, I am fine, everything is going well, see you soon'
+                          : 'Bonjour la famille je vais bien tout se passe bien à bientôt';
+                    }
+
+                    // Append GPS link if available
+                    const locationSuffix = finderLat && finderLng
+                      ? (lang === 'ar' ? `\n\n📍 موقعي: https://maps.google.com/?q=${finderLat},${finderLng}` : lang === 'en' ? `\n\n📍 My location: https://maps.google.com/?q=${finderLat},${finderLng}` : `\n\n📍 Ma localisation: https://maps.google.com/?q=${finderLat},${finderLng}`)
+                      : '';
+
+                    return (
+                      <a
+                        href={`https://wa.me/${cleanPhone(pilgrim.familyContact!)}?text=${encodeURIComponent(waMessage + locationSuffix)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                        style={{ background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
+                      >
+                        <Heart className="w-5 h-5" />
+                        {buttonLabel}
+                      </a>
+                    );
+                  })()}
                 </div>
               )}
 

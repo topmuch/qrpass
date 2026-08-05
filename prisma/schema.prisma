@@ -577,6 +577,7 @@ model Pilgrim {
   roomMedina       String?  // Room number in Medina
   hotelCoords      Json?    // { lat: number, lng: number }
   hotelAddress     String?  // Adresse de l'hôtel
+  hotelPhone       String?  // Téléphone de l'hôtel (ex: "+966 12 557 0000")
   groupLeaderPhone String?  // WhatsApp number of group leader
   agencyPhone      String?  // Agency contact number
   familyContact    String?  // Family emergency contact
