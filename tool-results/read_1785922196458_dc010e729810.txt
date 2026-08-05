@@ -1,0 +1,656 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect } from 'react';
+     4→import { useRouter } from 'next/navigation';
+     5→import Link from 'next/link';
+     6→import { agencyLogin } from '@/services/api';
+     7→import { Button } from '@/components/ui/button';
+     8→import { Input } from '@/components/ui/input';
+     9→import { Label } from '@/components/ui/label';
+    10→import {
+    11→  Card,
+    12→  CardContent,
+    13→  CardHeader,
+    14→  CardTitle,
+    15→  CardDescription,
+    16→} from '@/components/ui/card';
+    17→import { motion, AnimatePresence } from 'framer-motion';
+    18→import {
+    19→  Mail,
+    20→  Lock,
+    21→  Eye,
+    22→  EyeOff,
+    23→  ArrowRight,
+    24→  Loader2,
+    25→  Building2,
+    26→  QrCode,
+    27→  Plane,
+    28→  Luggage,
+    29→  Globe,
+    30→  ShieldCheck,
+    31→} from 'lucide-react';
+    32→
+    33→/* ══════════════════════════════════════════════════════════
+    34→   DATA
+    35→   ══════════════════════════════════════════════════════════ */
+    36→
+    37→const STATS = [
+    38→  { value: '2M+', label: 'Bagages protégés' },
+    39→  { value: '850+', label: 'Agences partenaires' },
+    40→  { value: '45+', label: 'Pays couverts' },
+    41→  { value: '99.9%', label: 'Disponibilité' },
+    42→];
+    43→
+    44→/* ══════════════════════════════════════════════════════════
+    45→   FLOATING ICON COMPONENT
+    46→   ══════════════════════════════════════════════════════════ */
+    47→
+    48→function FloatingIcon({
+    49→  icon: Icon,
+    50→  className,
+    51→  delay = 0,
+    52→  duration = 6,
+    53→}: {
+    54→  icon: React.ElementType;
+    55→  className?: string;
+    56→  delay?: number;
+    57→  duration?: number;
+    58→}) {
+    59→  return (
+    60→    <motion.div
+    61→      className={`absolute ${className}`}
+    62→      initial={{ opacity: 0, scale: 0.6 }}
+    63→      animate={{
+    64→        opacity: [0.08, 0.18, 0.08],
+    65→        scale: [0.85, 1.1, 0.85],
+    66→        y: [0, -18, 0],
+    67→        rotate: [0, 8, -4, 0],
+    68→      }}
+    69→      transition={{
+    70→        duration,
+    71→        delay,
+    72→        repeat: Infinity,
+    73→        ease: 'easeInOut',
+    74→      }}
+    75→    >
+    76→      <Icon className="w-full h-full text-yellow-300/40" strokeWidth={1.2} />
+    77→    </motion.div>
+    78→  );
+    79→}
+    80→
+    81→/* ══════════════════════════════════════════════════════════
+    82→   FRAMER MOTION VARIANTS
+    83→   ══════════════════════════════════════════════════════════ */
+    84→
+    85→const containerVariants = {
+    86→  hidden: { opacity: 0 },
+    87→  visible: {
+    88→    opacity: 1,
+    89→    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+    90→  },
+    91→};
+    92→
+    93→const itemVariants = {
+    94→  hidden: { opacity: 0, y: 18 },
+    95→  visible: {
+    96→    opacity: 1,
+    97→    y: 0,
+    98→    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    99→  },
+   100→};
+   101→
+   102→/* ══════════════════════════════════════════════════════════
+   103→   MAIN COMPONENT
+   104→   ══════════════════════════════════════════════════════════ */
+   105→
+   106→export default function AgencyLoginPage() {
+   107→  const router = useRouter();
+   108→
+   109→  const [email, setEmail] = useState('');
+   110→  const [password, setPassword] = useState('');
+   111→  const [showPassword, setShowPassword] = useState(false);
+   112→  const [error, setError] = useState('');
+   113→  const [loading, setLoading] = useState(false);
+   114→  const [focusedField, setFocusedField] = useState<string | null>(null);
+   115→
+   116→  /* ── Submit handler ── */
+   117→  const handleSubmit = async (e: React.FormEvent) => {
+   118→    e.preventDefault();
+   119→    setError('');
+   120→    setLoading(true);
+   121→
+   122→    try {
+   123→      const result = await agencyLogin(email, password);
+   124→
+   125→      if (result?.user && result?.accessToken) {
+   126→        router.push('/agency/dashboard');
+   127→      } else {
+   128→        setError('Réponse inattendue du serveur.');
+   129→      }
+   130→    } catch (err: any) {
+   131→      console.error('Agency login error:', err);
+   132→      const message =
+   133→        err?.response?.data?.message ||
+   134→        err?.response?.data?.error ||
+   135→        err?.offlineMessage ||
+   136→        'Identifiants incorrects. Veuillez réessayer.';
+   137→      setError(message);
+   138→    } finally {
+   139→      setLoading(false);
+   140→    }
+   141→  };
+   142→
+   143→  /* ── Fill demo credentials ── */
+   144→  const fillDemo = () => {
+   145→    setEmail('agence@qrpass.com');
+   146→    setPassword('agence123');
+   147→  };
+   148→
+   149→  return (
+   150→    <div className="min-h-screen flex flex-col lg:flex-row">
+   151→      {/* ══════════════════════════════════════════════════
+   152→          LEFT PANEL — Immersive Branding (desktop)
+   153→          ══════════════════════════════════════════════════ */}
+   154→      <div className="relative hidden lg:flex lg:w-[52%] min-h-screen flex-col overflow-hidden">
+   155→        {/* Base gradient */}
+   156→        <div className="absolute inset-0">
+   157→          <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f] to-[#f4b400]" />
+   158→          <div className="absolute inset-0 bg-gradient-to-t from-[#0c1d3a]/80 via-transparent to-[#1e3a5f]/60" />
+   159→        </div>
+   160→
+   161→        {/* Animated gradient orbs */}
+   162→        <div className="absolute top-[15%] -left-16 w-[340px] h-[340px] rounded-full bg-yellow-400/15 blur-[100px] animate-pulse" />
+   163→        <div
+   164→          className="absolute bottom-[20%] right-[-40px] w-[400px] h-[400px] rounded-full bg-yellow-500/10 blur-[120px] animate-pulse"
+   165→          style={{ animationDelay: '1.2s' }}
+   166→        />
+   167→        <div
+   168→          className="absolute top-[55%] left-[35%] w-[500px] h-[500px] rounded-full bg-yellow-300/8 blur-[150px] animate-pulse"
+   169→          style={{ animationDelay: '2.4s' }}
+   170→        />
+   171→
+   172→        {/* Grid pattern overlay */}
+   173→        <div
+   174→          className="absolute inset-0 opacity-[0.035]"
+   175→          style={{
+   176→            backgroundImage: `
+   177→              linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+   178→              linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)
+   179→            `,
+   180→            backgroundSize: '64px 64px',
+   181→          }}
+   182→        />
+   183→
+   184→        {/* Floating travel silhouettes */}
+   185→        <FloatingIcon icon={Globe} className="top-[18%] right-[12%] w-14 h-14" delay={0} duration={7} />
+   186→        <FloatingIcon icon={Plane} className="top-[32%] left-[8%] w-11 h-11" delay={1.5} duration={8} />
+   187→        <FloatingIcon icon={Luggage} className="bottom-[28%] right-[18%] w-12 h-12" delay={2.8} duration={6.5} />
+   188→        <FloatingIcon icon={QrCode} className="top-[60%] left-[22%] w-10 h-10" delay={0.8} duration={9} />
+   189→        <FloatingIcon icon={Plane} className="bottom-[42%] left-[55%] w-8 h-8" delay={3.5} duration={7.5} />
+   190→        <FloatingIcon icon={ShieldCheck} className="top-[12%] left-[42%] w-7 h-7" delay={4.2} duration={8.5} />
+   191→
+   192→        {/* Content */}
+   193→        <div className="relative z-10 flex flex-col h-full p-10 xl:p-14">
+   194→          {/* Top: Logo */}
+   195→          <div className="flex items-center">
+   196→            <Link href="/" className="group">
+   197→              <motion.div
+   198→                className="w-[72px] h-[72px] rounded-2xl bg-white/[0.1] backdrop-blur-md p-2.5 border border-white/[0.15] flex items-center justify-center group-hover:bg-white/[0.16] transition-all duration-300 shadow-xl shadow-black/10"
+   199→                initial={{ opacity: 0, scale: 0.85 }}
+   200→                animate={{ opacity: 1, scale: 1 }}
+   201→                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+   202→              >
+   203→                <div className="w-full h-full rounded-lg bg-[#f4b400] flex items-center justify-center">
+   204→                  <span className="text-[#1e3a5f] font-extrabold text-xl">PH</span>
+   205→                </div>
+   206→              </motion.div>
+   207→            </Link>
+   208→          </div>
+   209→
+   210→          {/* Middle: Hero content */}
+   211→          <div className="flex-1 flex flex-col justify-center max-w-lg">
+   212→            {/* QR icon illustration */}
+   213→            <motion.div
+   214→              className="relative mb-10"
+   215→              initial={{ opacity: 0, y: 20 }}
+   216→              animate={{ opacity: 1, y: 0 }}
+   217→              transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+   218→            >
+   219→              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f4b400] to-[#d49b00] flex items-center justify-center shadow-2xl shadow-amber-700/40">
+   220→                <QrCode className="w-10 h-10 text-white" />
+   221→              </div>
+   222→              {/* Decorative dots */}
+   223→              <div
+   224→                className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full bg-[#f4b400] animate-bounce"
+   225→                style={{ animationDelay: '0.4s' }}
+   226→              />
+   227→              <div
+   228→                className="absolute -bottom-1.5 -right-5 w-3.5 h-3.5 rounded-full bg-yellow-300/70 animate-bounce"
+   229→                style={{ animationDelay: '1s' }}
+   230→              />
+   231→              <div
+   232→                className="absolute top-1 -left-3 w-3 h-3 rounded-full bg-white/20 animate-bounce"
+   233→                style={{ animationDelay: '1.6s' }}
+   234→              />
+   235→            </motion.div>
+   236→
+   237→            <motion.h2
+   238→              className="text-4xl xl:text-5xl font-bold text-white mb-4 leading-[1.1] tracking-tight"
+   239→              initial={{ opacity: 0, y: 24 }}
+   240→              animate={{ opacity: 1, y: 0 }}
+   241→              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+   242→            >
+   243→              Protégez chaque
+   244→              <br />
+   245→              <span className="bg-gradient-to-r from-[#f4b400] via-[#f4b400] to-[#d49b00] bg-clip-text text-transparent">
+   246→                bagage, en toute
+   247→              </span>
+   248→              <br />
+   249→              sérénité.
+   250→            </motion.h2>
+   251→
+   252→            <motion.p
+   253→              className="text-white/50 text-lg leading-relaxed mb-10 max-w-md"
+   254→              initial={{ opacity: 0, y: 20 }}
+   255→              animate={{ opacity: 1, y: 0 }}
+   256→              transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+   257→            >
+   258→              Gérez vos bagages, vos clients et vos QR codes depuis un seul
+   259→              tableau de bord intuitif.
+   260→            </motion.p>
+   261→
+   262→            {/* Stats row */}
+   263→            <motion.div
+   264→              className="grid grid-cols-4 gap-3"
+   265→              initial={{ opacity: 0, y: 16 }}
+   266→              animate={{ opacity: 1, y: 0 }}
+   267→              transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+   268→            >
+   269→              {STATS.map((stat, i) => (
+   270→                <div
+   271→                  key={i}
+   272→                  className="text-center py-3 rounded-xl bg-white/[0.05] backdrop-blur-sm border border-white/[0.06]"
+   273→                >
+   274→                  <p className="text-white font-bold text-lg xl:text-xl">
+   275→                    {stat.value}
+   276→                  </p>
+   277→                  <p className="text-white/30 text-[10px] xl:text-xs mt-1 leading-tight px-1">
+   278→                    {stat.label}
+   279→                  </p>
+   280→                </div>
+   281→              ))}
+   282→            </motion.div>
+   283→          </div>
+   284→
+   285→          {/* Bottom: Tagline */}
+   286→          <motion.div
+   287→            className="relative"
+   288→            initial={{ opacity: 0, y: 16 }}
+   289→            animate={{ opacity: 1, y: 0 }}
+   290→            transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+   291→          >
+   292→            <div
+   293→              className="border-l-2 pl-5"
+   294→              style={{ borderColor: 'rgba(244, 180, 0, 0.5)' }}
+   295→            >
+   296→              <p className="text-white/60 text-sm italic leading-relaxed">
+   297→                &ldquo;PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.&rdquo;
+   298→              </p>
+   299→              <div className="flex items-center gap-3 mt-3">
+   300→                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f4b400] to-[#d49b00] flex items-center justify-center shadow-lg shadow-amber-700/30">
+   301→                  <span className="text-white text-xs font-bold">FD</span>
+   302→                </div>
+   303→                <div>
+   304→                  <p className="text-white/85 text-xs font-medium">Fatou Diallo</p>
+   305→                  <p className="text-white/35 text-[10px]">Agence Hajj Express</p>
+   306→                </div>
+   307→              </div>
+   308→            </div>
+   309→          </motion.div>
+   310→        </div>
+   311→      </div>
+   312→
+   313→      {/* ══════════════════════════════════════════════════
+   314→          RIGHT PANEL — Login Form
+   315→          ══════════════════════════════════════════════════ */}
+   316→      <div
+   317→        className="w-full lg:w-[48%] min-h-screen flex items-center justify-center px-6 py-12 sm:px-10 relative"
+   318→        style={{
+   319→          background:
+   320→            'linear-gradient(180deg, #f8fafc 0%, #fefce8 50%, #f8fafc 100%)',
+   321→        }}
+   322→      >
+   323→        {/* Subtle decorative circles */}
+   324→        <div
+   325→          className="absolute top-20 right-10 w-64 h-64 rounded-full opacity-[0.04]"
+   326→          style={{ background: 'radial-gradient(circle, #f4b400, transparent)' }}
+   327→        />
+   328→        <div
+   329→          className="absolute bottom-20 left-10 w-48 h-48 rounded-full opacity-[0.03]"
+   330→          style={{ background: 'radial-gradient(circle, #1e3a5f, transparent)' }}
+   331→        />
+   332→
+   333→        <motion.div
+   334→          className="w-full max-w-[420px] relative z-10"
+   335→          variants={containerVariants}
+   336→          initial="hidden"
+   337→          animate="visible"
+   338→        >
+   339→          {/* Mobile Logo */}
+   340→          <motion.div
+   341→            className="lg:hidden flex flex-col items-center mb-8"
+   342→            variants={itemVariants}
+   343→          >
+   344→            <div className="w-16 h-16 rounded-2xl p-2 flex items-center justify-center shadow-lg mb-4" style={{ background: 'linear-gradient(135deg, #1e3a5f, #0c1d3a)' }}>
+   345→              <div className="w-full h-full rounded-lg bg-[#f4b400] flex items-center justify-center">
+   346→                <span className="text-[#1e3a5f] font-extrabold text-lg">PH</span>
+   347→              </div>
+   348→            </div>
+   349→            <h2 className="text-2xl font-bold text-[#1e3a5f] text-center">
+   350→              Protégez chaque bagage
+   351→            </h2>
+   352→            <p className="text-slate-500 text-sm mt-1 text-center">
+   353→              Gérez vos bagages et QR codes simplement
+   354→            </p>
+   355→          </motion.div>
+   356→
+   357→          {/* Mobile Stats (compact) */}
+   358→          <motion.div
+   359→            className="lg:hidden grid grid-cols-4 gap-2 mb-8"
+   360→            variants={itemVariants}
+   361→          >
+   362→            {STATS.map((stat, i) => (
+   363→              <div
+   364→                key={i}
+   365→                className="text-center py-2 rounded-lg bg-white/80 border border-slate-100 shadow-sm"
+   366→              >
+   367→                <p className="text-[#1e3a5f] font-bold text-sm">{stat.value}</p>
+   368→                <p className="text-slate-400 text-[9px] mt-0.5 leading-tight">
+   369→                  {stat.label}
+   370→                </p>
+   371→              </div>
+   372→            ))}
+   373→          </motion.div>
+   374→
+   375→          {/* Badge */}
+   376→          <motion.div className="flex items-center gap-2 mb-6" variants={itemVariants}>
+   377→            <span
+   378→              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white shadow-sm"
+   379→              style={{ background: 'linear-gradient(135deg, #1e3a5f, #0c1d3a)' }}
+   380→            >
+   381→              <Building2 className="w-3 h-3" />
+   382→              Agence
+   383→            </span>
+   384→          </motion.div>
+   385→
+   386→          {/* Header */}
+   387→          <motion.div className="mb-8" variants={itemVariants}>
+   388→            <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ color: '#1e3a5f' }}>
+   389→              Bienvenue
+   390→            </h1>
+   391→            <p className="text-sm leading-relaxed text-slate-500">
+   392→              Connectez-vous à votre espace agence pour gérer vos bagages et QR
+   393→              codes
+   394→            </p>
+   395→          </motion.div>
+   396→
+   397→          {/* Error Alert */}
+   398→          <AnimatePresence>
+   399→            {error && (
+   400→              <motion.div
+   401→                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+   402→                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+   403→                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+   404→                transition={{ duration: 0.3 }}
+   405→                className="overflow-hidden"
+   406→              >
+   407→                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-start gap-3">
+   408→                  <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5">
+   409→                    <span className="text-white text-xs font-bold">!</span>
+   410→                  </div>
+   411→                  <span>{error}</span>
+   412→                </div>
+   413→              </motion.div>
+   414→            )}
+   415→          </AnimatePresence>
+   416→
+   417→          {/* Form Card */}
+   418→          <motion.div variants={itemVariants}>
+   419→            <Card
+   420→              className="rounded-2xl shadow-xl border"
+   421→              style={{
+   422→                background: 'rgba(255,255,255,0.85)',
+   423→                backdropFilter: 'blur(12px)',
+   424→                borderColor: 'rgba(244,180,0,0.12)',
+   425→              }}
+   426→            >
+   427→              <CardContent className="p-6">
+   428→                <form onSubmit={handleSubmit} className="space-y-5">
+   429→                  {/* Email Field */}
+   430→                  <div className="space-y-2">
+   431→                    <Label
+   432→                      htmlFor="agency-email"
+   433→                      className="text-xs font-semibold uppercase tracking-wider"
+   434→                      style={{ color: '#1e3a5f' }}
+   435→                    >
+   436→                      Email
+   437→                    </Label>
+   438→                    <div
+   439→                      className={`relative flex items-center rounded-xl border-2 transition-all duration-200 ${
+   440→                        focusedField === 'email'
+   441→                          ? 'shadow-[0_0_0_3px_rgba(244,180,0,0.12)]'
+   442→                          : ''
+   443→                      }`}
+   444→                      style={{
+   445→                        borderColor: focusedField === 'email' ? '#f4b400' : '#e2e8f0',
+   446→                        backgroundColor: focusedField === 'email' ? '#fff' : '#f8fafc',
+   447→                      }}
+   448→                    >
+   449→                      <div
+   450→                        className="pl-4 transition-colors duration-200"
+   451→                        style={{ color: focusedField === 'email' ? '#f4b400' : '#94a3b8' }}
+   452→                      >
+   453→                        <Mail className="w-[18px] h-[18px]" />
+   454→                      </div>
+   455→                      <Input
+   456→                        id="agency-email"
+   457→                        type="email"
+   458→                        value={email}
+   459→                        onChange={(e) => setEmail(e.target.value)}
+   460→                        onFocus={() => setFocusedField('email')}
+   461→                        onBlur={() => setFocusedField(null)}
+   462→                        className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+   463→                        style={{ color: '#1e3a5f' }}
+   464→                        placeholder="vous@agence.com"
+   465→                        required
+   466→                        autoComplete="email"
+   467→                      />
+   468→                    </div>
+   469→                  </div>
+   470→
+   471→                  {/* Password Field */}
+   472→                  <div className="space-y-2">
+   473→                    <Label
+   474→                      htmlFor="agency-password"
+   475→                      className="text-xs font-semibold uppercase tracking-wider"
+   476→                      style={{ color: '#1e3a5f' }}
+   477→                    >
+   478→                      Mot de passe
+   479→                    </Label>
+   480→                    <div
+   481→                      className={`relative flex items-center rounded-xl border-2 transition-all duration-200 ${
+   482→                        focusedField === 'password'
+   483→                          ? 'shadow-[0_0_0_3px_rgba(244,180,0,0.12)]'
+   484→                          : ''
+   485→                      }`}
+   486→                      style={{
+   487→                        borderColor: focusedField === 'password' ? '#f4b400' : '#e2e8f0',
+   488→                        backgroundColor: focusedField === 'password' ? '#fff' : '#f8fafc',
+   489→                      }}
+   490→                    >
+   491→                      <div
+   492→                        className="pl-4 transition-colors duration-200"
+   493→                        style={{ color: focusedField === 'password' ? '#f4b400' : '#94a3b8' }}
+   494→                      >
+   495→                        <Lock className="w-[18px] h-[18px]" />
+   496→                      </div>
+   497→                      <Input
+   498→                        id="agency-password"
+   499→                        type={showPassword ? 'text' : 'password'}
+   500→                        value={password}
+   501→                        onChange={(e) => setPassword(e.target.value)}
+   502→                        onFocus={() => setFocusedField('password')}
+   503→                        onBlur={() => setFocusedField(null)}
+   504→                        className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+   505→                        style={{ color: '#1e3a5f' }}
+   506→                        placeholder="Entrez votre mot de passe"
+   507→                        required
+   508→                        autoComplete="current-password"
+   509→                      />
+   510→                      <button
+   511→                        type="button"
+   512→                        onClick={() => setShowPassword(!showPassword)}
+   513→                        className="pr-4 transition-colors duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
+   514→                        style={{ color: focusedField === 'password' ? '#f4b400' : '#94a3b8' }}
+   515→                        tabIndex={-1}
+   516→                        aria-label={
+   517→                          showPassword
+   518→                            ? 'Masquer le mot de passe'
+   519→                            : 'Afficher le mot de passe'
+   520→                        }
+   521→                      >
+   522→                        {showPassword ? (
+   523→                          <EyeOff className="w-[18px] h-[18px]" />
+   524→                        ) : (
+   525→                          <Eye className="w-[18px] h-[18px]" />
+   526→                        )}
+   527→                      </button>
+   528→                    </div>
+   529→                  </div>
+   530→
+   531→                  {/* Forgot password link */}
+   532→                  <div className="flex items-center justify-end">
+   533→                    <Link
+   534→                      href="#"
+   535→                      onClick={(e) => e.preventDefault()}
+   536→                      className="text-sm font-semibold transition-colors hover:underline"
+   537→                      style={{ color: '#f4b400' }}
+   538→                    >
+   539→                      Mot de passe oublié ?
+   540→                    </Link>
+   541→                  </div>
+   542→
+   543→                  {/* Submit Button */}
+   544→                  <motion.div whileTap={loading ? {} : { scale: 0.98 }}>
+   545→                    <Button
+   546→                      type="submit"
+   547→                      disabled={loading}
+   548→                      className="w-full font-semibold py-3.5 px-4 rounded-xl text-sm shadow-lg hover:shadow-xl transition-all duration-300 h-auto"
+   549→                      style={{
+   550→                        background: 'linear-gradient(135deg, #f4b400, #d49b00)',
+   551→                        color: '#1e3a5f',
+   552→                        boxShadow: '0 4px 14px rgba(244,180,0,0.35)',
+   553→                      }}
+   554→                    >
+   555→                      {loading ? (
+   556→                        <>
+   557→                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+   558→                          Connexion en cours...
+   559→                        </>
+   560→                      ) : (
+   561→                        <>
+   562→                          Se connecter
+   563→                          <ArrowRight className="w-4 h-4 ml-2" />
+   564→                        </>
+   565→                      )}
+   566→                    </Button>
+   567→                  </motion.div>
+   568→                </form>
+   569→              </CardContent>
+   570→            </Card>
+   571→          </motion.div>
+   572→
+   573→          {/* Demo Account Card */}
+   574→          <motion.div
+   575→            className="mt-6 p-4 rounded-xl border"
+   576→            style={{
+   577→              background: 'rgba(255,255,255,0.6)',
+   578→              borderColor: 'rgba(244,180,0,0.15)',
+   579→            }}
+   580→            variants={itemVariants}
+   581→          >
+   582→            <div className="flex items-center justify-between">
+   583→              <div className="flex items-center gap-3">
+   584→                <div
+   585→                  className="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm"
+   586→                  style={{ background: 'linear-gradient(135deg, #1e3a5f, #0c1d3a)' }}
+   587→                >
+   588→                  <ShieldCheck className="w-4 h-4 text-white" />
+   589→                </div>
+   590→                <div>
+   591→                  <p className="text-xs font-semibold" style={{ color: '#1e3a5f' }}>
+   592→                    Compte démo
+   593→                  </p>
+   594→                  <p className="text-[10px] font-mono leading-relaxed text-slate-400">
+   595→                    agence@qrpass.com / agence123
+   596→                  </p>
+   597→                </div>
+   598→              </div>
+   599→              <button
+   600→                type="button"
+   601→                onClick={fillDemo}
+   602→                className="text-xs font-semibold px-3.5 py-2 rounded-lg text-white active:scale-[0.97] transition-all duration-200 shadow-sm"
+   603→                style={{ background: '#1e3a5f' }}
+   604→              >
+   605→                Remplir
+   606→              </button>
+   607→            </div>
+   608→          </motion.div>
+   609→
+   610→          {/* Switch to Admin */}
+   611→          <motion.div
+   612→            className="mt-8 text-center text-sm text-slate-500"
+   613→            variants={itemVariants}
+   614→          >
+   615→            Vous êtes administrateur ?{' '}
+   616→            <Link
+   617→              href="/admin/connexion"
+   618→              className="font-semibold transition-colors hover:underline"
+   619→              style={{ color: '#f4b400' }}
+   620→            >
+   621→              Connexion SuperAdmin
+   622→            </Link>
+   623→          </motion.div>
+   624→
+   625→          {/* Bottom links */}
+   626→          <motion.div
+   627→            className="mt-6 flex items-center justify-center gap-4 text-xs text-slate-400"
+   628→            variants={itemVariants}
+   629→          >
+   630→            <Link
+   631→              href="/cgu"
+   632→              className="hover:text-slate-600 transition-colors"
+   633→            >
+   634→              CGU
+   635→            </Link>
+   636→            <span className="text-slate-300">•</span>
+   637→            <Link
+   638→              href="/confidentialite"
+   639→              className="hover:text-slate-600 transition-colors"
+   640→            >
+   641→              Confidentialité
+   642→            </Link>
+   643→            <span className="text-slate-300">•</span>
+   644→            <Link
+   645→              href="/contact"
+   646→              className="hover:text-slate-600 transition-colors"
+   647→            >
+   648→              Aide
+   649→            </Link>
+   650→          </motion.div>
+   651→        </motion.div>
+   652→      </div>
+   653→    </div>
+   654→  );
+   655→}
+   656→
