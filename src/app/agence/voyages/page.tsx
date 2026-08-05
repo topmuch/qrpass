@@ -501,8 +501,7 @@ export default function VoyagesPage() {
   // ── Share OTP ────────────────────────────────────────
   async function shareOtp(name: string, otp: string) {
     const message = buildShareMessage(name, otp);
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const pwaUrl = `${origin}/manager`;
+    const pwaUrl = 'https://passhajj.qrbags.com/manager';
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {

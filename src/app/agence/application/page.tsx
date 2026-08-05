@@ -135,14 +135,14 @@ function FeatureBadge({ icon, label, color }: { icon: React.ReactNode; label: st
 export default function ApplicationPWAPage() {
   const [copied, setCopied] = useState(false);
 
-  /** PWA URL — dynamic based on current host or env fallback */
+  /** PWA URL — fixed production URL for QR code */
   const pwaUrl = useMemo(() => {
     if (typeof window !== 'undefined') {
       const envUrl = process.env.NEXT_PUBLIC_PWA_URL;
       if (envUrl) return envUrl;
-      return `${window.location.origin}/manager`;
+      return 'https://passhajj.qrbags.com/manager';
     }
-    return '/manager';
+    return 'https://passhajj.qrbags.com/manager';
   }, []);
 
   /* ── Copy PWA link to clipboard ── */

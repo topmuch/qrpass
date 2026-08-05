@@ -175,8 +175,7 @@ export default function VoyageDetailPage() {
   async function shareOtp() {
     if (!trip) return;
     const message = buildShareMessage(trip.name, trip.otp);
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const pwaUrl = `${origin}/manager`;
+    const pwaUrl = 'https://passhajj.qrbags.com/manager';
     if (navigator.share) {
       try { await navigator.share({ title: `OTP Voyage — ${trip.name}`, text: message, url: pwaUrl }); return; }
       catch (err) { if ((err as DOMException).name === 'AbortError') return; }
