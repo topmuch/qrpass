@@ -1,0 +1,16 @@
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.22.187:3000
+- Environments: .env
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 3.6s
+⚠ Your project has `@next/font` installed as a dependency, please use the built-in `next/font` instead. The `@next/font` package will be removed in Next.js 14. You can migrate by running `npx --yes @next/codemod@latest built-in-next-font .`. Read more: https://nextjs.org/docs/messages/built-in-next-font
+○ Compiling / ...
+ GET / 200 in 3.1s (compile: 2.6s, proxy.ts: 5ms, render: 420ms)
+ GET / 200 in 4.1s (compile: 3.6s, proxy.ts: 61ms, render: 370ms)
+⚠ Cross origin request detected from preview-chat-6c6421c1-5198-4127-8893-cf466b75d927.space-z.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET /api/auth/session 200 in 378ms (compile: 357ms, proxy.ts: 7ms, render: 14ms)
+ GET / 200 in 92ms (compile: 4ms, proxy.ts: 4ms, render: 85ms)

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ServiceWorkerRegistration } from "@/components/pwa-registration";
@@ -10,6 +10,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
 });
@@ -391,7 +397,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} antialiased bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white`}
+        className={`${inter.variable} ${playfair.variable} antialiased bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white`}
       >
         <ThemeProvider>
           <AuthProvider>

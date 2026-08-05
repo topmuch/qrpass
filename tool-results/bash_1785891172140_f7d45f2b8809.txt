@@ -1,0 +1,815 @@
+- main
+  - generic
+    - generic
+      - image "Skyline business district au coucher du soleil"
+    - generic
+      - StaticText "CONSEIL & MANAGEMENT DES ENTREPRISES"
+    - heading "Votre partenaire en conseil et management" [level=1, ref=e38]
+      - StaticText "Votre partenaire en conseil et management"
+    - paragraph
+      - StaticText "HMC est un cabinet de conseil et de management dédié aux entreprises. Nous accompagnons les organisations dans leur développement, sécurisons leur activité tout en maîtrisant leurs risques, de la stratégie à la mise en œuvre opérationnelle."
+    - link "Découvrir nos services" [ref=e39]
+    - link "Nous contacter" [ref=e40]
+    - StaticText "+30"
+    - StaticText "ANS D'EXPÉRIENCE"
+    - StaticText "+20"
+    - StaticText "PAYS COUVERTS"
+    - StaticText "PMe → Groupes"
+    - StaticText "TOUTES TAILLES"
+    - StaticText "AFRIQUE & OCÉAN INDIEN"
+  - generic
+    - generic
+      - image "Équipe de consultants collaborant en bureau"
+    - generic
+      - generic
+      - StaticText "ans d'expérience en conseil et management"
+  - StaticText "À PROPOS"
+  - heading "Une rencontre entre expertise et excellence managériale" [level=2, ref=e19]
+    - StaticText "Une rencontre entre expertise et excellence managériale"
+  - paragraph
+    - StaticText "Forte d'une expérience de près de 30 ans auprès des entreprises, nos experts sont des spécialistes dans le support, l'accompagnement et la structuration des organisations — PME, groupes et projets — dans l'atteinte de l'excellence opérationnelle."
+  - paragraph
+    - StaticText "HMC est un partenaire délivrant un service clé en main de haute valeur ajoutée afin de vous accompagner dans la sécurisation de vos décisions et de vos choix stratégiques. Notre mission est d'accompagner les entreprises à opter pour la stratégie optimale et à sécuriser leur activité tout en maîtrisant leurs risques."
+  - paragraph
+    - StaticText "Nous proposons un accompagnement personnalisé afin de permettre le développement des projets suivant leur phase de croissance et de maturité."
+  - list
+    - listitem [level=1]
+      - StaticText "Service clé en main"
+    - listitem [level=1]
+      - StaticText "Haute valeur ajoutée"
+    - listitem [level=1]
+      - StaticText "Accompagnement personnalisé"
+    - listitem [level=1]
+      - StaticText "Sécurisation des décisions"
+  - StaticText "EXPLOREZ HMC"
+  - heading "Découvrez notre univers" [level=2, ref=e20]
+    - StaticText "Découvrez notre univers"
+  - paragraph
+    - StaticText "Un cabinet de conseil et de management dédié aux entreprises, du diagnostic stratégique à la mise en œuvre opérationnelle."
+  - generic
+    - generic
+      - StaticText "0"
+      - StaticText "1"
+      - heading "Conseil Stratégique" [level=3, ref=e78]
+      - paragraph
+      - paragraph
+  - generic
+    - generic
+      - StaticText "0"
+      - StaticText "2"
+      - heading "Management Opérationnel" [level=3, ref=e79]
+      - paragraph
+      - paragraph
+  - generic
+    - generic
+      - StaticText "0"
+      - StaticText "3"
+      - heading "Transformation" [level=3, ref=e80]
+      - paragraph
+      - paragraph
+  - link "Voir tous nos services" [ref=e41]
+  - StaticText "FORMATIONS"
+  - heading "Nos domaines de formation" [level=2, ref=e21]
+    - StaticText "Nos domaines de formation"
+  - paragraph
+    - StaticText "Développez les compétences de vos équipes grâce à nos formations sur mesure, dispensées par des experts et adaptées aux réalités du marché africain."
+  - link "Achats et approvisionnement 3 formations Achats et approvisionnement Maîtrisez les stratégies d'achat, la gestion des fournisseurs et l'optimisation des processus d'approvisionnement pour maximiser la performance de votre chaîne d'approvisionnement. Découvrir" [ref=e22]
+    - generic
+      - image "Achats et approvisionnement"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "Achats et approvisionnement" [level=3, ref=e42]
+    - paragraph
+      - StaticText "Maîtrisez les stratégies d'achat, la gestion des fournisseurs et l'optimisation des processus d'approvisionnement pour maximiser la performance de votre chaîne d'approvisionnement."
+    - StaticText "Découvrir"
+  - link "Assurance 3 formations Assurance Développez votre expertise dans le secteur de l'assurance, de la souscription à la gestion des sinistres, en passant par la réglementation et la conformité. Découvrir" [ref=e23]
+    - generic
+      - image "Assurance"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "Assurance" [level=3, ref=e43]
+    - paragraph
+      - StaticText "Développez votre expertise dans le secteur de l'assurance, de la souscription à la gestion des sinistres, en passant par la réglementation et la conformité."
+    - StaticText "Découvrir"
+  - link "Audit 3 formations Audit Acquérez les méthodologies et outils d'audit pour évaluer les processus, identifier les risques et formuler des recommandations pertinentes. Découvrir" [ref=e24]
+    - generic
+      - image "Audit"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "Audit" [level=3, ref=e44]
+    - paragraph
+      - StaticText "Acquérez les méthodologies et outils d'audit pour évaluer les processus, identifier les risques et formuler des recommandations pertinentes."
+    - StaticText "Découvrir"
+  - link "Banque 3 formations Banque Formez-vous aux métiers bancaires, à l'analyse financière, au crédit et à la conformité réglementaire dans un secteur en pleine mutation. Découvrir" [ref=e25]
+    - generic
+      - image "Banque"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "Banque" [level=3, ref=e45]
+    - paragraph
+      - StaticText "Formez-vous aux métiers bancaires, à l'analyse financière, au crédit et à la conformité réglementaire dans un secteur en pleine mutation."
+    - StaticText "Découvrir"
+  - link "BI — Business Intelligence 3 formations BI — Business Intelligence Maîtrisez les outils et techniques de la Business Intelligence pour transformer vos données en décisions stratégiques éclairées. Découvrir" [ref=e26]
+    - generic
+      - image "BI — Business Intelligence"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "BI — Business Intelligence" [level=3, ref=e46]
+    - paragraph
+      - StaticText "Maîtrisez les outils et techniques de la Business Intelligence pour transformer vos données en décisions stratégiques éclairées."
+    - StaticText "Découvrir"
+  - link "Changement 3 formations Changement Apprenez à piloter et accompagner le changement au sein de votre organisation pour garantir l'adhésion et la réussite de vos transformations. Découvrir" [ref=e27]
+    - generic
+      - image "Changement"
+      - StaticText "3"
+      - StaticText " formation"
+      - StaticText "s"
+    - heading "Changement" [level=3, ref=e47]
+    - paragraph
+      - StaticText "Apprenez à piloter et accompagner le changement au sein de votre organisation pour garantir l'adhésion et la réussite de vos transformations."
+    - StaticText "Découvrir"
+  - link "Voir toutes les formations" [ref=e48]
+  - StaticText "NOS PRODUITS"
+  - heading "Solutions digitales innovantes" [level=2, ref=e28]
+    - StaticText "Solutions digitales innovantes"
+  - paragraph
+    - StaticText "Découvrez notre gamme de solutions basées sur la technologie QR code, conçues pour la traçabilité, la logistique et l'expérience client."
+  - link "QRbags Voyage & Mobilité QRbags Ne perdez plus jamais vos bagages Solution de traçabilité de bagages pour les voyageurs. Chaque bagage est équipé d'un QR code unique. Récupérez vos bagages 10x plus vite Vos données personnelles restent confidentielles Voir le produit" [ref=e29]
+    - generic
+      - image "QRbags"
+      - StaticText "Voyage & Mobilité"
+    - heading "QRbags" [level=3, ref=e49]
+    - paragraph
+      - StaticText "Ne perdez plus jamais vos bagages"
+    - paragraph
+      - StaticText "Solution de traçabilité de bagages pour les voyageurs. Chaque bagage est équipé d'un QR code unique."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "QRtags Objets personnels QRtags Retrouvez vos objets du quotidien Solution de traçabilité des objets trouvés. Collez un QR tag sur vos objets personnels. Discrétion totale sur vos objets Protection de votre identité Voir le produit" [ref=e30]
+    - generic
+      - image "QRtags"
+      - StaticText "Objets personnels"
+    - heading "QRtags" [level=3, ref=e50]
+    - paragraph
+      - StaticText "Retrouvez vos objets du quotidien"
+    - paragraph
+      - StaticText "Solution de traçabilité des objets trouvés. Collez un QR tag sur vos objets personnels."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "QRtags pour Entreprise Solutions professionnelles QRtags pour Entreprise La gestion des objets trouvés pour les professionnels Solution dédiée aux professionnels pour la gestion centralisée des objets trouvés. Réduction du temps de gestion des objets trouvés Amélioration de la satisfaction client Voir le produit" [ref=e31]
+    - generic
+      - image "QRtags pour Entreprise"
+      - StaticText "Solutions professionnelles"
+    - heading "QRtags pour Entreprise" [level=3, ref=e51]
+    - paragraph
+      - StaticText "La gestion des objets trouvés pour les professionnels"
+    - paragraph
+      - StaticText "Solution dédiée aux professionnels pour la gestion centralisée des objets trouvés."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "QRtrans Logistique & Livraison QRtrans Suivez vos colis en temps réel via WhatsApp Solution de traçabilité d'envoi de colis via QR code et notifications WhatsApp. Aucune application à installer pour le destinataire Réduction des appels de suivi client de 80% Voir le produit" [ref=e32]
+    - generic
+      - image "QRtrans"
+      - StaticText "Logistique & Livraison"
+    - heading "QRtrans" [level=3, ref=e52]
+    - paragraph
+      - StaticText "Suivez vos colis en temps réel via WhatsApp"
+    - paragraph
+      - StaticText "Solution de traçabilité d'envoi de colis via QR code et notifications WhatsApp."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "VerifScan Agroalimentaire VerifScan La transparence alimentaire par le scan Solution de traçabilité des produits agroalimentaires via un scan QR code pour les entrepreneurs. Renforcez la confiance de vos consommateurs Conformité aux normes de traçabilité alimentaire Voir le produit" [ref=e33]
+    - generic
+      - image "VerifScan"
+      - StaticText "Agroalimentaire"
+    - heading "VerifScan" [level=3, ref=e53]
+    - paragraph
+      - StaticText "La transparence alimentaire par le scan"
+    - paragraph
+      - StaticText "Solution de traçabilité des produits agroalimentaires via un scan QR code pour les entrepreneurs."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "MyRest Restauration MyRest Votre menu digital, scannable en un geste Solution qui permet aux clients de restaurants de scanner un QR code pour accéder au menu digital. Réduction des coûts d'impression de menus Expérience client moderne et sans contact Voir le produit" [ref=e34]
+    - generic
+      - image "MyRest"
+      - StaticText "Restauration"
+    - heading "MyRest" [level=3, ref=e54]
+    - paragraph
+      - StaticText "Votre menu digital, scannable en un geste"
+    - paragraph
+      - StaticText "Solution qui permet aux clients de restaurants de scanner un QR code pour accéder au menu digital."
+    - list
+      - listitem [level=1]
+      - listitem [level=1]
+    - StaticText "Voir le produit"
+  - link "Voir tous nos produits" [ref=e55]
+  - generic
+    - generic
+      - heading "Parlons de votre projet" [level=3, ref=e81]
+      - paragraph
+      - link "Nous contacter" [ref=e82]
+  - StaticText "BLOG & ACTUALITÉS"
+  - heading "Nos dernières publications" [level=2, ref=e35]
+    - StaticText "Nos dernières publications"
+  - paragraph
+    - StaticText "Analyses, conseils et retours d'expérience pour accompagner le développement de votre entreprise et anticiper les évolutions des marchés."
+  - paragraph
+    - StaticText "Aucun article publié pour le moment. Revenez bientôt !"
+  - link "Voir tous les articles" [ref=e56]
+  - StaticText "TÉMOIGNAGES"
+  - heading "Ils nous font confiance" [level=2, ref=e36]
+    - StaticText "Ils nous font confiance"
+  - paragraph
+    - StaticText "Découvrez ce que nos clients disent de notre accompagnement et de notre engagement à leurs côtés."
+  - generic
+    - generic
+      - image "Jean-Pierre Kouassi"
+      - blockquote
+      - paragraph
+      - paragraph
+      - paragraph
+    - button "Témoignage précédent" [ref=e57]
+    - button "Témoignage suivant" [ref=e58]
+    - button "Aller au témoignage 1" [ref=e59]
+    - button "Aller au témoignage 2" [ref=e60]
+    - button "Aller au témoignage 3" [ref=e61]
+    - button "Aller au témoignage 4" [ref=e62]
+    - button "Aller au témoignage 5" [ref=e63]
+    - button "Aller au témoignage 6" [ref=e64]
+  - generic
+    - generic
+    - StaticText "RENDEZ-VOUS"
+    - heading "Prenez rendez-vous" [level=2, ref=e65]
+      - StaticText "Prenez rendez-vous"
+    - paragraph
+      - StaticText "Réservez un créneau avec notre équipe. Que ce soit pour un audit, une consultation stratégique ou un accompagnement opérationnel, nous sommes à votre écoute."
+    - StaticText "DISPONIBILITÉ"
+    - StaticText "Lun. — Ven. 9h–18h"
+    - StaticText "DURÉE ESTIMÉE"
+    - StaticText "45 min — 1h"
+    - StaticText "CONFIRMATION"
+    - StaticText "Par e-mail sous 24h"
+    - StaticText "GRATUIT & SANS ENGAGEMENT"
+    - form
+      - LabelText
+      - textbox "Votre nom" [required, ref=e85]
+      - LabelText
+      - textbox "vous@exemple.com" [required, ref=e86]
+      - LabelText
+      - textbox "+221 ..." [ref=e87]
+      - LabelText
+      - textbox "Votre entreprise" [ref=e88]
+      - LabelText
+      - Date
+      - LabelText
+      - InputTime
+      - LabelText
+      - textbox "Décrivez brièvement l'objet de votre rendez-vous…" [ref=e89]
+      - button "Réserver le rendez-vous" [ref=e83]
+      - paragraph
+  - generic
+    - StaticText "NEWSLETTER"
+    - heading "Restez informé" [level=2, ref=e84]
+      - StaticText "Restez informé"
+    - paragraph
+      - StaticText "Recevez nos analyses, nos conseils et nos actualités directement dans votre boîte mail. Une fois par mois, sans spam."
+    - form
+      - textbox "Adresse e-mail" [ref=e93]
+      - button "S'inscrire" [ref=e90]
+- generic
+  - generic
+    - image "Équipe de consultants collaborant en bureau"
+  - generic
+    - generic
+      - StaticText "+30"
+    - StaticText "ans d'expérience en conseil et management"
+- StaticText "À PROPOS"
+- heading "Une rencontre entre expertise et excellence managériale" [level=2, ref=e19]
+  - StaticText "Une rencontre entre expertise et excellence managériale"
+- paragraph
+  - StaticText "Forte d'une expérience de près de 30 ans auprès des entreprises, nos experts sont des spécialistes dans le support, l'accompagnement et la structuration des organisations — PME, groupes et projets — dans l'atteinte de l'excellence opérationnelle."
+- paragraph
+  - StaticText "HMC est un partenaire délivrant un service clé en main de haute valeur ajoutée afin de vous accompagner dans la sécurisation de vos décisions et de vos choix stratégiques. Notre mission est d'accompagner les entreprises à opter pour la stratégie optimale et à sécuriser leur activité tout en maîtrisant leurs risques."
+- paragraph
+  - StaticText "Nous proposons un accompagnement personnalisé afin de permettre le développement des projets suivant leur phase de croissance et de maturité."
+- list
+  - listitem [level=1]
+    - StaticText "Service clé en main"
+  - listitem [level=1]
+    - StaticText "Haute valeur ajoutée"
+  - listitem [level=1]
+    - StaticText "Accompagnement personnalisé"
+  - listitem [level=1]
+    - StaticText "Sécurisation des décisions"
+- StaticText "EXPLOREZ HMC"
+- heading "Découvrez notre univers" [level=2, ref=e20]
+  - StaticText "Découvrez notre univers"
+- paragraph
+  - StaticText "Un cabinet de conseil et de management dédié aux entreprises, du diagnostic stratégique à la mise en œuvre opérationnelle."
+- generic
+  - generic
+    - StaticText "0"
+    - StaticText "1"
+    - heading "Conseil Stratégique" [level=3, ref=e78]
+    - paragraph
+      - StaticText "VISION & DÉCISION"
+    - paragraph
+      - StaticText "Une connaissance profonde des secteurs d'activité nous permet d'adapter nos interventions à chaque typologie d'entreprise et à chaque phase de maturité, de la PMe au grand groupe."
+- generic
+  - generic
+    - StaticText "0"
+    - StaticText "2"
+    - heading "Management Opérationnel" [level=3, ref=e79]
+    - paragraph
+      - StaticText "PILOTAGE & PERFORMANCE"
+    - paragraph
+      - StaticText "Une offre complète couvrant le management de transition, l'organisation et le pilotage de la performance, pour sécuriser l'activité et garantir la rentabilité de nos clients."
+- generic
+  - generic
+    - StaticText "0"
+    - StaticText "3"
+    - heading "Transformation" [level=3, ref=e80]
+    - paragraph
+      - StaticText "SOLUTIONS INNOVANTES"
+    - paragraph
+      - StaticText "L'application de solutions digitales et de méthodes éprouvées à notre expertise nous permet de proposer des accompagnements modernes, mesurables et adaptés aux évolutions des marchés."
+- link "Voir tous nos services" [ref=e41]
+- StaticText "FORMATIONS"
+- heading "Nos domaines de formation" [level=2, ref=e21]
+  - StaticText "Nos domaines de formation"
+- paragraph
+  - StaticText "Développez les compétences de vos équipes grâce à nos formations sur mesure, dispensées par des experts et adaptées aux réalités du marché africain."
+- link "Achats et approvisionnement 3 formations Achats et approvisionnement Maîtrisez les stratégies d'achat, la gestion des fournisseurs et l'optimisation des processus d'approvisionnement pour maximiser la performance de votre chaîne d'approvisionnement. Découvrir" [ref=e22]
+  - generic
+    - image "Achats et approvisionnement"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "Achats et approvisionnement" [level=3, ref=e42]
+  - paragraph
+    - StaticText "Maîtrisez les stratégies d'achat, la gestion des fournisseurs et l'optimisation des processus d'approvisionnement pour maximiser la performance de votre chaîne d'approvisionnement."
+  - StaticText "Découvrir"
+- link "Assurance 3 formations Assurance Développez votre expertise dans le secteur de l'assurance, de la souscription à la gestion des sinistres, en passant par la réglementation et la conformité. Découvrir" [ref=e23]
+  - generic
+    - image "Assurance"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "Assurance" [level=3, ref=e43]
+  - paragraph
+    - StaticText "Développez votre expertise dans le secteur de l'assurance, de la souscription à la gestion des sinistres, en passant par la réglementation et la conformité."
+  - StaticText "Découvrir"
+- link "Audit 3 formations Audit Acquérez les méthodologies et outils d'audit pour évaluer les processus, identifier les risques et formuler des recommandations pertinentes. Découvrir" [ref=e24]
+  - generic
+    - image "Audit"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "Audit" [level=3, ref=e44]
+  - paragraph
+    - StaticText "Acquérez les méthodologies et outils d'audit pour évaluer les processus, identifier les risques et formuler des recommandations pertinentes."
+  - StaticText "Découvrir"
+- link "Banque 3 formations Banque Formez-vous aux métiers bancaires, à l'analyse financière, au crédit et à la conformité réglementaire dans un secteur en pleine mutation. Découvrir" [ref=e25]
+  - generic
+    - image "Banque"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "Banque" [level=3, ref=e45]
+  - paragraph
+    - StaticText "Formez-vous aux métiers bancaires, à l'analyse financière, au crédit et à la conformité réglementaire dans un secteur en pleine mutation."
+  - StaticText "Découvrir"
+- link "BI — Business Intelligence 3 formations BI — Business Intelligence Maîtrisez les outils et techniques de la Business Intelligence pour transformer vos données en décisions stratégiques éclairées. Découvrir" [ref=e26]
+  - generic
+    - image "BI — Business Intelligence"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "BI — Business Intelligence" [level=3, ref=e46]
+  - paragraph
+    - StaticText "Maîtrisez les outils et techniques de la Business Intelligence pour transformer vos données en décisions stratégiques éclairées."
+  - StaticText "Découvrir"
+- link "Changement 3 formations Changement Apprenez à piloter et accompagner le changement au sein de votre organisation pour garantir l'adhésion et la réussite de vos transformations. Découvrir" [ref=e27]
+  - generic
+    - image "Changement"
+    - StaticText "3"
+    - StaticText " formation"
+    - StaticText "s"
+  - heading "Changement" [level=3, ref=e47]
+  - paragraph
+    - StaticText "Apprenez à piloter et accompagner le changement au sein de votre organisation pour garantir l'adhésion et la réussite de vos transformations."
+  - StaticText "Découvrir"
+- link "Voir toutes les formations" [ref=e48]
+- StaticText "NOS PRODUITS"
+- heading "Solutions digitales innovantes" [level=2, ref=e28]
+  - StaticText "Solutions digitales innovantes"
+- paragraph
+  - StaticText "Découvrez notre gamme de solutions basées sur la technologie QR code, conçues pour la traçabilité, la logistique et l'expérience client."
+- link "QRbags Voyage & Mobilité QRbags Ne perdez plus jamais vos bagages Solution de traçabilité de bagages pour les voyageurs. Chaque bagage est équipé d'un QR code unique. Récupérez vos bagages 10x plus vite Vos données personnelles restent confidentielles Voir le produit" [ref=e29]
+  - generic
+    - image "QRbags"
+    - StaticText "Voyage & Mobilité"
+  - heading "QRbags" [level=3, ref=e49]
+  - paragraph
+    - StaticText "Ne perdez plus jamais vos bagages"
+  - paragraph
+    - StaticText "Solution de traçabilité de bagages pour les voyageurs. Chaque bagage est équipé d'un QR code unique."
+  - list
+    - listitem [level=1]
+      - StaticText "Récupérez vos bagages 10x plus vite"
+    - listitem [level=1]
+      - StaticText "Vos données personnelles restent confidentielles"
+  - StaticText "Voir le produit"
+- link "QRtags Objets personnels QRtags Retrouvez vos objets du quotidien Solution de traçabilité des objets trouvés. Collez un QR tag sur vos objets personnels. Discrétion totale sur vos objets Protection de votre identité Voir le produit" [ref=e30]
+  - generic
+    - image "QRtags"
+    - StaticText "Objets personnels"
+  - heading "QRtags" [level=3, ref=e50]
+  - paragraph
+    - StaticText "Retrouvez vos objets du quotidien"
+  - paragraph
+    - StaticText "Solution de traçabilité des objets trouvés. Collez un QR tag sur vos objets personnels."
+  - list
+    - listitem [level=1]
+      - StaticText "Discrétion totale sur vos objets"
+    - listitem [level=1]
+      - StaticText "Protection de votre identité"
+  - StaticText "Voir le produit"
+- link "QRtags pour Entreprise Solutions professionnelles QRtags pour Entreprise La gestion des objets trouvés pour les professionnels Solution dédiée aux professionnels pour la gestion centralisée des objets trouvés. Réduction du temps de gestion des objets trouvés Amélioration de la satisfaction client Voir le produit" [ref=e31]
+  - generic
+    - image "QRtags pour Entreprise"
+    - StaticText "Solutions professionnelles"
+  - heading "QRtags pour Entreprise" [level=3, ref=e51]
+  - paragraph
+    - StaticText "La gestion des objets trouvés pour les professionnels"
+  - paragraph
+    - StaticText "Solution dédiée aux professionnels pour la gestion centralisée des objets trouvés."
+  - list
+    - listitem [level=1]
+      - StaticText "Réduction du temps de gestion des objets trouvés"
+    - listitem [level=1]
+      - StaticText "Amélioration de la satisfaction client"
+  - StaticText "Voir le produit"
+- link "QRtrans Logistique & Livraison QRtrans Suivez vos colis en temps réel via WhatsApp Solution de traçabilité d'envoi de colis via QR code et notifications WhatsApp. Aucune application à installer pour le destinataire Réduction des appels de suivi client de 80% Voir le produit" [ref=e32]
+  - generic
+    - image "QRtrans"
+    - StaticText "Logistique & Livraison"
+  - heading "QRtrans" [level=3, ref=e52]
+  - paragraph
+    - StaticText "Suivez vos colis en temps réel via WhatsApp"
+  - paragraph
+    - StaticText "Solution de traçabilité d'envoi de colis via QR code et notifications WhatsApp."
+  - list
+    - listitem [level=1]
+      - StaticText "Aucune application à installer pour le destinataire"
+    - listitem [level=1]
+      - StaticText "Réduction des appels de suivi client de 80%"
+  - StaticText "Voir le produit"
+- link "VerifScan Agroalimentaire VerifScan La transparence alimentaire par le scan Solution de traçabilité des produits agroalimentaires via un scan QR code pour les entrepreneurs. Renforcez la confiance de vos consommateurs Conformité aux normes de traçabilité alimentaire Voir le produit" [ref=e33]
+  - generic
+    - image "VerifScan"
+    - StaticText "Agroalimentaire"
+  - heading "VerifScan" [level=3, ref=e53]
+  - paragraph
+    - StaticText "La transparence alimentaire par le scan"
+  - paragraph
+    - StaticText "Solution de traçabilité des produits agroalimentaires via un scan QR code pour les entrepreneurs."
+  - list
+    - listitem [level=1]
+      - StaticText "Renforcez la confiance de vos consommateurs"
+    - listitem [level=1]
+      - StaticText "Conformité aux normes de traçabilité alimentaire"
+  - StaticText "Voir le produit"
+- link "MyRest Restauration MyRest Votre menu digital, scannable en un geste Solution qui permet aux clients de restaurants de scanner un QR code pour accéder au menu digital. Réduction des coûts d'impression de menus Expérience client moderne et sans contact Voir le produit" [ref=e34]
+  - generic
+    - image "MyRest"
+    - StaticText "Restauration"
+  - heading "MyRest" [level=3, ref=e54]
+  - paragraph
+    - StaticText "Votre menu digital, scannable en un geste"
+  - paragraph
+    - StaticText "Solution qui permet aux clients de restaurants de scanner un QR code pour accéder au menu digital."
+  - list
+    - listitem [level=1]
+      - StaticText "Réduction des coûts d'impression de menus"
+    - listitem [level=1]
+      - StaticText "Expérience client moderne et sans contact"
+  - StaticText "Voir le produit"
+- link "Voir tous nos produits" [ref=e55]
+- generic
+  - generic
+    - heading "Parlons de votre projet" [level=3, ref=e81]
+      - StaticText "Parlons de votre projet"
+    - paragraph
+      - StaticText "Une question, un projet de développement ou de structuration ? Notre équipe vous répond avec la confidentialité que méritent vos enjeux."
+    - link "Nous contacter" [ref=e82]
+- StaticText "BLOG & ACTUALITÉS"
+- heading "Nos dernières publications" [level=2, ref=e35]
+  - StaticText "Nos dernières publications"
+- paragraph
+  - StaticText "Analyses, conseils et retours d'expérience pour accompagner le développement de votre entreprise et anticiper les évolutions des marchés."
+- paragraph
+  - StaticText "Aucun article publié pour le moment. Revenez bientôt !"
+- link "Voir tous les articles" [ref=e56]
+- StaticText "TÉMOIGNAGES"
+- heading "Ils nous font confiance" [level=2, ref=e36]
+  - StaticText "Ils nous font confiance"
+- paragraph
+  - StaticText "Découvrez ce que nos clients disent de notre accompagnement et de notre engagement à leurs côtés."
+- generic
+  - generic
+    - image "Jean-Pierre Kouassi"
+    - blockquote
+      - StaticText "«Grâce à l'intervention d'HMC, nous avons pu restructurer notre organisation et améliorer significativement notre performance opérationnelle en moins de six mois. Leur méthode est pragmatique et leurs recommandations sont toujours applicables.»"
+    - paragraph
+      - StaticText "Jean-Pierre Kouassi"
+    - paragraph
+      - StaticText "Président — Atlantique Industries SA"
+    - paragraph
+      - StaticText "Transformation digitale & réorganisation"
+  - button "Témoignage précédent" [ref=e57]
+  - button "Témoignage suivant" [ref=e58]
+  - button "Aller au témoignage 1" [ref=e59]
+  - button "Aller au témoignage 2" [ref=e60]
+  - button "Aller au témoignage 3" [ref=e61]
+  - button "Aller au témoignage 4" [ref=e62]
+  - button "Aller au témoignage 5" [ref=e63]
+  - button "Aller au témoignage 6" [ref=e64]
+- generic
+  - StaticText "NEWSLETTER"
+  - heading "Restez informé" [level=2, ref=e84]
+    - StaticText "Restez informé"
+  - paragraph
+    - StaticText "Recevez nos analyses, nos conseils et nos actualités directement dans votre boîte mail. Une fois par mois, sans spam."
+  - form
+    - textbox "Adresse e-mail" [ref=e93]
+    - button "S'inscrire" [ref=e90]
+- generic
+  - StaticText "CONSEIL & MANAGEMENT DES ENTREPRISES"
+- heading "Votre partenaire en conseil et management" [level=1, ref=e38]
+  - StaticText "Votre partenaire en conseil et management"
+- paragraph
+  - StaticText "HMC est un cabinet de conseil et de management dédié aux entreprises. Nous accompagnons les organisations dans leur développement, sécurisons leur activité tout en maîtrisant leurs risques, de la stratégie à la mise en œuvre opérationnelle."
+- link "Découvrir nos services" [ref=e39]
+- link "Nous contacter" [ref=e40]
+- StaticText "+30"
+- StaticText "ANS D'EXPÉRIENCE"
+- StaticText "+20"
+- StaticText "PAYS COUVERTS"
+- StaticText "PMe → Groupes"
+- StaticText "TOUTES TAILLES"
+- StaticText "AFRIQUE & OCÉAN INDIEN"
+- heading "Achats et approvisionnement" [level=3, ref=e42]
+- paragraph
+  - StaticText "Maîtrisez les stratégies d'achat, la gestion des fournisseurs et l'optimisation des processus d'approvisionnement pour maximiser la performance de votre chaîne d'approvisionnement."
+- StaticText "Découvrir"
+- heading "Assurance" [level=3, ref=e43]
+- paragraph
+  - StaticText "Développez votre expertise dans le secteur de l'assurance, de la souscription à la gestion des sinistres, en passant par la réglementation et la conformité."
+- StaticText "Découvrir"
+- heading "Audit" [level=3, ref=e44]
+- paragraph
+  - StaticText "Acquérez les méthodologies et outils d'audit pour évaluer les processus, identifier les risques et formuler des recommandations pertinentes."
+- StaticText "Découvrir"
+- heading "Banque" [level=3, ref=e45]
+- paragraph
+  - StaticText "Formez-vous aux métiers bancaires, à l'analyse financière, au crédit et à la conformité réglementaire dans un secteur en pleine mutation."
+- StaticText "Découvrir"
+- heading "BI — Business Intelligence" [level=3, ref=e46]
+- paragraph
+  - StaticText "Maîtrisez les outils et techniques de la Business Intelligence pour transformer vos données en décisions stratégiques éclairées."
+- StaticText "Découvrir"
+- heading "Changement" [level=3, ref=e47]
+- paragraph
+  - StaticText "Apprenez à piloter et accompagner le changement au sein de votre organisation pour garantir l'adhésion et la réussite de vos transformations."
+- StaticText "Découvrir"
+- heading "QRbags" [level=3, ref=e49]
+- paragraph
+  - StaticText "Ne perdez plus jamais vos bagages"
+- paragraph
+  - StaticText "Solution de traçabilité de bagages pour les voyageurs. Chaque bagage est équipé d'un QR code unique."
+- list
+  - listitem [level=1]
+    - StaticText "Récupérez vos bagages 10x plus vite"
+  - listitem [level=1]
+    - StaticText "Vos données personnelles restent confidentielles"
+- StaticText "Voir le produit"
+- heading "QRtags" [level=3, ref=e50]
+- paragraph
+  - StaticText "Retrouvez vos objets du quotidien"
+- paragraph
+  - StaticText "Solution de traçabilité des objets trouvés. Collez un QR tag sur vos objets personnels."
+- list
+  - listitem [level=1]
+    - StaticText "Discrétion totale sur vos objets"
+  - listitem [level=1]
+    - StaticText "Protection de votre identité"
+- StaticText "Voir le produit"
+- heading "QRtags pour Entreprise" [level=3, ref=e51]
+- paragraph
+  - StaticText "La gestion des objets trouvés pour les professionnels"
+- paragraph
+  - StaticText "Solution dédiée aux professionnels pour la gestion centralisée des objets trouvés."
+- list
+  - listitem [level=1]
+    - StaticText "Réduction du temps de gestion des objets trouvés"
+  - listitem [level=1]
+    - StaticText "Amélioration de la satisfaction client"
+- StaticText "Voir le produit"
+- heading "QRtrans" [level=3, ref=e52]
+- paragraph
+  - StaticText "Suivez vos colis en temps réel via WhatsApp"
+- paragraph
+  - StaticText "Solution de traçabilité d'envoi de colis via QR code et notifications WhatsApp."
+- list
+  - listitem [level=1]
+    - StaticText "Aucune application à installer pour le destinataire"
+  - listitem [level=1]
+    - StaticText "Réduction des appels de suivi client de 80%"
+- StaticText "Voir le produit"
+- heading "VerifScan" [level=3, ref=e53]
+- paragraph
+  - StaticText "La transparence alimentaire par le scan"
+- paragraph
+  - StaticText "Solution de traçabilité des produits agroalimentaires via un scan QR code pour les entrepreneurs."
+- list
+  - listitem [level=1]
+    - StaticText "Renforcez la confiance de vos consommateurs"
+  - listitem [level=1]
+    - StaticText "Conformité aux normes de traçabilité alimentaire"
+- StaticText "Voir le produit"
+- heading "MyRest" [level=3, ref=e54]
+- paragraph
+  - StaticText "Votre menu digital, scannable en un geste"
+- paragraph
+  - StaticText "Solution qui permet aux clients de restaurants de scanner un QR code pour accéder au menu digital."
+- list
+  - listitem [level=1]
+    - StaticText "Réduction des coûts d'impression de menus"
+  - listitem [level=1]
+    - StaticText "Expérience client moderne et sans contact"
+- StaticText "Voir le produit"
+- button "Aller au témoignage 1" [ref=e59]
+- button "Aller au témoignage 2" [ref=e60]
+- button "Aller au témoignage 3" [ref=e61]
+- button "Aller au témoignage 4" [ref=e62]
+- button "Aller au témoignage 5" [ref=e63]
+- button "Aller au témoignage 6" [ref=e64]
+- StaticText "RENDEZ-VOUS"
+- heading "Prenez rendez-vous" [level=2, ref=e65]
+  - StaticText "Prenez rendez-vous"
+- paragraph
+  - StaticText "Réservez un créneau avec notre équipe. Que ce soit pour un audit, une consultation stratégique ou un accompagnement opérationnel, nous sommes à votre écoute."
+- StaticText "DISPONIBILITÉ"
+- StaticText "Lun. — Ven. 9h–18h"
+- StaticText "DURÉE ESTIMÉE"
+- StaticText "45 min — 1h"
+- StaticText "CONFIRMATION"
+- StaticText "Par e-mail sous 24h"
+- StaticText "GRATUIT & SANS ENGAGEMENT"
+- form
+  - LabelText
+    - StaticText "NOM COMPLET *"
+  - textbox "Votre nom" [required, ref=e85]
+  - LabelText
+    - StaticText "E-MAIL *"
+  - textbox "vous@exemple.com" [required, ref=e86]
+  - LabelText
+    - StaticText "TÉLÉPHONE"
+  - textbox "+221 ..." [ref=e87]
+  - LabelText
+    - StaticText "SOCIÉTÉ"
+  - textbox "Votre entreprise" [ref=e88]
+  - LabelText
+    - StaticText "DATE SOUHAITÉE *"
+  - Date
+    - generic
+      - spinbutton "Month" [ref=e94]: 0
+      - StaticText "/"
+      - spinbutton "Day" [ref=e95]: 0
+      - StaticText "/"
+      - spinbutton "Year" [ref=e96]: 0
+    - button "Show date picker" [ref=e91]
+  - LabelText
+    - StaticText "HEURE SOUHAITÉE"
+  - InputTime
+    - generic
+      - spinbutton "Hours" [ref=e97]: 0
+      - StaticText ":"
+      - spinbutton "Minutes" [ref=e98]: 0
+      - StaticText " "
+      - spinbutton "AM/PM" [ref=e99]: 0
+    - button "Show time picker" [ref=e92]
+  - LabelText
+    - StaticText "SUJET / MESSAGE"
+  - textbox "Décrivez brièvement l'objet de votre rendez-vous…" [ref=e89]
+  - button "Réserver le rendez-vous" [ref=e83]
+  - paragraph
+    - StaticText "En envoyant ce formulaire, vous acceptez d'être recontacté par HMC."
+- StaticText "0"
+- StaticText "1"
+- StaticText "0"
+- StaticText "2"
+- StaticText "0"
+- StaticText "3"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "3"
+- StaticText " formation"
+- StaticText "s"
+- StaticText "Voyage & Mobilité"
+- StaticText "Objets personnels"
+- StaticText "Solutions professionnelles"
+- StaticText "Logistique & Livraison"
+- StaticText "Agroalimentaire"
+- StaticText "Restauration"
+- heading "Parlons de votre projet" [level=3, ref=e81]
+  - StaticText "Parlons de votre projet"
+- paragraph
+  - StaticText "Une question, un projet de développement ou de structuration ? Notre équipe vous répond avec la confidentialité que méritent vos enjeux."
+- LabelText
+  - StaticText "NOM COMPLET *"
+- textbox "Votre nom" [required, ref=e85]
+- LabelText
+  - StaticText "E-MAIL *"
+- textbox "vous@exemple.com" [required, ref=e86]
+- LabelText
+  - StaticText "TÉLÉPHONE"
+- textbox "+221 ..." [ref=e87]
+- LabelText
+  - StaticText "SOCIÉTÉ"
+- textbox "Votre entreprise" [ref=e88]
+- LabelText
+  - StaticText "DATE SOUHAITÉE *"
+- Date
+  - generic
+    - spinbutton "Month" [ref=e94]: 0
+      - StaticText "mm"
+    - StaticText "/"
+    - spinbutton "Day" [ref=e95]: 0
+      - StaticText "dd"
+    - StaticText "/"
+    - spinbutton "Year" [ref=e96]: 0
+      - StaticText "yyyy"
+  - button "Show date picker" [ref=e91]
+- LabelText
+  - StaticText "HEURE SOUHAITÉE"
+- InputTime
+  - generic
+    - spinbutton "Hours" [ref=e97]: 0
+      - StaticText "--"
+    - StaticText ":"
+    - spinbutton "Minutes" [ref=e98]: 0
+      - StaticText "--"
+    - StaticText " "
+    - spinbutton "AM/PM" [ref=e99]: 0
+      - StaticText "--"
+  - button "Show time picker" [ref=e92]
+- LabelText
+  - StaticText "SUJET / MESSAGE"
+- textbox "Décrivez brièvement l'objet de votre rendez-vous…" [ref=e89]
+- StaticText "NEWSLETTER"
+- heading "Restez informé" [level=2, ref=e84]
+  - StaticText "Restez informé"
+- paragraph
+  - StaticText "Recevez nos analyses, nos conseils et nos actualités directement dans votre boîte mail. Une fois par mois, sans spam."
+- form
+  - textbox "Adresse e-mail" [ref=e93]
+  - button "S'inscrire" [ref=e90]
+- image "Jean-Pierre Kouassi"
+- blockquote
+  - StaticText "«Grâce à l'intervention d'HMC, nous avons pu restructurer notre organisation et améliorer significativement notre performance opérationnelle en moins de six mois. Leur méthode est pragmatique et leurs recommandations sont toujours applicables.»"
+- paragraph
+  - StaticText "Jean-Pierre Kouassi"
+- paragraph
+  - StaticText "Président — Atlantique Industries SA"
+- paragraph
+  - StaticText "Transformation digitale & réorganisation"
