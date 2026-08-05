@@ -27,7 +27,8 @@ import {
   ShoppingCart,
   MoreVertical,
   UserRound,
-  Smartphone
+  Smartphone,
+  Plane
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,6 +76,7 @@ function Sidebar({ isOpen, setIsOpen, unreadMessages, onLogout, userName, agency
   
   const menuItems: MenuItem[] = [
     { label: "Tableau de bord", icon: <Home className="w-5 h-5" />, href: "/agence/tableau-de-bord" },
+    { label: "Voyages", icon: <Plane className="w-5 h-5" />, href: "/agency/dashboard" },
     { label: "Bagages", icon: <Luggage className="w-5 h-5" />, href: "/agence/baggages" },
     { label: "Identity", icon: <UserRound className="w-5 h-5" />, href: "/agence/identity" },
     { label: "Assistance", icon: <MessageCircle className="w-5 h-5" />, href: "/agence/assistance", badge: unreadMessages },
@@ -525,6 +527,24 @@ export default function AgencyRootLayout({
             
             {children}
           </main>
+
+          {/* Footer avec lien QR Code PWA */}
+          <footer className="border-t border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3">
+            <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+              <span>&copy; {new Date().getFullYear()} PassHajj — Espace Agence</span>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/agence/application"
+                  className="flex items-center gap-1.5 hover:text-[#f4b400] transition-colors font-medium"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">QR Code PWA</span>
+                  <span className="sm:hidden">PWA</span>
+                </Link>
+                <span className="hidden sm:inline">Tous droits réservés</span>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
     </AgencyContext.Provider>

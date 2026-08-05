@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Smartphone,
@@ -27,10 +27,6 @@ import { motion } from 'framer-motion';
 const JAUNE = '#f4b400';
 const JAUNE_HOVER = '#d97706';
 const BLEU_MARINE = '#1e3a5f';
-
-/** PWA URL — from env or fallback */
-const PwaUrl =
-  process.env.NEXT_PUBLIC_PWA_URL || 'https://passhajj.com/manager';
 
 const QR_SIZE = 220;
 
@@ -139,16 +135,26 @@ function FeatureBadge({ icon, label, color }: { icon: React.ReactNode; label: st
 export default function ApplicationPWAPage() {
   const [copied, setCopied] = useState(false);
 
+  /** PWA URL — dynamic based on current host or env fallback */
+  const pwaUrl = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const envUrl = process.env.NEXT_PUBLIC_PWA_URL;
+      if (envUrl) return envUrl;
+      return `${window.location.origin}/manager`;
+    }
+    return '/manager';
+  }, []);
+
   /* ── Copy PWA link to clipboard ── */
   const handleCopyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(PwaUrl);
+      await navigator.clipboard.writeText(pwaUrl);
       setCopied(true);
       toast.success('Lien copié dans le presse-papiers !');
       setTimeout(() => setCopied(false), 2500);
     } catch {
       const textArea = document.createElement('textarea');
-      textArea.value = PwaUrl;
+      textArea.value = pwaUrl;
       textArea.style.position = 'fixed';
       textArea.style.left = '-9999px';
       document.body.appendChild(textArea);
@@ -163,7 +169,7 @@ export default function ApplicationPWAPage() {
       }
       document.body.removeChild(textArea);
     }
-  }, []);
+  }, [pwaUrl]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -199,7 +205,7 @@ export default function ApplicationPWAPage() {
             {/* QR Code */}
             <div className="relative bg-white p-5 rounded-xl inline-block shadow-sm border-2 border-slate-100">
               <QRCodeSVG
-                value={PwaUrl}
+                value={pwaUrl}
                 size={QR_SIZE}
                 level="M"
                 bgColor="#ffffff"
@@ -254,7 +260,7 @@ export default function ApplicationPWAPage() {
             {/* URL display */}
             <div className="flex items-center gap-1.5 text-xs text-slate-400 break-all">
               <Globe className="w-3.5 h-3.5 shrink-0" />
-              <span className="font-mono select-all">{PwaUrl}</span>
+              <span className="font-mono select-all">{pwaUrl}</span>
             </div>
           </CardContent>
         </Card>
