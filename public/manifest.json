@@ -2,12 +2,12 @@
   "name": "PassHajj Manager – Gestion Pèlerins & Bagages",
   "short_name": "PassHajj",
   "description": "Application offline-first pour les Chefs de Groupe Hajj. Gestion des pèlerins et bagages par scan QR en temps réel.",
-  "start_url": "/?source=pwa",
+  "start_url": "/manager?source=pwa",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f4b400",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/manager",
   "prefer_related_applications": false,
   "icons": [
     {
@@ -73,7 +73,7 @@
       "name": "Scanner un QR",
       "short_name": "Scanner",
       "description": "Scanner un bracelet ou bagage",
-      "url": "/?action=scan",
+      "url": "/manager?action=scan",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],
