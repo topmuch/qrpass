@@ -27,6 +27,11 @@ import {
   Phone,
   Mail,
   ChevronRight,
+  Luggage,
+  UserCheck,
+  BookOpen,
+  Send,
+  Navigation,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PublicNavigation, PublicFooter } from '@/components/public/PublicLayout';
@@ -285,6 +290,290 @@ function AboutSection() {
                 </li>
               ))}
             </motion.ul>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   NOS PASS — 3 product cards (Pass Bagage, Identity, Passeport)
+   ══════════════════════════════════════════════════════════ */
+function NosPassSection() {
+  const passes = [
+    {
+      emoji: '🧳',
+      title: 'Pass Bagage',
+      subtitle: 'PROTECTION BAGAGE',
+      desc: "Un QR code autocollant collé sur votre bagage. Si quelqu'un le trouve, il scanne le code et vous recevez instantanément une alerte WhatsApp avec sa position GPS. Plus besoin de s'inquiéter à tapis roulant !",
+      features: [
+        'QR code autocollant résistant',
+        'Alerte WhatsApp instantanée + position GPS',
+        'Fonctionne sans app, sans batterie',
+        'Taux de récupération 98%',
+      ],
+      icon: Luggage,
+      gradient: 'from-amber-500 to-orange-500',
+      color: '#f59e0b',
+    },
+    {
+      emoji: '🪪',
+      title: 'Pass Identity',
+      subtitle: 'CARTE D\'IDENTITÉ MÉDICALE',
+      desc: "Un QR code porté par le pèlerin (bracelet, carte ou pendentif). En cas de malaise ou d\'urgence, les secours scannent le code et accèdent immédiatement à vos infos médicales : groupe sanguin, allergies, maladies, contact d\'urgence.",
+      features: [
+        'Infos médicales accessibles en 1 scan',
+        'Groupe sanguin, allergies, maladies',
+        'Bouton d\'appel direct 997 / 911',
+        'Bouton « Rassurer la famille » intelligent',
+      ],
+      icon: UserCheck,
+      gradient: 'from-emerald-500 to-teal-500',
+      color: '#10b981',
+    },
+    {
+      emoji: '📘',
+      title: 'Pass Passeport',
+      subtitle: 'PROTECTION PASSEPORT',
+      desc: "Un QR code collé sur la couverture de votre passeport. En cas de perte ou de vol, celui qui le trouve scanne le code et vous êtes alerté immédiatement. Essentiel lors des déplacements à Jeddah, Médine ou lors des rituels.",
+      features: [
+        'QR code discret sur le passeport',
+        'Alerte instantanée si scanné',
+        'Infos de contact pour le retour',
+        'Idéal pour Hajj, Omra & voyages',
+      ],
+      icon: BookOpen,
+      gradient: 'from-blue-500 to-cyan-500',
+      color: '#3b82f6',
+    },
+  ];
+
+  return (
+    <section id="solutions" className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
+      <BlurOrb size="h-64 w-64" color={JAUNE} opacity={0.1} position="-bottom-24 -left-24" />
+      <BlurOrb size="h-40 w-40" color={NAVY} opacity={0.06} position="-top-20 -right-20" />
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={fadeUp}
+          className="text-center mb-16"
+        >
+          <Overline>Nos Pass</Overline>
+          <h2
+            className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`}
+            style={{ color: INK }}
+          >
+            3 QR codes, 3 protections, 1 sérénité
+          </h2>
+          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: MUTED }}>
+            Chaque Pass protège un aspect essentiel de votre voyage. Un simple scan suffit.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          variants={stagger}
+          className="grid lg:grid-cols-3 gap-8"
+        >
+          {passes.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <motion.div
+                key={p.title}
+                variants={fadeUp}
+                custom={i}
+                className="group relative bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-transparent transition-all duration-300"
+              >
+                {/* Gradient header */}
+                <div className={`h-48 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center`}>
+                  <div className="bg-gradient-to-t from-black/40 to-transparent absolute inset-0" />
+                  <span className="relative text-7xl select-none">{p.emoji}</span>
+                  {/* Icon badge */}
+                  <div className="absolute top-4 right-4 h-12 w-12 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  {/* Subtitle badge */}
+                  <span className="absolute top-4 left-4 rounded-full border border-white/40 bg-white/10 backdrop-blur-md px-4 py-1.5 text-xs font-semibold text-white tracking-wide">
+                    {p.subtitle}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 sm:p-7">
+                  <h3 className={`text-xl font-semibold mb-3 ${serif}`} style={{ color: INK }}>
+                    {p.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed mb-5" style={{ color: MUTED }}>
+                    {p.desc}
+                  </p>
+                  <ul className="space-y-2 mb-5">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: p.color }} />
+                        <span className="text-sm" style={{ color: INK }}>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   RASSURER LA FAMILLE — Prominent section explaining Caméléon
+   ══════════════════════════════════════════════════════════ */
+function RassurerLaFamilleSection() {
+  return (
+    <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: NAVY_DARK }}>
+      {/* Decorative orbs */}
+      <BlurOrb size="h-96 w-96" color={JAUNE} opacity={0.1} position="top-0 right-0 translate-x-1/3 -translate-y-1/4" />
+      <BlurOrb size="h-72 w-72" color="#10b981" opacity={0.08} position="bottom-0 left-0 -translate-x-1/3 translate-y-1/4" />
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Content */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp}>
+              <Overline color={JAUNE_LIGHT}>Fonctionnalité phare</Overline>
+            </motion.div>
+            <motion.h2
+              variants={fadeUp}
+              custom={1}
+              className={`text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight mb-6 text-white ${serif}`}
+            >
+              Rassurer la famille,{' '}
+              <span style={{ color: JAUNE }}>automatiquement</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg leading-relaxed mb-8 text-white/80"
+            >
+              Le bouton <strong className="text-white">&quot;Rassurer la famille&quot;</strong> est le cœur de Pass Identity.
+              Il utilise la <strong className="text-white">géolocalisation GPS</strong> pour adapter automatiquement
+              le message envoyé à votre famille via WhatsApp — sans que vous n&apos;ayez rien à taper.
+            </motion.p>
+
+            {/* How it works */}
+            <motion.div variants={fadeUp} custom={3} className="space-y-4 mb-8">
+              <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: JAUNE }}>
+                Comment ça marche ?
+              </h3>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold" style={{ backgroundColor: JAUNE, color: NAVY }}>1</div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Le GPS détecte votre position</p>
+                  <p className="text-xs text-white/60">Médine, Mina, Arafat, Mecque…</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold" style={{ backgroundColor: JAUNE, color: NAVY }}>2</div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Le message s&apos;adapte automatiquement</p>
+                  <p className="text-xs text-white/60">Le bouton devient &quot;caméléon&quot; : il change de texte selon où vous êtes</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold" style={{ backgroundColor: JAUNE, color: NAVY }}>3</div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Un clic = message WhatsApp envoyé</p>
+                  <p className="text-xs text-white/60">Avec votre position GPS et l&apos;étape suivante du Hajj</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeUp} custom={4}>
+              <Link href="/hajj-omra" className="group">
+                <Button size="lg" className="rounded-[10px] px-6 h-12 text-sm font-medium shadow-lg transition-all" style={{ backgroundColor: JAUNE, color: NAVY }}>
+                  Découvrir Pass Identity
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* Example messages card */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 sm:p-8 shadow-2xl">
+              <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <Heart className="w-5 h-5" style={{ color: JAUNE }} />
+                Exemples de messages automatiques
+              </h3>
+
+              <div className="space-y-4">
+                {/* Medina */}
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4" style={{ color: '#10b981' }} />
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#10b981' }}>Médine</span>
+                  </div>
+                  <p className="text-sm text-white/90 italic">
+                    &quot;Bonjour la famille, je suis à Médine, tout se passe bien, je me repose avant le Hajj, à très bientôt inch&apos;Allah&quot;
+                  </p>
+                </div>
+
+                {/* Mina */}
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4" style={{ color: JAUNE }} />
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: JAUNE }}>Mina</span>
+                  </div>
+                  <p className="text-sm text-white/90 italic">
+                    &quot;Bonjour la famille, actuellement je suis en train de faire le Hajj à Mina, la prochaine étape c&apos;est Arafat, sinon tout se passe bien je vais super bien merci&quot;
+                  </p>
+                </div>
+
+                {/* Arafat */}
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-red-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-red-400">Arafat</span>
+                  </div>
+                  <p className="text-sm text-white/90 italic">
+                    &quot;Bonjour la famille, je suis à Arafat pour le jour le plus important du Hajj, la prochaine étape c&apos;est Muzdalifah, tout se passe bien alhamdulillah&quot;
+                  </p>
+                </div>
+
+                {/* Mecque */}
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-400">Mecque</span>
+                  </div>
+                  <p className="text-sm text-white/90 italic">
+                    &quot;Bonjour la famille, je suis à la Mecque pour le Tawaf, tout se passe bien alhamdulillah, à très bientôt inch&apos;Allah&quot;
+                  </p>
+                </div>
+              </div>
+
+              {/* WhatsApp indicator */}
+              <div className="mt-6 flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#25D36620' }}>
+                <MessageCircle className="w-5 h-5" style={{ color: '#25D366' }} />
+                <span className="text-sm font-medium" style={{ color: '#25D366' }}>Envoyé automatiquement via WhatsApp</span>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -827,6 +1116,8 @@ export default function HomePage() {
       <main className="flex-1 pt-16">
         <HeroSection />
         <AboutSection />
+        <NosPassSection />
+        <RassurerLaFamilleSection />
         <SolutionsSection />
         <FeaturesGrid />
         <HowItWorksSection />
