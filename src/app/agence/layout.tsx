@@ -76,7 +76,7 @@ function Sidebar({ isOpen, setIsOpen, unreadMessages, onLogout, userName, agency
   
   const menuItems: MenuItem[] = [
     { label: "Tableau de bord", icon: <Home className="w-5 h-5" />, href: "/agence/tableau-de-bord" },
-    { label: "Voyages", icon: <Plane className="w-5 h-5" />, href: "/agency/dashboard" },
+    { label: "Voyages", icon: <Plane className="w-5 h-5" />, href: "/agence/voyages" },
     { label: "Bagages", icon: <Luggage className="w-5 h-5" />, href: "/agence/baggages" },
     { label: "Identity", icon: <UserRound className="w-5 h-5" />, href: "/agence/identity" },
     { label: "Assistance", icon: <MessageCircle className="w-5 h-5" />, href: "/agence/assistance", badge: unreadMessages },
