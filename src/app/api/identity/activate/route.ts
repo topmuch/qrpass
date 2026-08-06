@@ -41,14 +41,24 @@ export async function POST(request: NextRequest) {
     // ── Extract fields ──
     const qrCode = fields.qrCode?.trim();
     const fullName = fields.fullName?.trim();
+    const nationality = fields.nationality?.trim();
     const bloodType = fields.bloodType?.trim();
+    const allergies = fields.allergies?.trim();
+    const diseases = fields.diseases?.trim();
     const medicalInfo = fields.medicalInfo?.trim();
     const hotelMecca = fields.hotelMecca?.trim();
     const roomMecca = fields.roomMecca?.trim();
     const hotelMedina = fields.hotelMedina?.trim();
     const roomMedina = fields.roomMedina?.trim();
+    const hotelAddress = fields.hotelAddress?.trim();
+    const hotelPhone = fields.hotelPhone?.trim();
     const groupLeaderPhone = fields.groupLeaderPhone?.trim();
     const familyContact = fields.familyContact?.trim();
+    const address = fields.address?.trim();
+    const phone = fields.phone?.trim();
+    const language = fields.language?.trim();
+    const firstName = fields.firstName?.trim();
+    const lastName = fields.lastName?.trim();
     const photoUrl = fields.photoUrl?.trim();
 
     // ── Validate required fields ──
@@ -110,7 +120,7 @@ export async function POST(request: NextRequest) {
     // ── Build update data ──
     const updateData: Record<string, unknown> = {
       fullName,
-      nationality: 'Non spécifié', // Required by model but not collected in the form
+      nationality: nationality || 'Non spécifié',
       isActive: true,
       duration,
       expiresAt,
@@ -119,13 +129,22 @@ export async function POST(request: NextRequest) {
     // Optional fields — only set if provided, otherwise null
     if (photoUrl !== undefined) updateData.photoUrl = photoUrl || null;
     if (bloodType) updateData.bloodType = bloodType;
+    if (allergies) updateData.allergies = allergies;
+    if (diseases) updateData.diseases = diseases;
     if (medicalInfo) updateData.medicalInfo = medicalInfo;
     if (hotelMecca) updateData.hotelMecca = hotelMecca;
     if (roomMecca) updateData.roomMecca = roomMecca;
     if (hotelMedina) updateData.hotelMedina = hotelMedina;
     if (roomMedina) updateData.roomMedina = roomMedina;
+    if (hotelAddress) updateData.hotelAddress = hotelAddress;
+    if (hotelPhone) updateData.hotelPhone = hotelPhone;
     if (groupLeaderPhone) updateData.groupLeaderPhone = groupLeaderPhone;
     if (familyContact) updateData.familyContact = familyContact;
+    if (address) updateData.address = address;
+    if (phone) updateData.phone = phone;
+    if (language) updateData.language = language;
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
 
     // ── Update the pilgrim ──
     const updated = await db.pilgrim.update({
@@ -141,15 +160,25 @@ export async function POST(request: NextRequest) {
           id: updated.id,
           qrCode: updated.qrCode,
           fullName: updated.fullName,
+          firstName: updated.firstName,
+          lastName: updated.lastName,
           nationality: updated.nationality,
           photoUrl: updated.photoUrl,
           bloodType: updated.bloodType,
+          allergies: updated.allergies,
+          diseases: updated.diseases,
           medicalInfo: updated.medicalInfo,
+          address: updated.address,
+          phone: updated.phone,
+          language: updated.language,
           hotelMecca: updated.hotelMecca,
           roomMecca: updated.roomMecca,
           hotelMedina: updated.hotelMedina,
           roomMedina: updated.roomMedina,
+          hotelAddress: updated.hotelAddress,
+          hotelPhone: updated.hotelPhone,
           groupLeaderPhone: updated.groupLeaderPhone,
+          agencyPhone: updated.agencyPhone,
           familyContact: updated.familyContact,
           isActive: updated.isActive,
           duration: updated.duration,

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from '@/hooks/use-toast';
 import PhoneInput from '@/components/ui/PhoneInput';
-import { COUNTRY_MAP } from '@/lib/phone';
+import { COUNTRY_MAP, COUNTRIES } from '@/lib/phone';
 import {
   ChevronRight,
   ChevronLeft,
@@ -60,6 +60,10 @@ function IdentityActivateContent() {
   const [phone, setPhone] = useState('');
   const [language, setLanguage] = useState('');
 
+  // Step 1: Nationalité
+  const [nationality, setNationality] = useState('');
+  const [nationalitySearch, setNationalitySearch] = useState('');
+
   // Step 2: Santé
   const [bloodType, setBloodType] = useState('');
   const [allergies, setAllergies] = useState('');
@@ -73,6 +77,7 @@ function IdentityActivateContent() {
   const [leaderPhone, setLeaderPhone] = useState('');
   const [familyPhone, setFamilyPhone] = useState('');
   const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelPhone, setHotelPhone] = useState('');
 
   // Country codes for PhoneInput (detected from IP on mount)
   const [phoneCountry, setPhoneCountry] = useState('SN');
@@ -123,6 +128,7 @@ function IdentityActivateContent() {
     if (!code.trim()) newErrors.code = true;
     if (!firstName.trim()) newErrors.firstName = true;
     if (!lastName.trim()) newErrors.lastName = true;
+    if (!nationality.trim()) newErrors.nationality = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       toast({ title: 'Veuillez remplir tous les champs obligatoires', variant: 'destructive' });
@@ -212,7 +218,7 @@ function IdentityActivateContent() {
         fullName,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        nationality: 'Non spécifié', // Required by API but not in form
+        nationality: nationality.trim(),
         groupLeaderPhone: leaderPhone.trim(),
         bloodType: bloodType === 'Inconnu' ? 'Unknown' : bloodType,
         allergies: allergies.trim() || undefined,
@@ -223,6 +229,7 @@ function IdentityActivateContent() {
         language: language.trim() || undefined,
         familyContact: familyPhone.trim() || undefined,
         hotelAddress: hotelAddress.trim() || undefined,
+        hotelPhone: hotelPhone.trim() || undefined,
       };
 
       if (photoUrl) {
@@ -507,6 +514,54 @@ function IdentityActivateContent() {
               />
             </div>
 
+            {/* Nationalité */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Nationalité *
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={nationalitySearch || nationality}
+                  onChange={(e) => {
+                    setNationalitySearch(e.target.value);
+                    setNationality('');
+                  }}
+                  onFocus={() => setNationalitySearch(nationalitySearch || '')}
+                  placeholder="Ex: Sénégal, Maroc, France..."
+                  className={errors.nationality ? inputErrorClass : inputNormalClass}
+                  style={errors.nationality ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                />
+                {nationalitySearch && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border max-h-48 overflow-y-auto z-50" style={{ borderColor: INPUT_BORDER }}>
+                    {COUNTRIES.filter(c =>
+                      c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+                      c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
+                    ).slice(0, 10).map(c => (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          setNationality(c.name);
+                          setNationalitySearch('');
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                      >
+                        <span className="text-lg">{c.flag}</span>
+                        <span className="font-medium" style={{ color: TEXT }}>{c.name}</span>
+                      </button>
+                    ))}
+                    {COUNTRIES.filter(c =>
+                      c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+                      c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
+                    ).length === 0 && (
+                      <div className="px-4 py-3 text-sm" style={{ color: MUTED }}>Aucun pays trouvé</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Allergies — also in Step 1 for quick access */}
             <div className="mb-6">
               <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1.5" style={{ color: TEXT }}>
@@ -732,6 +787,24 @@ function IdentityActivateContent() {
                 className={inputNormalClass}
                 style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />
+            </div>
+
+            {/* Téléphone de l'Hôtel */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1.5" style={{ color: TEXT }}>
+                🏨 Téléphone de l&apos;Hôtel
+              </label>
+              <input
+                type="tel"
+                value={hotelPhone}
+                onChange={(e) => setHotelPhone(e.target.value)}
+                placeholder="Ex: +966 12 557 0000"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+              <p className="text-xs mt-1" style={{ color: MUTED }}>
+                Optionnel — sera affiché sur le profil pour appel direct
+              </p>
             </div>
 
             {/* WhatsApp Chef de Groupe */}

@@ -270,3 +270,34 @@ Stage Summary:
 - Only unassigned pilgrims shown (Option 2: YES)
 - ORP generated per voyage (Option 3: YES - PAR VOYAGE)
 - API endpoints updated to support pilgrim assignment during trip creation
+
+---
+Task ID: 1
+Agent: main
+Task: Fix missing fields in activation form and API — Nationalité, Téléphone de l'hôtel, allergies, diseases
+
+Work Log:
+- Analyzed user screenshot showing Step 3 of activation form missing hotel phone field
+- Read all relevant source files: activate/identity/page.tsx, api/pilgrims/activate/[code]/route.ts, api/identity/activate/route.ts, agence/tableau-de-bord/page.tsx, p/[code]/page.tsx, prisma/schema.prisma
+- Identified root cause: nationality was hardcoded as 'Non spécifié' in activation payload, hotelPhone was not included in payload or form UI, and both activation APIs didn't handle allergies/diseases/hotelPhone/etc.
+- Fixed activate/identity/page.tsx:
+  - Added Nationalité search/select dropdown in Step 1 with COUNTRIES list from lib/phone
+  - Added nationality validation in validateStep1
+  - Added "🏨 Téléphone de l'Hôtel" input field in Step 3
+  - Changed payload from hardcoded nationality: 'Non spécifié' to nationality.trim()
+  - Added hotelPhone to payload
+- Fixed /api/pilgrims/activate/[code]/route.ts:
+  - Added handlers for allergies, diseases, hotelPhone, hotelAddress, address, phone, language, firstName, lastName
+  - Added all new fields to response object
+- Fixed /api/identity/activate/route.ts:
+  - Added extraction of nationality, allergies, diseases, hotelPhone, hotelAddress, address, phone, language, firstName, lastName from request body
+  - Changed nationality from hardcoded 'Non spécifié' to dynamic from form
+  - Added all new fields to updateData and response object
+- Verified all changes are consistent across codebase
+
+Stage Summary:
+- Activation form now has Nationalité field (Step 1) and Téléphone de l'Hôtel field (Step 3)
+- Both activation APIs now properly save all pilgrim fields
+- Agency dashboard edit dialog already had all fields — was working correctly
+- Profile page already displays nationality, health alert (4 boxes), hotel info, and "Appeler l'Hôtel" button
+- The root cause was that data was never being saved during activation because the form didn't collect it and the API didn't persist it

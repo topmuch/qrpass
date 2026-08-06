@@ -80,15 +80,24 @@ export async function POST(
     // Optional fields
     if (body.photoUrl !== undefined) updateData.photoUrl = body.photoUrl || null;
     if (body.bloodType !== undefined) updateData.bloodType = body.bloodType || null;
+    if (body.allergies !== undefined) updateData.allergies = body.allergies || null;
+    if (body.diseases !== undefined) updateData.diseases = body.diseases || null;
     if (body.medicalInfo !== undefined) updateData.medicalInfo = body.medicalInfo || null;
     if (body.hotelMecca !== undefined) updateData.hotelMecca = body.hotelMecca || null;
     if (body.roomMecca !== undefined) updateData.roomMecca = body.roomMecca || null;
     if (body.hotelMedina !== undefined) updateData.hotelMedina = body.hotelMedina || null;
     if (body.roomMedina !== undefined) updateData.roomMedina = body.roomMedina || null;
     if (body.hotelCoords !== undefined) updateData.hotelCoords = body.hotelCoords || null;
+    if (body.hotelAddress !== undefined) updateData.hotelAddress = body.hotelAddress || null;
+    if (body.hotelPhone !== undefined) updateData.hotelPhone = body.hotelPhone || null;
     if (body.agencyPhone !== undefined) updateData.agencyPhone = body.agencyPhone || null;
     if (body.familyContact !== undefined) updateData.familyContact = body.familyContact || null;
     if (body.alNusukDocUrl !== undefined) updateData.alNusukDocUrl = body.alNusukDocUrl || null;
+    if (body.address !== undefined) updateData.address = body.address || null;
+    if (body.phone !== undefined) updateData.phone = body.phone || null;
+    if (body.language !== undefined) updateData.language = body.language || null;
+    if (body.firstName !== undefined) updateData.firstName = body.firstName || null;
+    if (body.lastName !== undefined) updateData.lastName = body.lastName || null;
 
     // Update the pilgrim
     const updated = await db.pilgrim.update({
@@ -104,15 +113,24 @@ export async function POST(
           id: updated.id,
           qrCode: updated.qrCode,
           fullName: updated.fullName,
+          firstName: updated.firstName,
+          lastName: updated.lastName,
           nationality: updated.nationality,
           photoUrl: updated.photoUrl,
           bloodType: updated.bloodType,
+          allergies: updated.allergies,
+          diseases: updated.diseases,
           medicalInfo: updated.medicalInfo,
+          address: updated.address,
+          phone: updated.phone,
+          language: updated.language,
           hotelMecca: updated.hotelMecca,
           roomMecca: updated.roomMecca,
           hotelMedina: updated.hotelMedina,
           roomMedina: updated.roomMedina,
           hotelCoords: updated.hotelCoords,
+          hotelAddress: updated.hotelAddress,
+          hotelPhone: updated.hotelPhone,
           groupLeaderPhone: updated.groupLeaderPhone,
           agencyPhone: updated.agencyPhone,
           familyContact: updated.familyContact,
