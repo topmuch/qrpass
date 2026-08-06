@@ -542,7 +542,7 @@ function PassIdentitySection() {
             transition={{ duration: 0.6 }}
             className="relative lg:order-2"
           >
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-200/50">
+            <div className="relative aspect-[3/2] rounded-3xl overflow-hidden shadow-2xl border border-emerald-200/50">
               <Image
                 src="/medical-id-card.png"
                 alt="PassHajj — Carte d'identité médicale avec QR code"
