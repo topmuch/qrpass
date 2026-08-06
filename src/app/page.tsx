@@ -123,20 +123,18 @@ function BlurOrb({
 function HeroSection() {
   return (
     <section className="relative min-h-[100svh] flex items-center overflow-hidden">
-      {/* Background video — Jeddah airport Hajj pilgrims arriving */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="/hajj-airport-hero.jpg"
+      {/* Background image — PassHajj products (valise, bracelet, passeport) */}
+      <Image
+        src="/passhajj-products.png"
+        alt="PassHajj — Valise, Bracelet & Passeport avec QR code"
+        fill
+        sizes="100vw"
         className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src="/hajj-hero-zoom.mp4" type="video/mp4" />
-      </video>
+        priority
+      />
 
       {/* Gradient overlays — HMC style multi-layer */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#1e3a5f]/95 via-[#1e3a5f]/75 to-[#1e3a5f]/30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#1e3a5f]/90 via-[#1e3a5f]/65 to-[#1e3a5f]/20" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/80 via-transparent to-[#1e3a5f]/40" />
 
       {/* Decorative blur orbs */}
@@ -149,139 +147,78 @@ function HeroSection() {
       </div>
 
       <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left — Text content */}
-          <div className="max-w-2xl">
-            <motion.div initial="hidden" animate="visible" variants={stagger}>
-              <motion.div variants={fadeUp} custom={0}>
-                <Overline color={JAUNE_LIGHT}>Protection bagages & pèlerins</Overline>
-              </motion.div>
-
-              <motion.h1
-                variants={fadeUp}
-                custom={1}
-                className={`text-4xl sm:text-5xl lg:text-7xl font-semibold text-white leading-[1.08] tracking-tight mb-6 ${serif}`}
-              >
-                Protégez chaque bagage,{' '}
-                <span style={{ color: JAUNE }}>en toute sérénité</span>
-              </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                custom={2}
-                className="text-lg sm:text-xl text-white/85 leading-relaxed mb-10 max-w-xl"
-                style={{ fontFamily: 'var(--font-inter)' }}
-              >
-                La première solution sans application, sans batterie, sans GPS.
-                Un simple QR code pour protéger, retrouver et notifier — instantanément.
-              </motion.p>
-
-              <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
-                <Link href="/hajj-omra" className="group">
-                  <Button
-                    size="lg"
-                    className="rounded-[10px] px-6 h-12 text-sm font-medium shadow-lg transition-all duration-300 group-hover:shadow-xl"
-                    style={{ backgroundColor: JAUNE, color: NAVY }}
-                  >
-                    Hajj & Omra
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-                <Link href="/demo" className="group">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
-                  >
-                    Voir la démo
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-              </motion.div>
+        <div className="max-w-2xl">
+          <motion.div initial="hidden" animate="visible" variants={stagger}>
+            <motion.div variants={fadeUp} custom={0}>
+              <Overline color={JAUNE_LIGHT}>Protection bagages & pèlerins</Overline>
             </motion.div>
 
-            {/* Stats row — HMC style */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
+            <motion.h1
               variants={fadeUp}
-              custom={5}
-              className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10"
+              custom={1}
+              className={`text-4xl sm:text-5xl lg:text-7xl font-semibold text-white leading-[1.08] tracking-tight mb-6 ${serif}`}
             >
-              {[
-                { value: '10 000+', label: 'Bagages protégés' },
-                { value: '98%', label: 'Taux de récupération' },
-                { value: '500+', label: 'Agences partenaires' },
-                { value: '45+', label: 'Pays couverts' },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <p className="text-2xl sm:text-3xl font-bold" style={{ color: JAUNE_LIGHT }}>
-                    {stat.value}
-                  </p>
-                  <p className="text-white/60 text-xs uppercase tracking-wider mt-1">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+              Protégez chaque bagage,{' '}
+              <span style={{ color: JAUNE }}>en toute sérénité</span>
+            </motion.h1>
 
-          {/* Right — PassHajj products showcase (valise + bracelet + passeport) */}
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="relative hidden lg:block"
-          >
-            {/* Main product image */}
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="relative"
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg sm:text-xl text-white/85 leading-relaxed mb-10 max-w-xl"
+              style={{ fontFamily: 'var(--font-inter)' }}
             >
-              <div className="relative w-[540px] h-[232px] rounded-2xl overflow-hidden shadow-2xl border border-white/15">
-                <Image
-                  src="/passhajj-products.png"
-                  alt="PassHajj — Valise, Bracelet & Passeport avec QR code"
-                  fill
-                  sizes="540px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              {/* Glow behind image */}
-              <div
-                className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-20"
-                style={{ background: `radial-gradient(ellipse, ${JAUNE} 0%, transparent 70%)` }}
-              />
-            </motion.div>
+              La première solution sans application, sans batterie, sans GPS.
+              Un simple QR code pour protéger, retrouver et notifier — instantanément.
+            </motion.p>
 
-            {/* Product labels */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-              className="flex items-center gap-3 mt-4 justify-center"
-            >
-              {[
-                { icon: <Luggage className="w-3.5 h-3.5" />, label: 'Bagage' },
-                { icon: <Fingerprint className="w-3.5 h-3.5" />, label: 'Bracelet' },
-                { icon: <BookCheck className="w-3.5 h-3.5" />, label: 'Passeport' },
-              ].map((item, i) => (
-                <motion.span
-                  key={item.label}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 200, delay: 1.1 + i * 0.12 }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md"
+            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
+              <Link href="/hajj-omra" className="group">
+                <Button
+                  size="lg"
+                  className="rounded-[10px] px-6 h-12 text-sm font-medium shadow-lg transition-all duration-300 group-hover:shadow-xl"
                   style={{ backgroundColor: JAUNE, color: NAVY }}
                 >
-                  {item.icon}
-                  {item.label}
-                </motion.span>
-              ))}
+                  Hajj & Omra
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+              <Link href="/demo" className="group">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
+                >
+                  Voir la démo
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
             </motion.div>
+          </motion.div>
+
+          {/* Stats row — HMC style */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={5}
+            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10"
+          >
+            {[
+              { value: '10 000+', label: 'Bagages protégés' },
+              { value: '98%', label: 'Taux de récupération' },
+              { value: '500+', label: 'Agences partenaires' },
+              { value: '45+', label: 'Pays couverts' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-2xl sm:text-3xl font-bold" style={{ color: JAUNE_LIGHT }}>
+                  {stat.value}
+                </p>
+                <p className="text-white/60 text-xs uppercase tracking-wider mt-1">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </motion.div>
         </div>
       </div>
