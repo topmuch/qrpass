@@ -858,7 +858,7 @@ export default function PilgrimScanPage() {
                 style={{ background: '#fef2f2', boxShadow: SHADOW }}
               >
                 <h3 className="text-xl font-extrabold mb-2 text-center flex items-center justify-center gap-2" style={{ color: TEXT }}>
-                  <span className="text-3xl">🚑</span> {t('emerTitle')}
+                  <span className="text-5xl">🚑</span> {t('emerTitle')}
                 </h3>
                 <p className="text-base font-bold text-center mb-4" style={{ color: DANGER }}>
                   {t('emerDirect')}
@@ -869,7 +869,7 @@ export default function PilgrimScanPage() {
                     className="flex-1 py-4 rounded-[14px] text-white font-extrabold text-xl no-underline flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
                     style={{ background: '#dc2626', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }}
                   >
-                    🚑 997
+                    <span className="text-2xl">🚑</span> 997
                   </a>
                   <a
                     href="tel:911"

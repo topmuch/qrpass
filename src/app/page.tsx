@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
   QrCode,
@@ -32,6 +33,15 @@ import {
   BookOpen,
   Send,
   Navigation,
+  ShieldCheck,
+  Siren,
+  ScanLine,
+  AlertTriangle,
+  Droplets,
+  ChevronDown,
+  BadgeCheck,
+  Fingerprint,
+  BookCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PublicNavigation, PublicFooter } from '@/components/public/PublicLayout';
@@ -298,135 +308,474 @@ function AboutSection() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   NOS PASS — 3 product cards (Pass Bagage, Identity, Passeport)
+   NOS PASS — 3 fully developed product sections
    ══════════════════════════════════════════════════════════ */
-function NosPassSection() {
-  const passes = [
-    {
-      emoji: '🧳',
-      title: 'Pass Bagage',
-      subtitle: 'PROTECTION BAGAGE',
-      desc: "Un QR code autocollant collé sur votre bagage. Si quelqu'un le trouve, il scanne le code et vous recevez instantanément une alerte WhatsApp avec sa position GPS. Plus besoin de s'inquiéter à tapis roulant !",
-      features: [
-        'QR code autocollant résistant',
-        'Alerte WhatsApp instantanée + position GPS',
-        'Fonctionne sans app, sans batterie',
-        'Taux de récupération 98%',
-      ],
-      icon: Luggage,
-      gradient: 'from-amber-500 to-orange-500',
-      color: '#f59e0b',
-    },
-    {
-      emoji: '🪪',
-      title: 'Pass Identity',
-      subtitle: 'CARTE D\'IDENTITÉ MÉDICALE',
-      desc: "Un QR code porté par le pèlerin (bracelet, carte ou pendentif). En cas de malaise ou d\'urgence, les secours scannent le code et accèdent immédiatement à vos infos médicales : groupe sanguin, allergies, maladies, contact d\'urgence.",
-      features: [
-        'Infos médicales accessibles en 1 scan',
-        'Groupe sanguin, allergies, maladies',
-        'Bouton d\'appel direct 997 / 911',
-        'Bouton « Rassurer la famille » intelligent',
-      ],
-      icon: UserCheck,
-      gradient: 'from-emerald-500 to-teal-500',
-      color: '#10b981',
-    },
-    {
-      emoji: '📘',
-      title: 'Pass Passeport',
-      subtitle: 'PROTECTION PASSEPORT',
-      desc: "Un QR code collé sur la couverture de votre passeport. En cas de perte ou de vol, celui qui le trouve scanne le code et vous êtes alerté immédiatement. Essentiel lors des déplacements à Jeddah, Médine ou lors des rituels.",
-      features: [
-        'QR code discret sur le passeport',
-        'Alerte instantanée si scanné',
-        'Infos de contact pour le retour',
-        'Idéal pour Hajj, Omra & voyages',
-      ],
-      icon: BookOpen,
-      gradient: 'from-blue-500 to-cyan-500',
-      color: '#3b82f6',
-    },
-  ];
 
+/* ─── Pass Bagage — Full Detail Section ─── */
+function PassBagageSection() {
   return (
-    <section id="solutions" className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
-      <BlurOrb size="h-64 w-64" color={JAUNE} opacity={0.1} position="-bottom-24 -left-24" />
-      <BlurOrb size="h-40 w-40" color={NAVY} opacity={0.06} position="-top-20 -right-20" />
+    <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
+      <BlurOrb size="h-64 w-64" color="#f59e0b" opacity={0.08} position="-bottom-24 -left-24" />
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={fadeUp}
-          className="text-center mb-16"
-        >
-          <Overline>Nos Pass</Overline>
-          <h2
-            className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`}
-            style={{ color: INK }}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Visual */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="relative"
           >
-            3 QR codes, 3 protections, 1 sérénité
-          </h2>
-          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: MUTED }}>
-            Chaque Pass protège un aspect essentiel de votre voyage. Un simple scan suffit.
-          </p>
-        </motion.div>
+            <div className="relative bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
+              <div className="relative text-center">
+                <span className="text-8xl block mb-6">🧳</span>
+                <div className="bg-white rounded-2xl p-6 inline-block shadow-xl">
+                  <div className="w-32 h-32 mx-auto bg-amber-50 rounded-xl flex items-center justify-center border-2 border-dashed border-amber-300">
+                    <QrCode className="w-20 h-20 text-amber-600" />
+                  </div>
+                </div>
+                <p className="mt-4 text-white/90 font-medium text-sm">Autocollant résistant eau & chaleur</p>
+              </div>
+            </div>
+          </motion.div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          variants={stagger}
-          className="grid lg:grid-cols-3 gap-8"
-        >
-          {passes.map((p, i) => {
-            const Icon = p.icon;
-            return (
+          {/* Content */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp}>
+              <Overline color="#f59e0b">Pass Bagage</Overline>
+            </motion.div>
+            <motion.h2
+              variants={fadeUp}
+              custom={1}
+              className={`text-3xl sm:text-4xl font-semibold leading-tight tracking-tight mb-6 ${serif}`}
+              style={{ color: INK }}
+            >
+              Votre bagage est perdu ?{' '}
+              <span style={{ color: '#f59e0b' }}>On le retrouve.</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg leading-relaxed mb-8"
+              style={{ color: MUTED }}
+            >
+              Un QR code autocollant résistant que vous collez sur votre valise. Si quelqu&apos;un trouve votre bagage au tapis roulant,
+              il scanne le code avec son téléphone et <strong style={{ color: INK }}>vous recevez instantanément une alerte WhatsApp</strong> avec
+              sa position GPS. Pas d&apos;application à télécharger, pas de batterie nécessaire.
+            </motion.p>
+
+            {/* How it works — 3 steps */}
+            <motion.div variants={fadeUp} custom={3} className="space-y-5 mb-8">
+              {[
+                { num: '1', title: 'Collez le QR code sur votre bagage', desc: 'Autocollant résistant à l\'eau, la chaleur et les chocs' },
+                { num: '2', title: 'Quelqu\'un le trouve et scanne le code', desc: 'Un simple scan avec n\'importe quel smartphone' },
+                { num: '3', title: 'Vous recevez une alerte WhatsApp + GPS', desc: 'Position exacte, nom du trouveur, message personnalisé' },
+              ].map((step) => (
+                <div key={step.num} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base font-bold shadow-sm" style={{ backgroundColor: '#f59e0b', color: '#fff' }}>
+                    {step.num}
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: INK }}>{step.title}</p>
+                    <p className="text-sm" style={{ color: MUTED }}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Key features */}
+            <motion.div variants={fadeUp} custom={4} className="grid grid-cols-2 gap-3 mb-8">
+              {[
+                { icon: <MessageCircle className="w-5 h-5" />, label: 'Alerte WhatsApp instantanée' },
+                { icon: <MapPin className="w-5 h-5" />, label: 'Position GPS du trouveur' },
+                { icon: <Smartphone className="w-5 h-5" />, label: 'Sans application' },
+                { icon: <BatteryCharging className="w-5 h-5" />, label: 'Sans batterie' },
+                { icon: <ShieldCheck className="w-5 h-5" />, label: 'Taux récupération 98%' },
+                { icon: <Clock className="w-5 h-5" />, label: 'Valide 1 an (Hajj complet)' },
+              ].map((feat, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
+                  <span style={{ color: '#f59e0b' }}>{feat.icon}</span>
+                  <span className="text-sm font-medium" style={{ color: INK }}>{feat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Scenarios */}
+            <motion.div variants={fadeUp} custom={5}>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#f59e0b' }}>
+                Scénarios fréquents
+              </h4>
+              <div className="space-y-2">
+                {[
+                  'Valise égarée sur le tapis roulant à l\'aéroport de Jeddah',
+                  'Sac confisqué lors du contrôle de sécurité',
+                  'Bagage mélangé avec celui d\'un autre pèlerin à l\'hôtel',
+                ].map((s, idx) => (
+                  <div key={idx} className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                    <span className="text-sm" style={{ color: MUTED }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Pass Identity — Full Detail Section ─── */
+function PassIdentitySection() {
+  return (
+    <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: '#f0fdf4' }}>
+      <BlurOrb size="h-64 w-64" color="#10b981" opacity={0.08} position="-bottom-24 -right-24" />
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Content */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+            className="lg:order-1"
+          >
+            <motion.div variants={fadeUp}>
+              <Overline color="#10b981">Pass Identity</Overline>
+            </motion.div>
+            <motion.h2
+              variants={fadeUp}
+              custom={1}
+              className={`text-3xl sm:text-4xl font-semibold leading-tight tracking-tight mb-6 ${serif}`}
+              style={{ color: INK }}
+            >
+              Votre carte d&apos;identité médicale,{' '}
+              <span style={{ color: '#10b981' }}>accessible en 1 scan</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg leading-relaxed mb-8"
+              style={{ color: MUTED }}
+            >
+              Un QR code que vous portez en bracelet, carte ou pendentif. En cas de malaise ou d&apos;urgence,
+              les secours scannent le code et accèdent <strong style={{ color: INK }}>immédiatement à vos informations médicales</strong> :
+              groupe sanguin, allergies, maladies chroniques, contact d&apos;urgence. Le bouton
+              <strong style={{ color: INK }}> &quot;Rassurer la famille&quot;</strong> envoie automatiquement un message
+              WhatsApp adapté à votre position GPS.
+            </motion.p>
+
+            {/* How it works — 3 steps */}
+            <motion.div variants={fadeUp} custom={3} className="space-y-5 mb-8">
+              {[
+                { num: '1', title: 'Portez le bracelet / carte QR code', desc: 'Bracelet résistant, carte plastifiée ou pendentif' },
+                { num: '2', title: 'Les secours scannent en cas d\'urgence', desc: 'Groupe sanguin, allergies, maladies — tout est accessible' },
+                { num: '3', title: 'Appel direct 997/911 + rassurer la famille', desc: 'Boutons d\'appel d\'urgence et message WhatsApp automatique' },
+              ].map((step) => (
+                <div key={step.num} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base font-bold shadow-sm" style={{ backgroundColor: '#10b981', color: '#fff' }}>
+                    {step.num}
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: INK }}>{step.title}</p>
+                    <p className="text-sm" style={{ color: MUTED }}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Key features */}
+            <motion.div variants={fadeUp} custom={4} className="grid grid-cols-2 gap-3 mb-8">
+              {[
+                { icon: <Droplets className="w-5 h-5" />, label: 'Groupe sanguin' },
+                { icon: <AlertTriangle className="w-5 h-5" />, label: 'Allergies & maladies' },
+                { icon: <Siren className="w-5 h-5" />, label: 'Appel 997 / 911 direct' },
+                { icon: <Heart className="w-5 h-5" />, label: 'Rassurer la famille' },
+                { icon: <MapPin className="w-5 h-5" />, label: 'Messages GPS adaptés' },
+                { icon: <Navigation className="w-5 h-5" />, label: 'Itinéraire vers l\'hôtel' },
+              ].map((feat, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: '#ecfdf5' }}>
+                  <span style={{ color: '#10b981' }}>{feat.icon}</span>
+                  <span className="text-sm font-medium" style={{ color: INK }}>{feat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Icons on QR code explanation */}
+            <motion.div variants={fadeUp} custom={5}>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#10b981' }}>
+                Icônes sur le QR code
+              </h4>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#ecfdf5' }}>
+                  <span className="text-2xl">✉️</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: INK }}>Côté gauche</p>
+                    <p className="text-xs" style={{ color: MUTED }}>Scannez pour écrire à votre famille</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#fef2f2' }}>
+                  <span className="text-2xl">⚕️</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: INK }}>Côté droit</p>
+                    <p className="text-xs" style={{ color: MUTED }}>Profil santé pour les secours</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Visual */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="relative lg:order-2"
+          >
+            <div className="relative bg-gradient-to-br from-emerald-500 to-teal-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
+              <div className="relative text-center">
+                <span className="text-8xl block mb-6">🪪</span>
+                {/* Simulated profile card */}
+                <div className="bg-white rounded-2xl p-5 shadow-xl text-left space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                      <UserCheck className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800">Ahmed Benali</p>
+                      <p className="text-xs text-slate-500">Algérie • Hajj 2026</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-red-50 text-center">
+                      <Droplets className="w-4 h-4 text-red-500 mx-auto mb-1" />
+                      <p className="text-xs font-bold text-red-600">A+</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-amber-50 text-center">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                      <p className="text-xs font-bold text-amber-600">Pénicilline</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex-1 py-2 rounded-xl bg-red-500 text-white text-xs font-bold text-center">🚑 997</div>
+                    <div className="flex-1 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold text-center flex items-center justify-center gap-1">
+                      <Heart className="w-3 h-3" /> Famille
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Pass Passeport — Full Detail Section ─── */
+function PassPasseportSection() {
+  return (
+    <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
+      <BlurOrb size="h-64 w-64" color="#3b82f6" opacity={0.08} position="-top-24 -right-24" />
+
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Visual */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            <div className="relative bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
+              <div className="relative text-center">
+                <span className="text-8xl block mb-6">📘</span>
+                {/* Simulated passport */}
+                <div className="bg-white rounded-2xl p-6 shadow-xl">
+                  <div className="border-2 border-blue-200 rounded-xl p-4 bg-blue-50/50">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookCheck className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm font-bold text-blue-800">PASSEPORT</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center border-2 border-dashed border-blue-300">
+                        <QrCode className="w-12 h-12 text-blue-600" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-xs font-medium text-blue-800">QR code collé sur</p>
+                        <p className="text-xs font-medium text-blue-800">la couverture du passeport</p>
+                        <p className="text-[10px] text-blue-500 mt-1">En cas de perte, scannez !</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp}>
+              <Overline color="#3b82f6">Pass Passeport</Overline>
+            </motion.div>
+            <motion.h2
+              variants={fadeUp}
+              custom={1}
+              className={`text-3xl sm:text-4xl font-semibold leading-tight tracking-tight mb-6 ${serif}`}
+              style={{ color: INK }}
+            >
+              Passeport perdu ?{' '}
+              <span style={{ color: '#3b82f6' }}>On vous alerte instantanément</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg leading-relaxed mb-8"
+              style={{ color: MUTED }}
+            >
+              Un QR code discret que vous collez sur la couverture de votre passeport. En cas de perte ou de vol —
+              situation fréquente à Jeddah, Médine ou lors des rituels — celui qui le trouve scanne le code et
+              <strong style={{ color: INK }}> vous êtes alerté immédiatement via WhatsApp</strong> avec sa position GPS.
+              Le passeport est le document le plus critique du voyage : le protéger est essentiel.
+            </motion.p>
+
+            {/* How it works — 3 steps */}
+            <motion.div variants={fadeUp} custom={3} className="space-y-5 mb-8">
+              {[
+                { num: '1', title: 'Collez le QR code sur votre passeport', desc: 'Autocollant discret, ne gêne ni la lecture ni les tampons' },
+                { num: '2', title: 'Quelqu\'un trouve votre passeport et scanne', desc: 'Un simple scan — pas besoin de chercher le propriétaire' },
+                { num: '3', title: 'Alerte WhatsApp + position GPS du trouveur', desc: 'Vous savez immédiatement où récupérer votre passeport' },
+              ].map((step) => (
+                <div key={step.num} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base font-bold shadow-sm" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>
+                    {step.num}
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: INK }}>{step.title}</p>
+                    <p className="text-sm" style={{ color: MUTED }}>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Key features */}
+            <motion.div variants={fadeUp} custom={4} className="grid grid-cols-2 gap-3 mb-8">
+              {[
+                { icon: <Fingerprint className="w-5 h-5" />, label: 'QR code discret' },
+                { icon: <MessageCircle className="w-5 h-5" />, label: 'Alerte WhatsApp' },
+                { icon: <MapPin className="w-5 h-5" />, label: 'Position GPS' },
+                { icon: <ShieldCheck className="w-5 h-5" />, label: 'Sans app / sans batterie' },
+                { icon: <BadgeCheck className="w-5 h-5" />, label: 'Infos de contact' },
+                { icon: <Globe className="w-5 h-5" />, label: 'Hajj, Omra & voyages' },
+              ].map((feat, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: '#eff6ff' }}>
+                  <span style={{ color: '#3b82f6' }}>{feat.icon}</span>
+                  <span className="text-sm font-medium" style={{ color: INK }}>{feat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Scenarios */}
+            <motion.div variants={fadeUp} custom={5}>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#3b82f6' }}>
+                Pourquoi c&apos;est critique
+              </h4>
+              <div className="space-y-2">
+                {[
+                  'Sans passeport : impossible de prendre le vol retour',
+                  'Passeport perdu pendant les rituels (Mina, Arafat, Muzdalifah)',
+                  'Vol ou perte lors des transferts Jeddah ↔ Médine ↔ Mecque',
+                  'Démarches consulales longues et coûteuses à Jeddah',
+                ].map((s, idx) => (
+                  <div key={idx} className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#3b82f6' }} />
+                    <span className="text-sm" style={{ color: MUTED }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Nos Pass — Header section with 3 mini-cards ─── */
+function NosPassSection() {
+  return (
+    <>
+      {/* Section header */}
+      <section className="relative pt-20 pb-8 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
+          >
+            <Overline>Nos Pass</Overline>
+            <h2
+              className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-2 ${serif}`}
+              style={{ color: INK }}
+            >
+              3 QR codes, 3 protections, 1 sérénité
+            </h2>
+            <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: MUTED }}>
+              Chaque Pass protège un aspect essentiel de votre voyage. Un simple scan suffit.
+            </p>
+          </motion.div>
+
+          {/* 3 mini-cards as visual anchor */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            variants={stagger}
+            className="grid sm:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto"
+          >
+            {[
+              { emoji: '🧳', title: 'Pass Bagage', color: '#f59e0b', bg: '#fffbeb' },
+              { emoji: '🪪', title: 'Pass Identity', color: '#10b981', bg: '#ecfdf5' },
+              { emoji: '📘', title: 'Pass Passeport', color: '#3b82f6', bg: '#eff6ff' },
+            ].map((p, i) => (
               <motion.div
                 key={p.title}
                 variants={fadeUp}
                 custom={i}
-                className="group relative bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-transparent transition-all duration-300"
+                className="rounded-2xl p-5 border border-slate-100 shadow-sm"
+                style={{ backgroundColor: p.bg }}
               >
-                {/* Gradient header */}
-                <div className={`h-48 bg-gradient-to-br ${p.gradient} relative flex items-center justify-center`}>
-                  <div className="bg-gradient-to-t from-black/40 to-transparent absolute inset-0" />
-                  <span className="relative text-7xl select-none">{p.emoji}</span>
-                  {/* Icon badge */}
-                  <div className="absolute top-4 right-4 h-12 w-12 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  {/* Subtitle badge */}
-                  <span className="absolute top-4 left-4 rounded-full border border-white/40 bg-white/10 backdrop-blur-md px-4 py-1.5 text-xs font-semibold text-white tracking-wide">
-                    {p.subtitle}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 sm:p-7">
-                  <h3 className={`text-xl font-semibold mb-3 ${serif}`} style={{ color: INK }}>
-                    {p.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed mb-5" style={{ color: MUTED }}>
-                    {p.desc}
-                  </p>
-                  <ul className="space-y-2 mb-5">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: p.color }} />
-                        <span className="text-sm" style={{ color: INK }}>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <span className="text-4xl block mb-2">{p.emoji}</span>
+                <h3 className="font-semibold" style={{ color: p.color }}>{p.title}</h3>
               </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-    </section>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Full detail sections */}
+      <PassBagageSection />
+      <PassIdentitySection />
+      <PassPasseportSection />
+    </>
   );
 }
 
