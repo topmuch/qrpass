@@ -534,7 +534,7 @@ function PassIdentitySection() {
             </motion.div>
           </motion.div>
 
-          {/* Visual */}
+          {/* Visual — Medical ID card image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -542,40 +542,17 @@ function PassIdentitySection() {
             transition={{ duration: 0.6 }}
             className="relative lg:order-2"
           >
-            <div className="relative bg-gradient-to-br from-emerald-500 to-teal-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
-              <div className="relative text-center">
-                <span className="text-8xl block mb-6">🪪</span>
-                {/* Simulated profile card */}
-                <div className="bg-white rounded-2xl p-5 shadow-xl text-left space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <UserCheck className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">Ahmed Benali</p>
-                      <p className="text-xs text-slate-500">Algérie • Hajj 2026</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded-lg bg-red-50 text-center">
-                      <Droplets className="w-4 h-4 text-red-500 mx-auto mb-1" />
-                      <p className="text-xs font-bold text-red-600">A+</p>
-                    </div>
-                    <div className="p-2 rounded-lg bg-amber-50 text-center">
-                      <AlertTriangle className="w-4 h-4 text-amber-500 mx-auto mb-1" />
-                      <p className="text-xs font-bold text-amber-600">Pénicilline</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 py-2 rounded-xl bg-red-500 text-white text-xs font-bold text-center">🚑 997</div>
-                    <div className="flex-1 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold text-center flex items-center justify-center gap-1">
-                      <Heart className="w-3 h-3" /> Famille
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-emerald-200/50">
+              <Image
+                src="/medical-id-card.png"
+                alt="PassHajj — Carte d'identité médicale avec QR code"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
+            {/* Glow */}
+            <div className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-15" style={{ background: 'radial-gradient(ellipse, #10b981 0%, transparent 70%)' }} />
           </motion.div>
         </div>
       </div>
