@@ -178,6 +178,8 @@ export async function PUT(
     if (body.familyContact !== undefined) updateData.familyContact = body.familyContact || null;
     if (body.medicalInfo !== undefined) updateData.medicalInfo = body.medicalInfo || null;
     if (body.bloodType !== undefined) updateData.bloodType = body.bloodType || null;
+    if (body.allergies !== undefined) updateData.allergies = body.allergies || null;
+    if (body.diseases !== undefined) updateData.diseases = body.diseases || null;
 
     // --- Newly editable fields ---
     if (body.fullName !== undefined) {
