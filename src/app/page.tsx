@@ -123,14 +123,17 @@ function BlurOrb({
 function HeroSection() {
   return (
     <section className="relative min-h-[100svh] flex items-center overflow-hidden">
-      {/* Background image */}
-      <Image
-        src="/hajj-airport.png"
-        alt=""
-        fill
-        className="object-cover"
-        priority
-      />
+      {/* Background video — Jeddah airport Hajj pilgrims arriving */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/hajj-airport-hero.jpg"
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src="/hajj-hero-zoom.mp4" type="video/mp4" />
+      </video>
 
       {/* Gradient overlays — HMC style multi-layer */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#1e3a5f]/95 via-[#1e3a5f]/75 to-[#1e3a5f]/30" />
