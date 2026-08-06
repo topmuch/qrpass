@@ -19,6 +19,8 @@ import {
   Building2,
   BedDouble,
   Navigation,
+  Share,
+  Loader2,
 } from "lucide-react";
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -95,6 +97,31 @@ const I18N: Record<string, Record<Language, string>> = {
     en: 'This baggage has been reported lost. Please return it to its owner.',
     ar: 'تم الإبلاغ عن فقدان هذه الحقيبة. يرجى إرجاعها إلى مالكها.',
   },
+  // Emergency panel
+  emergencyTitle: { fr: 'URGENCE — BAGAGE PERDU', en: 'URGENT — LOST BAGGAGE', ar: 'طوارئ — حقيبة مفقودة' },
+  emergencyStep1: { fr: 'Contactez le propriétaire', en: 'Contact the owner', ar: 'اتصل بالمالك' },
+  emergencyStep1Desc: { fr: "Utilisez WhatsApp ou le téléphone pour prévenir le propriétaire.", en: 'Use WhatsApp or phone to notify the owner.', ar: 'استخدم واتساب أو الهاتف لإخطار المالك.' },
+  emergencyStep2: { fr: "Déposez le bagage à l'hôtel", en: 'Drop off at hotel', ar: 'تسليم الحقيبة في الفندق' },
+  emergencyStep2Desc: { fr: "Apportez le bagage à l'hébergement du propriétaire.", en: "Bring the baggage to the owner's accommodation.", ar: 'أحضر الحقيبة إلى مكان إقامة المالك.' },
+  emergencyStep3: { fr: 'Signalez comme retrouvé', en: 'Mark as found', ar: 'الإبلاغ عن العثور' },
+  emergencyStep3Desc: { fr: 'Indiquez que le bagage a été retrouvé pour prévenir le propriétaire.', en: 'Indicate the baggage has been found to notify the owner.', ar: 'أشير إلى أن الحقيبة تم العثور عليها لإخطار المالك.' },
+  // Mark found
+  markFoundBtn: { fr: "J'ai retrouvé ce bagage ✅", en: 'I found this baggage ✅', ar: 'وجدت هذه الحقيبة ✅' },
+  foundSuccess: { fr: 'Bagage marqué comme retrouvé !', en: 'Baggage marked as found!', ar: 'تم تحديد الحقيبة على أنها موجودة!' },
+  foundError: { fr: 'Erreur, réessayez', en: 'Error, try again', ar: 'خطأ، حاول مرة أخرى' },
+  // Mini map
+  viewOnMap: { fr: 'Voir sur la carte', en: 'View on map', ar: 'عرض على الخريطة' },
+  // Transport labels
+  trainLabel: { fr: 'DÉTAILS DU TRAIN', en: 'TRAIN DETAILS', ar: 'تفاصيل القطار' },
+  boatLabel: { fr: 'DÉTAILS DU BATEAU', en: 'BOAT DETAILS', ar: 'تفاصيل السفينة' },
+  busLabel: { fr: 'DÉTAILS DU BUS', en: 'BUS DETAILS', ar: 'تفاصيل الحافلة' },
+  // Scan badges
+  scannedBadge: { fr: 'Scanné', en: 'Scanned', ar: 'تم المسح' },
+  localizedBadge: { fr: 'Bagage localisé', en: 'Baggage located', ar: 'حقيبة محددة' },
+  lostBadge: { fr: 'PERDU', en: 'LOST', ar: 'مفقود' },
+  // Share
+  shareBtn: { fr: 'Partager', en: 'Share', ar: 'مشاركة' },
+  shareCopied: { fr: 'Lien copié !', en: 'Link copied!', ar: 'تم نسخ الرابط!' },
 };
 
 /** Shorthand to get inline i18n string */
@@ -423,6 +450,7 @@ export default function ScanPage() {
   // UI State
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isMarkingFound, setIsMarkingFound] = useState(false);
 
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
@@ -759,6 +787,48 @@ export default function ScanPage() {
     window.location.href = `tel:${phoneNumber}`;
   }, [finderName, finderPhone, t, logScan, baggageData]);
 
+  // Handle mark as found
+  const handleMarkFound = useCallback(async () => {
+    setIsMarkingFound(true);
+    try {
+      const res = await fetch(`/api/baggage-status/${reference}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark-found' }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      if (data.success) {
+        setBaggageData(prev => {
+          if (!prev?.baggage) return prev;
+          return {
+            ...prev,
+            status: 'active',
+            baggage: { ...prev.baggage, foundAt: new Date().toISOString() },
+          };
+        });
+        toast({ title: i18n('foundSuccess', lang) });
+      }
+    } catch {
+      toast({ title: i18n('foundError', lang), variant: 'destructive' as const });
+    } finally {
+      setIsMarkingFound(false);
+    }
+  }, [reference, lang]);
+
+  // Handle share
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `PassHajj - ${baggageData?.baggage?.travelerName || 'Bagage'}`, url });
+      } catch { /* cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: i18n('shareCopied', lang) });
+    }
+  }, [baggageData, lang]);
+
   // Format date for display
   const formatDate = (dateStr?: string | null) => {
     if (!dateStr) return null;
@@ -841,7 +911,17 @@ export default function ScanPage() {
           </div>
         )}
         {(!baggage || (baggageData?.status !== 'active' && baggageData?.status !== 'lost')) && <div />}
-        <LanguageSelector lang={lang} setLang={setLang} />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-black/10 rounded-full text-sm font-medium hover:bg-white transition-colors min-h-[36px]"
+            aria-label={i18n('shareBtn', lang)}
+          >
+            <Share className="w-4 h-4" />
+            <span className="hidden sm:inline">{i18n('shareBtn', lang)}</span>
+          </button>
+          <LanguageSelector lang={lang} setLang={setLang} />
+        </div>
       </header>
 
       {/* SuccessOverlay — Premium scan confirmation */}
@@ -864,7 +944,7 @@ export default function ScanPage() {
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
 
         {/* ═══ HEADER: Green ✓ icon + "BAGAGE TROUVÉ" + white thank-you text ═══ */}
-        <div className="text-center mb-5 sm:mb-6">
+        <div className="text-center mb-5 sm:mb-6" style={{ animation: 'fadeInUp 0.4s ease forwards' }}>
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500 mb-3 shadow-md">
             <CheckCircle className="w-8 h-8 text-white" />
           </div>
@@ -879,11 +959,89 @@ export default function ScanPage() {
               ? i18n('lostSubtitle', lang)
               : i18n('subtitle', lang)}
           </p>
+
+          {/* ═══ Scan Status Badges ═══ */}
+          <div className="flex items-center justify-center gap-2 mt-3">
+            {isDeclaredLost ? (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
+                🚨 {i18n('lostBadge', lang)}
+              </span>
+            ) : baggageData?.baggage?.status === 'scanned' ? (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                📍 {i18n('localizedBadge', lang)}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-400 text-white text-xs font-bold rounded-full">
+                {i18n('scannedBadge', lang)}
+              </span>
+            )}
+          </div>
         </div>
+
+        {/* ═══ EMERGENCY PANEL for Lost Baggage ═══ */}
+        {isDeclaredLost && (
+          <div
+            className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg border-2"
+            style={{ background: '#FEF2F2', borderColor: '#EF4444', animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.02s', opacity: 0 }}
+          >
+            <h2 className="text-base md:text-lg font-extrabold mb-4 flex items-center gap-2" style={{ color: '#991B1B' }}>
+              🚨 {i18n('emergencyTitle', lang)}
+            </h2>
+
+            <div className="space-y-4">
+              {/* Step 1 */}
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold flex items-center justify-center">1</span>
+                <div>
+                  <p className="font-bold text-sm" style={{ color: '#991B1B' }}>📞 {i18n('emergencyStep1', lang)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#7F1D1D' }}>{i18n('emergencyStep1Desc', lang)}</p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold flex items-center justify-center">2</span>
+                <div>
+                  <p className="font-bold text-sm" style={{ color: '#991B1B' }}>🏨 {i18n('emergencyStep2', lang)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#7F1D1D' }}>{i18n('emergencyStep2Desc', lang)}</p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-red-500 text-white text-sm font-bold flex items-center justify-center">3</span>
+                <div>
+                  <p className="font-bold text-sm" style={{ color: '#991B1B' }}>✅ {i18n('emergencyStep3', lang)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#7F1D1D' }}>{i18n('emergencyStep3Desc', lang)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Mark as Found Button ═══ */}
+            <button
+              onClick={handleMarkFound}
+              disabled={isMarkingFound}
+              className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px] mt-5"
+              style={{ background: '#10b981' }}
+            >
+              {isMarkingFound ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  <span>{i18n('markFoundBtn', lang)}</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* ═══ CARD 1 : PROPRIÉTAIRE (white card) ═══ */}
         {baggage && !isEditing && (
-          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.05s', opacity: 0 }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
               <span>👤</span> {i18n('ownerLabel', lang)}
             </h2>
@@ -924,7 +1082,7 @@ export default function ScanPage() {
 
         {/* ═══ CARD 2 : HÔTEL / HÉBERGEMENT (white card, NEW) ═══ */}
         {baggage && !isEditing && baggage.hotelName && (
-          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.1s', opacity: 0 }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
               <Building2 className="w-4 h-4" style={{ color: INK }} />
               {i18n('hotelLabel', lang)}
@@ -992,6 +1150,30 @@ export default function ScanPage() {
           </div>
         )}
 
+        {/* ═══ MINI HOTEL MAP ═══ */}
+        {baggage && !isEditing && baggage.hotelAddress && (
+          <div className="w-full rounded-[18px] p-4 md:p-5 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.12s', opacity: 0 }}>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(baggage.hotelAddress)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm min-h-[44px] border border-blue-200"
+            >
+              <MapPin className="w-4 h-4" />
+              {i18n('viewOnMap', lang)}
+            </a>
+            {autoGps && (
+              <iframe
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${autoGps.lng - 0.01},${autoGps.lat - 0.01},${autoGps.lng + 0.01},${autoGps.lat + 0.01}&layer=mapnik&marker=${autoGps.lat},${autoGps.lng}`}
+                className="w-full mt-3 rounded-lg border border-gray-200"
+                style={{ height: 200 }}
+                loading="lazy"
+                title="Map"
+              />
+            )}
+          </div>
+        )}
+
         {/* ═══ CARD 3 : DÉTAILS DU VOYAGE / TRANSPORT (white card) ═══ */}
         {baggage && !isEditing && (() => {
           const mode = safeTransportMode(baggage.transportMode) as TransportMode;
@@ -1030,7 +1212,7 @@ export default function ScanPage() {
           };
 
           return (
-            <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+            <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.15s', opacity: 0 }}>
               <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
                 <Image
                   src={transportImg}
@@ -1201,7 +1383,7 @@ export default function ScanPage() {
         {baggage && isEditing && (
           <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
-              <span>✈️</span> {i18n('flightLabel', lang)}
+              <span>{safeTransportMode(baggage.transportMode) === 'train' ? '🚂' : safeTransportMode(baggage.transportMode) === 'boat' ? '🚢' : safeTransportMode(baggage.transportMode) === 'bus' ? '🚌' : '✈️'}</span> {safeTransportMode(baggage.transportMode) === 'train' ? i18n('trainLabel', lang) : safeTransportMode(baggage.transportMode) === 'boat' ? i18n('boatLabel', lang) : safeTransportMode(baggage.transportMode) === 'bus' ? i18n('busLabel', lang) : i18n('flightLabel', lang)}
             </h2>
 
             {/* Airline */}
@@ -1307,7 +1489,7 @@ export default function ScanPage() {
         )}
 
         {/* ═══ CTA + FINDER FORM (white card) ═══ */}
-        <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG }}>
+        <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.2s', opacity: 0 }}>
 
           {/* ─── BIG "📞 Contacter le propriétaire" CTA button ─── */}
           {!showForm && (
@@ -1423,6 +1605,14 @@ export default function ScanPage() {
       <footer className="mt-auto pb-[env(safe-area-inset-bottom,8px)] pt-4 text-center text-xs font-medium" style={{ color: 'rgba(0,0,0,0.65)' }}>
         {i18n('footer', lang)}
       </footer>
+
+      {/* ═══ Staggered Entry Animation Keyframes ═══ */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
       {/* AI-FEATURE: Chatbot Widget (Feature #1) — only on active/lost baggage */}
       {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && (

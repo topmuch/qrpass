@@ -377,3 +377,36 @@ Stage Summary:
 - 14 new translation keys added across all 3 languages (FR, EN, AR)
 - Staggered fadeInUp animations on 7 card sections
 - No breaking changes to existing functionality
+
+---
+Task ID: scan-fix
+Agent: Main
+Task: Fix and Professionalize the Baggage Finder Scan Page (/scan/[reference])
+
+Work Log:
+- Read worklog.md and full scan page (1636 lines after edits)
+- Added Share + Loader2 imports from lucide-react
+- Added 22 new i18n keys to I18N object (emergencyTitle, emergencyStep1/2/3, emergencyStep1Desc/2Desc/3Desc, markFoundBtn, foundSuccess, foundError, viewOnMap, trainLabel, boatLabel, busLabel, scannedBadge, localizedBadge, lostBadge, shareBtn, shareCopied) — all in FR/EN/AR
+- Added isMarkingFound state and handleMarkFound handler (calls /api/baggage-status/${reference} with action 'mark-found')
+- Added handleShare handler (Web Share API with clipboard fallback)
+- Implemented Emergency Panel (#1): Red-themed card with 3 numbered steps (Contact owner, Drop at hotel, Mark as found), shown when isDeclaredLost
+- Implemented "J'ai retrouvé ce bagage" button (#2): Green #10b981 full-width button with CheckCircle icon and Loader2 spinner
+- Implemented Mini Hotel Map (#3): "Voir sur la carte" link opening Google Maps + OpenStreetMap iframe when autoGps is available
+- Fixed Transport Header Bug (#4): Edit mode card now shows correct emoji+label (🚂 Train, 🚢 Boat, 🚌 Bus, ✈️ Flight) based on transportMode
+- Added Scan Counter Badges (#5): Red pulse "PERDU" badge for lost, green "Bagage localisé" for scanned, gray "Scanné" default
+- Added Share Button (#6): Share icon button in header bar next to language selector, uses Web Share API / clipboard
+- Added Staggered Entry Animations (#7): fadeInUp keyframes via <style jsx>, staggered delays on Header (0s), Emergency (0.02s), Owner (0.05s), Hotel (0.1s), MiniMap (0.12s), Transport (0.15s), CTA Form (0.2s)
+- Fixed ReferenceError: Changed handleShare dependency from `baggage` to `baggageData` (baggage is defined after early returns)
+- Verified: scan page compiles (200), lint passes (only pre-existing scripts/ errors)
+
+Stage Summary:
+- 7 features implemented in single file: src/app/scan/[reference]/page.tsx
+- New imports: Share + Loader2 (lucide-react)
+- 22 new translation keys added across all 3 languages (FR, EN, AR)
+- Emergency panel with 3 steps + Mark Found button for lost baggage
+- Mini hotel map with Google Maps link + OpenStreetMap iframe
+- Transport header bug fixed (correct icon/label per mode)
+- Scan status badges (lost/scanned/default)
+- Share button in header bar
+- Staggered fadeInUp animations on all card sections
+- No breaking changes to existing functionality
