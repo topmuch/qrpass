@@ -735,9 +735,9 @@ export default function PilgrimScanPage() {
                   <h2 className="text-[24px] font-extrabold mb-1 text-white drop-shadow-sm">{pilgrim.fullName}</h2>
 
                   {/* Nationality badge */}
-                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
-                    <span className="bg-white/25 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold inline-block mt-1 text-white">
-                      {pilgrim.nationality}
+                  {pilgrim.nationality && (
+                    <span className="bg-white/25 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-bold inline-block mt-1 text-white">
+                      🌍 {pilgrim.nationality}
                     </span>
                   )}
                 </div>
@@ -756,10 +756,10 @@ export default function PilgrimScanPage() {
                       <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.firstName}</span>
                     </div>
                   )}
-                  {pilgrim.nationality && pilgrim.nationality !== 'Non spécifié' && (
+                  {pilgrim.nationality && (
                     <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
                       <span className="text-xs font-medium" style={{ color: MUTED }}>{t('nationalityLabel')}</span>
-                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.nationality}</span>
+                      <span className="text-sm font-bold" style={{ color: TEXT }}>🌍 {pilgrim.nationality}</span>
                     </div>
                   )}
                   {pilgrim.language && (
@@ -779,7 +779,7 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  1. ALERTE SANTÉ — RED BACKGROUND, WHITE TEXT — Very prominent
+                  1. ALERTE SANTÉ — 4 medical boxes: Blood, Disease, Allergies, Medicaments
               ═══════════════════════════════════════════════════════════ */}
               <div
                 className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
@@ -793,60 +793,39 @@ export default function PilgrimScanPage() {
                   {t('healthAlertTitle')}
                 </h3>
 
-                {/* Blood type — White on red */}
-                {pilgrim.bloodType && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                      <Droplets className="w-5 h-5" style={{ color: '#dc2626' }} />
-                    </div>
-                    <div>
-                      <span className="text-xs block text-white/70">Groupe sanguin</span>
-                      <span className="text-xl font-extrabold text-white">{pilgrim.bloodType}</span>
-                    </div>
+                {/* 4 medical boxes in 2x2 grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Blood type */}
+                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
+                    <span className="text-[10px] block text-white/70 mb-0.5">Groupe sanguin</span>
+                    <span className="text-lg font-extrabold text-white">{pilgrim.bloodType || '—'}</span>
                   </div>
-                )}
 
-                {/* Allergies — White on red */}
-                {pilgrim.allergies && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                      <AlertTriangle className="w-5 h-5" style={{ color: '#dc2626' }} />
-                    </div>
-                    <div className="text-left">
-                      <span className="text-xs block text-white/70">{t('allergiesLabel')}</span>
-                      <span className="text-sm font-bold text-white">{pilgrim.allergies}</span>
-                    </div>
+                  {/* Maladie critique */}
+                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <AlertTriangle className="w-6 h-6 mx-auto mb-1 text-white" />
+                    <span className="text-[10px] block text-white/70 mb-0.5">Maladie critique</span>
+                    <span className="text-sm font-bold text-white">{pilgrim.diseases || '—'}</span>
                   </div>
-                )}
 
-                {/* Maladies — White on red */}
-                {pilgrim.diseases && (
-                  <div className="flex items-center gap-3 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                      <Heart className="w-5 h-5" style={{ color: '#dc2626' }} />
-                    </div>
-                    <div className="text-left">
-                      <span className="text-xs block text-white/70">{t('diseasesLabel')}</span>
-                      <span className="text-sm font-bold text-white">{pilgrim.diseases}</span>
-                    </div>
+                  {/* Allergies */}
+                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <Shield className="w-6 h-6 mx-auto mb-1 text-white" />
+                    <span className="text-[10px] block text-white/70 mb-0.5">Allergies</span>
+                    <span className="text-sm font-bold text-white">{pilgrim.allergies || '—'}</span>
                   </div>
-                )}
 
-                {/* Autres infos médicales — White on red */}
-                {pilgrim.medicalInfo && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white">
-                      <AlertCircle className="w-5 h-5" style={{ color: '#dc2626' }} />
-                    </div>
-                    <div className="text-left">
-                      <span className="text-xs block text-white/70">{t('otherMedicalLabel')}</span>
-                      <span className="text-sm font-bold text-white">{pilgrim.medicalInfo}</span>
-                    </div>
+                  {/* Médicaments */}
+                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
+                    <span className="text-[10px] block text-white/70 mb-0.5">Médicaments</span>
+                    <span className="text-sm font-bold text-white">{pilgrim.medicalInfo || '—'}</span>
                   </div>
-                )}
+                </div>
 
                 {!pilgrim.bloodType && !pilgrim.allergies && !pilgrim.diseases && !pilgrim.medicalInfo && (
-                  <p className="text-sm text-white/70">{t('noMedical')}</p>
+                  <p className="text-sm text-white/70 mt-3 text-center">{t('noMedical')}</p>
                 )}
               </div>
 
@@ -951,7 +930,7 @@ export default function PilgrimScanPage() {
                       <div>
                         <span className="text-sm font-bold block" style={{ color: TEXT }}>{activeHotel}</span>
                         {activeRoom && (
-                          <span className="text-xs block" style={{ color: MUTED }}>{t('room')} {activeRoom}</span>
+                          <span className="text-base font-bold block" style={{ color: TEXT }}>{t('room')} {activeRoom}</span>
                         )}
                         {activeCity && (
                           <span className="text-xs block" style={{ color: MUTED }}>{activeCity}</span>

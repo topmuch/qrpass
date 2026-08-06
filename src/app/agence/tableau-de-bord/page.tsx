@@ -102,11 +102,14 @@ interface PassIdentity {
   nationality: string;
   photoUrl: string | null;
   bloodType: string | null;
+  allergies: string | null;
+  diseases: string | null;
   medicalInfo: string | null;
   hotelMecca: string | null;
   roomMecca: string | null;
   hotelMedina: string | null;
   roomMedina: string | null;
+  hotelPhone: string | null;
   groupLeaderPhone: string | null;
   agencyPhone: string | null;
   familyContact: string | null;
@@ -706,11 +709,14 @@ export default function AgencyDashboardPage() {
       fullName: pilgrim.fullName || '',
       nationality: pilgrim.nationality || '',
       bloodType: pilgrim.bloodType || '',
+      allergies: pilgrim.allergies || '',
+      diseases: pilgrim.diseases || '',
       medicalInfo: pilgrim.medicalInfo || '',
       hotelMecca: pilgrim.hotelMecca || '',
       roomMecca: pilgrim.roomMecca || '',
       hotelMedina: pilgrim.hotelMedina || '',
       roomMedina: pilgrim.roomMedina || '',
+      hotelPhone: pilgrim.hotelPhone || '',
       groupLeaderPhone: pilgrim.groupLeaderPhone || '',
       agencyPhone: pilgrim.agencyPhone || '',
       familyContact: pilgrim.familyContact || '',
@@ -728,11 +734,14 @@ export default function AgencyDashboardPage() {
       if (passIdForm.fullName !== undefined) body.fullName = passIdForm.fullName;
       if (passIdForm.nationality !== undefined) body.nationality = passIdForm.nationality;
       if (passIdForm.bloodType !== undefined) body.bloodType = passIdForm.bloodType || null;
+      if (passIdForm.allergies !== undefined) body.allergies = passIdForm.allergies || null;
+      if (passIdForm.diseases !== undefined) body.diseases = passIdForm.diseases || null;
       if (passIdForm.medicalInfo !== undefined) body.medicalInfo = passIdForm.medicalInfo || null;
       if (passIdForm.hotelMecca !== undefined) body.hotelMecca = passIdForm.hotelMecca || null;
       if (passIdForm.roomMecca !== undefined) body.roomMecca = passIdForm.roomMecca || null;
       if (passIdForm.hotelMedina !== undefined) body.hotelMedina = passIdForm.hotelMedina || null;
       if (passIdForm.roomMedina !== undefined) body.roomMedina = passIdForm.roomMedina || null;
+      if (passIdForm.hotelPhone !== undefined) body.hotelPhone = passIdForm.hotelPhone || null;
       if (passIdForm.groupLeaderPhone !== undefined) body.groupLeaderPhone = passIdForm.groupLeaderPhone || null;
       if (passIdForm.agencyPhone !== undefined) body.agencyPhone = passIdForm.agencyPhone || null;
       if (passIdForm.familyContact !== undefined) body.familyContact = passIdForm.familyContact || null;
@@ -2025,12 +2034,30 @@ export default function AgencyDashboardPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Infos médicales</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Maladie critique</Label>
+                  <Input
+                    value={passIdForm.diseases || ''}
+                    onChange={(e) => setPassIdForm({ ...passIdForm, diseases: e.target.value })}
+                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                    placeholder="Diabète, hypertension..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Allergies</Label>
+                  <Input
+                    value={passIdForm.allergies || ''}
+                    onChange={(e) => setPassIdForm({ ...passIdForm, allergies: e.target.value })}
+                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                    placeholder="Pénicilline, arachide..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Médicaments</Label>
                   <Input
                     value={passIdForm.medicalInfo || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, medicalInfo: e.target.value })}
                     className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="Allergies, conditions chroniques..."
+                    placeholder="Insuline, metformine..."
                   />
                 </div>
               </div>
@@ -2053,12 +2080,12 @@ export default function AgencyDashboardPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Chambre (Mecque)</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">N° Chambre Mecque</Label>
                   <Input
                     value={passIdForm.roomMecca || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, roomMecca: e.target.value })}
-                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="Numéro de chambre"
+                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-lg font-bold"
+                    placeholder="N° chambre"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -2071,12 +2098,21 @@ export default function AgencyDashboardPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Chambre (Médine)</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">N° Chambre Médine</Label>
                   <Input
                     value={passIdForm.roomMedina || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, roomMedina: e.target.value })}
+                    className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-lg font-bold"
+                    placeholder="N° chambre"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">☎️ Téléphone de l'hôtel</Label>
+                  <Input
+                    value={passIdForm.hotelPhone || ''}
+                    onChange={(e) => setPassIdForm({ ...passIdForm, hotelPhone: e.target.value })}
                     className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="Numéro de chambre"
+                    placeholder="+966 12 557 0000"
                   />
                 </div>
               </div>
@@ -2090,30 +2126,30 @@ export default function AgencyDashboardPage() {
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Téléphone du chef de groupe</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">📱 Chef de groupe (indicatif + n°)</Label>
                   <Input
                     value={passIdForm.groupLeaderPhone || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, groupLeaderPhone: e.target.value })}
                     className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="+33612345678"
+                    placeholder="+213 555 123 456"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Téléphone de l'agence</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">📱 Agence (indicatif + n°)</Label>
                   <Input
                     value={passIdForm.agencyPhone || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, agencyPhone: e.target.value })}
                     className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="+33612345678"
+                    placeholder="+966 12 557 0000"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-slate-600 dark:text-slate-400 text-xs">Contact familial</Label>
+                  <Label className="text-slate-600 dark:text-slate-400 text-xs">📱 Famille (indicatif + n°)</Label>
                   <Input
                     value={passIdForm.familyContact || ''}
                     onChange={(e) => setPassIdForm({ ...passIdForm, familyContact: e.target.value })}
                     className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
-                    placeholder="+33612345678"
+                    placeholder="+33 6 12 34 56 78"
                   />
                 </div>
                 <div className="space-y-1.5">
