@@ -149,78 +149,159 @@ function HeroSection() {
       </div>
 
       <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
-        <div className="max-w-2xl">
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.div variants={fadeUp} custom={0}>
-              <Overline color={JAUNE_LIGHT}>Protection bagages & pèlerins</Overline>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left — Text content */}
+          <div className="max-w-2xl">
+            <motion.div initial="hidden" animate="visible" variants={stagger}>
+              <motion.div variants={fadeUp} custom={0}>
+                <Overline color={JAUNE_LIGHT}>Protection bagages & pèlerins</Overline>
+              </motion.div>
+
+              <motion.h1
+                variants={fadeUp}
+                custom={1}
+                className={`text-4xl sm:text-5xl lg:text-7xl font-semibold text-white leading-[1.08] tracking-tight mb-6 ${serif}`}
+              >
+                Protégez chaque bagage,{' '}
+                <span style={{ color: JAUNE }}>en toute sérénité</span>
+              </motion.h1>
+
+              <motion.p
+                variants={fadeUp}
+                custom={2}
+                className="text-lg sm:text-xl text-white/85 leading-relaxed mb-10 max-w-xl"
+                style={{ fontFamily: 'var(--font-inter)' }}
+              >
+                La première solution sans application, sans batterie, sans GPS.
+                Un simple QR code pour protéger, retrouver et notifier — instantanément.
+              </motion.p>
+
+              <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
+                <Link href="/hajj-omra" className="group">
+                  <Button
+                    size="lg"
+                    className="rounded-[10px] px-6 h-12 text-sm font-medium shadow-lg transition-all duration-300 group-hover:shadow-xl"
+                    style={{ backgroundColor: JAUNE, color: NAVY }}
+                  >
+                    Hajj & Omra
+                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+                <Link href="/demo" className="group">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
+                  >
+                    Voir la démo
+                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+              </motion.div>
             </motion.div>
 
-            <motion.h1
+            {/* Stats row — HMC style */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
               variants={fadeUp}
-              custom={1}
-              className={`text-4xl sm:text-5xl lg:text-7xl font-semibold text-white leading-[1.08] tracking-tight mb-6 ${serif}`}
+              custom={5}
+              className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10"
             >
-              Protégez chaque bagage,{' '}
-              <span style={{ color: JAUNE }}>en toute sérénité</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeUp}
-              custom={2}
-              className="text-lg sm:text-xl text-white/85 leading-relaxed mb-10 max-w-xl"
-              style={{ fontFamily: 'var(--font-inter)' }}
-            >
-              La première solution sans application, sans batterie, sans GPS.
-              Un simple QR code pour protéger, retrouver et notifier — instantanément.
-            </motion.p>
-
-            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4">
-              <Link href="/hajj-omra" className="group">
-                <Button
-                  size="lg"
-                  className="rounded-[10px] px-6 h-12 text-sm font-medium shadow-lg transition-all duration-300 group-hover:shadow-xl"
-                  style={{ backgroundColor: JAUNE, color: NAVY }}
-                >
-                  Hajj & Omra
-                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-              <Link href="/demo" className="group">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
-                >
-                  Voir la démo
-                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
+              {[
+                { value: '10 000+', label: 'Bagages protégés' },
+                { value: '98%', label: 'Taux de récupération' },
+                { value: '500+', label: 'Agences partenaires' },
+                { value: '45+', label: 'Pays couverts' },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-2xl sm:text-3xl font-bold" style={{ color: JAUNE_LIGHT }}>
+                    {stat.value}
+                  </p>
+                  <p className="text-white/60 text-xs uppercase tracking-wider mt-1">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
             </motion.div>
-          </motion.div>
+          </div>
 
-          {/* Stats row — HMC style */}
+          {/* Right — Product images: Suitcase & Bracelet with QR codes */}
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={5}
-            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10"
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative hidden lg:flex flex-col items-center gap-6"
           >
-            {[
-              { value: '10 000+', label: 'Bagages protégés' },
-              { value: '98%', label: 'Taux de récupération' },
-              { value: '500+', label: 'Agences partenaires' },
-              { value: '45+', label: 'Pays couverts' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl sm:text-3xl font-bold" style={{ color: JAUNE_LIGHT }}>
-                  {stat.value}
-                </p>
-                <p className="text-white/60 text-xs uppercase tracking-wider mt-1">
-                  {stat.label}
-                </p>
+            {/* Suitcase with QR code */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="relative"
+            >
+              <div className="relative w-72 h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm">
+                <Image
+                  src="/suitcase-qrcode.png"
+                  alt="Valise avec QR code PassHajj"
+                  fill
+                  sizes="288px"
+                  className="object-contain p-4"
+                  priority
+                />
               </div>
-            ))}
+              {/* Badge */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 1.0 }}
+                className="absolute -top-3 -right-3 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
+                style={{ backgroundColor: JAUNE, color: NAVY }}
+              >
+                <Luggage className="w-3.5 h-3.5 inline mr-1" />
+                Bagage
+              </motion.div>
+            </motion.div>
+
+            {/* Bracelet with QR code */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.8 }}
+              className="relative"
+            >
+              <div className="relative w-64 h-64 rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm">
+                <Image
+                  src="/bracelet-qrcode.png"
+                  alt="Bracelet QR code PassHajj pour pèlerin"
+                  fill
+                  sizes="256px"
+                  className="object-contain p-4"
+                  priority
+                />
+              </div>
+              {/* Badge */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 1.3 }}
+                className="absolute -top-3 -right-3 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
+                style={{ backgroundColor: JAUNE, color: NAVY }}
+              >
+                <Fingerprint className="w-3.5 h-3.5 inline mr-1" />
+                Pèlerin
+              </motion.div>
+            </motion.div>
+
+            {/* Decorative QR scan lines */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              transition={{ duration: 1.5, delay: 1.5 }}
+              className="absolute -z-10 top-0 right-0 w-96 h-96"
+            >
+              <div className="w-full h-full rounded-full" style={{ background: `radial-gradient(circle, ${JAUNE}20 0%, transparent 70%)` }} />
+            </motion.div>
           </motion.div>
         </div>
       </div>
