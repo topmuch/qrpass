@@ -37,6 +37,8 @@ import {
   Phone,
   ScanLine,
   Building2,
+  Download,
+  ExternalLink,
 } from "lucide-react";
 import { useAgency } from '../layout';
 import { isActive, isPending, isLost, isFound, normalizeStatus } from '@/lib/status';
@@ -49,6 +51,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { QRCodeSVG } from 'qrcode.react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -465,6 +468,7 @@ export default function AgencyDashboardPage() {
   const [selectedPassId, setSelectedPassId] = useState<PassIdentity | null>(null);
   const [passIdForm, setPassIdForm] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<'baggages' | 'passidentity'>('baggages');
+  const [qrPreviewPilgrim, setQrPreviewPilgrim] = useState<PassIdentity | null>(null);
 
   // Command Modal State
   const [showCommandModal, setShowCommandModal] = useState(false);
@@ -1369,6 +1373,15 @@ export default function AgencyDashboardPage() {
                     <Button
                       size="sm"
                       variant="outline"
+                      className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl border-emerald-200"
+                      onClick={() => setQrPreviewPilgrim(pilgrim)}
+                    >
+                      <QrCode className="w-4 h-4 mr-1" />
+                      QR Code
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-xl border-blue-200"
                       onClick={() => openPassIdEdit(pilgrim)}
                     >
@@ -2139,6 +2152,95 @@ export default function AgencyDashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* QR Code Preview Modal for Pass Identity */}
+      {qrPreviewPilgrim && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm" onClick={() => setQrPreviewPilgrim(null)}>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <QrCode className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-white">QR Code Pass Identity</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">{qrPreviewPilgrim.qrCode}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setQrPreviewPilgrim(null)}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+            <div className="p-6 flex flex-col items-center">
+              {/* QR Code with flanking icons */}
+              <div className="flex items-center gap-3 mb-4">
+                {/* Envelope icon — family */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <span className="text-lg">✉️</span>
+                  </div>
+                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium text-center">Famille</span>
+                </div>
+                {/* QR Code */}
+                <div className="bg-white rounded-xl p-4 border-2 border-emerald-200">
+                  <QRCodeSVG
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/p/${qrPreviewPilgrim.qrCode}`}
+                    size={160}
+                    level="H"
+                    includeMargin={false}
+                    bgColor="#ffffff"
+                    fgColor="#059669"
+                  />
+                </div>
+                {/* Medical icon — health */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <span className="text-lg">⚕️</span>
+                  </div>
+                  <span className="text-[9px] text-red-600 dark:text-red-400 font-medium text-center">Santé</span>
+                </div>
+              </div>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{qrPreviewPilgrim.fullName}</p>
+              {qrPreviewPilgrim.bloodType && (
+                <p className="text-xs text-slate-500 dark:text-slate-400">🩸 Groupe sanguin : {qrPreviewPilgrim.bloodType}</p>
+              )}
+              <div className="flex gap-2 mt-4 w-full">
+                <a
+                  href={`${typeof window !== 'undefined' ? window.location.origin : ''}/p/${qrPreviewPilgrim.qrCode}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Voir le profil
+                </a>
+                <button
+                  onClick={() => {
+                    const svg = document.querySelector('#qr-preview-svg');
+                    if (svg) {
+                      const svgData = new XMLSerializer().serializeToString(svg);
+                      const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `pass-identity-${qrPreviewPilgrim.qrCode}.svg`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }
+                  }}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Télécharger
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

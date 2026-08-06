@@ -34,6 +34,8 @@ import {
   Calendar,
   Clock,
   Droplets,
+  Mail,
+  Activity,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
@@ -352,15 +354,32 @@ export default function PilgrimDashboardPage() {
           <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
-                {/* QR Code */}
-                <div className="bg-white rounded-xl p-4 flex-shrink-0">
-                  <QRCodeSVG
-                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/pilgrim/${code}`}
-                    size={120}
-                    level="M"
-                    bgColor="#ffffff"
-                    fgColor="#059669"
-                  />
+                {/* QR Code with flanking icons */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Envelope icon — indicates pilgrim can scan to write family */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                      <Mail className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <span className="text-[8px] text-emerald-300 font-medium leading-tight text-center">Famille</span>
+                  </div>
+                  {/* QR Code */}
+                  <div className="bg-white rounded-xl p-4">
+                    <QRCodeSVG
+                      value={`${typeof window !== 'undefined' ? window.location.origin : ''}/pilgrim/${code}`}
+                      size={120}
+                      level="M"
+                      bgColor="#ffffff"
+                      fgColor="#059669"
+                    />
+                  </div>
+                  {/* Caduceus/medical icon — indicates health profile for emergency */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                      <Activity className="w-4 h-4 text-red-600" />
+                    </div>
+                    <span className="text-[8px] text-red-300 font-medium leading-tight text-center">Santé</span>
+                  </div>
                 </div>
                 {/* Status Info */}
                 <div className="flex-1 text-center sm:text-left space-y-3">
