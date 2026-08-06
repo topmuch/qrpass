@@ -226,81 +226,61 @@ function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Right — Product images: Suitcase & Bracelet with QR codes */}
+          {/* Right — PassHajj products showcase (valise + bracelet + passeport) */}
           <motion.div
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="relative hidden lg:flex flex-col items-center gap-6"
+            transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative hidden lg:block"
           >
-            {/* Suitcase with QR code */}
+            {/* Main product image */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
               className="relative"
             >
-              <div className="relative w-72 h-72 rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm">
+              <div className="relative w-[540px] h-[232px] rounded-2xl overflow-hidden shadow-2xl border border-white/15">
                 <Image
-                  src="/suitcase-qrcode.png"
-                  alt="Valise avec QR code PassHajj"
+                  src="/passhajj-products.png"
+                  alt="PassHajj — Valise, Bracelet & Passeport avec QR code"
                   fill
-                  sizes="288px"
-                  className="object-contain p-4"
+                  sizes="540px"
+                  className="object-cover"
                   priority
                 />
               </div>
-              {/* Badge */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, delay: 1.0 }}
-                className="absolute -top-3 -right-3 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
-                style={{ backgroundColor: JAUNE, color: NAVY }}
-              >
-                <Luggage className="w-3.5 h-3.5 inline mr-1" />
-                Bagage
-              </motion.div>
+              {/* Glow behind image */}
+              <div
+                className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-20"
+                style={{ background: `radial-gradient(ellipse, ${JAUNE} 0%, transparent 70%)` }}
+              />
             </motion.div>
 
-            {/* Bracelet with QR code */}
+            {/* Product labels */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.8 }}
-              className="relative"
+              transition={{ duration: 0.6, delay: 1.0 }}
+              className="flex items-center gap-3 mt-4 justify-center"
             >
-              <div className="relative w-64 h-64 rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-sm">
-                <Image
-                  src="/bracelet-qrcode.png"
-                  alt="Bracelet QR code PassHajj pour pèlerin"
-                  fill
-                  sizes="256px"
-                  className="object-contain p-4"
-                  priority
-                />
-              </div>
-              {/* Badge */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, delay: 1.3 }}
-                className="absolute -top-3 -right-3 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
-                style={{ backgroundColor: JAUNE, color: NAVY }}
-              >
-                <Fingerprint className="w-3.5 h-3.5 inline mr-1" />
-                Pèlerin
-              </motion.div>
-            </motion.div>
-
-            {/* Decorative QR scan lines */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              transition={{ duration: 1.5, delay: 1.5 }}
-              className="absolute -z-10 top-0 right-0 w-96 h-96"
-            >
-              <div className="w-full h-full rounded-full" style={{ background: `radial-gradient(circle, ${JAUNE}20 0%, transparent 70%)` }} />
+              {[
+                { icon: <Luggage className="w-3.5 h-3.5" />, label: 'Bagage' },
+                { icon: <Fingerprint className="w-3.5 h-3.5" />, label: 'Bracelet' },
+                { icon: <BookCheck className="w-3.5 h-3.5" />, label: 'Passeport' },
+              ].map((item, i) => (
+                <motion.span
+                  key={item.label}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, delay: 1.1 + i * 0.12 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md"
+                  style={{ backgroundColor: JAUNE, color: NAVY }}
+                >
+                  {item.icon}
+                  {item.label}
+                </motion.span>
+              ))}
             </motion.div>
           </motion.div>
         </div>
