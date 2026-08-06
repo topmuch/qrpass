@@ -581,6 +581,7 @@ model Pilgrim {
   groupLeaderPhone String?  // WhatsApp number of group leader
   agencyPhone      String?  // Agency contact number
   familyContact    String?  // Family emergency contact
+  hajjStage        String?  // Current Hajj journey stage key (see hajj-stages.ts)
   alNusukDocUrl    String?  // AlNusuk/Visa document link
   isActive         Boolean  @default(false) // Activated by owner
   duration         String   @default("30d") // "15d" | "30d" | "1y"

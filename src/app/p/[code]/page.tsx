@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { HAJJ_STAGES, getStageLabel, getStageDesc, getStageMessage, holySiteToStageKey, type HajjStageKey, type HajjStage } from '@/lib/hajj-stages';
 
 // ─── Helper: Convert a stored photoUrl to a displayable URL ───
 // Photos uploaded via /api/pilgrims/upload-photo are stored as /uploads/pilgrim-photos/xxx.jpg
@@ -75,6 +76,7 @@ interface PilgrimData {
   agencyPhone: string | null;
   hotelPhone: string | null;
   familyContact: string | null;
+  hajjStage: string | null;
   alNusukDocUrl: string | null;
   isActive: boolean;
   duration: string | null;
@@ -161,6 +163,11 @@ const translations = {
     hotelSectionTitle: 'Hôtel',
     hotelItinerary: 'Itinéraire vers l\'hôtel',
     reassureFamily: 'Rassurer la famille',
+    hajjJourney: 'Mon parcours Hajj',
+    hajjStageLabel: 'Étape actuelle',
+    hajjNextStep: 'Prochaine étape',
+    hajjCompleted: 'Terminé',
+    hajjUpdateStage: 'Mettre à jour mon étape',
     reassureMessage: 'Je vais bien, je suis à Jeddah',
     reassureMedina: '💬 Bonjour je vais bien je suis à Médine',
     reassureMina: '💬 Dire à la famille que je suis à Mina',
@@ -224,6 +231,11 @@ const translations = {
     hotelSectionTitle: 'Hotel',
     hotelItinerary: 'Route to hotel',
     reassureFamily: 'Reassure family',
+    hajjJourney: 'My Hajj Journey',
+    hajjStageLabel: 'Current stage',
+    hajjNextStep: 'Next step',
+    hajjCompleted: 'Completed',
+    hajjUpdateStage: 'Update my stage',
     reassureMessage: 'I am fine, I am in Jeddah',
     reassureMedina: '💬 Hello, I am fine, I am in Medina',
     reassureMina: '💬 Tell family I am in Mina',
@@ -287,6 +299,11 @@ const translations = {
     hotelSectionTitle: 'الفندق',
     hotelItinerary: 'اتجاهات إلى الفندق',
     reassureFamily: 'إطمئن العائلة',
+    hajjJourney: 'رحلتي في الحج',
+    hajjStageLabel: 'المرحلة الحالية',
+    hajjNextStep: 'المرحلة التالية',
+    hajjCompleted: 'مكتمل',
+    hajjUpdateStage: 'تحديث مرحلتي',
     reassureMessage: 'أنا بخير، أنا في جدة',
     reassureMedina: '💬 مرحبا، أنا بخير، أنا في المدينة المنورة',
     reassureMina: '💬 أخبر العائلة أنني في منى',
@@ -1022,75 +1039,116 @@ export default function PilgrimScanPage() {
               </div>
 
               {/* ═══════════════════════════════════════════════════════════
-                  4b. RASSURER LA FAMILLE — Caméléon Button (GPS-aware)
-                  Personalized messages with Hajj pilgrimage context & next steps
+                  4b. HAJJ JOURNEY TRACKER + RASSURER LA FAMILLE
+                  Full Hajj stages with personalized WhatsApp notifications
               ═══════════════════════════════════════════════════════════ */}
               {pilgrim.familyContact && (
                 <div className="w-full max-w-[420px] mb-4">
                   {(() => {
-                    // ─── Caméléon: detect holy site from GPS ───
-                    const holySite = (finderLat && finderLng) ? detectHolySite(finderLat, finderLng) : null;
+                    // Determine current stage: use hajjStage from DB, or auto-detect from GPS
+                    const gpsHolySite = (finderLat && finderLng) ? detectHolySite(finderLat, finderLng) : null;
+                    const gpsStageKey = holySiteToStageKey(gpsHolySite);
+                    const currentStageKey = (pilgrim.hajjStage as HajjStageKey) || gpsStageKey || 'medina';
+                    const currentStage = HAJJ_STAGES.find(s => s.key === currentStageKey) || HAJJ_STAGES[0];
+                    const currentOrder = currentStage.order;
+                    const langCode = lang === 'ar' ? 'ar' as const : lang === 'en' ? 'en' as const : 'fr' as const;
+                    const nextStage = currentStage.nextKey ? HAJJ_STAGES.find(s => s.key === currentStage.nextKey) : null;
 
-                    // Button label & WhatsApp message — personalized with Hajj context & next step
-                    let buttonLabel: string;
-                    let waMessage: string;
+                    // WhatsApp message for current stage
+                    const waMessage = getStageMessage(currentStage, langCode);
 
-                    buttonLabel = t('reassureFamily');
-
-                    if (holySite === 'medina') {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، أنا في المدينة المنورة، كل شيء على ما يرام، أستريح قبل الحج، أراكم قريباً إن شاء الله'
-                        : lang === 'en'
-                          ? 'Hello family, I am in Medina, everything is going well, I am resting before Hajj, see you soon insha\'Allah'
-                          : 'Bonjour la famille, je suis à Médine, tout se passe bien, je me repose avant le Hajj, à très bientôt inch\'Allah';
-                    } else if (holySite === 'mina') {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، حالياً أنا في منى لأداء الحج، المرحلة التالية هي عرفات، كل شيء على ما يرام والحمد لله'
-                        : lang === 'en'
-                          ? 'Hello family, I am currently performing Hajj at Mina, the next step is Arafat, everything is going well alhamdulillah'
-                          : 'Bonjour la famille, actuellement je suis en train de faire le Hajj à Mina, la prochaine étape c\'est Arafat, sinon tout se passe bien je vais super bien merci';
-                    } else if (holySite === 'arafat') {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، حالياً أنا في عرفات في أهم يوم من الحج، المرحلة التالية هي مزدلفة، كل شيء على ما يرام والحمد لله'
-                        : lang === 'en'
-                          ? 'Hello family, I am at Arafat for the most important day of Hajj, the next step is Muzdalifah, everything is going well alhamdulillah'
-                          : 'Bonjour la famille, actuellement je suis à Arafat pour le jour le plus important du Hajj, la prochaine étape c\'est Muzdalifah, tout se passe bien alhamdulillah';
-                    } else if (holySite === 'muzdalifah') {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، أنا في مزدلفة، المرحلة التالية هي العودة إلى منى لرمي الجمرات، كل شيء على ما يرام شكراً'
-                        : lang === 'en'
-                          ? 'Hello family, I am at Muzdalifah, the next step is returning to Mina for the stoning, everything is going well thank you'
-                          : 'Bonjour la famille, je suis à Muzdalifah, la prochaine étape c\'est le retour à Mina pour le lancer de pierres, tout se passe bien merci';
-                    } else if (holySite === 'mecca') {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، أنا في مكة المكرمة للطواف، كل شيء على ما يرام والحمد لله، أراكم قريباً إن شاء الله'
-                        : lang === 'en'
-                          ? 'Hello family, I am in Mecca for the Tawaf, everything is going well alhamdulillah, see you soon insha\'Allah'
-                          : 'Bonjour la famille, je suis à la Mecque pour le Tawaf, tout se passe bien alhamdulillah, à très bientôt inch\'Allah';
-                    } else {
-                      waMessage = lang === 'ar'
-                        ? 'مرحبا بالعائلة، كل شيء على ما يرام، أنا بخير جداً شكراً، أراكم قريباً إن شاء الله'
-                        : lang === 'en'
-                          ? 'Hello family, everything is going well, I am very well thank you, see you soon insha\'Allah'
-                          : 'Bonjour la famille, tout se passe bien, je vais très bien merci, à bientôt inch\'Allah';
-                    }
-
-                    // Append GPS link if available
+                    // GPS location suffix
                     const locationSuffix = finderLat && finderLng
                       ? (lang === 'ar' ? `\n\n📍 موقعي: https://maps.google.com/?q=${finderLat},${finderLng}` : lang === 'en' ? `\n\n📍 My location: https://maps.google.com/?q=${finderLat},${finderLng}` : `\n\n📍 Ma localisation: https://maps.google.com/?q=${finderLat},${finderLng}`)
                       : '';
 
                     return (
-                      <a
-                        href={`https://wa.me/${cleanPhone(pilgrim.familyContact!)}?text=${encodeURIComponent(waMessage + locationSuffix)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                        style={{ background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
-                      >
-                        <Heart className="w-5 h-5" />
-                        {buttonLabel}
-                      </a>
+                      <div className="space-y-4">
+                        {/* Hajj Journey Progress Card */}
+                        <div className="rounded-[20px] p-4" style={{ background: CARD_BG, boxShadow: SHADOW }}>
+                          <h3 className="text-[15px] font-extrabold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
+                            🕋 {t('hajjJourney')}
+                          </h3>
+
+                          {/* Current stage highlight */}
+                          <div className="rounded-[14px] p-3 mb-3" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
+                            <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: SUCCESS }}>
+                              {t('hajjStageLabel')}
+                            </p>
+                            <p className="text-[15px] font-bold" style={{ color: TEXT }}>
+                              {currentStage.icon} {getStageLabel(currentStage, langCode)}
+                            </p>
+                            <p className="text-[12px] mt-1 leading-snug" style={{ color: MUTED }}>
+                              {getStageDesc(currentStage, langCode)}
+                            </p>
+                            {nextStage && (
+                              <p className="text-[12px] mt-2 font-semibold" style={{ color: SUCCESS }}>
+                                ➡️ {t('hajjNextStep')}: {nextStage.icon} {getStageLabel(nextStage, langCode)}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Stages timeline */}
+                          <div className="space-y-1 max-h-72 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+                            {HAJJ_STAGES.filter(s => s.key !== 'mecca-general' && s.key !== 'oumrah-ifrad').map((stage) => {
+                              const isCompleted = stage.order < currentOrder;
+                              const isCurrent = stage.key === currentStageKey;
+                              return (
+                                <button
+                                  key={stage.key}
+                                  onClick={async () => {
+                                    try {
+                                      const res = await fetch('/api/pilgrims/update-stage', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ qrCode: pilgrim.qrCode, hajjStage: stage.key }),
+                                      });
+                                      if (res.ok) {
+                                        // Update local state
+                                        setPilgrim(prev => prev ? { ...prev, hajjStage: stage.key } : prev);
+                                        toast({ title: lang === 'fr' ? 'Étape mise à jour !' : lang === 'en' ? 'Stage updated!' : 'تم تحديث المرحلة!' });
+                                      }
+                                    } catch { /* silent */ }
+                                  }}
+                                  className={`w-full text-left flex items-start gap-2.5 p-2 rounded-[10px] transition-all text-[12px] ${
+                                    isCurrent ? 'ring-2 ring-emerald-400' : ''
+                                  } ${isCompleted ? 'opacity-60' : ''}`}
+                                  style={{
+                                    background: isCurrent ? '#ecfdf5' : isCompleted ? '#f9fafb' : 'transparent',
+                                  }}
+                                >
+                                  {/* Status dot */}
+                                  <span className="mt-0.5 shrink-0">
+                                    {isCompleted ? (
+                                      <Check className="w-4 h-4" style={{ color: SUCCESS }} />
+                                    ) : isCurrent ? (
+                                      <span className="block w-4 h-4 rounded-full animate-pulse" style={{ background: SUCCESS }} />
+                                    ) : (
+                                      <span className="block w-4 h-4 rounded-full border-2" style={{ borderColor: '#d1d5db' }} />
+                                    )}
+                                  </span>
+                                  {/* Label */}
+                                  <span className={`leading-tight ${isCurrent ? 'font-bold' : isCompleted ? 'line-through' : 'font-medium'}`} style={{ color: isCurrent ? TEXT : MUTED }}>
+                                    {stage.icon} {getStageLabel(stage, langCode)}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Rassurer la famille button — WhatsApp with Hajj stage message */}
+                        <a
+                          href={`https://wa.me/${cleanPhone(pilgrim.familyContact!)}?text=${encodeURIComponent(waMessage + locationSuffix)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 text-white transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                          style={{ background: '#10b981', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}
+                        >
+                          <Heart className="w-5 h-5" />
+                          {t('reassureFamily')}
+                        </a>
+                      </div>
                     );
                   })()}
                 </div>
