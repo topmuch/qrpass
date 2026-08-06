@@ -18,7 +18,10 @@ import {
   Droplets,
   ShieldCheck,
   AlertTriangle,
+  Share,
+  ExternalLink,
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { HAJJ_STAGES, getStageLabel, getStageDesc, getStageMessage, holySiteToStageKey, type HajjStageKey, type HajjStage } from '@/lib/hajj-stages';
@@ -180,6 +183,19 @@ const translations = {
     firstNameLabel: 'Prénom',
     lastNameLabel: 'Nom',
     nationalityLabel: 'Nationalité',
+    qrCode: 'Code QR',
+    verifiedBadge: 'Vérifié ✓',
+    shareProfile: 'Partager',
+    shareCopied: 'Lien copié !',
+    scanCount: 'Scanné {n} fois',
+    createdOn: 'Créé le',
+    updatedOn: 'Mis à jour le',
+    callHotel: "Appeler l'Hôtel",
+    pilgrimPhone: 'Téléphone',
+    alNusukDoc: 'Document AlNusuk',
+    addressLabel: 'Adresse',
+    noMedicalInfo: 'Aucune info médicale',
+    viewOnMap: 'Voir sur la carte',
   },
   en: {
     helpLink: 'Help?',
@@ -248,6 +264,19 @@ const translations = {
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
     nationalityLabel: 'Nationality',
+    qrCode: 'QR Code',
+    verifiedBadge: 'Verified ✓',
+    shareProfile: 'Share',
+    shareCopied: 'Link copied!',
+    scanCount: 'Scanned {n} times',
+    createdOn: 'Created on',
+    updatedOn: 'Updated on',
+    callHotel: 'Call Hotel',
+    pilgrimPhone: 'Phone',
+    alNusukDoc: 'AlNusuk Document',
+    addressLabel: 'Address',
+    noMedicalInfo: 'No medical info',
+    viewOnMap: 'View on map',
   },
   ar: {
     helpLink: 'مساعدة؟',
@@ -316,6 +345,19 @@ const translations = {
     firstNameLabel: 'الاسم الأول',
     lastNameLabel: 'الاسم الأخير',
     nationalityLabel: 'الجنسية',
+    qrCode: 'رمز QR',
+    verifiedBadge: 'مُتحقق ✓',
+    shareProfile: 'مشاركة',
+    shareCopied: 'تم نسخ الرابط!',
+    scanCount: 'تم المسح {n} مرة',
+    createdOn: 'أنشئ في',
+    updatedOn: 'تحديث في',
+    callHotel: 'اتصل بالفندق',
+    pilgrimPhone: 'الهاتف',
+    alNusukDoc: 'وثيقة النسك',
+    addressLabel: 'العنوان',
+    noMedicalInfo: 'لا معلومات طبية',
+    viewOnMap: 'عرض على الخريطة',
   },
 };
 
@@ -658,7 +700,26 @@ export default function PilgrimScanPage() {
             <div className="flex items-center">
               <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Share Profile Button */}
+              <button
+                onClick={async () => {
+                  const shareData = { title: `PassHajj - ${pilgrim.fullName}`, url: window.location.href };
+                  if (navigator.share) {
+                    try { await navigator.share(shareData); } catch { /* user cancelled */ }
+                  } else {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                      toast({ title: t('shareCopied') });
+                    } catch { /* clipboard failed */ }
+                  }
+                }}
+                className="bg-white/30 border-none px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer hover:bg-white/50 transition-colors flex items-center gap-1"
+                style={{ color: TEXT }}
+              >
+                <Share className="w-3 h-3" />
+                {t('shareProfile')}
+              </button>
               <button
                 onClick={toggleLang}
                 className="bg-white/30 border-none px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer hover:bg-white/50 transition-colors"
@@ -748,8 +809,17 @@ export default function PilgrimScanPage() {
                       </div>
                   </div>
 
-                  {/* Name */}
+                  {/* Name + Verified Badge */}
                   <h2 className="text-[24px] font-extrabold mb-1 text-white drop-shadow-sm">{pilgrim.fullName}</h2>
+
+                  {/* Verified Badge */}
+                  <span
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold mb-2"
+                    style={{ background: '#10b981', color: '#fff' }}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {t('verifiedBadge')}
+                  </span>
 
                   {/* Nationality badge */}
                   {pilgrim.nationality && (
@@ -757,6 +827,14 @@ export default function PilgrimScanPage() {
                       🌍 {pilgrim.nationality}
                     </span>
                   )}
+
+                  {/* QR Code */}
+                  <div className="mt-3 flex flex-col items-center">
+                    <div className="bg-white rounded-xl p-1.5" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                      <QRCodeSVG value={pilgrim.qrCode} size={80} level="M" />
+                    </div>
+                    <span className="text-white/80 text-[10px] font-mono mt-1">{pilgrim.qrCode}</span>
+                  </div>
                 </div>
 
                 {/* Info list below name */}
@@ -779,6 +857,18 @@ export default function PilgrimScanPage() {
                       <span className="text-sm font-bold" style={{ color: TEXT }}>🌍 {pilgrim.nationality}</span>
                     </div>
                   )}
+                  {pilgrim.phone && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('pilgrimPhone')}</span>
+                      <a href={`tel:+${cleanPhone(pilgrim.phone)}`} className="text-sm font-semibold" style={{ color: BLUE }}>{pilgrim.phone}</a>
+                    </div>
+                  )}
+                  {pilgrim.address && (
+                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
+                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('addressLabel')}</span>
+                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.address}</span>
+                    </div>
+                  )}
                   {pilgrim.language && (
                     <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
                       <span className="text-xs font-medium" style={{ color: MUTED }}>{t('languageLabel')}</span>
@@ -791,6 +881,34 @@ export default function PilgrimScanPage() {
                       <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.agency.name}</span>
                     </div>
                   )}
+                  {/* AlNusuk document link */}
+                  {pilgrim.alNusukDocUrl && (
+                    <a
+                      href={pilgrim.alNusukDocUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold"
+                      style={{ background: '#eff6ff', color: BLUE }}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      {t('alNusukDoc')}
+                    </a>
+                  )}
+                  {/* Scan counter */}
+                  <div className="flex justify-center mt-1">
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full font-medium" style={{ background: '#f3f4f6', color: MUTED }}>
+                      {t('scanCount').replace('{n}', String((pilgrim.reports?.length ?? 0) + 1))}
+                    </span>
+                  </div>
+                  {/* Timestamps */}
+                  <div className="flex flex-col items-center gap-0.5 mt-1">
+                    <span className="text-[10px]" style={{ color: MUTED }}>
+                      {t('createdOn')} {new Date(pilgrim.createdAt).toLocaleDateString(lang === 'ar' ? 'ar-SA' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                    <span className="text-[10px]" style={{ color: MUTED }}>
+                      {t('updatedOn')} {new Date(pilgrim.updatedAt).toLocaleDateString(lang === 'ar' ? 'ar-SA' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
 
               </div>
@@ -798,60 +916,76 @@ export default function PilgrimScanPage() {
               {/* ═══════════════════════════════════════════════════════════
                   1. ALERTE SANTÉ — 4 medical boxes: Blood, Disease, Allergies, Medicaments
               ═══════════════════════════════════════════════════════════ */}
-              <div
-                className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
-                style={{
-                  background: '#dc2626',
-                  boxShadow: '0 8px 24px rgba(220,38,38,0.35)',
-                }}
-              >
-                <h3 className="text-[18px] font-extrabold mb-4 flex items-center gap-2 text-white">
-                  <Heart className="w-6 h-6 animate-pulse" />
-                  {t('healthAlertTitle')}
-                </h3>
+              {/* Health Alert — show full card only if at least one medical field has data */}
+              {pilgrim.bloodType || pilgrim.allergies || pilgrim.diseases || pilgrim.medicalInfo ? (
+                <div
+                  className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
+                  style={{
+                    background: '#dc2626',
+                    boxShadow: '0 8px 24px rgba(220,38,38,0.35)',
+                    animation: 'fadeInUp 0.4s ease forwards',
+                    animationDelay: '0.05s',
+                    opacity: 0,
+                  }}
+                >
+                  <h3 className="text-[18px] font-extrabold mb-4 flex items-center gap-2 text-white">
+                    <Heart className="w-6 h-6 animate-pulse" />
+                    {t('healthAlertTitle')}
+                  </h3>
 
-                {/* 4 medical boxes in 2x2 grid */}
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Blood type */}
-                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
-                    <span className="text-[10px] block text-white/70 mb-0.5">Groupe sanguin</span>
-                    <span className="text-lg font-extrabold text-white">{pilgrim.bloodType || '—'}</span>
-                  </div>
+                  {/* 4 medical boxes in 2x2 grid */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Blood type */}
+                    <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                      <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
+                      <span className="text-[10px] block text-white/70 mb-0.5">Groupe sanguin</span>
+                      <span className="text-lg font-extrabold text-white">{pilgrim.bloodType || '—'}</span>
+                    </div>
 
-                  {/* Maladie critique */}
-                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <AlertTriangle className="w-6 h-6 mx-auto mb-1 text-white" />
-                    <span className="text-[10px] block text-white/70 mb-0.5">Maladie critique</span>
-                    <span className="text-sm font-bold text-white">{pilgrim.diseases || '—'}</span>
-                  </div>
+                    {/* Maladie critique */}
+                    <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                      <AlertTriangle className="w-6 h-6 mx-auto mb-1 text-white" />
+                      <span className="text-[10px] block text-white/70 mb-0.5">Maladie critique</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.diseases || '—'}</span>
+                    </div>
 
-                  {/* Allergies */}
-                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <Shield className="w-6 h-6 mx-auto mb-1 text-white" />
-                    <span className="text-[10px] block text-white/70 mb-0.5">Allergies</span>
-                    <span className="text-sm font-bold text-white">{pilgrim.allergies || '—'}</span>
-                  </div>
+                    {/* Allergies */}
+                    <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                      <Shield className="w-6 h-6 mx-auto mb-1 text-white" />
+                      <span className="text-[10px] block text-white/70 mb-0.5">Allergies</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.allergies || '—'}</span>
+                    </div>
 
-                  {/* Médicaments */}
-                  <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                    <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
-                    <span className="text-[10px] block text-white/70 mb-0.5">Médicaments</span>
-                    <span className="text-sm font-bold text-white">{pilgrim.medicalInfo || '—'}</span>
+                    {/* Médicaments */}
+                    <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                      <Droplets className="w-6 h-6 mx-auto mb-1 text-white" />
+                      <span className="text-[10px] block text-white/70 mb-0.5">Médicaments</span>
+                      <span className="text-sm font-bold text-white">{pilgrim.medicalInfo || '—'}</span>
+                    </div>
                   </div>
                 </div>
-
-                {!pilgrim.bloodType && !pilgrim.allergies && !pilgrim.diseases && !pilgrim.medicalInfo && (
-                  <p className="text-sm text-white/70 mt-3 text-center">{t('noMedical')}</p>
-                )}
-              </div>
+              ) : (
+                <div
+                  className="w-full max-w-[420px] mb-4 flex justify-center"
+                  style={{
+                    animation: 'fadeInUp 0.4s ease forwards',
+                    animationDelay: '0.05s',
+                    opacity: 0,
+                  }}
+                >
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: '#d1fae5', color: '#065f46' }}>
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {t('noMedicalInfo')}
+                  </span>
+                </div>
+              )}
 
               {/* ═══════════════════════════════════════════════════════════
                   1b. URGENCE MÉDICALE — direct call buttons (997 + 911)
               ═══════════════════════════════════════════════════════════ */}
               <div
                 className="w-full max-w-[420px] rounded-[16px] p-5 mb-4"
-                style={{ background: '#fef2f2', boxShadow: SHADOW }}
+                style={{ background: '#fef2f2', boxShadow: SHADOW, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.1s', opacity: 0 }}
               >
                 <h3 className="text-xl font-extrabold mb-2 text-center flex items-center justify-center gap-2" style={{ color: TEXT }}>
                   <span className="text-5xl">🚑</span> {t('emerTitle')}
@@ -880,7 +1014,7 @@ export default function PilgrimScanPage() {
               {/* ═══════════════════════════════════════════════════════════
                   2. CONTACTS — 3 contact buttons
               ═══════════════════════════════════════════════════════════ */}
-              <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4">
+              <div className="w-full max-w-[420px] flex flex-col gap-3 mb-4" style={{ animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.15s', opacity: 0 }}>
                 {/* WhatsApp — Contacter le chef de groupe */}
                 {whatsappLeaderUrl && (
                   <a
@@ -930,6 +1064,9 @@ export default function PilgrimScanPage() {
                   boxShadow: SHADOW,
                   borderLeft: lang === 'ar' ? 'none' : '5px solid #3b82f6',
                   borderRight: lang === 'ar' ? '5px solid #3b82f6' : 'none',
+                  animation: 'fadeInUp 0.4s ease forwards',
+                  animationDelay: '0.2s',
+                  opacity: 0,
                 }}
               >
                 <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: BLUE }}>
@@ -980,9 +1117,20 @@ export default function PilgrimScanPage() {
                         className="w-full py-3.5 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2 text-white transition-all hover:opacity-90 active:scale-[0.98]"
                         style={{ background: '#0ea5e9', boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }}
                       >
-                        🏨 Appeler l&apos;Hôtel
+                        🏨 {t('callHotel')}
                       </a>
                     )}
+                    {/* Voir sur la carte — Google Maps link */}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${hotelLat},${hotelLng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3 rounded-[14px] font-semibold text-xs flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                      style={{ background: '#f0f9ff', color: BLUE, border: '1px solid #bfdbfe' }}
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      {t('viewOnMap')}
+                    </a>
                   </div>
                 )}
               </div>
@@ -990,7 +1138,7 @@ export default function PilgrimScanPage() {
               {/* ═══════════════════════════════════════════════════════════
                   4. CE PÈLERIN EST PERDU — Report section
               ═══════════════════════════════════════════════════════════ */}
-              <div className="w-full max-w-[420px] mb-4">
+              <div className="w-full max-w-[420px] mb-4" style={{ animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.25s', opacity: 0 }}>
                 <button
                   onClick={() => setShowReport(!showReport)}
                   className="w-full py-4 rounded-[14px] font-extrabold text-base flex items-center justify-center gap-2 bg-red-600 text-white hover:bg-red-700 transition-colors"
@@ -1043,7 +1191,7 @@ export default function PilgrimScanPage() {
                   Full Hajj stages with personalized WhatsApp notifications
               ═══════════════════════════════════════════════════════════ */}
               {pilgrim.familyContact && (
-                <div className="w-full max-w-[420px] mb-4">
+                <div className="w-full max-w-[420px] mb-4" style={{ animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.3s', opacity: 0 }}>
                   {(() => {
                     // Determine current stage: use hajjStage from DB, or auto-detect from GPS
                     const gpsHolySite = (finderLat && finderLng) ? detectHolySite(finderLat, finderLng) : null;
@@ -1159,7 +1307,7 @@ export default function PilgrimScanPage() {
               ═══════════════════════════════════════════════════════════ */}
               <div
                 className="w-full max-w-[420px] rounded-[20px] p-5 mb-4"
-                style={{ background: CARD_BG, boxShadow: SHADOW }}
+                style={{ background: CARD_BG, boxShadow: SHADOW, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.35s', opacity: 0 }}
               >
                 <h3 className="text-[16px] font-extrabold mb-3 flex items-center gap-2" style={{ color: TEXT }}>
                   <ShieldCheck className="w-5 h-5" style={{ color: SUCCESS }} />
@@ -1191,6 +1339,10 @@ export default function PilgrimScanPage() {
           <style jsx>{`
             @keyframes slideDown {
               from { opacity: 0; transform: translateY(-10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeInUp {
+              from { opacity: 0; transform: translateY(16px); }
               to { opacity: 1; transform: translateY(0); }
             }
           `}</style>

@@ -301,3 +301,79 @@ Stage Summary:
 - Agency dashboard edit dialog already had all fields — was working correctly
 - Profile page already displays nationality, health alert (4 boxes), hotel info, and "Appeler l'Hôtel" button
 - The root cause was that data was never being saved during activation because the form didn't collect it and the API didn't persist it
+
+---
+Task ID: 2
+Agent: Professional Features Agent
+Task: Implement 10 professional improvements on the PassHajj Finder page (src/app/p/[code]/page.tsx)
+
+Work Log:
+- Read worklog.md for context and full finder page (1354 lines)
+- Implemented all 10 required improvements:
+
+1. **QR Code Display on Profile Card** ✅
+   - Added `QRCodeSVG` import from 'qrcode.react'
+   - Rendered 80x80 QR code in green gradient banner with white rounded container
+   - Shows pilgrim's qrCode field (e.g., "PH-P-3M8N5") below the QR image
+   - Added translation key `qrCode` → FR/EN/AR
+
+2. **Verified Badge ✓** ✅
+   - Added green pill badge with ShieldCheck icon below pilgrim's name
+   - Shows "Vérifié ✓" / "Verified ✓" / "مُتحقق ✓" depending on language
+   - Added translation key `verifiedBadge` → FR/EN/AR
+
+3. **Share Profile Button** ✅
+   - Added Share icon import from lucide-react
+   - Added "Partager" button in header next to language toggle
+   - Uses Web Share API with clipboard copy fallback
+   - Share title: "PassHajj - [pilgrim name]", url: current page URL
+   - Added translation keys `shareProfile`, `shareCopied` → FR/EN/AR
+
+4. **Scan Counter Display** ✅
+   - Shows "Scanné X fois" badge below profile card info list
+   - Uses `reports.length + 1` as proxy for scan count
+   - Added translation key `scanCount` with `{n}` placeholder → FR/EN/AR
+
+5. **Timestamps (Created/Updated)** ✅
+   - Shows formatted dates at bottom of profile card using toLocaleDateString
+   - Respects current language (fr-FR, en-US, ar-SA)
+   - Added translation keys `createdOn`, `updatedOn` → FR/EN/AR
+
+6. **Fix "Appeler l'Hôtel" Hardcoded French** ✅
+   - Replaced `🏨 Appeler l&apos;Hôtel` with `🏨 {t('callHotel')}`
+   - Added translation key `callHotel` → FR: "Appeler l'Hôtel", EN: "Call Hotel", AR: "اتصل بالفندق"
+
+7. **Display Missing Fields** ✅
+   - Added pilgrim phone as clickable call link in info list
+   - Added pilgrim address in info list
+   - Added AlNusuk document link button (ExternalLink icon) when alNusukDocUrl exists
+   - Added translation keys `pilgrimPhone`, `alNusukDoc`, `addressLabel` → FR/EN/AR
+
+8. **Hide Health Alert when empty** ✅
+   - Added conditional rendering: if ALL 4 medical fields empty → small green pill "Aucune info médicale"
+   - If at least one field has data → keep full red alert card (removed the empty-state "noMedical" text)
+   - Added translation key `noMedicalInfo` → FR/EN/AR
+
+9. **Entry Animations** ✅
+   - Added `@keyframes fadeInUp` animation (translateY 16px → 0, opacity 0 → 1)
+   - Applied staggered delays to all card sections:
+     - Health alert: 0.05s, Emergency: 0.1s, Contacts: 0.15s, Hotel: 0.2s
+     - Report: 0.25s, Hajj journey: 0.3s, Reassurance: 0.35s
+   - All cards start with `opacity: 0` and animate in
+
+10. **Mini Map for Hotel** ✅
+    - Added "Voir sur la carte" link button below hotel itinerary
+    - Opens Google Maps search with hotel coordinates
+    - Light blue styling with MapPin icon and border
+    - Added translation key `viewOnMap` → FR/EN/AR
+
+- Also added ExternalLink icon import from lucide-react
+- Lint passes (only pre-existing errors in scripts/create-admin.cjs)
+- Dev server compiles successfully
+
+Stage Summary:
+- All 10 improvements implemented in single file: src/app/p/[code]/page.tsx
+- New imports: QRCodeSVG (qrcode.react), Share + ExternalLink (lucide-react)
+- 14 new translation keys added across all 3 languages (FR, EN, AR)
+- Staggered fadeInUp animations on 7 card sections
+- No breaking changes to existing functionality
