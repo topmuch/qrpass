@@ -568,7 +568,7 @@ function PassPasseportSection() {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Visual */}
+          {/* Visual — Passport alert image */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -576,31 +576,17 @@ function PassPasseportSection() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
-              <div className="relative text-center">
-                <span className="text-8xl block mb-6">📘</span>
-                {/* Simulated passport */}
-                <div className="bg-white rounded-2xl p-6 shadow-xl">
-                  <div className="border-2 border-blue-200 rounded-xl p-4 bg-blue-50/50">
-                    <div className="flex items-center gap-2 mb-3">
-                      <BookCheck className="w-5 h-5 text-blue-600" />
-                      <span className="text-sm font-bold text-blue-800">PASSEPORT</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center border-2 border-dashed border-blue-300">
-                        <QrCode className="w-12 h-12 text-blue-600" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-xs font-medium text-blue-800">QR code collé sur</p>
-                        <p className="text-xs font-medium text-blue-800">la couverture du passeport</p>
-                        <p className="text-[10px] text-blue-500 mt-1">En cas de perte, scannez !</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="relative aspect-[3/2] rounded-3xl overflow-hidden shadow-2xl border border-blue-200/50">
+              <Image
+                src="/passport-alert.png"
+                alt="PassHajj — Passeport perdu, alerte instantanée via QR code"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
+            {/* Glow */}
+            <div className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-15" style={{ background: 'radial-gradient(ellipse, #3b82f6 0%, transparent 70%)' }} />
           </motion.div>
 
           {/* Content */}
