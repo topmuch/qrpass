@@ -320,7 +320,7 @@ function PassBagageSection() {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Visual */}
+          {/* Visual — Luggage found image */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -328,18 +328,17 @@ function PassBagageSection() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-8 sm:p-10 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl" />
-              <div className="relative text-center">
-                <span className="text-8xl block mb-6">🧳</span>
-                <div className="bg-white rounded-2xl p-6 inline-block shadow-xl">
-                  <div className="w-32 h-32 mx-auto bg-amber-50 rounded-xl flex items-center justify-center border-2 border-dashed border-amber-300">
-                    <QrCode className="w-20 h-20 text-amber-600" />
-                  </div>
-                </div>
-                <p className="mt-4 text-white/90 font-medium text-sm">Autocollant résistant eau & chaleur</p>
-              </div>
+            <div className="relative aspect-[3/2] rounded-3xl overflow-hidden shadow-2xl border border-amber-200/50">
+              <Image
+                src="/luggage-found.png"
+                alt="PassHajj — Bagage perdu retrouvé grâce au QR code"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
+            {/* Glow */}
+            <div className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-15" style={{ background: 'radial-gradient(ellipse, #f59e0b 0%, transparent 70%)' }} />
           </motion.div>
 
           {/* Content */}
