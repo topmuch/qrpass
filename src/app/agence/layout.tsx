@@ -28,7 +28,8 @@ import {
   MoreVertical,
   UserRound,
   Smartphone,
-  Plane
+  Plane,
+  BookOpen
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -79,6 +80,7 @@ function Sidebar({ isOpen, setIsOpen, unreadMessages, onLogout, userName, agency
     { label: "Voyages", icon: <Plane className="w-5 h-5" />, href: "/agence/voyages" },
     { label: "Bagages", icon: <Luggage className="w-5 h-5" />, href: "/agence/baggages" },
     { label: "Identity", icon: <UserRound className="w-5 h-5" />, href: "/agence/identity" },
+    { label: "Passeport", icon: <BookOpen className="w-5 h-5" />, href: "/agence/passeport" },
     { label: "Assistance", icon: <MessageCircle className="w-5 h-5" />, href: "/agence/assistance", badge: unreadMessages },
     { label: "Trouvailles", icon: <CheckCircle className="w-5 h-5" />, href: "/agence/trouvailles" },
     { label: "Perdus", icon: <AlertTriangle className="w-5 h-5" />, href: "/agence/perdus" },

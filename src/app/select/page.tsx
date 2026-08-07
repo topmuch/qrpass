@@ -75,6 +75,25 @@ const PRODUCTS: Product[] = [
     cta: 'Choisir Pass Identity',
     href: '/activate/identity',
   },
+  {
+    id: 'passeport',
+    icon: '🛂',
+    title: 'Pass Passeport',
+    badge: 'Nouveau',
+    badgeColor: '#6366f1',
+    description: 'Sticker de protection pour votre passeport en cas de perte',
+    features: [
+      '1 sticker QR code pour passeport',
+      'Alerte WhatsApp si trouvé',
+      'Contact du trouveur en 1 clic',
+      'Géolocalisation automatique',
+      'Protection 1 an dès activation',
+    ],
+    price: 'À partir de 3 000 FCFA',
+    priceSub: 'Sticker passport inclus',
+    cta: 'Choisir Pass Passeport',
+    href: '/activate/passeport',
+  },
 ];
 
 /* ─── Inner component ─── */
@@ -96,17 +115,28 @@ function SelectPageInner() {
     setValidating(true);
     setError(null);
     try {
-      // Use the unified lookup API that checks BOTH Baggage and Pilgrim tables
-      const res = await fetch(`/api/pilgrims/lookup/${encodeURIComponent(qrReference.trim())}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.found) {
+      const ref = qrReference.trim();
+      // PP- codes: check passport API
+      if (ref.startsWith('PP-')) {
+        const res = await fetch(`/api/passeport/${encodeURIComponent(ref)}`);
+        if (res.ok) {
           setRefValidated(true);
         } else {
-          setError('Référence QR non trouvée. Vérifiez votre code ou demandez-le à votre agence.');
+          setError('Code passeport non trouvé. Vérifiez votre code ou demandez-le à votre agence.');
         }
       } else {
-        setError('Erreur de vérification. Réessayez.');
+        // Use the unified lookup API that checks BOTH Baggage and Pilgrim tables
+        const res = await fetch(`/api/pilgrims/lookup/${encodeURIComponent(ref)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.found) {
+            setRefValidated(true);
+          } else {
+            setError('Référence QR non trouvée. Vérifiez votre code ou demandez-le à votre agence.');
+          }
+        } else {
+          setError('Erreur de vérification. Réessayez.');
+        }
       }
     } catch {
       setError('Erreur de connexion. Réessayez.');
@@ -200,7 +230,7 @@ function SelectPageInner() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {PRODUCTS.map((product, idx) => (
               <div
                 key={product.id}
@@ -232,13 +262,13 @@ function SelectPageInner() {
                 <ul className="space-y-2 mb-5 flex-1">
                   {product.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-sm" style={{ color: '#0f172a' }}>
-                      <span className="mt-0.5 flex-shrink-0 font-bold" style={{ color: product.id === 'baggage' ? '#1e3a8a' : '#10b981' }}>✓</span>
+                      <span className="mt-0.5 flex-shrink-0 font-bold" style={{ color: product.id === 'baggage' ? '#1e3a8a' : product.id === 'passeport' ? '#6366f1' : '#10b981' }}>✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="rounded-xl px-4 py-3 mb-4" style={{ backgroundColor: product.id === 'baggage' ? '#dbeafe' : '#d1fae5' }}>
+                <div className="rounded-xl px-4 py-3 mb-4" style={{ backgroundColor: product.id === 'baggage' ? '#dbeafe' : product.id === 'passeport' ? '#e0e7ff' : '#d1fae5' }}>
                   <p className="font-bold text-base" style={{ color: '#0f172a' }}>{product.price}</p>
                   <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>{product.priceSub}</p>
                 </div>
@@ -247,7 +277,7 @@ function SelectPageInner() {
                   onClick={() => handleChoose(product.href)}
                   disabled={!refValidated}
                   className="w-full py-3 px-6 rounded-xl font-semibold text-white text-base transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  style={{ backgroundColor: product.id === 'baggage' ? '#1e3a8a' : '#059669' }}
+                  style={{ backgroundColor: product.id === 'baggage' ? '#1e3a8a' : product.id === 'passeport' ? '#6366f1' : '#059669' }}
                 >
                   {product.cta}
                 </button>

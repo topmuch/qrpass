@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Luggage, UserCircle, AlertCircle, Globe, ChevronRight, Shield } from 'lucide-react';
+import { Luggage, UserCircle, AlertCircle, Globe, ChevronRight, Shield, BookOpen } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import Image from 'next/image';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -80,6 +80,12 @@ export default function FoundSelectorPage() {
 
     const lookup = async () => {
       try {
+        // ─── Passport QR code (PP-XXXXXX) → redirect to passport finder page ───
+        if (code.startsWith('PP-')) {
+          router.replace('/scan-passeport/' + code);
+          return;
+        }
+
         const res = await fetch(`/api/pilgrims/lookup/${code}`);
         if (!res.ok) {
           setState('error');
@@ -351,6 +357,39 @@ export default function FoundSelectorPage() {
                 <Shield className="w-4 h-4" />
                 <span>PassHajj · Protection intelligente Hajj & Omrah</span>
               </div>
+
+              {/* Pass Passeport Card - for PP- codes that reach selector */}
+              {code.startsWith('PP-') && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 180 }}
+                >
+                  <div
+                    className="rounded-[20px] p-5 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                    style={{ background: CARD_BG }}
+                    onClick={() => router.push('/scan-passeport/' + code)}
+                  >
+                    <div className="flex items-center gap-4 w-full">
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ background: '#6366f1' }}
+                      >
+                        <BookOpen className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <h3 className="text-lg font-bold" style={{ color: INK }}>
+                          Pass Passeport
+                        </h3>
+                        <p className="text-sm mt-0.5" style={{ color: MUTED }}>
+                          Protéger et retrouver votre passeport
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 shrink-0" style={{ color: MUTED }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

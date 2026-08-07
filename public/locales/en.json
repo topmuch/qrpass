@@ -281,20 +281,20 @@
       "title": "PASSHAJJ",
       "subtitle": "Your safety, our prayer.",
       "cta": "Activate my QR",
-      "login": "Already have an account? Log in"
+      "login": "Already have an account? Sign in"
     },
     "products": {
       "badge": "Our Products",
-      "title": "Two products, one mission",
-      "subtitle": "Protect every pilgrim, from baggage to person.",
+      "title": "Two solutions to protect what matters",
+      "subtitle": "Whether you're traveling with luggage or you're a pilgrim, PassHajj watches over you.",
       "learn_more": "Learn more",
       "activate_now": "Activate now",
       "bagage": {
-        "title": "PassHajj Bagage",
-        "description": "Connected tag for your suitcases and pilgrimage bags.",
-        "feature1": "Scan if lost → WhatsApp alert",
-        "feature2": "Geolocation included",
-        "feature3": "Flexible activation",
+        "title": "PassHajj Baggage",
+        "description": "Smart tag for your luggage and travel bags.",
+        "feature1": "Scan if lost → instant WhatsApp alert",
+        "feature2": "Built-in geolocation",
+        "feature3": "Flexible activation: 15d / 30d / 1 year",
         "feature4": "Tracking dashboard"
       },
       "identity": {
@@ -303,27 +303,27 @@
         "feature1": "Medical info + contacts accessible in 1 scan",
         "feature2": "Auto multilingual (FR/EN/AR)",
         "feature3": "Action buttons: WhatsApp, GPS, 997/911",
-        "feature4": "Hotel modifiable remotely"
+        "feature4": "Hotel info remotely updatable"
       }
     },
     "steps": {
       "badge": "How it works",
-      "title": "How it works",
+      "title": "As simple as 1-2-3",
       "step1": {
         "title": "Scan your QR",
-        "description": "Activate your product in 30 seconds"
+        "description": "Activate your product in 30 seconds from your phone."
       },
       "step2": {
         "title": "Wear it with peace of mind",
-        "description": "Stick the tag or wear the bracelet"
+        "description": "Stick the tag on your luggage or wear the bracelet."
       },
       "step3": {
         "title": "Be found instantly",
-        "description": "One scan is all it takes to alert your loved ones"
+        "description": "If lost, one scan is all it takes to alert your loved ones."
       }
     },
     "stats": {
-      "pilgrims": "Pilgrims protected",
+      "pilgrims": "Protected pilgrims",
       "recovery": "Recovery rate",
       "countries": "Countries covered",
       "support": "Support available"
@@ -331,17 +331,17 @@
     "agencies": {
       "badge": "B2B",
       "title": "Are you a travel agency?",
-      "description": "Offer PassHajj to your pilgrims and provide them with complete protection. Manage your groups, centralize information, and benefit from priority support.",
-      "cta": "Become a partner",
+      "description": "Offer PassHajj to your pilgrims and provide them with premium safety during their Hajj or Umrah.",
       "feature1_title": "Custom group dashboard",
       "feature1_desc": "Manage all your pilgrims from a centralized dashboard.",
       "feature2_title": "Centralized hotel management",
-      "feature2_desc": "Modify hotel info remotely for each pilgrim.",
+      "feature2_desc": "Update your pilgrims' accommodation info in real time.",
       "feature3_title": "Priority WhatsApp support",
-      "feature3_desc": "A dedicated team to respond to your needs in real time."
+      "feature3_desc": "A dedicated line for fast and efficient assistance.",
+      "cta": "Become a partner"
     },
     "footer": {
-      "copyright": "© 2026 PassHajj – Security for Hajj & Umrah pilgrims",
+      "copyright": "© 2026 PassHajj – Safety for Hajj & Umrah pilgrims",
       "legal": "Legal notice",
       "privacy": "Privacy",
       "contact": "Contact"
@@ -574,81 +574,6 @@
       "callEmergency": "Call emergency services"
     }
   },
-  "homepage": {
-    "nav": {
-      "login": "Login",
-      "register": "Sign up"
-    },
-    "hero": {
-      "title": "PASSHAJJ",
-      "subtitle": "Your safety, our prayer.",
-      "cta": "Activate my QR",
-      "login": "Already have an account? Sign in"
-    },
-    "products": {
-      "badge": "Our Products",
-      "title": "Two solutions to protect what matters",
-      "subtitle": "Whether you're traveling with luggage or you're a pilgrim, PassHajj watches over you.",
-      "learn_more": "Learn more",
-      "activate_now": "Activate now",
-      "bagage": {
-        "title": "PassHajj Baggage",
-        "description": "Smart tag for your luggage and travel bags.",
-        "feature1": "Scan if lost → instant WhatsApp alert",
-        "feature2": "Built-in geolocation",
-        "feature3": "Flexible activation: 15d / 30d / 1 year",
-        "feature4": "Tracking dashboard"
-      },
-      "identity": {
-        "title": "PassHajj Identity",
-        "description": "Emergency bracelet for elderly or vulnerable pilgrims.",
-        "feature1": "Medical info + contacts accessible in 1 scan",
-        "feature2": "Auto multilingual (FR/EN/AR)",
-        "feature3": "Action buttons: WhatsApp, GPS, 997/911",
-        "feature4": "Hotel info remotely updatable"
-      }
-    },
-    "steps": {
-      "badge": "How it works",
-      "title": "As simple as 1-2-3",
-      "step1": {
-        "title": "Scan your QR",
-        "description": "Activate your product in 30 seconds from your phone."
-      },
-      "step2": {
-        "title": "Wear it with peace of mind",
-        "description": "Stick the tag on your luggage or wear the bracelet."
-      },
-      "step3": {
-        "title": "Be found instantly",
-        "description": "If lost, one scan is all it takes to alert your loved ones."
-      }
-    },
-    "stats": {
-      "pilgrims": "Protected pilgrims",
-      "recovery": "Recovery rate",
-      "countries": "Countries covered",
-      "support": "Support available"
-    },
-    "agencies": {
-      "badge": "B2B",
-      "title": "Are you a travel agency?",
-      "description": "Offer PassHajj to your pilgrims and provide them with premium safety during their Hajj or Umrah.",
-      "feature1_title": "Custom group dashboard",
-      "feature1_desc": "Manage all your pilgrims from a centralized dashboard.",
-      "feature2_title": "Centralized hotel management",
-      "feature2_desc": "Update your pilgrims' accommodation info in real time.",
-      "feature3_title": "Priority WhatsApp support",
-      "feature3_desc": "A dedicated line for fast and efficient assistance.",
-      "cta": "Become a partner"
-    },
-    "footer": {
-      "copyright": "© 2026 PassHajj – Safety for Hajj & Umrah pilgrims",
-      "legal": "Legal notice",
-      "privacy": "Privacy",
-      "contact": "Contact"
-    }
-  },
   "landing": {
     "nav": {
       "products": "Products",
@@ -868,5 +793,63 @@
       "demo": "Demo Mode",
       "rights": "All rights reserved. Smart protection for Hajj & Umrah"
     }
+  },
+  "passeport": {
+    "subtitle": "Protect your passport if lost",
+    "step1Label": "Step 1/2",
+    "step1Title": "Passport Information",
+    "step2Label": "Step 2/2",
+    "step2Title": "Contact & Travel",
+    "fullName": "Full name *",
+    "fullNamePlaceholder": "As on passport",
+    "nationality": "Nationality",
+    "passportNumber": "Passport number (optional)",
+    "passportNumberPlaceholder": "Passport number",
+    "privacyNote": "🔒 Your number stays confidential",
+    "dateOfBirth": "Date of birth",
+    "placeOfBirth": "Place of birth",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "phone": "Phone *",
+    "whatsapp": "WhatsApp *",
+    "email": "Email",
+    "emergencyContact": "Emergency contact",
+    "emergencyPhone": "Emergency phone",
+    "homeAddress": "Address / Country of residence",
+    "travelDestination": "Travel destination",
+    "travelDate": "Departure date",
+    "returnDate": "Return date",
+    "notes": "Additional notes",
+    "next": "Continue →",
+    "back": "← Back",
+    "submit": "Activate my passport",
+    "submitLoading": "Activating...",
+    "infoNote": "Stick this sticker on the back of your passport. If someone finds it, they scan the QR code to contact you.",
+    "changeProduct": "Change product",
+    "activationSuccess": "Passport activated successfully!",
+    "activationError": "Activation error",
+    "nationalityPlaceholder": "E.g. Senegal, Morocco, France...",
+    "optional": "optional",
+    "placeOfBirthPlaceholder": "E.g. Dakar",
+    "phoneRequired": "Phone number required",
+    "whatsappRequired": "WhatsApp number required",
+    "validationRequired": "Please fill all required fields",
+    "validationContact": "Please provide at least a phone number and WhatsApp",
+    "connectionError": "Connection error. Please retry.",
+    "step1Desc": "Passport information",
+    "step2Desc": "Contact & travel info",
+    "emailPlaceholder": "email@example.com",
+    "emergencyContactPlaceholder": "Contact name",
+    "emergencyPhonePlaceholder": "+221 77 000 00 00",
+    "homeAddressPlaceholder": "E.g. Dakar, Senegal",
+    "travelDestinationPlaceholder": "E.g. Mecca, Dubai...",
+    "notesPlaceholder": "Additional information..."
+  },
+  "PASSEPORT": {
+    "STEP1LABEL": "Step 1/2",
+    "STEP1TITLE": "Passport Information",
+    "STEP2LABEL": "Step 2/2",
+    "STEP2TITLE": "Contact & Travel"
   }
 }

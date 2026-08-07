@@ -285,16 +285,16 @@
     },
     "products": {
       "badge": "Nos Produits",
-      "title": "Deux produits, une mission",
-      "subtitle": "Protéger chaque pèlerin, du bagage à la personne.",
+      "title": "Deux solutions pour protéger ce qui compte",
+      "subtitle": "Que vous voyagez avec des bagages ou que vous êtes un pèlerin, PassHajj veille sur vous.",
       "learn_more": "En savoir plus",
       "activate_now": "Activer maintenant",
       "bagage": {
         "title": "PassHajj Bagage",
         "description": "Étiquette connectée pour vos valises et sacs de pèlerinage.",
-        "feature1": "Scan si perdu → alerte WhatsApp",
+        "feature1": "Scan si perdu → alerte WhatsApp immédiate",
         "feature2": "Géolocalisation incluse",
-        "feature3": "Activation flexible",
+        "feature3": "Activation flexible : 15j / 30j / 1 an",
         "feature4": "Dashboard de suivi"
       },
       "identity": {
@@ -308,18 +308,18 @@
     },
     "steps": {
       "badge": "Comment ça marche",
-      "title": "Comment ça marche",
+      "title": "Simple comme 1-2-3",
       "step1": {
         "title": "Scannez votre QR",
-        "description": "Activez votre produit en 30 secondes"
+        "description": "Activez votre produit en 30 secondes via votre téléphone."
       },
       "step2": {
         "title": "Portez-le sereinement",
-        "description": "Collez l'étiquette ou portez le bracelet"
+        "description": "Collez l'étiquette sur votre valise ou portez le bracelet."
       },
       "step3": {
         "title": "Soyez retrouvé instantanément",
-        "description": "Un scan suffit pour alerter vos proches"
+        "description": "Si perdu, un scan suffit pour alerter vos proches."
       }
     },
     "stats": {
@@ -331,14 +331,14 @@
     "agencies": {
       "badge": "B2B",
       "title": "Vous êtes une agence de voyage ?",
-      "description": "Proposez PassHajj à vos pèlerins et offrez-leur une protection complète. Gérez vos groupes, centralisez les informations et bénéficiez d'un support prioritaire.",
-      "cta": "Devenir partenaire",
+      "description": "Proposez PassHajj à vos pèlerins et offrez-leur une sécurité premium durant leur Hajj ou Omrah.",
       "feature1_title": "Dashboard groupe personnalisé",
       "feature1_desc": "Gérez tous vos pèlerins depuis un tableau de bord centralisé.",
       "feature2_title": "Gestion centralisée des hôtels",
-      "feature2_desc": "Modifiez les infos hôtel à distance pour chaque pèlerin.",
+      "feature2_desc": "Mettez à jour les infos d'hébergement de vos pèlerins en temps réel.",
       "feature3_title": "Support prioritaire WhatsApp",
-      "feature3_desc": "Une équipe dédiée pour répondre à vos besoins en temps réel."
+      "feature3_desc": "Une ligne dédiée pour une assistance rapide et efficace.",
+      "cta": "Devenir partenaire"
     },
     "footer": {
       "copyright": "© 2026 PassHajj – Sécurité pour pèlerins Hajj & Omrah",
@@ -794,79 +794,62 @@
       "callEmergency": "Appeler les secours"
     }
   },
-  "homepage": {
-    "nav": {
-      "login": "Connexion",
-      "register": "S'inscrire"
-    },
-    "hero": {
-      "title": "PASSHAJJ",
-      "subtitle": "Votre sécurité, notre prière.",
-      "cta": "Activer mon QR",
-      "login": "Déjà un compte ? Se connecter"
-    },
-    "products": {
-      "badge": "Nos Produits",
-      "title": "Deux solutions pour protéger ce qui compte",
-      "subtitle": "Que vous voyagez avec des bagages ou que vous êtes un pèlerin, PassHajj veille sur vous.",
-      "learn_more": "En savoir plus",
-      "activate_now": "Activer maintenant",
-      "bagage": {
-        "title": "PassHajj Bagage",
-        "description": "Étiquette connectée pour vos valises et sacs de pèlerinage.",
-        "feature1": "Scan si perdu → alerte WhatsApp immédiate",
-        "feature2": "Géolocalisation incluse",
-        "feature3": "Activation flexible : 15j / 30j / 1 an",
-        "feature4": "Dashboard de suivi"
-      },
-      "identity": {
-        "title": "PassHajj Identity",
-        "description": "Bracelet d'urgence pour pèlerins âgés ou vulnérables.",
-        "feature1": "Infos médicales + contacts accessibles en 1 scan",
-        "feature2": "Multilingue auto (FR/EN/AR)",
-        "feature3": "Boutons d'action : WhatsApp, GPS, 997/911",
-        "feature4": "Hôtel modifiable à distance"
-      }
-    },
-    "steps": {
-      "badge": "Comment ça marche",
-      "title": "Simple comme 1-2-3",
-      "step1": {
-        "title": "Scannez votre QR",
-        "description": "Activez votre produit en 30 secondes via votre téléphone."
-      },
-      "step2": {
-        "title": "Portez-le sereinement",
-        "description": "Collez l'étiquette sur votre valise ou portez le bracelet."
-      },
-      "step3": {
-        "title": "Soyez retrouvé instantanément",
-        "description": "Si perdu, un scan suffit pour alerter vos proches."
-      }
-    },
-    "stats": {
-      "pilgrims": "Pèlerins protégés",
-      "recovery": "Taux de récupération",
-      "countries": "Pays couverts",
-      "support": "Support disponible"
-    },
-    "agencies": {
-      "badge": "B2B",
-      "title": "Vous êtes une agence de voyage ?",
-      "description": "Proposez PassHajj à vos pèlerins et offrez-leur une sécurité premium durant leur Hajj ou Omrah.",
-      "feature1_title": "Dashboard groupe personnalisé",
-      "feature1_desc": "Gérez tous vos pèlerins depuis un tableau de bord centralisé.",
-      "feature2_title": "Gestion centralisée des hôtels",
-      "feature2_desc": "Mettez à jour les infos d'hébergement de vos pèlerins en temps réel.",
-      "feature3_title": "Support prioritaire WhatsApp",
-      "feature3_desc": "Une ligne dédiée pour une assistance rapide et efficace.",
-      "cta": "Devenir partenaire"
-    },
-    "footer": {
-      "copyright": "© 2026 PassHajj – Sécurité pour pèlerins Hajj & Omrah",
-      "legal": "Mentions légales",
-      "privacy": "Confidentialité",
-      "contact": "Contact"
-    }
+  "passeport": {
+    "subtitle": "Protégez votre passeport en cas de perte",
+    "step1Label": "Étape 1/2",
+    "step1Title": "Informations du passeport",
+    "step2Label": "Étape 2/2",
+    "step2Title": "Contact & Voyage",
+    "fullName": "Nom complet *",
+    "fullNamePlaceholder": "Comme sur le passeport",
+    "nationality": "Nationalité",
+    "passportNumber": "N° passeport (optionnel)",
+    "passportNumberPlaceholder": "Numéro du passeport",
+    "privacyNote": "🔒 Votre numéro reste confidentiel",
+    "dateOfBirth": "Date de naissance",
+    "placeOfBirth": "Lieu de naissance",
+    "gender": "Sexe",
+    "male": "Homme",
+    "female": "Femme",
+    "phone": "Téléphone *",
+    "whatsapp": "WhatsApp *",
+    "email": "Email",
+    "emergencyContact": "Contact d'urgence",
+    "emergencyPhone": "Tél. d'urgence",
+    "homeAddress": "Adresse / Pays de résidence",
+    "travelDestination": "Destination du voyage",
+    "travelDate": "Date de départ",
+    "returnDate": "Date de retour",
+    "notes": "Notes supplémentaires",
+    "next": "Continuer →",
+    "back": "← Retour",
+    "submit": "Activer mon passeport",
+    "submitLoading": "Activation en cours...",
+    "infoNote": "Collez ce sticker au dos de votre passeport. Si quelqu'un le trouve, il scanner le QR code pour vous contacter.",
+    "changeProduct": "Changer de produit",
+    "activationSuccess": "Passeport activé avec succès !",
+    "activationError": "Erreur lors de l'activation",
+    "nationalityPlaceholder": "Ex: Sénégal, Maroc, France...",
+    "optional": "optionnel",
+    "placeOfBirthPlaceholder": "Ex: Dakar",
+    "phoneRequired": "Numéro de téléphone requis",
+    "whatsappRequired": "Numéro WhatsApp requis",
+    "validationRequired": "Veuillez remplir tous les champs obligatoires",
+    "validationContact": "Veuillez renseigner au moins un numéro de téléphone et WhatsApp",
+    "connectionError": "Erreur de connexion. Veuillez réessayer.",
+    "step1Desc": "Informations du passeport",
+    "step2Desc": "Contact & informations de voyage",
+    "emailPlaceholder": "email@exemple.com",
+    "emergencyContactPlaceholder": "Nom du contact",
+    "emergencyPhonePlaceholder": "+221 77 000 00 00",
+    "homeAddressPlaceholder": "Ex: Dakar, Sénégal",
+    "travelDestinationPlaceholder": "Ex: La Mecque, Dubai...",
+    "notesPlaceholder": "Informations supplémentaires..."
+  },
+  "PASSEPORT": {
+    "STEP1LABEL": "Étape 1/2",
+    "STEP1TITLE": "Informations du passeport",
+    "STEP2LABEL": "Étape 2/2",
+    "STEP2TITLE": "Contact & Voyage"
   }
 }

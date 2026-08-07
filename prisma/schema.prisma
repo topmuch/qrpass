@@ -26,6 +26,7 @@ model User {
   dailyReports    DailyReport[]
   blogPosts       BlogPost[]
   pilgrims        Pilgrim[]     // Pass Identity — pilgrim bracelets owned by this user
+  passports       Passport[]    // Pass Passeport — passport stickers owned by this user
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -74,6 +75,7 @@ model Agency {
   trips        Trip[]
   groups       PilgrimGroup[]
   bags         Bag[]
+  passports    Passport[]
 }
 
 // Baggage model - main entity for luggage tracking
@@ -650,6 +652,7 @@ model Trip {
   groups        PilgrimGroup[]
   leaderScans   LeaderScan[]
   incidents     LeaderIncident[]
+  passports     Passport[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -748,4 +751,70 @@ model LeaderIncident {
   @@index([tripId])
   @@index([timestamp])
   @@index([synced])
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PASS PASSEPORT — Passport sticker models (NEW)
+// ═══════════════════════════════════════════════════════════════
+
+// Passport model - Pass Passeport sticker on a passport
+model Passport {
+  id               String   @id @default(cuid())
+  qrCode           String   @unique // ex: "PP-3M8N5K"
+  fullName         String   // Full name as on passport
+  firstName        String?  // First name
+  lastName         String?  // Last name
+  nationality      String?  // Nationality on passport
+  passportNumber   String?  // Passport number (optional for privacy)
+  dateOfBirth      String?  // Date of birth
+  placeOfBirth     String?  // Place of birth
+  gender           String?  // "M" | "F"
+  photoUrl         String?  // Photo of passport holder
+  phone            String?  // Phone number of passport owner
+  whatsapp         String?  // WhatsApp number for contact
+  email            String?  // Email address
+  emergencyContact String?  // Emergency contact name
+  emergencyPhone   String?  // Emergency contact phone
+  homeAddress      String?  // Home address / country of residence
+  travelDestination String? // Travel destination
+  travelDate       String?  // Travel/departure date
+  returnDate       String?  // Return date
+  notes            String?  // Additional notes
+  isActive         Boolean  @default(false) // Activated by owner
+  status           String   @default("pending_activation") // "pending_activation" | "active" | "lost" | "found" | "blocked"
+  duration         String   @default("1y") // "30d" | "1y"
+  expiresAt        DateTime?
+  ownerId          String?
+  owner            User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  agencyId         String?  // Direct link to agency
+  agency           Agency?  @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  tripId           String?  // Trip assignment
+  trip             Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  reports          PassportReport[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([qrCode])
+  @@index([isActive])
+  @@index([status])
+  @@index([createdAt])
+  @@index([agencyId])
+}
+
+// PassportReport model - someone found/reported a lost passport
+model PassportReport {
+  id          String   @id @default(cuid())
+  passportId  String
+  passport    Passport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+  finderName  String
+  finderPhone String
+  finderEmail String?
+  latitude    Float?
+  longitude   Float?
+  location    String?  // City, Country description
+  message     String?  // Message from finder
+  createdAt   DateTime @default(now())
+
+  @@index([passportId])
+  @@index([createdAt])
 }

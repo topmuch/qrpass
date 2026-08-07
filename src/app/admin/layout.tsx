@@ -28,7 +28,8 @@ import {
   Newspaper,
   Activity,
   MapPin,
-  ShieldCheck
+  ShieldCheck,
+  BookOpen
 } from "lucide-react";
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -99,6 +100,9 @@ function Sidebar({
 
     // Identity (Pass Identity bracelets)
     { label: "Identity", icon: <ShieldCheck className="w-5 h-5" />, href: "/admin/identity", permission: PERMISSIONS.VIEW_BAGGAGES },
+
+    // Passeport (Pass Passeport stickers)
+    { label: "Passeport", icon: <BookOpen className="w-5 h-5" />, href: "/admin/passeport", permission: PERMISSIONS.VIEW_BAGGAGES },
 
     // Messages Category
     { label: "MESSAGES", icon: null, isCategory: true },
