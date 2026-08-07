@@ -1,35 +1,35 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from '@/hooks/use-toast';
-import { useTranslation } from '@/hooks/useTranslation';
 import PhoneInput from '@/components/ui/PhoneInput';
-import { COUNTRY_MAP, COUNTRIES } from '@/lib/phone';
+import { COUNTRY_MAP } from '@/lib/phone';
 import {
   ChevronRight,
-  ChevronLeft,
+  Upload,
   User,
-  ShieldCheck,
   AlertTriangle,
   Loader2,
   CheckCircle,
-  Plane,
-  Phone,
+  Globe,
+  Building2,
+  CalendarDays,
+  Hash,
   MessageCircle,
 } from 'lucide-react';
 
-// ─── Brand constants ───
-const BG = '#f4b400';
+// ─── Brand constants (same style as Identity page) ───
+const BG = '#059669';
 const CARD_BG = '#ffffff';
-const TEXT = '#0f172a';
+const TEXT = '#1a1a1a';
 const MUTED = '#6b7280';
 const INPUT_BG = '#f3f4f6';
 const INPUT_BORDER = '#d1d5db';
-const BTN_PRIMARY = '#0f172a';
-const BTN_PRIMARY_HOVER = '#1e293b';
+const BTN_PRIMARY = '#111827';
+const BTN_PRIMARY_HOVER = '#374151';
 const RADIUS = '20px';
 
 // ─── Inner component (needs useSearchParams inside Suspense) ───
@@ -37,38 +37,24 @@ function PasseportActivateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const qrCodeParam = searchParams.get('code') || '';
-  const { t } = useTranslation();
 
   // Step state
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
 
-  // Step 1: Passport Information
+  // Step 1: Identity & Passport
   const [code, setCode] = useState(qrCodeParam);
-  const [fullName, setFullName] = useState('');
-  const [nationality, setNationality] = useState('');
-  const [nationalitySearch, setNationalitySearch] = useState('');
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [passportNumber, setPassportNumber] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [placeOfBirth, setPlaceOfBirth] = useState('');
-  const [gender, setGender] = useState<'M' | 'F' | ''>('');
+  const [expirationDate, setExpirationDate] = useState('');
 
-  // Step 2: Contact & Travel Info
-  const [phone, setPhone] = useState('');
+  // Step 2: Contact & Hotel
   const [whatsapp, setWhatsapp] = useState('');
-  const [email, setEmail] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('');
-  const [emergencyPhone, setEmergencyPhone] = useState('');
-  const [homeAddress, setHomeAddress] = useState('');
-  const [travelDestination, setTravelDestination] = useState('');
-  const [travelDate, setTravelDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [notes, setNotes] = useState('');
-
-  // Country codes for PhoneInput (detected from IP on mount)
-  const [phoneCountry, setPhoneCountry] = useState('SN');
   const [whatsappCountry, setWhatsappCountry] = useState('SN');
-  const [emergencyCountry, setEmergencyCountry] = useState('SN');
+  const [hotelAddress, setHotelAddress] = useState('');
 
   // IP-based country detection on mount
   useEffect(() => {
@@ -76,9 +62,7 @@ function PasseportActivateContent() {
       .then((r) => r.json())
       .then((data) => {
         if (data.country && COUNTRY_MAP[data.country.toUpperCase()]) {
-          setPhoneCountry(data.country.toUpperCase());
           setWhatsappCountry(data.country.toUpperCase());
-          setEmergencyCountry(data.country.toUpperCase());
         }
       })
       .catch(() => {});
@@ -87,10 +71,13 @@ function PasseportActivateContent() {
   // Validation errors
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
+  // Photo input ref
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
   // ─── Step labels ───
   const stepLabels: Record<1 | 2, string> = {
-    1: t('passeport.step1Label') || 'ÉTAPE 1 SUR 2 — INFORMATIONS PASSEPORT',
-    2: t('passeport.step2Label') || 'ÉTAPE 2 SUR 2 — CONTACT & VOYAGE',
+    1: 'ÉTAPE 1 SUR 2 — IDENTITÉ & PASSEPORT',
+    2: 'ÉTAPE 2 SUR 2 — CONTACT & HÔTEL',
   };
 
   // ─── Progress widths ───
@@ -103,13 +90,13 @@ function PasseportActivateContent() {
   const validateStep1 = (): boolean => {
     const newErrors: Record<string, boolean> = {};
     if (!code.trim()) newErrors.code = true;
-    if (!fullName.trim()) newErrors.fullName = true;
+    if (!firstName.trim()) newErrors.firstName = true;
+    if (!lastName.trim()) newErrors.lastName = true;
+    if (!passportNumber.trim()) newErrors.passportNumber = true;
+    if (!expirationDate) newErrors.expirationDate = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast({
-        title: t('passeport.validationRequired') || 'Veuillez remplir tous les champs obligatoires',
-        variant: 'destructive',
-      });
+      toast({ title: 'Veuillez remplir tous les champs obligatoires', variant: 'destructive' });
       return false;
     }
     return true;
@@ -118,14 +105,10 @@ function PasseportActivateContent() {
   // ─── Validate step 2 ───
   const validateStep2 = (): boolean => {
     const newErrors: Record<string, boolean> = {};
-    if (!phone.trim()) newErrors.phone = true;
     if (!whatsapp.trim()) newErrors.whatsapp = true;
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast({
-        title: t('passeport.validationContact') || 'Veuillez renseigner au moins un numéro de téléphone et WhatsApp',
-        variant: 'destructive',
-      });
+      toast({ title: 'Veuillez renseigner votre numéro WhatsApp', variant: 'destructive' });
       return false;
     }
     return true;
@@ -138,6 +121,17 @@ function PasseportActivateContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // ─── Photo change handler ───
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
   // ─── Submit activation ───
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,25 +141,41 @@ function PasseportActivateContent() {
     setLoading(true);
 
     try {
+      let photoUrl: string | null = null;
+
+      // Upload photo first if selected
+      if (photoFile) {
+        try {
+          const photoFormData = new FormData();
+          photoFormData.append('file', photoFile);
+          const uploadRes = await fetch('/api/pilgrims/upload-photo', {
+            method: 'POST',
+            body: photoFormData,
+          });
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            photoUrl = uploadData.photoUrl;
+          }
+        } catch (uploadErr) {
+          console.error('Photo upload error (non-blocking):', uploadErr);
+        }
+      }
+
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
       const payload: Record<string, unknown> = {
         qrCode: code.trim(),
-        fullName: fullName.trim(),
-        nationality: nationality.trim() || undefined,
-        passportNumber: passportNumber.trim() || undefined,
-        dateOfBirth: dateOfBirth || undefined,
-        placeOfBirth: placeOfBirth.trim() || undefined,
-        gender: gender || undefined,
-        phone: phone.trim() || undefined,
-        whatsapp: whatsapp.trim() || undefined,
-        email: email.trim() || undefined,
-        emergencyContact: emergencyContact.trim() || undefined,
-        emergencyPhone: emergencyPhone.trim() || undefined,
-        homeAddress: homeAddress.trim() || undefined,
-        travelDestination: travelDestination.trim() || undefined,
-        travelDate: travelDate || undefined,
-        returnDate: returnDate || undefined,
-        notes: notes.trim() || undefined,
+        fullName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        passportNumber: passportNumber.trim(),
+        returnDate: expirationDate, // Using returnDate field for passport expiration
+        whatsapp: whatsapp.trim(),
+        homeAddress: hotelAddress.trim() || undefined, // Using homeAddress for hotel
       };
+
+      if (photoUrl) {
+        payload.photoUrl = photoUrl;
+      }
 
       const response = await fetch('/api/passeport/activate', {
         method: 'POST',
@@ -174,37 +184,42 @@ function PasseportActivateContent() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-
         // Store activation data in sessionStorage for success page
         sessionStorage.setItem(
           'activationData',
           JSON.stringify({
             type: 'passeport',
             reference: code.trim(),
-            fullName: fullName.trim(),
-            nationality: nationality.trim(),
-            phone: phone.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            photoUrl: photoUrl || null,
+            photoPreview: photoPreview || null,
+            passportNumber: passportNumber.trim(),
             whatsapp: whatsapp.trim(),
-            email: email.trim(),
           })
         );
 
-        // Redirect to success page
-        router.push(`/success?type=passeport&code=${encodeURIComponent(code.trim())}`);
+        // Redirect to confirmation page
+        const params = new URLSearchParams({
+          type: 'passeport',
+          code: code.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        });
+        if (photoUrl) {
+          params.set('photo', photoUrl);
+        }
+        router.push(`/activate/confirmation?${params.toString()}`);
       } else {
         const errorData = await response.json();
         toast({
-          title: errorData.message || errorData.error || t('passeport.activationError') || "Erreur lors de l'activation",
+          title: errorData.message || errorData.error || "Erreur lors de l'activation",
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Activation error:', error);
-      toast({
-        title: t('passeport.connectionError') || 'Erreur de connexion. Veuillez réessayer.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Erreur de connexion. Veuillez réessayer.', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -224,21 +239,10 @@ function PasseportActivateContent() {
       {/* ─── Header / Logo ─── */}
       <div className="w-full max-w-[420px] mb-5">
         <div className="text-2xl font-extrabold tracking-tight text-black">
-          <Image
-            src="/logo.png"
-            alt="PassHajj"
-            width={150}
-            height={58}
-            style={{
-              objectFit: 'contain',
-              borderRadius: '14px',
-              padding: '5px',
-              background: 'rgba(255,255,255,0.9)',
-            }}
-          />
+          <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
         </div>
-        <p className="text-sm mt-1 font-medium" style={{ color: TEXT }}>
-          🛂 {t('passeport.subtitle') || 'Protection de votre passeport'}
+        <p className="text-sm mt-1" style={{ color: MUTED }}>
+          🛂 Sticker Passeport — Protection & Restitution
         </p>
       </div>
 
@@ -260,25 +264,26 @@ function PasseportActivateContent() {
 
       {/* ─── Form ─── */}
       <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
-        {/* ═══ STEP 1: Passport Information ═══ */}
+        {/* ═══ STEP 1: Identity & Passport ═══ */}
         {step === 1 && (
           <div
             className="rounded-[20px] p-6 shadow-lg mb-4"
             style={{ background: CARD_BG }}
           >
             <div className="text-lg font-bold mb-4 flex items-center gap-2">
-              <User className="w-5 h-5" />
-              {t('passeport.step1Title') || 'Informations du Passeport'}
+              <Globe className="w-5 h-5" style={{ color: '#7c3aed' }} />
+              Identité & Passeport
             </div>
 
-            {/* QR Code illustration */}
-            <div className="flex items-center justify-center mb-4">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                style={{ backgroundColor: '#fef3c7' }}
-              >
-                <ShieldCheck className="w-8 h-8" style={{ color: BG }} />
-              </div>
+            {/* Alert info box */}
+            <div
+              className="rounded-xl p-3 mb-5 flex items-start gap-2"
+              style={{ backgroundColor: '#fef9c3' }}
+            >
+              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#d97706' }} />
+              <p className="text-sm font-medium" style={{ color: '#92400e' }}>
+                Ces infos seront visibles si votre passeport est perdu. Elles aideront à vous le restituer.
+              </p>
             </div>
 
             {/* QR Code field */}
@@ -309,179 +314,114 @@ function PasseportActivateContent() {
                   Code détecté automatiquement depuis l&apos;URL
                 </p>
               )}
-              {!qrCodeParam && (
-                <p className="text-xs mt-1.5" style={{ color: MUTED }}>
-                  Saisissez le code PP- indiqué sur votre autocollant
-                </p>
-              )}
             </div>
 
-            {/* Info box */}
-            <div
-              className="rounded-xl p-3 mb-5 flex items-start gap-2"
-              style={{ backgroundColor: '#fef9c3' }}
-            >
-              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#d97706' }} />
-              <p className="text-sm font-medium" style={{ color: '#92400e' }}>
-                {t('passeport.infoNote') || "Ces informations aideront à vous identifier si votre passeport est perdu."}
-              </p>
-            </div>
-
-            {/* Nom complet */}
+            {/* Photo upload (circular preview) */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.fullName') || 'Nom complet'} *
+                Photo
               </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder={t('passeport.fullNamePlaceholder') || 'Ex: Ahmed Diop'}
-                className={errors.fullName ? inputErrorClass : inputNormalClass}
-                style={errors.fullName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Nationalité */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.nationality') || 'Nationalité'}
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={nationalitySearch || nationality}
-                  onChange={(e) => {
-                    setNationalitySearch(e.target.value);
-                    setNationality('');
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  className="w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center shrink-0 transition-colors hover:border-black"
+                  style={{
+                    borderColor: photoPreview ? '#10b981' : INPUT_BORDER,
+                    backgroundColor: photoPreview ? 'transparent' : INPUT_BG,
+                    overflow: 'hidden',
                   }}
-                  onFocus={() => setNationalitySearch(nationalitySearch || '')}
-                  placeholder={t('passeport.nationalityPlaceholder') || 'Ex: Sénégal, Maroc, France...'}
-                  className={inputNormalClass}
-                  style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                >
+                  {photoPreview ? (
+                    <img
+                      src={photoPreview}
+                      alt="Photo"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Upload className="w-6 h-6" style={{ color: MUTED }} />
+                  )}
+                </button>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: TEXT }}>
+                    Cliquez pour ajouter
+                  </p>
+                  <p className="text-xs" style={{ color: MUTED }}>
+                    JPG, PNG — max 10 Mo
+                  </p>
+                </div>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
                 />
-                {nationalitySearch && (
-                  <div
-                    className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border max-h-48 overflow-y-auto z-50"
-                    style={{ borderColor: INPUT_BORDER }}
-                  >
-                    {COUNTRIES.filter(
-                      (c) =>
-                        c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
-                        c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
-                    )
-                      .slice(0, 10)
-                      .map((c) => (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => {
-                            setNationality(c.name);
-                            setNationalitySearch('');
-                          }}
-                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
-                        >
-                          <span className="text-lg">{c.flag}</span>
-                          <span className="font-medium" style={{ color: TEXT }}>
-                            {c.name}
-                          </span>
-                        </button>
-                      ))}
-                    {COUNTRIES.filter(
-                      (c) =>
-                        c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
-                        c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
-                    ).length === 0 && (
-                      <div className="px-4 py-3 text-sm" style={{ color: MUTED }}>
-                        Aucun pays trouvé
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* N° passeport (optional, with privacy note) */}
+            {/* Prénom */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.passportNumber') || 'N° passeport'}{' '}
-                <span className="font-normal" style={{ color: MUTED }}>
-                  ({t('passeport.optional') || 'optionnel'})
-                </span>
+                Prénom *
+              </label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Ex: Ahmed"
+                className={errors.firstName ? inputErrorClass : inputNormalClass}
+                style={errors.firstName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Nom */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Nom *
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Ex: Diop"
+                className={errors.lastName ? inputErrorClass : inputNormalClass}
+                style={errors.lastName ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* N° Passeport */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
+                <Hash className="w-4 h-4" style={{ color: '#7c3aed' }} />
+                N° Passeport *
               </label>
               <input
                 type="text"
                 value={passportNumber}
                 onChange={(e) => setPassportNumber(e.target.value)}
-                placeholder={t('passeport.passportNumberPlaceholder') || 'Ex: A12345678'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                placeholder="Ex: A12345678"
+                className={errors.passportNumber ? inputErrorClass : inputNormalClass}
+                style={errors.passportNumber ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />
               <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: MUTED }}>
-                🔒 {t('passeport.privacyNote') || 'Votre numéro reste confidentiel'}
+                🔒 Votre numéro reste confidentiel
               </p>
             </div>
 
-            {/* Date de naissance */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.dateOfBirth') || 'Date de naissance'}
+            {/* Date d'expiration */}
+            <div className="mb-6">
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
+                <CalendarDays className="w-4 h-4" style={{ color: '#7c3aed' }} />
+                Date d&apos;expiration *
               </label>
               <input
                 type="date"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                value={expirationDate}
+                onChange={(e) => setExpirationDate(e.target.value)}
+                className={errors.expirationDate ? inputErrorClass : inputNormalClass}
+                style={errors.expirationDate ? undefined : { backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />
-            </div>
-
-            {/* Lieu de naissance */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.placeOfBirth') || 'Lieu de naissance'}
-              </label>
-              <input
-                type="text"
-                value={placeOfBirth}
-                onChange={(e) => setPlaceOfBirth(e.target.value)}
-                placeholder={t('passeport.placeOfBirthPlaceholder') || 'Ex: Dakar'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Sexe (M/F) */}
-            <div className="mb-6">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.gender') || 'Sexe'}
-              </label>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setGender('M')}
-                  className={`flex-1 py-3 rounded-xl font-bold text-base transition-all border-2 ${
-                    gender === 'M'
-                      ? 'text-white border-transparent'
-                      : 'bg-white text-black border-gray-300 hover:border-gray-400'
-                  }`}
-                  style={gender === 'M' ? { background: BTN_PRIMARY } : undefined}
-                >
-                  {t('passeport.male') || 'M'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGender('F')}
-                  className={`flex-1 py-3 rounded-xl font-bold text-base transition-all border-2 ${
-                    gender === 'F'
-                      ? 'text-white border-transparent'
-                      : 'bg-white text-black border-gray-300 hover:border-gray-400'
-                  }`}
-                  style={gender === 'F' ? { background: BTN_PRIMARY } : undefined}
-                >
-                  {t('passeport.female') || 'F'}
-                </button>
-              </div>
             </div>
 
             {/* Suivant button */}
@@ -491,39 +431,20 @@ function PasseportActivateContent() {
               className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
               style={{ background: BTN_PRIMARY }}
             >
-              {t('passeport.next') || 'Continuer'} <ChevronRight className="w-5 h-5" />
+              Continuer <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         )}
 
-        {/* ═══ STEP 2: Contact & Travel Info ═══ */}
+        {/* ═══ STEP 2: Contact & Hotel ═══ */}
         {step === 2 && (
           <div
             className="rounded-[20px] p-6 shadow-lg mb-4"
             style={{ background: CARD_BG }}
           >
             <div className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Plane className="w-5 h-5" />
-              {t('passeport.step2Title') || 'Contact & Voyage'}
-            </div>
-
-            {/* Phone */}
-            <div className="mb-4">
-              <PhoneInput
-                countryCode={phoneCountry}
-                onCountryChange={setPhoneCountry}
-                value={phone}
-                onChange={setPhone}
-                placeholder="77 123 45 67"
-                label={`${t('passeport.phone') || 'Téléphone'} *`}
-                required
-                dark={false}
-              />
-              {errors.phone && (
-                <p className="text-xs mt-1 text-red-500 font-medium">
-                  {t('passeport.phoneRequired') || 'Numéro de téléphone requis'}
-                </p>
-              )}
+              <Building2 className="w-5 h-5" style={{ color: '#7c3aed' }} />
+              Contact & Hôtel
             </div>
 
             {/* WhatsApp */}
@@ -534,131 +455,37 @@ function PasseportActivateContent() {
                 value={whatsapp}
                 onChange={setWhatsapp}
                 placeholder="77 123 45 67"
-                label={`${t('passeport.whatsapp') || 'WhatsApp'} *`}
+                label="WhatsApp *"
                 required
                 dark={false}
               />
               {errors.whatsapp && (
                 <p className="text-xs mt-1 text-red-500 font-medium">
-                  {t('passeport.whatsappRequired') || 'Numéro WhatsApp requis'}
+                  Numéro WhatsApp requis
                 </p>
               )}
+              <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: MUTED }}>
+                <MessageCircle className="w-3 h-3" /> Pour être contacté si votre passeport est trouvé
+              </p>
             </div>
 
-            {/* Email */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.email') || 'Email'}
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('passeport.emailPlaceholder') || 'Ex: ahmed@example.com'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Emergency contact name */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.emergencyContact') || 'Contact d\'urgence'}
-              </label>
-              <input
-                type="text"
-                value={emergencyContact}
-                onChange={(e) => setEmergencyContact(e.target.value)}
-                placeholder={t('passeport.emergencyContactPlaceholder') || 'Ex: Fatou Diop'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Emergency phone */}
-            <div className="mb-4">
-              <PhoneInput
-                countryCode={emergencyCountry}
-                onCountryChange={setEmergencyCountry}
-                value={emergencyPhone}
-                onChange={setEmergencyPhone}
-                placeholder="33 800 00 00"
-                label={t('passeport.emergencyPhone') || 'Téléphone d\'urgence'}
-                dark={false}
-              />
-            </div>
-
-            {/* Home address */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.homeAddress') || 'Adresse domicile'}
-              </label>
-              <input
-                type="text"
-                value={homeAddress}
-                onChange={(e) => setHomeAddress(e.target.value)}
-                placeholder={t('passeport.homeAddressPlaceholder') || 'Ex: 12 Rue Faidherbe, Dakar'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Travel destination */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.travelDestination') || 'Destination de voyage'}
-              </label>
-              <input
-                type="text"
-                value={travelDestination}
-                onChange={(e) => setTravelDestination(e.target.value)}
-                placeholder={t('passeport.travelDestinationPlaceholder') || 'Ex: Arabie Saoudite'}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Travel date */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.travelDate') || 'Date de départ'}
-              </label>
-              <input
-                type="date"
-                value={travelDate}
-                onChange={(e) => setTravelDate(e.target.value)}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Return date */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.returnDate') || 'Date de retour'}
-              </label>
-              <input
-                type="date"
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
-            </div>
-
-            {/* Notes */}
+            {/* Adresse hôtel */}
             <div className="mb-6">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                {t('passeport.notes') || 'Notes'}
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
+                <Building2 className="w-4 h-4" style={{ color: '#7c3aed' }} />
+                Adresse de l&apos;hôtel
               </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder={t('passeport.notesPlaceholder') || 'Informations supplémentaires...'}
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl text-base outline-none transition-colors focus:ring-2 focus:ring-black/20 border resize-none"
+              <input
+                type="text"
+                value={hotelAddress}
+                onChange={(e) => setHotelAddress(e.target.value)}
+                placeholder="Ex: Hilton Makkah, Rue Ibrahim Al-Jafri"
+                className={inputNormalClass}
                 style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
               />
+              <p className="text-xs mt-1.5" style={{ color: MUTED }}>
+                Optionnel — pour faciliter la restitution
+              </p>
             </div>
 
             {/* Action buttons */}
@@ -671,7 +498,7 @@ function PasseportActivateContent() {
                 }}
                 className="flex-1 py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors"
               >
-                <ChevronLeft className="w-5 h-5" /> {t('passeport.previous') || 'Précédent'}
+                Précédent
               </button>
               <button
                 type="submit"
@@ -682,12 +509,12 @@ function PasseportActivateContent() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    {t('passeport.activating') || 'Activation...'}
+                    Activation...
                   </>
                 ) : (
                   <>
                     <CheckCircle className="w-5 h-5" />
-                    {t('passeport.activate') || 'Activer le Passeport'}
+                    Activer le Passeport
                   </>
                 )}
               </button>
@@ -700,7 +527,7 @@ function PasseportActivateContent() {
       <footer className="mt-auto pt-8 pb-4 text-center text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
         Propulsé par <strong>PassHajj</strong> ·{' '}
         <Link href="/select" className="text-black font-semibold underline">
-          {t('passeport.changeProduct') || 'Changer de produit'}
+          Changer de produit
         </Link>
       </footer>
     </main>

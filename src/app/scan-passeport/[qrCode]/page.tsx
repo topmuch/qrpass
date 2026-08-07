@@ -23,6 +23,8 @@ import {
   Home,
   Plane,
   RotateCcw,
+  Building2,
+  MessageCircle,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,7 +36,7 @@ import { toast } from '@/hooks/use-toast';
 //  BRAND CONSTANTS — PassHajj palette
 // ═══════════════════════════════════════════════════════════════
 
-const GOLD = '#f4b400';
+const GOLD = '#059669';
 const INK = '#0f172a';
 const MUTED = '#64748b';
 const WHITE = '#ffffff';
@@ -644,7 +646,7 @@ export default function PassportFinderPage() {
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 shadow-md"
                   style={{ background: GOLD }}
                 >
-                  <BookOpen className="w-9 h-9 text-white" />
+                  <Globe className="w-9 h-9 text-white" />
                 </div>
                 <h1
                   className="text-2xl md:text-3xl font-extrabold leading-tight"
@@ -791,6 +793,18 @@ export default function PassportFinderPage() {
                   </>
                 )}
 
+                {/* Hotel Address */}
+                {passportData.homeAddress && (
+                  <>
+                    <div className="border-t border-gray-100 my-2" />
+                    <InfoRow
+                      icon={<Building2 className="w-4 h-4" style={{ color: GOLD }} />}
+                      label="Hôtel"
+                      value={passportData.homeAddress}
+                    />
+                  </>
+                )}
+
                 {/* Agency */}
                 {passportData.agency && (
                   <>
@@ -816,6 +830,59 @@ export default function PassportFinderPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ═══ ACTION BUTTONS: Appeler l'hôtel & Contacter le propriétaire ═══ */}
+              {(isActive || isLost) && (
+                <div
+                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg"
+                  style={{ background: CARD_BG }}
+                >
+                  <h2
+                    className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2"
+                    style={{ color: INK }}
+                  >
+                    <Phone className="w-4 h-4" />
+                    CONTACT RAPIDE
+                  </h2>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    {/* Contacter le propriétaire via WhatsApp */}
+                    <a
+                      href={passportData.whatsapp
+                        ? `https://wa.me/${passportData.whatsapp.replace(/[^0-9+]/g, '')}?text=${encodeURIComponent("Bonjour, j'ai trouvé votre passeport. Pouvez-vous me contacter pour sa restitution ?")}`
+                        : passportData.phone
+                          ? `tel:${passportData.phone.replace(/[^0-9+]/g, '')}`
+                          : '#'
+                      }
+                      target={passportData.whatsapp ? '_blank' : undefined}
+                      rel={passportData.whatsapp ? 'noopener noreferrer' : undefined}
+                      className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
+                      style={{ background: '#25D366' }}
+                    >
+                      <MessageCircle className="w-6 h-6" />
+                      Contacter le propriétaire
+                    </a>
+
+                    {/* Appeler l'hôtel */}
+                    {passportData.homeAddress && (
+                      <a
+                        href={`https://www.google.com/search?q=${encodeURIComponent(passportData.homeAddress)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
+                        style={{ background: INK }}
+                      >
+                        <Building2 className="w-6 h-6" />
+                        Appeler l&apos;hôtel
+                      </a>
+                    )}
+                  </div>
+
+                  <p className="text-xs mt-3 text-center" style={{ color: MUTED }}>
+                    🔒 Le numéro du propriétaire reste confidentiel. La mise en relation se fait via WhatsApp.
+                  </p>
+                </div>
+              )}
 
               {/* ═══ CARD 2: ACTIVE PASSPORT MESSAGE ═══ */}
               {isActive && !isLost && !isFound && (
