@@ -56,7 +56,6 @@ function IdentityActivateContent() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
-  const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [language, setLanguage] = useState('');
 
@@ -224,7 +223,6 @@ function IdentityActivateContent() {
         allergies: allergies.trim() || undefined,
         diseases: diseases.trim() || undefined,
         medicalInfo: medicalInfo.trim() || undefined,
-        address: address.trim() || undefined,
         phone: phone.trim() || undefined,
         language: language.trim() || undefined,
         familyContact: familyPhone.trim() || undefined,
@@ -469,21 +467,6 @@ function IdentityActivateContent() {
               <p className="text-xs mt-1" style={{ color: MUTED }}>
                 Optionnel
               </p>
-            </div>
-
-            {/* Adresse */}
-            <div className="mb-4">
-              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
-                Adresse
-              </label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Ex: Rue 12, Médina Gounass, Dakar"
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
             </div>
 
             {/* Numéro de téléphone */}

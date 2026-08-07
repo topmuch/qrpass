@@ -434,6 +434,7 @@ export default function PilgrimScanPage() {
   const [state, setState] = useState<PageState>('loading');
   const [pilgrim, setPilgrim] = useState<PilgrimData | null>(null);
   const [lang, setLang] = useState<Lang>('fr');
+  const [photoError, setPhotoError] = useState(false);
 
   // ─── GPS state (auto-detect on load) ───
   const [gpsStatus, setGpsStatus] = useState<GpsStatus>('idle');
@@ -779,34 +780,27 @@ export default function PilgrimScanPage() {
                 >
                   {/* Photo — read-only, no upload on public page */}
                   <div className="inline-block mx-auto mb-3">
-                      {pilgrim.photoUrl ? (
+                      {pilgrim.photoUrl && !photoError ? (
                         <img
                           src={getPhotoDisplayUrl(pilgrim.photoUrl)}
                           alt={pilgrim.fullName}
                           className="w-[110px] h-[110px] rounded-full object-cover border-4 border-white"
                           style={{ boxShadow: '0 6px 20px rgba(0,0,0,0.25)' }}
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            if (target.dataset.error) return;
-                            target.dataset.error = '1';
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement | null;
-                            if (fallback) fallback.style.display = 'flex';
-                          }}
+                          onError={() => setPhotoError(true)}
                         />
-                      ) : null}
-                      <div
-                        className="w-[110px] h-[110px] rounded-full border-4 border-white items-center justify-center text-3xl font-bold"
-                        style={{
-                          background: 'rgba(255,255,255,0.3)',
-                          color: '#fff',
-                          boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
-                          display: pilgrim.photoUrl ? 'none' : 'flex',
-                          margin: pilgrim.photoUrl ? undefined : '0 auto',
-                        }}
-                      >
-                        {getInitials(pilgrim.fullName)}
-                      </div>
+                      ) : (
+                        <div
+                          className="w-[110px] h-[110px] rounded-full border-4 border-white flex items-center justify-center text-3xl font-bold"
+                          style={{
+                            background: 'rgba(255,255,255,0.3)',
+                            color: '#fff',
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
+                            margin: '0 auto',
+                          }}
+                        >
+                          {getInitials(pilgrim.fullName)}
+                        </div>
+                      )}
                   </div>
 
                   {/* Name + Verified Badge */}
@@ -861,12 +855,6 @@ export default function PilgrimScanPage() {
                     <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
                       <span className="text-xs font-medium" style={{ color: MUTED }}>{t('pilgrimPhone')}</span>
                       <a href={`tel:+${cleanPhone(pilgrim.phone)}`} className="text-sm font-semibold" style={{ color: BLUE }}>{pilgrim.phone}</a>
-                    </div>
-                  )}
-                  {pilgrim.address && (
-                    <div className="flex justify-between items-center px-3 py-1.5 rounded-lg" style={{ background: '#f9fafb' }}>
-                      <span className="text-xs font-medium" style={{ color: MUTED }}>{t('addressLabel')}</span>
-                      <span className="text-sm font-semibold" style={{ color: TEXT }}>{pilgrim.address}</span>
                     </div>
                   )}
                   {pilgrim.language && (

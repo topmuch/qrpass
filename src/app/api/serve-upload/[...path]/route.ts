@@ -3,7 +3,10 @@ import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
-const UPLOAD_BASE = join(process.cwd(), 'public', 'uploads');
+// Use data/uploads/ (persistent across deployments) instead of public/uploads/
+// Falls back to public/uploads/ for legacy files uploaded before the migration
+const UPLOAD_BASE_PRIMARY = join(process.cwd(), 'data', 'uploads');
+const UPLOAD_BASE_LEGACY = join(process.cwd(), 'public', 'uploads');
 
 // MIME types for common image formats
 const MIME_TYPES: Record<string, string> = {
@@ -38,14 +41,23 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
     }
 
-    const absolutePath = join(UPLOAD_BASE, safePath);
+    // Try primary location (data/uploads/) first, then legacy (public/uploads/)
+    const primaryPath = join(UPLOAD_BASE_PRIMARY, safePath);
+    const legacyPath = join(UPLOAD_BASE_LEGACY, safePath);
 
-    // Security: ensure the resolved path is within UPLOAD_BASE
-    if (!absolutePath.startsWith(UPLOAD_BASE)) {
+    // Security: ensure the resolved path is within allowed directories
+    if (!primaryPath.startsWith(UPLOAD_BASE_PRIMARY) && !legacyPath.startsWith(UPLOAD_BASE_LEGACY)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (!existsSync(absolutePath)) {
+    let absolutePath: string | null = null;
+    if (existsSync(primaryPath)) {
+      absolutePath = primaryPath;
+    } else if (existsSync(legacyPath)) {
+      absolutePath = legacyPath;
+    }
+
+    if (!absolutePath) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 

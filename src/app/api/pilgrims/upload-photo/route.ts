@@ -3,8 +3,8 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 
-// Store in public/ so Next.js can serve the files directly
-const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'pilgrim-photos');
+// Store in data/uploads/ (persistent across deployments) instead of public/uploads/
+const UPLOAD_DIR = join(process.cwd(), 'data', 'uploads', 'pilgrim-photos');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = new Set([
   'image/jpeg', 'image/png', 'image/webp', 'image/gif',

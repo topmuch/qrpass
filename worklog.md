@@ -410,3 +410,32 @@ Stage Summary:
 - Share button in header bar
 - Staggered fadeInUp animations on all card sections
 - No breaking changes to existing functionality
+
+---
+Task ID: 2
+Agent: main
+Task: Fix profile image disappearing on identity page + Remove pilgrim address from identity form
+
+Work Log:
+- Identified root cause of photo disappearing: uploaded files stored in `public/uploads/` which can be wiped during deployments/rebuilds
+- Identified secondary cause: photo onError handler used DOM mutations (target.style.display) that get reset on React re-renders (GPS status change, language toggle, etc.)
+- Moved upload storage from `public/uploads/` to `data/uploads/` (persistent across deployments)
+- Updated `/api/serve-upload/[...path]/route.ts` to check `data/uploads/` first, then fall back to `public/uploads/` for legacy files
+- Updated `/api/pilgrims/upload-photo/route.ts` to write to `data/uploads/pilgrim-photos/`
+- Updated `/api/baggage/upload-photo/route.ts` to write to `data/uploads/baggage-photos/`
+- Created `data/uploads/` directory structure with `.gitkeep` files
+- Added `data/uploads/` to `.gitignore` (user data, not in git)
+- Fixed profile page (`/p/[code]/page.tsx`): replaced DOM mutation onError handler with React `photoError` state
+- Fixed scan page (`/scan/[reference]/page.tsx`): added `baggagePhotoError` state, added `getPhotoDisplayUrl` helper, fixed onError handler
+- Removed pilgrim address field from identity activation form (`/activate/identity/page.tsx`):
+  - Removed `address` state variable
+  - Removed address input field from Step 1
+  - Removed `address` from submit payload
+- Removed address display from profile page (`/p/[code]/page.tsx`)
+- Migrated existing test files from `public/uploads/` to `data/uploads/`
+
+Stage Summary:
+- Profile photos now persist across server restarts/deployments (stored in `data/uploads/`)
+- Photo error handling is React state-based (survives re-renders)
+- Address field removed from identity form and profile display
+- Backward compatible: serve-upload API falls back to `public/uploads/` for legacy files

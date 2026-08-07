@@ -61,6 +61,12 @@ db/*.db-journal
 /upload/*
 !upload/.gitkeep
 
+# Data uploads (persistent across deployments, not in git)
+/data/uploads/*
+!data/uploads/.gitkeep
+!data/uploads/pilgrim-photos/.gitkeep
+!data/uploads/baggage-photos/.gitkeep
+
 # Skills directory
 /skills/
 

@@ -37,6 +37,15 @@ import {
   TRANSPORT_ICONS,
 } from '@/lib/transport';
 import type { TransportMode } from '@/lib/transport';
+
+// ─── Helper: Convert a stored photoUrl to a displayable URL ───
+function getPhotoDisplayUrl(photoUrl: string | null): string | null {
+  if (!photoUrl) return null;
+  if (photoUrl.startsWith('/uploads/')) {
+    return `/api/serve-upload/${photoUrl.slice('/uploads/'.length)}`;
+  }
+  return photoUrl;
+}
 import TransportModeSelector from '@/components/inscrire/TransportModeSelector';
 
 // AI-FEATURE: Lazy-load ChatbotWidget (Feature #1) — doesn't block page render
@@ -446,6 +455,7 @@ export default function ScanPage() {
 
   const [baggageData, setBaggageData] = useState<BaggageData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [baggagePhotoError, setBaggagePhotoError] = useState(false);
 
   // UI State
   const [showForm, setShowForm] = useState(false);
@@ -1067,14 +1077,14 @@ export default function ScanPage() {
             </div>
 
             {/* Baggage Photo — helps finder identify the luggage */}
-            {baggage.photoUrl && (
+            {baggage.photoUrl && !baggagePhotoError && (
               <div className="mt-3 pt-3 border-t border-gray-100">
                 <p className="text-xs font-medium mb-2" style={{ color: MUTED }}>📸 {i18n('photoLabel', lang)}</p>
                 <img
-                  src={baggage.photoUrl}
+                  src={getPhotoDisplayUrl(baggage.photoUrl) || baggage.photoUrl}
                   alt={i18n('photoLabel', lang)}
                   className="max-w-full max-h-40 object-cover rounded-lg"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  onError={() => setBaggagePhotoError(true)}
                 />
               </div>
             )}
