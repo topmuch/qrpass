@@ -75,6 +75,7 @@ export async function GET(
         dateOfBirth: passport.dateOfBirth,
         placeOfBirth: passport.placeOfBirth,
         gender: passport.gender,
+        photoUrl: passport.photoUrl,
         phone: passport.phone,
         whatsapp: passport.whatsapp,
         email: passport.email,

@@ -106,6 +106,7 @@ interface PassportData {
   dateOfBirth?: string | null;
   placeOfBirth?: string | null;
   gender?: string | null;
+  photoUrl?: string | null;
   phone?: string | null;
   whatsapp?: string | null;
   email?: string | null;
@@ -698,21 +699,33 @@ export default function PassportFinderPage() {
                   PROPRIÉTAIRE
                 </h2>
 
-                {/* Full Name */}
-                <InfoRow
-                  icon={<User className="w-4 h-4" style={{ color: GOLD }} />}
-                  label="Nom complet"
-                  value={passportData.fullName || 'Non renseigné'}
-                />
-
-                <div className="border-t border-gray-100 my-2" />
-
-                {/* Nationality */}
-                <InfoRow
-                  icon={<Flag className="w-4 h-4" style={{ color: GOLD }} />}
-                  label="Nationalité"
-                  value={`${getFlag(passportData.nationality)} ${passportData.nationality || 'Non renseignée'}`}
-                />
+                {/* Photo + Name header */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm"
+                    style={{ background: '#f1f5f9' }}
+                  >
+                    {passportData.photoUrl ? (
+                      <img
+                        src={passportData.photoUrl}
+                        alt={passportData.fullName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-8 h-8" style={{ color: MUTED }} />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold" style={{ color: INK }}>
+                      {passportData.fullName || 'Non renseigné'}
+                    </p>
+                    {passportData.nationality && (
+                      <p className="text-sm" style={{ color: MUTED }}>
+                        {getFlag(passportData.nationality)} {passportData.nationality}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
                 <div className="border-t border-gray-100 my-2" />
 
@@ -800,7 +813,30 @@ export default function PassportFinderPage() {
                     <InfoRow
                       icon={<Building2 className="w-4 h-4" style={{ color: GOLD }} />}
                       label="Hôtel"
-                      value={passportData.homeAddress}
+                      value={passportData.travelDestination ? `${passportData.travelDestination} — ${passportData.homeAddress}` : passportData.homeAddress}
+                    />
+                    {/* Déposer à l'hôtel button */}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(passportData.homeAddress)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                      style={{ background: '#7c3aed' }}
+                    >
+                      <MapPin className="w-4 h-4" />
+                      Déposer à l&apos;hôtel
+                    </a>
+                  </>
+                )}
+
+                {/* Hotel Phone */}
+                {passportData.emergencyPhone && (
+                  <>
+                    <div className="border-t border-gray-100 my-2" />
+                    <InfoRow
+                      icon={<Phone className="w-4 h-4" style={{ color: GOLD }} />}
+                      label="Téléphone hôtel"
+                      value={passportData.emergencyPhone}
                     />
                   </>
                 )}

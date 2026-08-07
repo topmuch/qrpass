@@ -6,22 +6,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from '@/hooks/use-toast';
 import PhoneInput from '@/components/ui/PhoneInput';
-import { COUNTRY_MAP } from '@/lib/phone';
+import { COUNTRY_MAP, COUNTRIES } from '@/lib/phone';
 import {
   ChevronRight,
+  ChevronLeft,
   Upload,
+  Globe,
+  Building2,
   User,
   AlertTriangle,
   Loader2,
   CheckCircle,
-  Globe,
-  Building2,
-  CalendarDays,
+  MapPin,
   Hash,
-  MessageCircle,
+  CalendarDays,
 } from 'lucide-react';
 
-// ─── Brand constants (same style as Identity page) ───
+// ─── Brand constants (cloned from Identity page) ───
 const BG = '#059669';
 const CARD_BG = '#ffffff';
 const TEXT = '#1a1a1a';
@@ -39,10 +40,10 @@ function PasseportActivateContent() {
   const qrCodeParam = searchParams.get('code') || '';
 
   // Step state
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
 
-  // Step 1: Identity & Passport
+  // Step 1: Identité & Passeport
   const [code, setCode] = useState(qrCodeParam);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -50,19 +51,28 @@ function PasseportActivateContent() {
   const [lastName, setLastName] = useState('');
   const [passportNumber, setPassportNumber] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
+  const [nationality, setNationality] = useState('');
+  const [nationalitySearch, setNationalitySearch] = useState('');
 
-  // Step 2: Contact & Hotel
+  // Step 2: WhatsApp
   const [whatsapp, setWhatsapp] = useState('');
   const [whatsappCountry, setWhatsappCountry] = useState('SN');
-  const [hotelAddress, setHotelAddress] = useState('');
 
-  // IP-based country detection on mount
+  // Step 3: Hôtel
+  const [hotelName, setHotelName] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelPhone, setHotelPhone] = useState('');
+  const [hotelPhoneCountry, setHotelPhoneCountry] = useState('SA');
+
+  // Country detection on mount
   useEffect(() => {
     fetch('/api/ip-country')
       .then((r) => r.json())
       .then((data) => {
         if (data.country && COUNTRY_MAP[data.country.toUpperCase()]) {
-          setWhatsappCountry(data.country.toUpperCase());
+          const c = data.country.toUpperCase();
+          setWhatsappCountry(c);
+          setHotelPhoneCountry(c);
         }
       })
       .catch(() => {});
@@ -75,15 +85,17 @@ function PasseportActivateContent() {
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   // ─── Step labels ───
-  const stepLabels: Record<1 | 2, string> = {
-    1: 'ÉTAPE 1 SUR 2 — IDENTITÉ & PASSEPORT',
-    2: 'ÉTAPE 2 SUR 2 — CONTACT & HÔTEL',
+  const stepLabels: Record<1 | 2 | 3, string> = {
+    1: 'ÉTAPE 1 SUR 3 — IDENTITÉ & PASSEPORT',
+    2: 'ÉTAPE 2 SUR 3 — CONTACT',
+    3: 'ÉTAPE 3 SUR 3 — HÔTEL',
   };
 
   // ─── Progress widths ───
-  const progressWidths: Record<1 | 2, string> = {
-    1: '50%',
-    2: '100%',
+  const progressWidths: Record<1 | 2 | 3, string> = {
+    1: '33%',
+    2: '66%',
+    3: '100%',
   };
 
   // ─── Validate step 1 ───
@@ -115,8 +127,9 @@ function PasseportActivateContent() {
   };
 
   // ─── Navigate to step ───
-  const goToStep = (s: 1 | 2) => {
+  const goToStep = (s: 1 | 2 | 3) => {
     if (s === 2 && !validateStep1()) return;
+    if (s === 3 && !validateStep2()) return;
     setStep(s);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -135,8 +148,6 @@ function PasseportActivateContent() {
   // ─── Submit activation ───
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateStep2()) return;
 
     setLoading(true);
 
@@ -162,15 +173,25 @@ function PasseportActivateContent() {
       }
 
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
+
+      // Build hotel info as a combined homeAddress string
+      const hotelParts: string[] = [];
+      if (hotelName.trim()) hotelParts.push(hotelName.trim());
+      if (hotelAddress.trim()) hotelParts.push(hotelAddress.trim());
+      const combinedHotelAddress = hotelParts.join(', ');
+
       const payload: Record<string, unknown> = {
         qrCode: code.trim(),
         fullName,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         passportNumber: passportNumber.trim(),
-        returnDate: expirationDate, // Using returnDate field for passport expiration
+        returnDate: expirationDate, // Using returnDate for passport expiration
+        nationality: nationality.trim() || undefined,
         whatsapp: whatsapp.trim(),
-        homeAddress: hotelAddress.trim() || undefined, // Using homeAddress for hotel
+        homeAddress: combinedHotelAddress || undefined,
+        travelDestination: hotelName.trim() || undefined, // Using travelDestination for hotel name
+        emergencyPhone: hotelPhone.trim() || undefined, // Using emergencyPhone for hotel phone
       };
 
       if (photoUrl) {
@@ -184,7 +205,7 @@ function PasseportActivateContent() {
       });
 
       if (response.ok) {
-        // Store activation data in sessionStorage for success page
+        // Store activation data in sessionStorage for confirmation page
         sessionStorage.setItem(
           'activationData',
           JSON.stringify({
@@ -195,7 +216,10 @@ function PasseportActivateContent() {
             photoUrl: photoUrl || null,
             photoPreview: photoPreview || null,
             passportNumber: passportNumber.trim(),
+            nationality: nationality.trim(),
             whatsapp: whatsapp.trim(),
+            hotelName: hotelName.trim(),
+            hotelAddress: hotelAddress.trim(),
           })
         );
 
@@ -264,7 +288,7 @@ function PasseportActivateContent() {
 
       {/* ─── Form ─── */}
       <form onSubmit={handleSubmit} className="w-full max-w-[420px]">
-        {/* ═══ STEP 1: Identity & Passport ═══ */}
+        {/* ═══ STEP 1: Identité & Passeport ═══ */}
         {step === 1 && (
           <div
             className="rounded-[20px] p-6 shadow-lg mb-4"
@@ -286,7 +310,7 @@ function PasseportActivateContent() {
               </p>
             </div>
 
-            {/* QR Code field */}
+            {/* QR Code field (readonly, auto-detected) */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
                 QR Code *
@@ -316,7 +340,7 @@ function PasseportActivateContent() {
               )}
             </div>
 
-            {/* Photo upload (circular preview) */}
+            {/* Photo upload (circular preview) — same as Identity */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
                 Photo
@@ -390,6 +414,65 @@ function PasseportActivateContent() {
               />
             </div>
 
+            {/* Nationalité (same as Identity) */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Nationalité
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={nationalitySearch || nationality}
+                  onChange={(e) => {
+                    setNationalitySearch(e.target.value);
+                    setNationality('');
+                  }}
+                  onFocus={() => setNationalitySearch(nationalitySearch || '')}
+                  placeholder="Ex: Sénégal, Maroc, France..."
+                  className={inputNormalClass}
+                  style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+                />
+                {nationalitySearch && (
+                  <div
+                    className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border max-h-48 overflow-y-auto z-50"
+                    style={{ borderColor: INPUT_BORDER }}
+                  >
+                    {COUNTRIES.filter(
+                      (c) =>
+                        c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+                        c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
+                    )
+                      .slice(0, 10)
+                      .map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => {
+                            setNationality(c.name);
+                            setNationalitySearch('');
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                        >
+                          <span className="text-lg">{c.flag}</span>
+                          <span className="font-medium" style={{ color: TEXT }}>
+                            {c.name}
+                          </span>
+                        </button>
+                      ))}
+                    {COUNTRIES.filter(
+                      (c) =>
+                        c.name.toLowerCase().includes(nationalitySearch.toLowerCase()) ||
+                        c.code.toLowerCase().includes(nationalitySearch.toLowerCase())
+                    ).length === 0 && (
+                      <div className="px-4 py-3 text-sm" style={{ color: MUTED }}>
+                        Aucun pays trouvé
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* N° Passeport */}
             <div className="mb-4">
               <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
@@ -409,7 +492,7 @@ function PasseportActivateContent() {
               </p>
             </div>
 
-            {/* Date d'expiration */}
+            {/* Date d'expiration du passeport */}
             <div className="mb-6">
               <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
                 <CalendarDays className="w-4 h-4" style={{ color: '#7c3aed' }} />
@@ -436,19 +519,19 @@ function PasseportActivateContent() {
           </div>
         )}
 
-        {/* ═══ STEP 2: Contact & Hotel ═══ */}
+        {/* ═══ STEP 2: Contact ═══ */}
         {step === 2 && (
           <div
             className="rounded-[20px] p-6 shadow-lg mb-4"
             style={{ background: CARD_BG }}
           >
             <div className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Building2 className="w-5 h-5" style={{ color: '#7c3aed' }} />
-              Contact & Hôtel
+              <User className="w-5 h-5" />
+              Contact
             </div>
 
             {/* WhatsApp */}
-            <div className="mb-4">
+            <div className="mb-6">
               <PhoneInput
                 countryCode={whatsappCountry}
                 onCountryChange={setWhatsappCountry}
@@ -464,27 +547,8 @@ function PasseportActivateContent() {
                   Numéro WhatsApp requis
                 </p>
               )}
-              <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: MUTED }}>
-                <MessageCircle className="w-3 h-3" /> Pour être contacté si votre passeport est trouvé
-              </p>
-            </div>
-
-            {/* Adresse hôtel */}
-            <div className="mb-6">
-              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
-                <Building2 className="w-4 h-4" style={{ color: '#7c3aed' }} />
-                Adresse de l&apos;hôtel
-              </label>
-              <input
-                type="text"
-                value={hotelAddress}
-                onChange={(e) => setHotelAddress(e.target.value)}
-                placeholder="Ex: Hilton Makkah, Rue Ibrahim Al-Jafri"
-                className={inputNormalClass}
-                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
-              />
               <p className="text-xs mt-1.5" style={{ color: MUTED }}>
-                Optionnel — pour faciliter la restitution
+                Pour être contacté si votre passeport est trouvé
               </p>
             </div>
 
@@ -492,13 +556,99 @@ function PasseportActivateContent() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => {
-                  setStep(1);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="flex-1 py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors"
               >
-                Précédent
+                <ChevronLeft className="w-5 h-5" /> Précédent
+              </button>
+              <button
+                type="button"
+                onClick={() => goToStep(3)}
+                className="flex-[2] py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                style={{ background: BTN_PRIMARY }}
+              >
+                Continuer <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ STEP 3: Hôtel ═══ */}
+        {step === 3 && (
+          <div
+            className="rounded-[20px] p-6 shadow-lg mb-4"
+            style={{ background: CARD_BG }}
+          >
+            <div className="text-lg font-bold mb-4 flex items-center gap-2">
+              <Building2 className="w-5 h-5" style={{ color: '#7c3aed' }} />
+              Hôtel
+            </div>
+
+            {/* Hotel Name */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block" style={{ color: TEXT }}>
+                Nom de l&apos;hôtel
+              </label>
+              <input
+                type="text"
+                value={hotelName}
+                onChange={(e) => setHotelName(e.target.value)}
+                placeholder="Ex: ALSHAHBA ALFAIHA HOTEL"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+            </div>
+
+            {/* Hotel Address */}
+            <div className="mb-4">
+              <label className="text-sm font-semibold mb-1.5 block flex items-center gap-1" style={{ color: TEXT }}>
+                <MapPin className="w-4 h-4" style={{ color: '#7c3aed' }} />
+                Adresse de l&apos;hôtel
+              </label>
+              <input
+                type="text"
+                value={hotelAddress}
+                onChange={(e) => setHotelAddress(e.target.value)}
+                placeholder="Ex: Ibrahim Al-Jafri Street, Makkah"
+                className={inputNormalClass}
+                style={{ backgroundColor: INPUT_BG, borderColor: INPUT_BORDER }}
+              />
+              {/* Déposer à l'hôtel button (opens Google Maps) */}
+              {hotelAddress.trim() && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelAddress.trim())}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                  style={{ background: '#7c3aed' }}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Déposer à l&apos;hôtel
+                </a>
+              )}
+            </div>
+
+            {/* Hotel Phone */}
+            <div className="mb-6">
+              <PhoneInput
+                countryCode={hotelPhoneCountry}
+                onCountryChange={setHotelPhoneCountry}
+                value={hotelPhone}
+                onChange={setHotelPhone}
+                placeholder="01 234 5678"
+                label="Téléphone de l'hôtel"
+                dark={false}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="flex-1 py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-100 transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" /> Précédent
               </button>
               <button
                 type="submit"
