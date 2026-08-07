@@ -462,31 +462,6 @@ export default function ScanPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isMarkingFound, setIsMarkingFound] = useState(false);
 
-  // Edit mode state
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [editFirstName, setEditFirstName] = useState('');
-  const [editLastName, setEditLastName] = useState('');
-  const [editWhatsapp, setEditWhatsapp] = useState('');
-  const [editTransportMode, setEditTransportMode] = useState<TransportMode>('flight');
-  const [editAirlineName, setEditAirlineName] = useState('');
-  const [editFlightNumber, setEditFlightNumber] = useState('');
-  const [editTrainCompany, setEditTrainCompany] = useState('');
-  const [editTrainNumber, setEditTrainNumber] = useState('');
-  const [editShipName, setEditShipName] = useState('');
-  const [editShipCabin, setEditShipCabin] = useState('');
-  const [editBusCompany, setEditBusCompany] = useState('');
-  const [editBusLineNumber, setEditBusLineNumber] = useState('');
-  const [editDestination, setEditDestination] = useState('');
-  const [editDepartureDate, setEditDepartureDate] = useState('');
-  const [editDepartureTime, setEditDepartureTime] = useState('');
-  const [editPhoneCountry, setEditPhoneCountry] = useState(countryCode);
-  // Edit hotel fields
-  const [editHotelName, setEditHotelName] = useState('');
-  const [editHotelAddress, setEditHotelAddress] = useState('');
-  const [editHotelPhone, setEditHotelPhone] = useState('');
-  const [editRoomNumber, setEditRoomNumber] = useState('');
-
   // Finder form state
   const [finderName, setFinderName] = useState('');
   const [finderPhone, setFinderPhone] = useState('');
@@ -536,111 +511,6 @@ export default function ScanPage() {
       setScanConfirmed(true);
     }
   }, [baggageData?.baggage?.reference]);
-
-  // Pre-fill edit state when baggage data loads
-  useEffect(() => {
-    const b = baggageData?.baggage;
-    if (b) {
-      setEditFirstName(b.travelerFirstName || '');
-      setEditLastName(b.travelerLastName || '');
-      setEditWhatsapp(b.whatsappOwner || '');
-      setEditTransportMode(safeTransportMode(b.transportMode) as TransportMode);
-      setEditAirlineName(b.airlineName || '');
-      setEditFlightNumber(b.flightNumber || '');
-      setEditTrainCompany(b.trainCompany || '');
-      setEditTrainNumber(b.trainNumber || '');
-      setEditShipName(b.shipName || '');
-      setEditShipCabin(b.shipCabin || '');
-      setEditBusCompany(b.busCompany || '');
-      setEditBusLineNumber(b.busLineNumber || '');
-      setEditDestination(b.destination || '');
-      setEditHotelName(b.hotelName || '');
-      setEditHotelAddress(b.hotelAddress || '');
-      setEditHotelPhone(b.hotelPhone || '');
-      setEditRoomNumber(b.roomNumber || '');
-      // Format departureDate to YYYY-MM-DD for the date input
-      if (b.departureDate) {
-        try {
-          const d = new Date(b.departureDate);
-          setEditDepartureDate(d.toISOString().split('T')[0]);
-        } catch {
-          setEditDepartureDate('');
-        }
-      } else {
-        setEditDepartureDate('');
-      }
-      setEditDepartureTime(b.departureTime || '');
-    }
-  }, [baggageData?.baggage?.reference]); // only re-run when baggage reference changes
-
-  // Handle save edit
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const res = await fetch(`/api/baggage/reference/${reference}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          travelerFirstName: editFirstName.trim() || null,
-          travelerLastName: editLastName.trim() || null,
-          whatsappOwner: editWhatsapp.trim() || null,
-          transportMode: editTransportMode,
-          airlineName: editAirlineName.trim() || null,
-          flightNumber: editFlightNumber.trim() || null,
-          trainCompany: editTrainCompany.trim() || null,
-          trainNumber: editTrainNumber.trim() || null,
-          shipName: editShipName.trim() || null,
-          shipCabin: editShipCabin.trim() || null,
-          busCompany: editBusCompany.trim() || null,
-          busLineNumber: editBusLineNumber.trim() || null,
-          destination: editDestination.trim() || null,
-          departureDate: editDepartureDate || null,
-          departureTime: editDepartureTime.trim() || null,
-          hotelName: editHotelName.trim() || null,
-          hotelAddress: editHotelAddress.trim() || null,
-          hotelPhone: editHotelPhone.trim() || null,
-          roomNumber: editRoomNumber.trim() || null,
-        }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
-      const data = await res.json();
-      // Update local state with the updated baggage data
-      setBaggageData({
-        ...baggageData!,
-        status: baggageData!.status,
-        baggage: {
-          ...baggageData!.baggage!,
-          travelerFirstName: data.baggage.travelerFirstName,
-          travelerLastName: data.baggage.travelerLastName,
-          travelerName: `${data.baggage.travelerFirstName || ''} ${data.baggage.travelerLastName || ''}`.trim(),
-          whatsappOwner: data.baggage.whatsappOwner,
-          transportMode: data.baggage.transportMode,
-          airlineName: data.baggage.airlineName,
-          flightNumber: data.baggage.flightNumber,
-          trainCompany: data.baggage.trainCompany,
-          trainNumber: data.baggage.trainNumber,
-          shipName: data.baggage.shipName,
-          shipCabin: data.baggage.shipCabin,
-          busCompany: data.baggage.busCompany,
-          busLineNumber: data.baggage.busLineNumber,
-          destination: data.baggage.destination,
-          departureDate: data.baggage.departureDate,
-          departureTime: data.baggage.departureTime,
-          hotelName: data.baggage.hotelName,
-          hotelAddress: data.baggage.hotelAddress,
-          hotelPhone: data.baggage.hotelPhone,
-          roomNumber: data.baggage.roomNumber,
-        },
-      });
-      setIsEditing(false);
-      toast({ title: t('finder.edit_success') });
-    } catch (error) {
-      console.error('Save error:', error);
-      toast({ title: t('finder.edit_error'), variant: 'destructive' });
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   // Generate WhatsApp message — friendly notification to the owner
   const generateWhatsAppMessage = useCallback((
@@ -908,21 +778,6 @@ export default function ScanPage() {
         {/* PassHajj Logo */}
         <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* ✏️ Modifier button — visible only for active/lost baggage */}
-          {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-white border border-black/10 rounded-full text-xs sm:text-sm font-bold hover:bg-white/80 transition-colors min-h-[32px] sm:min-h-[36px]"
-              style={{ color: INK }}
-            >
-              <span>{t('finder.edit_btn')}</span>
-            </button>
-          )}
-          {isEditing && (
-            <span className="font-bold text-xs sm:text-sm px-2" style={{ color: INK }}>
-              {t('finder.edit_title')}
-            </span>
-          )}
           <button
             onClick={handleShare}
             className="flex items-center gap-1 px-2.5 py-1.5 bg-white/80 border border-black/10 rounded-full text-xs sm:text-sm font-medium hover:bg-white transition-colors min-h-[32px] sm:min-h-[36px]"
@@ -954,10 +809,10 @@ export default function ScanPage() {
       {/* ─── Container ─── */}
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
 
-        {/* ═══ HEADER: Green ✓ icon + "BAGAGE TROUVÉ" + white thank-you text ═══ */}
+        {/* ═══ HEADER: Luggage icon + "BAGAGE TROUVÉ" + white thank-you text ═══ */}
         <div className="text-center mb-5 sm:mb-6" style={{ animation: 'fadeInUp 0.4s ease forwards' }}>
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-500 mb-3 shadow-md">
-            <CheckCircle className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-3 shadow-md" style={{ background: '#f4b400' }}>
+            <Luggage className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: INK }}>
             {isDeclaredLost
@@ -1051,7 +906,7 @@ export default function ScanPage() {
         )}
 
         {/* ═══ CARD 1 : PROPRIÉTAIRE (white card) ═══ */}
-        {baggage && !isEditing && (
+        {baggage && (
           <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.05s', opacity: 0 }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
               <span>👤</span> {i18n('ownerLabel', lang)}
@@ -1092,7 +947,7 @@ export default function ScanPage() {
         )}
 
         {/* ═══ CARD 2 : HÔTEL / HÉBERGEMENT (white card, NEW) ═══ */}
-        {baggage && !isEditing && baggage.hotelName && (
+        {baggage && baggage.hotelName && (
           <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.1s', opacity: 0 }}>
             <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
               <Building2 className="w-4 h-4" style={{ color: INK }} />
@@ -1162,7 +1017,7 @@ export default function ScanPage() {
         )}
 
         {/* ═══ MINI HOTEL MAP ═══ */}
-        {baggage && !isEditing && baggage.hotelAddress && (
+        {baggage && baggage.hotelAddress && (
           <div className="w-full rounded-[18px] p-4 md:p-5 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.12s', opacity: 0 }}>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(baggage.hotelAddress)}`}
@@ -1186,7 +1041,7 @@ export default function ScanPage() {
         )}
 
         {/* ═══ CARD 3 : DÉTAILS DU VOYAGE / TRANSPORT (white card) ═══ */}
-        {baggage && !isEditing && (() => {
+        {baggage && (() => {
           const mode = safeTransportMode(baggage.transportMode) as TransportMode;
           const transportImg = getTransportImage(mode);
           const blockHeader = getTransportBlockHeader(mode, lang);
@@ -1283,221 +1138,6 @@ export default function ScanPage() {
             </div>
           );
         })()}
-
-        {/* ═══ EDIT MODE: CARD 1 — Owner Info (white card) ═══ */}
-        {baggage && isEditing && (
-          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
-              <span>👤</span> {i18n('ownerLabel', lang)}
-            </h2>
-
-            {/* First Name */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_first_name')}</label>
-              <input
-                type="text"
-                value={editFirstName}
-                onChange={(e) => setEditFirstName(e.target.value)}
-                placeholder={t('inscrire.first_name_placeholder')}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* Last Name */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_last_name')}</label>
-              <input
-                type="text"
-                value={editLastName}
-                onChange={(e) => setEditLastName(e.target.value)}
-                placeholder={t('inscrire.last_name_placeholder')}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* WhatsApp Number */}
-            <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_whatsapp')}</label>
-              <PhoneInput
-                countryCode={editPhoneCountry}
-                onCountryChange={setEditPhoneCountry}
-                value={editWhatsapp}
-                onChange={setEditWhatsapp}
-                placeholder="6 12 34 56 78"
-                className="min-h-[48px]"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ═══ EDIT MODE: CARD 2 — Hotel Info (white card, NEW) ═══ */}
-        {baggage && isEditing && (
-          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
-              <Building2 className="w-4 h-4" style={{ color: INK }} />
-              {i18n('hotelLabel', lang)}
-            </h2>
-
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelNameLabel', lang)}</label>
-              <input
-                type="text"
-                value={editHotelName}
-                onChange={(e) => setEditHotelName(e.target.value)}
-                placeholder="Hilton, Mövenpick..."
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelAddressLabel', lang)}</label>
-              <input
-                type="text"
-                value={editHotelAddress}
-                onChange={(e) => setEditHotelAddress(e.target.value)}
-                placeholder="Ibrahim Al Jafri Street, Mecca"
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('hotelPhoneLabel', lang)}</label>
-              <input
-                type="text"
-                value={editHotelPhone}
-                onChange={(e) => setEditHotelPhone(e.target.value)}
-                placeholder="+966 12 557 0000"
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('roomLabel', lang)}</label>
-              <input
-                type="text"
-                value={editRoomNumber}
-                onChange={(e) => setEditRoomNumber(e.target.value)}
-                placeholder="123"
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ═══ EDIT MODE: CARD 3 — Vol / Transport (white card, simplified — no mode selector) ═══ */}
-        {baggage && isEditing && (
-          <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ background: CARD_BG }}>
-            <h2 className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2" style={{ color: INK }}>
-              <span>{safeTransportMode(baggage.transportMode) === 'train' ? '🚂' : safeTransportMode(baggage.transportMode) === 'boat' ? '🚢' : safeTransportMode(baggage.transportMode) === 'bus' ? '🚌' : '✈️'}</span> {safeTransportMode(baggage.transportMode) === 'train' ? i18n('trainLabel', lang) : safeTransportMode(baggage.transportMode) === 'boat' ? i18n('boatLabel', lang) : safeTransportMode(baggage.transportMode) === 'bus' ? i18n('busLabel', lang) : i18n('flightLabel', lang)}
-            </h2>
-
-            {/* Airline */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('airlineLabel', lang)}</label>
-              <input
-                type="text"
-                value={editAirlineName}
-                onChange={(e) => setEditAirlineName(e.target.value)}
-                placeholder={t('transport.airline_placeholder')}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* Flight Number */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('flightNumLabel', lang)}</label>
-              <input
-                type="text"
-                value={editFlightNumber}
-                onChange={(e) => setEditFlightNumber(e.target.value)}
-                placeholder={t('transport.flight_number_placeholder')}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* Destination */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('destLabel', lang)}</label>
-              <input
-                type="text"
-                value={editDestination}
-                onChange={(e) => setEditDestination(e.target.value)}
-                placeholder={t('transport.common_destination_placeholder')}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* Departure Date */}
-            <div className="mb-3">
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{i18n('dateLabel', lang)}</label>
-              <input
-                type="date"
-                value={editDepartureDate}
-                onChange={(e) => setEditDepartureDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-
-            {/* Departure Time */}
-            <div>
-              <label className="text-xs font-medium mb-1 block" style={{ color: MUTED }}>{t('finder.edit_departure_time')}</label>
-              <input
-                type="time"
-                value={editDepartureTime}
-                onChange={(e) => setEditDepartureTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f4b400] focus:border-transparent transition-all min-h-[48px]"
-                style={{ background: INPUT_BG, color: INK, border: '1px solid #d1d5db' }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ═══ EDIT MODE: Action Buttons (Save + Cancel) ═══ */}
-        {isEditing && (
-          <div className="flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            {/* Save Button — primary dark blue */}
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="flex-1 py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
-              style={{ background: ACCENT }}
-            >
-              {isSaving ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>{t('finder.edit_saving')}</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5" />
-                  <span>{t('finder.edit_save')}</span>
-                </>
-              )}
-            </button>
-            {/* Cancel Button — white outline */}
-            <button
-              onClick={() => setIsEditing(false)}
-              disabled={isSaving}
-              className="flex-1 py-4 px-6 bg-white hover:bg-gray-50 disabled:opacity-50 border-2 border-black rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
-              style={{ color: INK }}
-            >
-              <span>{t('finder.edit_cancel')}</span>
-            </button>
-          </div>
-        )}
 
         {/* ═══ CTA + FINDER FORM (white card) ═══ */}
         <div className="w-full rounded-[18px] p-5 md:p-6 mb-4 shadow-lg" style={{ background: CARD_BG, animation: 'fadeInUp 0.4s ease forwards', animationDelay: '0.2s', opacity: 0 }}>

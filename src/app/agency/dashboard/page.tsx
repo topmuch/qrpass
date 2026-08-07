@@ -364,7 +364,7 @@ export default function AgencyDashboardPage() {
 
   // ─── Share OTP via Web Share API ───
   const shareOtp = async (otp: string, tripName: string) => {
-    const pwaLink = 'https://passhajj.qrbags.com/manager';
+    const pwaLink = typeof window !== 'undefined' ? `${window.location.origin}/manager` : 'https://passhajj.qrbags.com/manager';
     const shareData = {
       title: `Code OTP - ${tripName}`,
       text: `Assalamou Alaikoum,\n\nVoici votre code OTP pour le voyage « ${tripName} » :\n\n🔑 ${otp}\n\nEntrez ce code dans l'application PassHajj Manager pour accéder aux données du voyage.\n\n📲 Lien de l'application : ${pwaLink}\n\nCe code est valide 24h. Ne le partagez qu'avec les chefs de groupe.`,
@@ -498,7 +498,7 @@ export default function AgencyDashboardPage() {
                     variant="outline"
                     className="flex-1 gap-2"
                     onClick={() => {
-                      const pwaLink = 'https://passhajj.qrbags.com/manager';
+                      const pwaLink = typeof window !== 'undefined' ? `${window.location.origin}/manager` : 'https://passhajj.qrbags.com/manager';
                       copyToClipboard(pwaLink, 'Lien PWA');
                     }}
                   >

@@ -111,12 +111,13 @@ const IOS_STEPS: InstructionStep[] = [
 export default function PWAPage() {
   const [copied, setCopied] = useState(false);
 
-  /** PWA URL — fixed production URL for QR code */
+  /** PWA URL — uses current domain dynamically so QR code always works */
   const pwaUrl = useMemo(() => {
     if (typeof window !== 'undefined') {
       const envUrl = process.env.NEXT_PUBLIC_PWA_URL;
       if (envUrl) return envUrl;
-      return 'https://passhajj.qrbags.com/manager';
+      // Dynamically use the current origin so the QR code always points to the correct domain
+      return `${window.location.origin}/manager`;
     }
     return 'https://passhajj.qrbags.com/manager';
   }, []);

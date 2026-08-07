@@ -439,3 +439,27 @@ Stage Summary:
 - Photo error handling is React state-based (survives re-renders)
 - Address field removed from identity form and profile display
 - Backward compatible: serve-upload API falls back to `public/uploads/` for legacy files
+
+---
+Task ID: 3
+Agent: main
+Task: Fix QR code URL, replace green icon, remove Modifier button from scan page
+
+Work Log:
+- Fixed QR code URL: Changed all hardcoded `passhajj.qrbags.com/manager` URLs to use `window.location.origin + '/manager'` dynamically
+  - Updated: agence/application/page.tsx, agency/pwa/page.tsx, agence/voyages/page.tsx, agence/voyages/[id]/page.tsx, agency/dashboard/page.tsx
+  - Now the QR code always points to the current domain's /manager path
+- Replaced green CheckCircle icon above "Bagage trouvé" with a Luggage icon on Jaune (#f4b400) background
+  - Changed from `<CheckCircle>` in green circle to `<Luggage>` in brand Jaune circle
+- Removed the "Modifier" (Edit) button and all edit functionality from the scan page (/scan/[reference])
+  - Removed: isEditing, isSaving state and 20+ edit field states
+  - Removed: Pre-fill edit state useEffect
+  - Removed: handleSave function
+  - Removed: Modifier button from header
+  - Removed: 4 edit form card sections (Owner, Hotel, Transport, Action buttons)
+  - Removed: All `!isEditing` conditions from display cards (info always visible now)
+
+Stage Summary:
+- QR code URL now dynamic (window.location.origin) — works on any domain
+- Scan page header icon: Luggage 🧳 on Jaune background (brand-consistent)
+- Edit functionality fully removed from scan page (cleaner, simpler UX for finders)
