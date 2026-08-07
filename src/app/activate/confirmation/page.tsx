@@ -18,7 +18,7 @@ const WHATSAPP = '#25D366';
 const WHATSAPP_HOVER = '#128C7E';
 
 interface ConfirmationData {
-  type: 'baggage' | 'identity';
+  type: 'baggage' | 'identity' | 'passeport';
   code: string;
   firstName: string;
   lastName: string;
@@ -31,6 +31,11 @@ interface ConfirmationData {
   hotel: string;
   room: string;
   leaderPhone: string;
+  // Passeport-specific
+  passportNumber: string;
+  nationality: string;
+  hotelName: string;
+  hotelAddress: string;
   // Shared
   photo: string | null;
 }
@@ -149,6 +154,10 @@ function ConfirmationContent() {
             hotel: parsed.hotel || '',
             room: parsed.room || '',
             leaderPhone: parsed.leaderPhone || '',
+            passportNumber: parsed.passportNumber || '',
+            nationality: parsed.nationality || '',
+            hotelName: parsed.hotelName || '',
+            hotelAddress: parsed.hotelAddress || '',
             // Use base64 preview (photoPreview) as primary source — guaranteed to work without server request
             // Fall back to server photoUrl if no preview available
             photo: parsed.photoPreview || parsed.photoUrl || null,
@@ -162,7 +171,7 @@ function ConfirmationContent() {
 
   // 2️⃣ Fallback: URL search params
   if (!data) {
-    const type = (searchParams.get('type') || 'baggage') as 'baggage' | 'identity';
+    const type = (searchParams.get('type') || 'baggage') as 'baggage' | 'identity' | 'passeport';
     const code = searchParams.get('code') || '';
     const firstName = searchParams.get('firstName') || '';
     const lastName = searchParams.get('lastName') || '';
@@ -188,16 +197,23 @@ function ConfirmationContent() {
         hotel,
         room,
         leaderPhone,
+        passportNumber: searchParams.get('passportNumber') || '',
+        nationality: searchParams.get('nationality') || '',
+        hotelName: searchParams.get('hotelName') || '',
+        hotelAddress: searchParams.get('hotelAddress') || '',
         photo,
       };
     }
   }
 
   const isIdentity = data?.type === 'identity';
-  const productLabel = isIdentity ? 'Bracelet Identity' : 'Bagage';
+  const isPasseport = data?.type === 'passeport';
+  const productLabel = isIdentity ? 'Bracelet Identity' : isPasseport ? 'Sticker Passeport' : 'Bagage';
   const subtitle = isIdentity
     ? 'Votre bracelet est maintenant activé'
-    : 'Votre bagage est maintenant protégé';
+    : isPasseport
+      ? 'Votre sticker passeport est maintenant activé'
+      : 'Votre bagage est maintenant protégé';
 
   // WhatsApp share message
   const whatsappMessage = data
@@ -208,11 +224,18 @@ function ConfirmationContent() {
             `Pèlerin: ${data.firstName} ${data.lastName}\n` +
             `Groupe sanguin: ${data.bloodType || 'Non renseigné'}\n\n` +
             `Protégez vos proches aussi : passhajjj.qrbags.com`
-          : `✅ J'ai activé mon PassHajj Bagage !\n\n` +
-            `Code: ${data.code}\n` +
-            `Propriétaire: ${data.firstName} ${data.lastName}\n` +
-            `Vol: ${data.flight} - ${data.destination}\n\n` +
-            `Protégez vos bagages aussi : passhajjj.qrbags.com`
+          : isPasseport
+            ? `✅ J'ai activé mon Pass Passeport !\n\n` +
+              `Code: ${data.code}\n` +
+              `Propriétaire: ${data.firstName} ${data.lastName}\n` +
+              `Nationalité: ${data.nationality || 'Non renseignée'}\n` +
+              `Passeport: ${data.passportNumber || 'Non renseigné'}\n\n` +
+              `Protégez votre passeport aussi : passhajjj.qrbags.com`
+            : `✅ J'ai activé mon PassHajj Bagage !\n\n` +
+              `Code: ${data.code}\n` +
+              `Propriétaire: ${data.firstName} ${data.lastName}\n` +
+              `Vol: ${data.flight} - ${data.destination}\n\n` +
+              `Protégez vos bagages aussi : passhajjj.qrbags.com`
       )
     : '';
 
@@ -279,15 +302,35 @@ function ConfirmationContent() {
           </div>
           <div className="flex justify-between py-2.5 border-b border-gray-200">
             <span className="text-sm" style={{ color: MUTED }}>
-              {isIdentity ? 'Pèlerin' : 'Propriétaire'}
+              {isIdentity ? 'Pèlerin' : isPasseport ? 'Propriétaire' : 'Propriétaire'}
             </span>
             <span className="font-bold text-sm">
               {data.firstName} {data.lastName}
             </span>
           </div>
 
+          {/* Passeport-specific fields */}
+          {isPasseport && data.nationality && (
+            <div className="flex justify-between py-2.5 border-b border-gray-200">
+              <span className="text-sm" style={{ color: MUTED }}>Nationalité</span>
+              <span className="font-bold text-sm">{data.nationality}</span>
+            </div>
+          )}
+          {isPasseport && data.passportNumber && (
+            <div className="flex justify-between py-2.5 border-b border-gray-200">
+              <span className="text-sm" style={{ color: MUTED }}>N° Passeport</span>
+              <span className="font-mono font-bold text-sm">{data.passportNumber}</span>
+            </div>
+          )}
+          {isPasseport && data.hotelName && (
+            <div className="flex justify-between py-2.5 border-b border-gray-200">
+              <span className="text-sm" style={{ color: MUTED }}>Hôtel</span>
+              <span className="font-bold text-sm">{data.hotelName}</span>
+            </div>
+          )}
+
           {/* Baggage-specific fields */}
-          {!isIdentity && data.flight && (
+          {!isIdentity && !isPasseport && data.flight && (
             <div className="flex justify-between py-2.5 border-b border-gray-200">
               <span className="text-sm" style={{ color: MUTED }}>Vol</span>
               <span className="font-bold text-sm">
@@ -295,7 +338,7 @@ function ConfirmationContent() {
               </span>
             </div>
           )}
-          {!isIdentity && data.chefPhone && (
+          {!isIdentity && !isPasseport && data.chefPhone && (
             <div className="flex justify-between py-2.5">
               <span className="text-sm" style={{ color: MUTED }}>Contact Chef</span>
               <span className="font-bold text-sm">{data.chefPhone}</span>
@@ -327,7 +370,7 @@ function ConfirmationContent() {
         {data.photo && (
           <div className="mb-6 p-4 bg-gray-100 rounded-xl">
             <span className="text-xs block mb-2" style={{ color: MUTED }}>
-              {isIdentity ? '📸 Photo du Pèlerin' : '📸 Photo du bagage'}
+              {isIdentity ? '📸 Photo du Pèlerin' : isPasseport ? '📸 Photo du propriétaire' : '📸 Photo du bagage'}
             </span>
             {photoError ? (
               <div className="flex flex-col items-center justify-center py-6 text-gray-400">
@@ -337,9 +380,9 @@ function ConfirmationContent() {
             ) : (
               <img
                 src={data.photo}
-                alt={isIdentity ? 'Pèlerin' : 'Bagage'}
+                alt={isIdentity ? 'Pèlerin' : isPasseport ? 'Propriétaire' : 'Bagage'}
                 className={`max-w-full max-h-36 object-cover mx-auto ${
-                  isIdentity ? 'rounded-full w-32 h-32' : 'rounded-lg'
+                  isIdentity || isPasseport ? 'rounded-full w-32 h-32' : 'rounded-lg'
                 }`}
                 onError={() => setPhotoError(true)}
               />
@@ -360,6 +403,13 @@ function ConfirmationContent() {
               <li>En cas de malaise, les secours scanneront le bracelet</li>
               <li>Le chef de groupe recevra une alerte WhatsApp immédiate</li>
             </ul>
+          ) : isPasseport ? (
+            <ul className="ml-5 text-sm list-disc space-y-1.5" style={{ color: MUTED }}>
+              <li>Collez le sticker QR sur la couverture de votre passeport</li>
+              <li>Conservez ce code de référence : <strong className="text-black">{data.code}</strong></li>
+              <li>Si votre passeport est perdu, le trouveur scannera le QR</li>
+              <li>Vous recevrez une notification WhatsApp immédiate</li>
+            </ul>
           ) : (
             <ul className="ml-5 text-sm list-disc space-y-1.5" style={{ color: MUTED }}>
               <li>Collez l&apos;étiquette QR sur votre valise de façon visible</li>
@@ -372,13 +422,16 @@ function ConfirmationContent() {
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-3">
-          <Link
-            href={isIdentity ? `/p/${data.code}` : `/suivi/${data.code}`}
-            className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5"
-            style={{ background: BTN_PRIMARY }}
-          >
-            {isIdentity ? '👤 Voir mon profil' : '📊 Voir mon tableau de bord'}
-          </Link>
+          {/* Voir mon profil / tableau de bord — NOT shown for passeport */}
+          {!isPasseport && (
+            <Link
+              href={isIdentity ? `/p/${data.code}` : `/suivi/${data.code}`}
+              className="w-full py-4 rounded-[14px] text-white font-bold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5"
+              style={{ background: BTN_PRIMARY }}
+            >
+              {isIdentity ? '👤 Voir mon profil' : '📊 Voir mon tableau de bord'}
+            </Link>
+          )}
           <a
             href={whatsappHref}
             target="_blank"
