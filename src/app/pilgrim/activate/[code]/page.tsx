@@ -649,8 +649,8 @@ export default function PilgrimActivatePage() {
         <div className="mt-8 text-center">
           <p className="text-white/60 text-sm">
             Besoin d&apos;aide ? Contactez votre agence ou{' '}
-            <a href="mailto:contact@qrpass.com" className="text-white underline">
-              contact@qrpass.com
+            <a href="mailto:contact@qrbags.com" className="text-white underline">
+              contact@qrbags.com
             </a>
           </p>
         </div>

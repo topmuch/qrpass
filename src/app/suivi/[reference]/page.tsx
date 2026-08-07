@@ -727,7 +727,7 @@ export default function SuiviPage() {
   const supportBody = encodeURIComponent(
     `Bonjour, je rencontre un problème avec mon bagage ${reference}.\n\nDescription du problème :\n`
   );
-  const supportHref = `mailto:contact@passhajj.com?subject=${supportSubject}&body=${supportBody}`;
+  const supportHref = `mailto:contact@qrbags.com?subject=${supportSubject}&body=${supportBody}`;
 
   // Checklist CTA link
   const checklistHref = `/checklist?ref=${encodeURIComponent(reference)}&source=tracking_page`;

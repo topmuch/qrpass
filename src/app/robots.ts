@@ -25,7 +25,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://passhajj.com/sitemap.xml',
-    host: 'https://passhajj.com',
+    sitemap: 'https://passhajjj.qrbags.com/sitemap.xml',
+    host: 'https://passhajjj.qrbags.com',
   };
 }

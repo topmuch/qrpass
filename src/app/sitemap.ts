@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://passhajj.com';
+const BASE_URL = 'https://passhajjj.qrbags.com';
 
 // All public pages to index
 const PAGES = [

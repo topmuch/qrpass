@@ -147,8 +147,8 @@ function AProposContent() {
             </div>
             <div className="flex items-center justify-center gap-2">
               <span className="text-xl">✉️</span>
-              <a href="mailto:contact@qrpass.com" className="hover:text-[#1E40AF] transition-colors">
-                contact@qrpass.com
+              <a href="mailto:contact@qrbags.com" className="hover:text-[#1E40AF] transition-colors">
+                contact@qrbags.com
               </a>
             </div>
           </div>

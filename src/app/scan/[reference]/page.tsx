@@ -521,7 +521,7 @@ export default function ScanPage() {
     travelerName: string,
     baggageType: string
   ) => {
-    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://passhajj.com'}/suivi/${reference}`;
+    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://passhajjj.qrbags.com'}/suivi/${reference}`;
 
     // Extract owner's first name from full name
     const firstName = travelerName.split(' ')[0] || travelerName || '';

@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     // ─── Build absolute public URL ───
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    const host = request.headers.get('host') || 'passhajj.com';
+    const host = request.headers.get('host') || 'passhajjj.qrbags.com';
     const baseUrl = `${protocol}://${host}`;
     const publicUrl = buildPublicChecklistUrl(code, baseUrl);
 

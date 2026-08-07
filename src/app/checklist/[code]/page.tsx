@@ -542,7 +542,7 @@ export default function ChecklistViewPage() {
       </section>
 
       <footer className="bg-[#0f172a] text-[#2563eb] text-center py-3 mt-auto">
-        <p className="text-xs">PassHajj — Protection intelligente des bagages • passhajj.com</p>
+        <p className="text-xs">PassHajj — Protection intelligente des bagages • passhajjj.qrbags.com</p>
       </footer>
     </main>
   );

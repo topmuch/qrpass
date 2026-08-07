@@ -489,7 +489,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#1D4ED8]" />
-                contact@qrpass.com
+                contact@qrbags.com
               </li>
               <li className="flex items-center gap-2">
                 <MapPinned className="w-4 h-4 text-[#1D4ED8]" />

@@ -260,7 +260,7 @@ function generatePassengerReadme(
   lines.push('');
   lines.push('1. Imprimez chaque QR code sur une etiquette.');
   lines.push('2. Collez chaque etiquette sur le bagage correspondant.');
-  lines.push('3. Le voyageur active ses QR codes sur passhajj.com/activate');
+  lines.push('3. Le voyageur active ses QR codes sur passhajjj.qrbags.com/activate');
   lines.push('4. Si un bagage est perdu, le trouveur scanne le QR code');
   lines.push('   et le proprietaire recoit une notification WhatsApp.');
   lines.push('');

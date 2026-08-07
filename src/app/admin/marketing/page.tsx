@@ -769,7 +769,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
         ) : (
           <button
             onClick={() => {
-              window.location.href = getMailtoUrl('contact@qrpass.com', 'Renouvellement PassHajj', emailBody);
+              window.location.href = getMailtoUrl('contact@qrbags.com', 'Renouvellement PassHajj', emailBody);
             }}
             className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-medium transition-colors"
           >

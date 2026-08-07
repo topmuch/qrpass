@@ -7,7 +7,7 @@ const defaultSettings = {
   company_name: 'QRPass',
   company_address: 'Poissy, France',
   company_phone: '+33 7 45 34 93 39',
-  company_email: 'contact@qrpass.com',
+  company_email: 'contact@qrbags.com',
   company_logo: '',
   // SEO
   seo_title: 'QRPass - Protection intelligente des bagages',

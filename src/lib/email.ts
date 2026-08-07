@@ -54,7 +54,7 @@ export async function getEmailSettings(): Promise<EmailConfig | null> {
       // Return default console provider settings
       return {
         provider: 'console',
-        fromEmail: 'noreply@qrpass.com',
+        fromEmail: 'noreply@qrbags.com',
         fromName: 'QRPass',
         smtpEncryption: 'tls',
       };
@@ -111,7 +111,7 @@ export async function saveEmailSettings(config: Partial<EmailConfig>): Promise<E
       const created = await prisma.emailSettings.create({
         data: {
           provider: config.provider || 'console',
-          fromEmail: config.fromEmail || 'noreply@qrpass.com',
+          fromEmail: config.fromEmail || 'noreply@qrbags.com',
           fromName: config.fromName || 'QRPass',
           recipientEmail: config.recipientEmail || null,
           smtpHost: config.smtpHost,
@@ -806,7 +806,7 @@ export function getChecklistEmailTemplate(data: ChecklistEmailData): { html: str
   <!-- Footer -->
   <div style="background: #1a1a1a; padding: 16px 24px; border-radius: 0 0 12px 12px; border: 2px solid #1a1a1a; border-top: none;">
     <div style="color: #c5a643; font-size: 12px; font-weight: bold;">QRPass — Protection intelligente des bagages</div>
-    <div style="color: #999; font-size: 11px; margin-top: 4px;">passhajj.com • Document protégé par le protocole de certification QRPass</div>
+    <div style="color: #999; font-size: 11px; margin-top: 4px;">passhajjj.qrbags.com • Document protégé par le protocole de certification QRPass</div>
   </div>
 
 </body>
@@ -841,7 +841,7 @@ Comment utiliser votre attestation :
 Conservez précieusement cet email. Il constitue votre preuve d'inventaire en cas de litige.
 
 — L'équipe QRPass
-passhajj.com
+passhajjj.qrbags.com
 `.trim();
 
   return { html, text };

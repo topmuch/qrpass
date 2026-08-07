@@ -253,7 +253,7 @@ export default function ParametresPage() {
   
   const [emailSettings, setEmailSettings] = useState<EmailSettingsData>({
     provider: 'console',
-    fromEmail: 'noreply@qrpass.com',
+    fromEmail: 'noreply@qrbags.com',
     fromName: 'PassHajj',
     recipientEmail: null,
     smtpHost: null,

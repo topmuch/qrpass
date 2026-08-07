@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   description: "PassHajj protège vos bagages et votre identité pendant le Hajj et l'Omrah. Étiquette QR code pour valises, bracelet d'urgence pour pèlerins à la Mecque et Médine. Sans application, sans batterie. Utilisé dans 45+ pays : Sénégal, Mali, Maroc, Algérie, Tunisie, Guinée, Côte d'Ivoire, Cameroun, Burkina Faso, Niger, Tchad, RDC, Congo, Bénin, Togo, Gabon, Mauritanie, Comores, Djibouti, Rwanda, Burundi, Haïti, France, Belgique, Suisse, Canada, Luxembourg, Monaco.",
   keywords: [
     // Core brand & product
-    "PassHajj", "pass hajj", "passhajj.com",
+    "PassHajj", "pass hajj", "passhajjj.qrbags.com",
     // Hajj & Omrah keywords
     "hajj", "haj", "hadj", "omrah", "omra", "umrah", "pélerinage", "pèlerinage",
     "mecque", "la mecque", "makkah", "médine", "medine", "madinah",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   authors: [{ name: "PassHajj Team" }, { name: "MMASOLUTION" }],
   creator: "MMASOLUTION",
   publisher: "PassHajj",
-  metadataBase: new URL("https://passhajj.com"),
+  metadataBase: new URL("https://passhajjj.qrbags.com"),
 
   // PWA Icons
   icons: {
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PassHajj – Protection bagages & pèlerins pour le Hajj et l'Omrah",
     description: "Étiquette QR code pour valises et bracelet d'urgence pour pèlerins à la Mecque. Protégez vos bagages et vos proches pendant le Hajj & Omrah. Sans application. Sans batterie. 850+ agences dans 45 pays.",
-    url: "https://passhajj.com",
+    url: "https://passhajjj.qrbags.com",
     siteName: "PassHajj",
     type: "website",
     locale: "fr_FR",
@@ -153,26 +153,26 @@ export const metadata: Metadata = {
 
   // Alternates — canonical + hreflang for francophone countries
   alternates: {
-    canonical: "https://passhajj.com",
+    canonical: "https://passhajjj.qrbags.com",
     languages: {
-      "fr": "https://passhajj.com",
-      "fr-sn": "https://passhajj.com",
-      "fr-ml": "https://passhajj.com",
-      "fr-ma": "https://passhajj.com",
-      "fr-dz": "https://passhajj.com",
-      "fr-tn": "https://passhajj.com",
-      "fr-ci": "https://passhajj.com",
-      "fr-cm": "https://passhajj.com",
-      "fr-bf": "https://passhajj.com",
-      "fr-gn": "https://passhajj.com",
-      "fr-ht": "https://passhajj.com",
-      "fr-fr": "https://passhajj.com",
-      "fr-be": "https://passhajj.com",
-      "fr-ch": "https://passhajj.com",
-      "fr-ca": "https://passhajj.com",
-      "en": "https://passhajj.com",
-      "ar": "https://passhajj.com",
-      "x-default": "https://passhajj.com",
+      "fr": "https://passhajjj.qrbags.com",
+      "fr-sn": "https://passhajjj.qrbags.com",
+      "fr-ml": "https://passhajjj.qrbags.com",
+      "fr-ma": "https://passhajjj.qrbags.com",
+      "fr-dz": "https://passhajjj.qrbags.com",
+      "fr-tn": "https://passhajjj.qrbags.com",
+      "fr-ci": "https://passhajjj.qrbags.com",
+      "fr-cm": "https://passhajjj.qrbags.com",
+      "fr-bf": "https://passhajjj.qrbags.com",
+      "fr-gn": "https://passhajjj.qrbags.com",
+      "fr-ht": "https://passhajjj.qrbags.com",
+      "fr-fr": "https://passhajjj.qrbags.com",
+      "fr-be": "https://passhajjj.qrbags.com",
+      "fr-ch": "https://passhajjj.qrbags.com",
+      "fr-ca": "https://passhajjj.qrbags.com",
+      "en": "https://passhajjj.qrbags.com",
+      "ar": "https://passhajjj.qrbags.com",
+      "x-default": "https://passhajjj.qrbags.com",
     },
   },
 
@@ -264,8 +264,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "PassHajj",
-              "url": "https://passhajj.com",
-              "logo": "https://passhajj.com/logo.png",
+              "url": "https://passhajjj.qrbags.com",
+              "logo": "https://passhajjj.qrbags.com/logo.png",
               "description": "PassHajj protège vos bagages et votre identité pendant le Hajj et l'Omrah. Étiquette QR code pour valises, bracelet d'urgence pour pèlerins.",
               "foundingDate": "2024",
               "founder": {
@@ -329,10 +329,10 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "PassHajj",
-              "url": "https://passhajj.com",
+              "url": "https://passhajjj.qrbags.com",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://passhajj.com/?q={search_term_string}",
+                "target": "https://passhajjj.qrbags.com/?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               },
               "inLanguage": ["fr", "en", "ar"]

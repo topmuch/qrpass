@@ -22,7 +22,7 @@ export default function MentionsLegales() {
               <p>
                 <strong>Siège social :</strong> Poissy, France<br />
                 <strong>Téléphone :</strong> [numéro de téléphone]<br />
-                <strong>Email :</strong> contact@qrpass.com<br />
+                <strong>Email :</strong> contact@qrbags.com<br />
                 <strong>Directeur de la publication :</strong> [Nom du directeur]
               </p>
             </section>
@@ -50,7 +50,7 @@ export default function MentionsLegales() {
                 Les informations concernant la collecte et le traitement des données personnelles sont détaillées dans notre <a href="/confidentialite" className="text-[#b8860b] hover:underline">Politique de confidentialité</a>.
               </p>
               <p>
-                Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos données personnelles. Pour exercer ces droits, vous pouvez nous contacter à : contact@qrpass.com.
+                Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos données personnelles. Pour exercer ces droits, vous pouvez nous contacter à : contact@qrbags.com.
               </p>
             </section>
 
@@ -84,7 +84,7 @@ export default function MentionsLegales() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">8. Contact</h2>
               <p>
-                Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à : <a href="mailto:contact@qrpass.com" className="text-[#b8860b] hover:underline">contact@qrpass.com</a>
+                Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à : <a href="mailto:contact@qrbags.com" className="text-[#b8860b] hover:underline">contact@qrbags.com</a>
               </p>
             </section>
           </div>

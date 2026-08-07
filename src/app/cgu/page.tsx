@@ -146,7 +146,7 @@ export default function CGU() {
                 Les données personnelles collectées par PassHajj sont traitées conformément à notre <a href="/confidentialite" className="text-[#b8860b] hover:underline">Politique de confidentialité</a> et dans le respect du Règlement Général sur la Protection des Données (RGPD).
               </p>
               <p>
-                Pour toute question relative à vos données personnelles, contactez-nous à : contact@qrpass.com
+                Pour toute question relative à vos données personnelles, contactez-nous à : contact@qrbags.com
               </p>
             </section>
 
@@ -182,7 +182,7 @@ export default function CGU() {
                 Pour toute question relative aux présentes CGU, vous pouvez nous contacter :
               </p>
               <p>
-                <strong>Email :</strong> <a href="mailto:contact@qrpass.com" className="text-[#b8860b] hover:underline">contact@qrpass.com</a><br />
+                <strong>Email :</strong> <a href="mailto:contact@qrbags.com" className="text-[#b8860b] hover:underline">contact@qrbags.com</a><br />
                 <strong>Adresse :</strong> Poissy, France
               </p>
             </section>

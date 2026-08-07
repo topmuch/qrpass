@@ -71,9 +71,9 @@ interface ChatResponse {
 // ═══════════════════════════════════════════════════════
 
 const FALLBACK_RESPONSES: Record<Language, string> = {
-  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : info@passhajj.com',
-  en: 'I am experiencing a technical issue. Please contact support: info@passhajj.com',
-  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: info@passhajj.com',
+  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : contact@qrbags.com',
+  en: 'I am experiencing a technical issue. Please contact support: contact@qrbags.com',
+  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: contact@qrbags.com',
 };
 
 // ═══════════════════════════════════════════════════════
@@ -81,7 +81,7 @@ const FALLBACK_RESPONSES: Record<Language, string> = {
 // ═══════════════════════════════════════════════════════
 
 function buildSystemPrompt(locale: Language): string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passhajj.com';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passhajjj.qrbags.com';
 
   const prompts: Record<Language, string> = {
     fr: `Tu es l'assistant QRPass, un agent de support intelligent sur la page d'accueil. Réponds en français, de façon concise (max 3 phrases) et empathique. Tu connais TOUT sur QRPass.
@@ -90,7 +90,7 @@ function buildSystemPrompt(locale: Language): string {
 • Nom : QRPass — édité par MMASOLUTION
 • Siège social : 43 Rue Maryse Bastié, 78300 Poissy, France
 • Origine : Né à Dakar (Sénégal), déployé dans 15 pays
-• Site web : https://passhajj.com
+• Site web : https://passhajjj.qrbags.com
 • Mission : Protection intelligente des bagages pour voyageurs et pèlerins
 • Résaux sociaux : facebook.com/qrpass | instagram.com/qrpass | twitter.com/qrpass
 • Stats : +10 000 bagages protégés, +500 agences partenaires, 98% de taux de récupération
@@ -135,8 +135,8 @@ function buildSystemPrompt(locale: Language): string {
 • Devis personnalisé sous 24h : ${appUrl}/devenir-partenaire
 
 🆘 CONTACT & SAV :
-• Email général : contact@qrpass.com
-• Email SAV : info@passhajj.com
+• Email général : contact@qrbags.com
+• Email SAV : contact@qrbags.com
 • Téléphone : +33 7 45 34 93 39
 • WhatsApp principal : +33 7 45 34 93 39 → https://wa.me/33745349339
 • WhatsApp SAV : +221 78 4858226 → https://wa.me/221784858226
@@ -150,7 +150,7 @@ RÈGLES :
 - Ne jamais inventer d'info non présente dans cette base de connaissances.
 - Ne jamais donner de conseil juridique ou médical.
 - Si l'utilisateur demande un lien de suivi, demande-lui sa référence QR (format: VOL26-XXXXXX).
-- IMPORTANT LIENS : Quand tu mentionnes une page du site (suivi, inscription, contact, etc.), donne TOUJOURS l'URL COMPLETE avec https://. Exemples : https://passhajj.com/inscrire , https://passhajj.com/contact , https://passhajj.com/suivi/VOL26-XXXXXX. Ne donne JAMAIS un chemin partiel comme "/inscrire" seul.`,
+- IMPORTANT LIENS : Quand tu mentionnes une page du site (suivi, inscription, contact, etc.), donne TOUJOURS l'URL COMPLETE avec https://. Exemples : https://passhajjj.qrbags.com/inscrire , https://passhajjj.qrbags.com/contact , https://passhajjj.qrbags.com/suivi/VOL26-XXXXXX. Ne donne JAMAIS un chemin partiel comme "/inscrire" seul.`,
 
     en: `You are the QRPass assistant, an intelligent support agent on the landing page. Respond in English, concisely (max 3 sentences) and empathetically. You know EVERYTHING about QRPass.
 
@@ -158,7 +158,7 @@ RÈGLES :
 • Name: QRPass — published by MMASOLUTION
 • Headquarters: 43 Rue Maryse Bastié, 78300 Poissy, France
 • Origin: Born in Dakar (Senegal), deployed in 15 countries
-• Website: https://passhajj.com
+• Website: https://passhajjj.qrbags.com
 • Mission: Intelligent baggage protection for travelers and pilgrims
 • Social media: facebook.com/qrpass | instagram.com/qrpass | twitter.com/qrpass
 • Stats: 10,000+ bags protected, 500+ partner agencies, 98% recovery rate
@@ -203,8 +203,8 @@ RÈGLES :
 • Personalized quote within 24h: ${appUrl}/devenir-partenaire
 
 🆘 CONTACT & SUPPORT:
-• General email: contact@qrpass.com
-• Support email: info@passhajj.com
+• General email: contact@qrbags.com
+• Support email: contact@qrbags.com
 • Phone: +33 7 45 34 93 39
 • Main WhatsApp: +33 7 45 34 93 39 → https://wa.me/33745349339
 • Support WhatsApp: +221 78 4858226 → https://wa.me/221784858226
@@ -218,7 +218,7 @@ RULES:
 - Never invent info not in this knowledge base.
 - Never give legal or medical advice.
 - If the user asks for a tracking link, ask for their QR reference (format: VOL26-XXXXXX).
-- IMPORTANT LINKS: When mentioning a site page (tracking, signup, contact, etc.), ALWAYS provide the FULL URL with https://. Examples: https://passhajj.com/inscrire , https://passhajj.com/contact , https://passhajj.com/suivi/VOL26-XXXXXX. NEVER give a partial path like "/inscrire" alone.`,
+- IMPORTANT LINKS: When mentioning a site page (tracking, signup, contact, etc.), ALWAYS provide the FULL URL with https://. Examples: https://passhajjj.qrbags.com/inscrire , https://passhajjj.qrbags.com/contact , https://passhajjj.qrbags.com/suivi/VOL26-XXXXXX. NEVER give a partial path like "/inscrire" alone.`,
 
     ar: `أنت مساعد QRPass، وكيل دعم ذكي على الصفحة الرئيسية. أجب باللغة العربية، بطريقة موجزة (بحد أقصى 3 جمل) وبلطف. تعرف كل شيء عن QRPass.
 
@@ -226,7 +226,7 @@ RULES:
 • الاسم: QRPass — تصدرها شركة MMASOLUTION
 • المقر الرئيسي: 43 Rue Maryse Bastié، 78300 بواسي، فرنسا
 • المنشأ: ولدت في داكار (السنغال)، منتشرة في 15 دولة
-• الموقع: https://passhajj.com
+• الموقع: https://passhajjj.qrbags.com
 • المهمة: حماية ذكية للأمتعة للمسافرين والحجاج
 • وسائل التواصل: facebook.com/qrpass | instagram.com/qrpass | twitter.com/qrpass
 • إحصائيات: أكثر من 10,000 حقيبة محمية، أكثر من 500 وكالة شريكة، نسبة استرداد 98%
@@ -271,8 +271,8 @@ RULES:
 • عرض أسعار مخصص خلال 24 ساعة: ${appUrl}/devenir-partenaire
 
 🆘 الاتصال والدعم:
-• البريد العام: contact@qrpass.com
-• بريد الدعم: info@passhajj.com
+• البريد العام: contact@qrbags.com
+• بريد الدعم: contact@qrbags.com
 • الهاتف: +33 7 45 34 93 39
 • واتساب رئيسي: +33 7 45 34 93 39 → https://wa.me/33745349339
 • واتساب الدعم: +221 78 4858226 → https://wa.me/221784858226
@@ -286,7 +286,7 @@ RULES:
 • لا تخترع أبداً معلومات غير موجودة في قاعدة المعرفة.
 • لا تقدم نصيحة قانونية أو طبية.
 • إذا طلب المستخدم رابط تتبع، اطلب منه مرجع QR (الصيغة: VOL26-XXXXXX).
-• مهم روابط: عند ذكر صفحة الموقع، ضع دائماً الرابط الكامل مع https://. أمثلة: https://passhajj.com/inscrire , https://passhajj.com/contact. لا تضع مساراً جزئياً.`,
+• مهم روابط: عند ذكر صفحة الموقع، ضع دائماً الرابط الكامل مع https://. أمثلة: https://passhajjj.qrbags.com/inscrire , https://passhajjj.qrbags.com/contact. لا تضع مساراً جزئياً.`,
   };
 
   return prompts[locale] || prompts.fr;
@@ -434,7 +434,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // ─── 3. Detect tracking request BEFORE calling Groq ───
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passhajj.com';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://passhajjj.qrbags.com';
     const trackingResult = detectTrackingRequest(sanitizedQuestion, locale);
 
     if (trackingResult?.type === 'link') {

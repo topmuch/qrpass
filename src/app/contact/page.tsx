@@ -92,7 +92,7 @@ function ContactContent() {
 
             {/* Email */}
             <a
-              href="mailto:contact@qrpass.com"
+              href="mailto:contact@qrbags.com"
               className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
             >
               <div style={{ background: `${GOLD}15`, width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -174,7 +174,7 @@ function ContactContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Site web</h3>
-                  <p className="text-gray-500 text-sm">passhajj.com</p>
+                  <p className="text-gray-500 text-sm">passhajjj.qrbags.com</p>
                 </div>
               </div>
 

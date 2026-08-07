@@ -207,12 +207,12 @@ function ConfirmationContent() {
             `Code: ${data.code}\n` +
             `Pèlerin: ${data.firstName} ${data.lastName}\n` +
             `Groupe sanguin: ${data.bloodType || 'Non renseigné'}\n\n` +
-            `Protégez vos proches aussi : passhajj.com`
+            `Protégez vos proches aussi : passhajjj.qrbags.com`
           : `✅ J'ai activé mon PassHajj Bagage !\n\n` +
             `Code: ${data.code}\n` +
             `Propriétaire: ${data.firstName} ${data.lastName}\n` +
             `Vol: ${data.flight} - ${data.destination}\n\n` +
-            `Protégez vos bagages aussi : passhajj.com`
+            `Protégez vos bagages aussi : passhajjj.qrbags.com`
       )
     : '';
 

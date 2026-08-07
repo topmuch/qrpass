@@ -11,7 +11,7 @@ interface SocialShareProps {
   lang: string;
 }
 
-const QRPASS_URL = 'https://passhajj.com';
+const QRPASS_URL = 'https://passhajjj.qrbags.com';
 
 function getShareText(props: SocialShareProps): string {
   const { reference, scanCount, lastCity, lastCountry, status, lang } = props;

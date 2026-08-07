@@ -138,7 +138,7 @@ export async function generateChecklistPdf(data: ChecklistPdfData): Promise<Buff
   }
 
   // ─── Generate QR code as PNG buffer ───
-  const qrBuffer = await QRCode.toBuffer(data.publicUrl || 'https://passhajj.com', {
+  const qrBuffer = await QRCode.toBuffer(data.publicUrl || 'https://passhajjj.qrbags.com', {
     type: 'png',
     width: 200,
     margin: 1,
@@ -432,7 +432,7 @@ export async function generateChecklistPdf(data: ChecklistPdfData): Promise<Buff
   page.drawText('QRPass — Protection intelligente des bagages', {
     x: margin, y: footerY + 28, size: 9, font: fontBold, color: yellow,
   });
-  const footerLine = `Document protégé par le protocole de certification QRPass • Généré le ${formatTimestamp(createdAt)} • passhajj.com`;
+  const footerLine = `Document protégé par le protocole de certification QRPass • Généré le ${formatTimestamp(createdAt)} • passhajjj.qrbags.com`;
   page.drawText(footerLine, {
     x: margin, y: footerY + 14, size: 7, font: fontRegular, color: rgb(0.8, 0.8, 0.8),
   });
@@ -450,6 +450,6 @@ export async function generateChecklistPdf(data: ChecklistPdfData): Promise<Buff
  * Uses NEXT_PUBLIC_BASE_URL if set, otherwise derives from request headers.
  */
 export function buildPublicChecklistUrl(code: string, baseUrl?: string): string {
-  const base = baseUrl || process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://passhajj.com';
+  const base = baseUrl || process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://passhajjj.qrbags.com';
   return `${base.replace(/\/$/, '')}/checklist/${code}`;
 }
