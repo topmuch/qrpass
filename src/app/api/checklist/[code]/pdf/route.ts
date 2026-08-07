@@ -68,7 +68,7 @@ export async function GET(
 
     // ─── Build public URL for QR code in PDF ───
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    const host = request.headers.get('host') || 'qrpasss.com';
+    const host = request.headers.get('host') || 'passhajj.com';
     const publicUrl = buildPublicChecklistUrl(checklist.code, `${protocol}://${host}`);
 
     // ─── Generate PDF ───

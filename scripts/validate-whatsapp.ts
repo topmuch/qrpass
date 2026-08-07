@@ -7,7 +7,7 @@
  *   ✅ Message généré sans crash
  *   ✅ Longueur ≤ 400 caractères
  *   ✅ Présence du formatage WhatsApp (*gras*, `monospace`)
- *   ✅ Lien de suivi qrpasss.com/suivi/[REF] présent
+ *   ✅ Lien de suivi passhajj.com/suivi/[REF] présent
  *   ✅ Icône du mode de transport présente
  *   ✅ Icône du contexte présente
  *   ✅ Signature QRPass présente
@@ -113,7 +113,7 @@ function runTest(mode: string, context: string, locale: string): TestResult {
     errors.push('❌ Pas de formatage `monospace`');
   }
 
-  // CHECK 5: Tracking link (localhost ou qrpasss.com selon env)
+  // CHECK 5: Tracking link (localhost ou passhajj.com selon env)
   if (message.includes('/suivi/VOL26-TEST99')) {
     checks.push('✅ Lien suivi présent');
   } else {

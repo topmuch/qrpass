@@ -339,7 +339,7 @@ function ChecklistPageContent() {
         </section>
 
         <footer className="bg-slate-900 text-slate-300 text-center py-3 mt-auto">
-          <p className="text-xs">PassHajj — Protection intelligente des bagages • qrpasss.com</p>
+          <p className="text-xs">PassHajj — Protection intelligente des bagages • passhajj.com</p>
         </footer>
       </main>
     );
@@ -774,7 +774,7 @@ function ChecklistPageContent() {
       </section>
 
       <footer className="bg-slate-900 text-slate-300 text-center py-3 mt-auto">
-        <p className="text-xs">PassHajj — Protection intelligente des bagages • qrpasss.com</p>
+        <p className="text-xs">PassHajj — Protection intelligente des bagages • passhajj.com</p>
       </footer>
     </main>
   );

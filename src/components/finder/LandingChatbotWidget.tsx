@@ -56,10 +56,10 @@ export default function LandingChatbotWidget() {
     : ['كيف أفعّل رمز QR الخاص بي؟', 'أين حقيبتي؟', 'ما هي الأسعار؟', 'كيف يعمل؟'];
 
   const errorMessage = lang === 'fr'
-    ? 'Je rencontre un problème technique. Contactez le SAV : info@qrpasss.com'
+    ? 'Je rencontre un problème technique. Contactez le SAV : info@passhajj.com'
     : lang === 'en'
-    ? 'I am experiencing a technical issue. Contact support: info@qrpasss.com'
-    : 'أواجه مشكلة تقنية. تواصل مع الدعم: info@qrpasss.com';
+    ? 'I am experiencing a technical issue. Contact support: info@passhajj.com'
+    : 'أواجه مشكلة تقنية. تواصل مع الدعم: info@passhajj.com';
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -175,7 +175,7 @@ export default function LandingChatbotWidget() {
       );
     }
 
-    // Standard URLs (qrpasss.com, etc.) — render text + clickable link buttons
+    // Standard URLs (passhajj.com, etc.) — render text + clickable link buttons
     let textContent = content;
     uniqueUrls.forEach(link => {
       textContent = textContent.replace(link, '');

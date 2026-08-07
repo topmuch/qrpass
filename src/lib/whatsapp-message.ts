@@ -14,7 +14,7 @@
  *   [EMOJI_CONTEXT + TITRE_CONTEXT]
  *   🧳 [REFERENCE] • [BAG_TYPE]
  *   [TRANSPORT_ICON] [CARRIER] [VEHICLE] • [DESTINATION]
- *   👉 Voir le bagage localisé : qrpasss.com/suivi/[REF]
+ *   👉 Voir le bagage localisé : passhajj.com/suivi/[REF]
  *   👤 [FINDER_NAME]
  *   📱 [FINDER_WHATSAPP]
  *   [CALL_TO_ACTION_CONTEXT]
@@ -23,7 +23,7 @@
  * Contraintes:
  *   - Max 400 caractères (limite wa.me pre-filled)
  *   - Formatage WhatsApp (*gras*, `monospace`)
- *   - Lien court qrpasss.com/suivi/[REF]
+ *   - Lien court passhajj.com/suivi/[REF]
  *   - i18n FR/EN/AR
  *   - Fallbacks robustes (pas de crash si champ manquant)
  *   - Logging discret
@@ -275,7 +275,7 @@ function smartTruncate(message: string, maxChars: number, locale: WhatsAppLocale
 
   // Retirer CTA (ligne qui commence par ⏰ ou 👉 et N'EST PAS "Voir le bagage")
   for (let i = lines.length - 1; i >= 0; i--) {
-    if ((lines[i].startsWith('⏰') || (lines[i].startsWith('👉') && !lines[i].includes('qrpasss.com')))) {
+    if ((lines[i].startsWith('⏰') || (lines[i].startsWith('👉') && !lines[i].includes('passhajj.com')))) {
       lines.splice(i, 1);
       truncated = true;
       break;
@@ -374,7 +374,7 @@ export function generatePreFilledMessage(params: PreFilledMessageParams): string
   // ─── Step 5: Assemble all lines ───
   const appUrl = process.env.NEXT_PUBLIC_APP_URL
     ? process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
-    : 'https://qrpasss.com';
+    : 'https://passhajj.com';
   const sanitizedRef = sanitize(baggage.reference);
 
   const lines: string[] = [];
