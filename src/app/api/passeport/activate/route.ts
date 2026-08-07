@@ -54,6 +54,10 @@ export async function POST(request: NextRequest) {
     const returnDate = fields.returnDate?.trim();
     const notes = fields.notes?.trim();
     const photoUrl = fields.photoUrl?.trim();
+    const hotelName = fields.hotelName?.trim();
+    const hotelAddress = fields.hotelAddress?.trim();
+    const hotelPhone = fields.hotelPhone?.trim();
+    const expirationDate = fields.expirationDate?.trim();
 
     // ── Validate required fields ──
     if (!qrCode) {
@@ -136,6 +140,10 @@ export async function POST(request: NextRequest) {
     if (returnDate) updateData.returnDate = returnDate;
     if (notes) updateData.notes = notes;
     if (photoUrl !== undefined) updateData.photoUrl = photoUrl || null;
+    if (hotelName) updateData.hotelName = hotelName;
+    if (hotelAddress) updateData.hotelAddress = hotelAddress;
+    if (hotelPhone) updateData.hotelPhone = hotelPhone;
+    if (expirationDate) updateData.expirationDate = expirationDate;
 
     // ── Update the passport ──
     const updated = await db.passport.update({
@@ -169,6 +177,10 @@ export async function POST(request: NextRequest) {
           travelDate: updated.travelDate,
           returnDate: updated.returnDate,
           notes: updated.notes,
+          hotelName: updated.hotelName,
+          hotelAddress: updated.hotelAddress,
+          hotelPhone: updated.hotelPhone,
+          expirationDate: updated.expirationDate,
           isActive: updated.isActive,
           status: updated.status,
           duration: updated.duration,

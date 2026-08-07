@@ -780,6 +780,10 @@ model Passport {
   travelDate       String?  // Travel/departure date
   returnDate       String?  // Return date
   notes            String?  // Additional notes
+  hotelName        String?  // Hotel name (e.g., "ALSHAHBA ALFAIHA HOTEL")
+  hotelAddress     String?  // Hotel address
+  hotelPhone       String?  // Hotel phone number
+  expirationDate   String?  // Passport expiration date
   isActive         Boolean  @default(false) // Activated by owner
   status           String   @default("pending_activation") // "pending_activation" | "active" | "lost" | "found" | "blocked"
   duration         String   @default("1y") // "30d" | "1y"

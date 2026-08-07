@@ -463,3 +463,88 @@ Stage Summary:
 - QR code URL now dynamic (window.location.origin) — works on any domain
 - Scan page header icon: Luggage 🧳 on Jaune background (brand-consistent)
 - Edit functionality fully removed from scan page (cleaner, simpler UX for finders)
+
+---
+Task ID: 4
+Agent: full-stack-developer
+Task: Rewrite passport activation page
+
+Work Log:
+- Read identity activation page (/src/app/activate/identity/page.tsx) as design template
+- Read current passport page (/src/app/activate/passeport/page.tsx) to understand existing implementation
+- Cloned identity page structure and adapted for passport-specific fields
+- Restructured to 3-step flow: Step 1 (Identité & Passeport), Step 2 (Contact & Hôtel), Step 3 (Confirmation)
+- Merged previous Step 2 (Contact) and Step 3 (Hôtel) into single Step 2 (Contact & Hôtel)
+- Added Step 3 as a review/confirmation step with summary cards and edit buttons
+- Fixed API payload to send correct field names: qrCode, fullName, firstName, lastName, nationality, passportNumber, expirationDate, whatsapp, hotelName, hotelAddress, hotelPhone, photoUrl
+- Computed fullName as firstName + ' ' + lastName
+- Added nationality dropdown with search/filter using COUNTRIES from @/lib/phone
+- Added "Déposer à l'hôtel" Google Maps button using hotelName + hotelAddress in query
+- Used PhoneInput component for WhatsApp and hotel phone numbers
+- Kept green theme BG = '#059669' matching identity page
+- Used Suspense wrapper around content component (same pattern as identity)
+- QR code comes from searchParams.get('code')
+- Photo upload to /api/pilgrims/upload-photo first, then uses returned photoUrl
+- Removed identity-specific fields (bloodType, city, roomNumber, allergies, diseases, medicalInfo)
+- Confirmation step shows photo+name header, identity summary, and contact/hotel summary with edit buttons
+- Dev server compiles successfully, no lint errors in passport page
+
+Stage Summary:
+- Rewrote /src/app/activate/passeport/page.tsx
+- Key changes: 3-step flow (Identité & Passeport → Contact & Hôtel → Confirmation), merged contact+hotel into single step, added confirmation/review step, fixed API payload field names, added Google Maps button with hotelName+hotelAddress, used nationality search dropdown with required validation, used green theme consistent with identity page
+
+---
+Task ID: 5
+Agent: full-stack-developer
+Task: Rewrite scan-passeport page with UX improvements
+
+Work Log:
+- Read existing scan-passeport/[qrCode]/page.tsx (1152 lines)
+- Read worklog.md for context from previous tasks
+- Updated PassportData interface: added hotelName, hotelAddress, hotelPhone, expirationDate fields
+- Added comprehensive translations object with FR/AR/WO keys for all UI text elements
+- Added LanguageSelector component (FR | AR | WO toggle buttons in header)
+- Added language state with RTL support (dir="rtl" when Arabic selected)
+- Added security question step before Signaler form (hotel name verification with case-insensitive partial match)
+- Added certification stamp badge next to Passeport badge in header (ShieldCheck icon, green bg)
+- Added bottom certification messages ("Service agréé par l'Autorité saoudienne du Hajj" + "Données cryptées – conformité RGPD")
+- Added golden gradient header: linear-gradient(180deg, #D4AF37 0%, #059669 60%)
+- Added Bismillah message at very top ("بسم الله الرحمن الرحيم" in subtle style)
+- Added religious blessing at bottom ("Que cette rencontre soit bénie par le Tout-Puissant 🤲")
+- Added expiration date display with "Valide jusqu'au DD/MM/YYYY" format
+- Updated hotel section to use dedicated hotelName, hotelAddress, hotelPhone fields
+- Hotel phone shown as callable link (tel:)
+- "Déposer à l'hôtel" button opens Google Maps with hotelName + hotelAddress
+- "Appeler l'hôtel" button uses tel:hotelPhone if available, shows phone number
+- Changed "Contacter le propriétaire" to "Envoyer un message (WhatsApp)"
+- Added MapPin icon next to "Déposer à l'hôtel" button
+- Added backup QR code at bottom using qrcode library (QRCode.toDataURL)
+- QR code encodes current page URL with "Scanner pour accéder à cette page" text
+- Added ShieldCheck and Lock lucide icons imports
+- Verified no lint errors in the page
+- Dev server compiles successfully
+
+Stage Summary:
+- Rewrote /src/app/scan-passeport/[qrCode]/page.tsx
+- Key changes: Security & Trust (certification stamps, security question before form, expiration date, RGPD badge), UX improvements (WhatsApp button text, hotel phone callable, MapPin on deposit button, backup QR code), Cultural adaptation (FR/AR/WO language selector with RTL, golden gradient header, Bismillah, religious blessing), Hotel section using dedicated hotelName/hotelAddress/hotelPhone fields instead of homeAddress
+---
+Task ID: 1-5
+Agent: main
+Task: Fix photo bug + schema + API + activation page + scan page improvements
+
+Work Log:
+- Fixed photo URL bug: converted /uploads/ to /api/serve-upload/ in finder API route
+- Improved passport number masking from 3 to 4 digits (**9999)
+- Added hotelName, hotelAddress, hotelPhone, expirationDate fields to Passport Prisma model
+- Ran db:push to sync schema
+- Updated passport activation API to handle new hotel and expiration fields
+- Updated finder API to return hotel and expiration fields
+- Delegated activation page rewrite to subagent (cloned identity page structure)
+- Delegated scan-passeport page rewrite to subagent (all UX improvements)
+
+Stage Summary:
+- Photo bug fixed: API now returns /api/serve-upload/ URLs for photos
+- Prisma schema extended with 4 new fields on Passport model
+- Activation API handles hotelName, hotelAddress, hotelPhone, expirationDate
+- Activation page: 3-step form (Identity+Passport → Contact+Hotel → Confirmation)
+- Scan page: certification stamps, security question, language selector (FR/AR/WO), golden gradient, religious messages, QR code backup, improved hotel section

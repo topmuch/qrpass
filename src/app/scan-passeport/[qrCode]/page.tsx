@@ -4,10 +4,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import QRCode from 'qrcode';
 import {
   BookOpen,
   AlertCircle,
   Shield,
+  ShieldCheck,
   MapPin,
   Loader2,
   CheckCircle,
@@ -25,6 +27,8 @@ import {
   RotateCcw,
   Building2,
   MessageCircle,
+  Lock,
+  Languages,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,6 +40,7 @@ import { toast } from '@/hooks/use-toast';
 //  BRAND CONSTANTS — PassHajj palette
 // ═══════════════════════════════════════════════════════════════
 
+const GOLD_ACTUAL = '#D4AF37';
 const GOLD = '#059669';
 const INK = '#0f172a';
 const MUTED = '#64748b';
@@ -120,6 +125,10 @@ interface PassportData {
   agency?: { id: string; name: string; phone: string } | null;
   isActive: boolean;
   passportStatus?: string;
+  hotelName?: string | null;
+  hotelAddress?: string | null;
+  hotelPhone?: string | null;
+  expirationDate?: string | null;
 }
 
 interface ApiResponse {
@@ -128,6 +137,114 @@ interface ApiResponse {
   status: 'active' | 'lost' | 'found' | 'not_activated' | 'expired';
   message?: string;
   data: PassportData;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TRANSLATIONS
+// ═══════════════════════════════════════════════════════════════
+
+type Lang = 'fr' | 'ar' | 'wo';
+
+const translations: Record<string, Record<Lang, string>> = {
+  passeportTrouve: {
+    fr: 'PASSEPORT TROUVÉ',
+    ar: 'جواز سفر مفقود',
+    wo: 'Pasipoo bi ñaan',
+  },
+  passeportPerdu: {
+    fr: 'PASSEPORT PERDU',
+    ar: 'جواز سفر مفقود',
+    wo: 'Pasipoo bi gën na',
+  },
+  passeportRetrouve: {
+    fr: 'PASSEPORT RETROUVÉ',
+    ar: 'جواز سفر مسترد',
+    wo: 'Pasipoo bi nangoo',
+  },
+  contacterProprietaire: {
+    fr: 'Envoyer un message (WhatsApp)',
+    ar: 'اتصل بصاحب الجواز',
+    wo: 'Jëndal boroom bi',
+  },
+  deposerHotel: {
+    fr: "Déposer à l'hôtel",
+    ar: 'اذهب الى الفندق',
+    wo: 'Jëli otel bi',
+  },
+  appelerHotel: {
+    fr: "Appeler l'hôtel",
+    ar: 'اتصل بالفندق',
+    wo: 'Wël otel bi',
+  },
+  signalerPasseport: {
+    fr: 'Signaler ce passeport trouvé',
+    ar: 'ابلغ عن الجواز',
+    wo: 'Xamal sa pasipoo bi',
+  },
+  proprietaire: {
+    fr: 'PROPRIÉTAIRE',
+    ar: 'صاحب الجواز',
+    wo: 'BOROOM BI',
+  },
+  numeroPasseport: {
+    fr: 'N° passeport',
+    ar: 'رقم الجواز',
+    wo: 'Nomba pasipoo',
+  },
+  nationalite: {
+    fr: 'Nationalité',
+    ar: 'الجنسية',
+    wo: 'Réew',
+  },
+  statut: {
+    fr: 'Statut',
+    ar: 'الحالة',
+    wo: 'Stat bi',
+  },
+  certifieMinistere: {
+    fr: 'Certifié par le Ministère du Hajj du Sénégal',
+    ar: 'معتمد من وزارة الحج السنغالية',
+    wo: 'Jaaru ngir Ministeer u Hajj u Senegaal',
+  },
+  serviceAgree: {
+    fr: "Service agréé par l'Autorité saoudienne du Hajj",
+    ar: 'خدمة معتمدة من السلطات السعودية للحج',
+    wo: 'Servis bëgg nañu ko ndigél u Aotorité saoudienne u Hajj',
+  },
+  donneesCryptees: {
+    fr: 'Données cryptées – conformité RGPD',
+    ar: 'بيانات مشفرة – توافق RGPD',
+    wo: 'Données yif – bépp RGPD',
+  },
+  valideJusquau: {
+    fr: 'Valide jusqu\'au',
+    ar: 'صالح حتى',
+    wo: 'Baax ba',
+  },
+  securityQuestion: {
+    fr: 'Quel est le nom de l\'hôtel de destination ?',
+    ar: 'ما اسم فندق الوجهة؟',
+    wo: 'Nan lan mo otel u destinasioŋ bi?',
+  },
+  securityHint: {
+    fr: 'Pour votre sécurité, veuillez répondre à cette question',
+    ar: 'لأمانك، يرجى الإجابة على هذا السؤال',
+    wo: 'Ngir sa kaaraange, jañ nga tuumaali laaj bii',
+  },
+  securityError: {
+    fr: 'Réponse incorrecte. Veuillez réessayer.',
+    ar: 'إجابة خاطئة. يرجى المحاولة مرة أخرى.',
+    wo: 'Tontu bi laaka. Jëm fii.',
+  },
+  verifier: {
+    fr: 'Vérifier',
+    ar: 'تحقق',
+    wo: 'Sét',
+  },
+};
+
+function t(key: string, lang: Lang): string {
+  return translations[key]?.[lang] || translations[key]?.fr || key;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -207,6 +324,42 @@ function InfoRow({
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  LANGUAGE SELECTOR COMPONENT
+// ═══════════════════════════════════════════════════════════════
+
+function LanguageSelector({
+  lang,
+  setLang,
+}: {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+}) {
+  const langs: { code: Lang; label: string }[] = [
+    { code: 'fr', label: 'FR' },
+    { code: 'ar', label: 'AR' },
+    { code: 'wo', label: 'WO' },
+  ];
+
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg overflow-hidden border border-white/30">
+      {langs.map((l) => (
+        <button
+          key={l.code}
+          onClick={() => setLang(l.code)}
+          className={`px-2.5 py-1 text-xs font-bold transition-all ${
+            lang === l.code
+              ? 'bg-white text-emerald-800'
+              : 'bg-transparent text-white/80 hover:bg-white/20'
+          }`}
+        >
+          {l.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  MAIN PAGE
 // ═══════════════════════════════════════════════════════════════
 
@@ -216,12 +369,18 @@ export default function PassportFinderPage() {
   const params = useParams<{ qrCode: string }>();
   const qrCode = params.qrCode;
 
+  // ─── Language state ───
+  const [lang, setLang] = useState<Lang>('fr');
+
   // ─── Fetch state ───
   const [pageState, setPageState] = useState<PageState>('loading');
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
 
   // ─── Form state ───
   const [showForm, setShowForm] = useState(false);
+  const [securityStep, setSecurityStep] = useState<'idle' | 'question' | 'form'>('idle');
+  const [securityAnswer, setSecurityAnswer] = useState('');
+  const [securityError, setSecurityError] = useState(false);
   const [finderName, setFinderName] = useState('');
   const [finderPhone, setFinderPhone] = useState('');
   const [finderPhoneCountry, setFinderPhoneCountry] = useState('FR');
@@ -232,6 +391,9 @@ export default function PassportFinderPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reportSubmitted, setReportSubmitted] = useState(false);
+
+  // ─── QR code backup state ───
+  const [backupQrUrl, setBackupQrUrl] = useState<string | null>(null);
 
   // ─── Fetch passport data ───
   useEffect(() => {
@@ -269,6 +431,19 @@ export default function PassportFinderPage() {
 
     return () => { cancelled = true; };
   }, [qrCode]);
+
+  // ─── Generate backup QR code ───
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const currentUrl = window.location.href;
+      QRCode.toDataURL(currentUrl, { width: 120, margin: 1, color: { dark: INK, light: '#ffffff00' } })
+        .then((url) => setBackupQrUrl(url))
+        .catch(() => {});
+    } catch {
+      // QR generation not critical
+    }
+  }, []);
 
   // ─── Auto-detect GPS on mount ───
   useEffect(() => {
@@ -316,6 +491,27 @@ export default function PassportFinderPage() {
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }, []);
+
+  // ─── Security question handler ───
+  const handleSecurityCheck = useCallback(() => {
+    const passportData = apiData?.data;
+    if (!passportData?.hotelName) {
+      // No hotel name — skip security question
+      setSecurityStep('form');
+      return;
+    }
+
+    const answer = securityAnswer.trim().toLowerCase();
+    const hotelName = passportData.hotelName.trim().toLowerCase();
+
+    // Partial, case-insensitive match
+    if (answer.length > 0 && (hotelName.includes(answer) || answer.includes(hotelName))) {
+      setSecurityError(false);
+      setSecurityStep('form');
+    } else {
+      setSecurityError(true);
+    }
+  }, [apiData, securityAnswer]);
 
   // ─── Submit report ───
   const handleSubmit = useCallback(async () => {
@@ -421,14 +617,53 @@ export default function PassportFinderPage() {
   const isFound = apiData?.status === 'found';
   const isActive = apiData?.status === 'active';
 
+  // ─── Hotel display helpers ───
+  const hotelName = passportData?.hotelName || null;
+  const hotelAddress = passportData?.hotelAddress || null;
+  const hotelPhone = passportData?.hotelPhone || null;
+  const hasHotel = !!(hotelName || hotelAddress);
+  const hotelMapsQuery = hotelName
+    ? `${hotelName}${hotelAddress ? ' ' + hotelAddress : ''}`
+    : hotelAddress || passportData?.homeAddress || '';
+
+  // ─── Format expiration date ───
+  const formatDate = (dateStr: string | null | undefined): string | null => {
+    if (!dateStr) return null;
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    } catch {
+      return null;
+    }
+  };
+
+  const expirationFormatted = formatDate(passportData?.expirationDate);
+
   // ═══════════════════════════════════════════════════════════════
   //  RENDER
   // ═══════════════════════════════════════════════════════════════
 
+  const isRtl = lang === 'ar';
+
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: GOLD }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: 'linear-gradient(180deg, #D4AF37 0%, #059669 60%)' }}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
+      {/* ─── Bismillah ─── */}
+      <div className="w-full text-center pt-3 pb-0">
+        <p
+          className="text-sm font-light tracking-wide"
+          style={{ color: 'rgba(255,255,255,0.6)' }}
+        >
+          بسم الله الرحمن الرحيم
+        </p>
+      </div>
+
       {/* ─── Brand Header ─── */}
-      <header className="w-full flex items-center justify-between px-4 sm:px-5 pt-4 pb-2">
+      <header className="w-full flex items-center justify-between px-4 sm:px-5 pt-2 pb-2">
         <div className="flex items-center gap-2">
           <Image
             src="/logo.png"
@@ -449,7 +684,17 @@ export default function PassportFinderPage() {
             <BookOpen className="w-3 h-3 mr-1" />
             Passeport
           </Badge>
+          {/* Certification stamp */}
+          <Badge
+            className="text-xs font-semibold px-2.5 py-1 border-0"
+            style={{ background: '#15803d', color: WHITE }}
+          >
+            <ShieldCheck className="w-3 h-3 mr-1" />
+            Certifié
+          </Badge>
         </div>
+        {/* Language selector */}
+        <LanguageSelector lang={lang} setLang={setLang} />
       </header>
 
       {/* ─── Main Content ─── */}
@@ -653,7 +898,12 @@ export default function PassportFinderPage() {
                   className="text-2xl md:text-3xl font-extrabold leading-tight"
                   style={{ color: INK }}
                 >
-                  {isLost ? '🚨 PASSEPORT PERDU' : isFound ? '✅ PASSEPORT RETROUVÉ' : '📘 PASSEPORT TROUVÉ'}
+                  {isLost
+                    ? `🚨 ${t('passeportPerdu', lang)}`
+                    : isFound
+                      ? `✅ ${t('passeportRetrouve', lang)}`
+                      : `📘 ${t('passeportTrouve', lang)}`
+                  }
                 </h1>
                 <p
                   className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto font-semibold"
@@ -665,6 +915,16 @@ export default function PassportFinderPage() {
                       ? 'Ce passeport a été signalé comme retrouvé. Le propriétaire a été notifié.'
                       : 'Merci d\'avoir trouvé ce passeport ! Le propriétaire sera contacté immédiatement.'}
                 </p>
+
+                {/* Expiration date display */}
+                {expirationFormatted && (
+                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+                    style={{ background: 'rgba(255,255,255,0.2)', color: WHITE }}
+                  >
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    {t('valideJusquau', lang)} {expirationFormatted}
+                  </div>
+                )}
 
                 {/* Status Badge */}
                 <div className="flex items-center justify-center gap-2 mt-3">
@@ -684,6 +944,17 @@ export default function PassportFinderPage() {
                     </span>
                   )}
                 </div>
+
+                {/* Certification badge */}
+                <div className="mt-3">
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+                    style={{ background: '#15803d', color: WHITE }}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {t('certifieMinistere', lang)}
+                  </span>
+                </div>
               </div>
 
               {/* ═══ CARD 1: PASSPORT INFO ═══ */}
@@ -696,7 +967,7 @@ export default function PassportFinderPage() {
                   style={{ color: INK }}
                 >
                   <User className="w-4 h-4" />
-                  PROPRIÉTAIRE
+                  {t('proprietaire', lang)}
                 </h2>
 
                 {/* Photo + Name header */}
@@ -732,7 +1003,7 @@ export default function PassportFinderPage() {
                 {/* Masked Passport Number */}
                 <InfoRow
                   icon={<Hash className="w-4 h-4" style={{ color: GOLD }} />}
-                  label="N° passeport"
+                  label={t('numeroPasseport', lang)}
                   value={passportData.passportNumber || 'Non renseigné'}
                   mono
                 />
@@ -745,7 +1016,7 @@ export default function PassportFinderPage() {
                     <Shield className="w-4 h-4" style={{ color: GOLD }} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium" style={{ color: MUTED }}>Statut</p>
+                    <p className="text-xs font-medium" style={{ color: MUTED }}>{t('statut', lang)}</p>
                     <span
                       className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-0.5"
                       style={{
@@ -782,6 +1053,18 @@ export default function PassportFinderPage() {
                   </>
                 )}
 
+                {/* Expiration Date */}
+                {expirationFormatted && (
+                  <>
+                    <div className="border-t border-gray-100 my-2" />
+                    <InfoRow
+                      icon={<CalendarDays className="w-4 h-4" style={{ color: GOLD_ACTUAL }} />}
+                      label={t('valideJusquau', lang)}
+                      value={expirationFormatted}
+                    />
+                  </>
+                )}
+
                 {/* Travel Destination */}
                 {passportData.travelDestination && (
                   <>
@@ -806,38 +1089,47 @@ export default function PassportFinderPage() {
                   </>
                 )}
 
-                {/* Hotel Address */}
-                {passportData.homeAddress && (
+                {/* Hotel Section — using dedicated hotel fields */}
+                {hasHotel && (
                   <>
                     <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
-                      icon={<Building2 className="w-4 h-4" style={{ color: GOLD }} />}
-                      label="Hôtel"
-                      value={passportData.travelDestination ? `${passportData.travelDestination} — ${passportData.homeAddress}` : passportData.homeAddress}
-                    />
+                    <div className="flex items-start gap-3 py-1.5">
+                      <span className="flex-shrink-0 mt-0.5">
+                        <Building2 className="w-4 h-4" style={{ color: GOLD }} />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium" style={{ color: MUTED }}>Hôtel</p>
+                        {hotelName && (
+                          <p className="text-sm font-semibold" style={{ color: INK }}>{hotelName}</p>
+                        )}
+                        {hotelAddress && (
+                          <p className="text-xs mt-0.5" style={{ color: MUTED }}>{hotelAddress}</p>
+                        )}
+                        {hotelPhone && (
+                          <a
+                            href={`tel:${hotelPhone.replace(/[^0-9+]/g, '')}`}
+                            className="text-xs mt-1 inline-flex items-center gap-1 font-semibold"
+                            style={{ color: INFO }}
+                          >
+                            <Phone className="w-3 h-3" />
+                            {hotelPhone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     {/* Déposer à l'hôtel button */}
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(passportData.homeAddress)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                      style={{ background: '#7c3aed' }}
-                    >
-                      <MapPin className="w-4 h-4" />
-                      Déposer à l&apos;hôtel
-                    </a>
-                  </>
-                )}
-
-                {/* Hotel Phone */}
-                {passportData.emergencyPhone && (
-                  <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
-                      icon={<Phone className="w-4 h-4" style={{ color: GOLD }} />}
-                      label="Téléphone hôtel"
-                      value={passportData.emergencyPhone}
-                    />
+                    {hotelMapsQuery && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelMapsQuery)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                        style={{ background: '#7c3aed' }}
+                      >
+                        <MapPin className="w-4 h-4" />
+                        {t('deposerHotel', lang)}
+                      </a>
+                    )}
                   </>
                 )}
 
@@ -896,11 +1188,31 @@ export default function PassportFinderPage() {
                       style={{ background: '#25D366' }}
                     >
                       <MessageCircle className="w-6 h-6" />
-                      Contacter le propriétaire
+                      {t('contacterProprietaire', lang)}
                     </a>
 
-                    {/* Appeler l'hôtel */}
-                    {passportData.homeAddress && (
+                    {/* Appeler l'hôtel — now uses hotelPhone if available */}
+                    {hotelPhone ? (
+                      <a
+                        href={`tel:${hotelPhone.replace(/[^0-9+]/g, '')}`}
+                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
+                        style={{ background: INK }}
+                      >
+                        <Phone className="w-6 h-6" />
+                        {t('appelerHotel', lang)} ({hotelPhone})
+                      </a>
+                    ) : hasHotel ? (
+                      <a
+                        href={`https://www.google.com/search?q=${encodeURIComponent(hotelMapsQuery)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
+                        style={{ background: INK }}
+                      >
+                        <Building2 className="w-6 h-6" />
+                        {t('appelerHotel', lang)}
+                      </a>
+                    ) : passportData.homeAddress ? (
                       <a
                         href={`https://www.google.com/search?q=${encodeURIComponent(passportData.homeAddress)}`}
                         target="_blank"
@@ -909,9 +1221,9 @@ export default function PassportFinderPage() {
                         style={{ background: INK }}
                       >
                         <Building2 className="w-6 h-6" />
-                        Appeler l&apos;hôtel
+                        {t('appelerHotel', lang)}
                       </a>
-                    )}
+                    ) : null}
                   </div>
 
                   <p className="text-xs mt-3 text-center" style={{ color: MUTED }}>
@@ -943,19 +1255,94 @@ export default function PassportFinderPage() {
                   className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg"
                   style={{ background: CARD_BG }}
                 >
-                  {/* CTA Button or Form */}
+                  {/* CTA Button or Security Question or Form */}
                   {!showForm ? (
                     <button
-                      onClick={() => setShowForm(true)}
+                      onClick={() => {
+                        setShowForm(true);
+                        // If hotelName exists, show security question first; otherwise go directly to form
+                        if (passportData?.hotelName) {
+                          setSecurityStep('question');
+                        } else {
+                          setSecurityStep('form');
+                        }
+                      }}
                       className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
                       style={{ background: INK }}
                     >
                       <Phone className="w-5 h-5" />
                       <span>
-                        {isLost ? 'Signaler que j\'ai trouvé ce passeport' : 'Signaler ce passeport trouvé'}
+                        {isLost ? 'Signaler que j\'ai trouvé ce passeport' : t('signalerPasseport', lang)}
                       </span>
                     </button>
+                  ) : securityStep === 'question' ? (
+                    /* ─── Security Question Step ─── */
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Lock className="w-5 h-5" style={{ color: GOLD_ACTUAL }} />
+                        <h3
+                          className="text-sm font-bold uppercase tracking-widest"
+                          style={{ color: INK }}
+                        >
+                          Vérification de sécurité
+                        </h3>
+                      </div>
+                      <p className="text-sm" style={{ color: MUTED }}>
+                        {t('securityHint', lang)}
+                      </p>
+                      <div>
+                        <label className="text-sm font-semibold mb-2 block" style={{ color: INK }}>
+                          {t('securityQuestion', lang)}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={lang === 'fr' ? 'Nom de l\'hôtel...' : '...'}
+                          value={securityAnswer}
+                          onChange={(e) => {
+                            setSecurityAnswer(e.target.value);
+                            setSecurityError(false);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSecurityCheck();
+                          }}
+                          className="w-full px-4 py-3 rounded-xl text-base placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all min-h-[48px]"
+                          style={{ background: INPUT_BG, color: INK, border: `1px solid ${securityError ? DANGER : '#d1d5db'}` }}
+                          autoFocus
+                        />
+                        {securityError && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs mt-1.5 font-semibold"
+                            style={{ color: DANGER }}
+                          >
+                            {t('securityError', lang)}
+                          </motion.p>
+                        )}
+                      </div>
+                      <button
+                        onClick={handleSecurityCheck}
+                        className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+                        style={{ background: INK }}
+                      >
+                        <ShieldCheck className="w-5 h-5" />
+                        {t('verifier', lang)}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowForm(false);
+                          setSecurityStep('idle');
+                          setSecurityAnswer('');
+                          setSecurityError(false);
+                        }}
+                        className="w-full py-2 px-4 rounded-xl text-sm font-semibold transition-all"
+                        style={{ color: MUTED }}
+                      >
+                        Annuler
+                      </button>
+                    </div>
                   ) : (
+                    /* ─── Full Finder Form ─── */
                     <div className="space-y-4">
                       <h3
                         className="text-sm font-bold uppercase tracking-widest mb-1"
@@ -1133,14 +1520,58 @@ export default function PassportFinderPage() {
                 </div>
               )}
 
+              {/* ═══ BACKUP QR CODE ═══ */}
+              {backupQrUrl && (
+                <div
+                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg flex flex-col items-center"
+                  style={{ background: CARD_BG }}
+                >
+                  <img
+                    src={backupQrUrl}
+                    alt="QR Code backup"
+                    className="w-28 h-28"
+                  />
+                  <p className="text-xs mt-2 font-medium" style={{ color: MUTED }}>
+                    Scanner pour accéder à cette page
+                  </p>
+                </div>
+              )}
+
               {/* ═══ FOOTER ═══ */}
-              <div className="text-center mt-2">
+              <div className="text-center mt-2 space-y-2">
+                {/* Religious blessing */}
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: 'rgba(255,255,255,0.85)' }}
+                >
+                  Que cette rencontre soit bénie par le Tout-Puissant 🤲
+                </p>
+
                 <p className="text-xs font-medium" style={{ color: INK }}>
                   PassHajj — Service officiel de protection des passeports
                 </p>
                 <p className="text-xs mt-1" style={{ color: MUTED }}>
                   Code QR : {qrCode}
                 </p>
+
+                {/* Bottom certification */}
+                <div className="pt-3 space-y-1.5">
+                  <p
+                    className="text-xs font-semibold inline-flex items-center gap-1"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {t('serviceAgree', lang)}
+                  </p>
+                  <br />
+                  <p
+                    className="text-xs font-semibold inline-flex items-center gap-1"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    {t('donneesCryptees', lang)}
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}

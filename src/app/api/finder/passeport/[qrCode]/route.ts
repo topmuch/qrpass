@@ -49,9 +49,16 @@ export async function GET(
       });
     }
 
-    // Mask passport number for privacy — show only last 3 chars if present
+    // Mask passport number for privacy — show only last 4 digits masked (e.g., **9999)
     const maskedPassportNumber = passport.passportNumber
-      ? '***' + passport.passportNumber.slice(-3)
+      ? passport.passportNumber.length > 4
+        ? '**' + passport.passportNumber.slice(-4)
+        : passport.passportNumber
+      : null;
+
+    // Convert /uploads/... path to /api/serve-upload/... for reliable file serving
+    const resolvedPhotoUrl = passport.photoUrl
+      ? `/api/serve-upload/${passport.photoUrl.replace(/^\/uploads\//, '')}`
       : null;
 
     // Determine top-level status based on DB status field
@@ -75,7 +82,7 @@ export async function GET(
         dateOfBirth: passport.dateOfBirth,
         placeOfBirth: passport.placeOfBirth,
         gender: passport.gender,
-        photoUrl: passport.photoUrl,
+        photoUrl: resolvedPhotoUrl,
         phone: passport.phone,
         whatsapp: passport.whatsapp,
         email: passport.email,
@@ -86,6 +93,10 @@ export async function GET(
         travelDate: passport.travelDate,
         returnDate: passport.returnDate,
         notes: passport.notes,
+        hotelName: passport.hotelName,
+        hotelAddress: passport.hotelAddress,
+        hotelPhone: passport.hotelPhone,
+        expirationDate: passport.expirationDate,
         agency: passport.agency,
         isActive: passport.isActive,
         passportStatus: passport.status,
