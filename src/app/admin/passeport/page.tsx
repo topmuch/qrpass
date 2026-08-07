@@ -162,15 +162,14 @@ export default function AdminPasseportPage() {
 
   // Re-fetch when filters change
   useEffect(() => {
-    if (!loading) fetchPassports();
-  }, [statusFilter, agencyFilter, loading]);
+    fetchPassports();
+  }, [statusFilter, agencyFilter]);
 
   // Debounced search
   useEffect(() => {
-    if (loading) return;
     const timer = setTimeout(() => fetchPassports(), 300);
     return () => clearTimeout(timer);
-  }, [search, loading]);
+  }, [search]);
 
   // Generate QR codes
   const handleGenerate = async () => {
