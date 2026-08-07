@@ -25,6 +25,7 @@ import {
   Luggage,
   UserRound,
   Lock,
+  Globe,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -41,7 +42,7 @@ interface Agency {
   createdAt: string;
 }
 
-type PassType = 'bagage' | 'identity';
+type PassType = 'bagage' | 'identity' | 'passeport';
 
 export default function GenererQRPage() {
   const { isSuperAdmin } = useAuth();
@@ -80,7 +81,7 @@ export default function GenererQRPage() {
   };
 
   // Calculate QR count for display
-  // Bagage: 2 QR soute per pilgrim | Identity: 1 QR bracelet per pilgrim
+  // Bagage: 2 QR soute per pilgrim | Identity: 1 QR bracelet per pilgrim | Passeport: 1 QR sticker per passport
   const getQrCount = () => {
     const perPilgrim = passType === 'bagage' ? 2 : 1;
     return agencyForm.travelerCount * perPilgrim;
@@ -190,23 +191,32 @@ export default function GenererQRPage() {
     setQrGenerating(true);
 
     try {
-      const endpoint = passType === 'identity'
-        ? '/api/pilgrims/generate'
-        : '/api/admin/baggages/generate';
+      let endpoint: string;
+      let payload: Record<string, unknown>;
 
-      const payload = passType === 'identity'
-        ? {
-            count: agencyForm.travelerCount,
-            agencyId: agencyForm.agencyId,
-          }
-        : {
-            context: 'agency',
-            type: 'hajj' as const,
-            passType: 'bagage' as const,
-            agencyId: agencyForm.agencyId,
-            travelerCount: agencyForm.travelerCount,
-            count: 2,
-          };
+      if (passType === 'passeport') {
+        endpoint = '/api/passeport/generate';
+        payload = {
+          count: agencyForm.travelerCount,
+          agencyId: agencyForm.agencyId,
+        };
+      } else if (passType === 'identity') {
+        endpoint = '/api/pilgrims/generate';
+        payload = {
+          count: agencyForm.travelerCount,
+          agencyId: agencyForm.agencyId,
+        };
+      } else {
+        endpoint = '/api/admin/baggages/generate';
+        payload = {
+          context: 'agency',
+          type: 'hajj',
+          passType: 'bagage',
+          agencyId: agencyForm.agencyId,
+          travelerCount: agencyForm.travelerCount,
+          count: 2,
+        };
+      }
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -240,7 +250,7 @@ export default function GenererQRPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Génération de QR Codes</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Créez des QR codes Pass Bagage ou Pass Identity pour les pèlerins Hajj</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Créez des QR codes Pass Bagage, Pass Identity ou Pass Passeport</p>
       </div>
 
       {/* Success Message */}
@@ -283,7 +293,7 @@ export default function GenererQRPage() {
 
       {/* Pass Type Selection */}
       <div className="mb-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={() => setPassType('bagage')}
             className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
@@ -327,6 +337,26 @@ export default function GenererQRPage() {
               </p>
             </div>
           </button>
+          <button
+            onClick={() => setPassType('passeport')}
+            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+              passType === 'passeport'
+                ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-violet-300'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              passType === 'passeport' ? 'bg-violet-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+            }`}>
+              <Globe className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <p className={`font-semibold text-sm ${passType === 'passeport' ? 'text-violet-700 dark:text-violet-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                Pass Passeport
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">1 QR sticker par passeport</p>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -338,20 +368,30 @@ export default function GenererQRPage() {
         </div>
       )}
 
+      {/* Passeport info notice */}
+      {passType === 'passeport' && (
+        <div className="mb-6 bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <Globe className="w-4 h-4" />
+          Pass Passeport : sticker QR à coller sur le passeport. Si le passeport est perdu, celui qui le trouve peut scanner le QR pour contacter le propriétaire.
+        </div>
+      )}
+
       {/* Mode indicator */}
       <div className="mb-6">
         <div className={`flex items-center gap-3 p-4 rounded-xl text-white ${
-          passType === 'bagage' ? 'bg-[#1e3a8a]' : 'bg-emerald-600'
+          passType === 'bagage' ? 'bg-[#1e3a8a]' : passType === 'identity' ? 'bg-emerald-600' : 'bg-violet-600'
         }`}>
-          {passType === 'bagage' ? <Luggage className="w-5 h-5" /> : <UserRound className="w-5 h-5" />}
+          {passType === 'bagage' ? <Luggage className="w-5 h-5" /> : passType === 'identity' ? <UserRound className="w-5 h-5" /> : <Globe className="w-5 h-5" />}
           <div>
             <p className="font-medium">
-              {passType === 'bagage' ? 'Génération Agence — Pass Bagage Hajj' : 'Génération Agence — Pass Identity Hajj'}
+              {passType === 'bagage' ? 'Génération Agence — Pass Bagage Hajj' : passType === 'identity' ? 'Génération Agence — Pass Identity Hajj' : 'Génération Agence — Pass Passeport'}
             </p>
             <p className="text-xs opacity-80">
               {passType === 'bagage'
                 ? 'Chaque pèlerin reçoit 2 QR codes soute'
-                : 'Chaque pèlerin reçoit 1 QR code bracelet d\'identification'
+                : passType === 'identity'
+                ? 'Chaque pèlerin reçoit 1 QR code bracelet d\'identification'
+                : 'Chaque passeport reçoit 1 QR code sticker'
               }
             </p>
           </div>
@@ -365,8 +405,10 @@ export default function GenererQRPage() {
             <CardTitle className="text-slate-800 dark:text-white flex items-center gap-2">
               {passType === 'bagage' ? (
                 <><Luggage className="w-5 h-5 text-amber-600" /> Génération Pass Bagage</>
-              ) : (
+              ) : passType === 'identity' ? (
                 <><UserRound className="w-5 h-5 text-blue-600" /> Génération Pass Identity</>
+              ) : (
+                <><Globe className="w-5 h-5 text-violet-600" /> Génération Pass Passeport</>
               )}
             </CardTitle>
           </CardHeader>
@@ -393,7 +435,7 @@ export default function GenererQRPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-slate-700 dark:text-slate-300">Nombre de pèlerins</Label>
+                <Label className="text-slate-700 dark:text-slate-300">Nombre de {passType === 'passeport' ? 'passeports' : 'pèlerins'}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -407,8 +449,10 @@ export default function GenererQRPage() {
               <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-sm text-slate-600 dark:text-slate-300">
                 {passType === 'bagage' ? (
                   <p>🧳 Pour le Hajj, chaque pèlerin reçoit 2 QR codes bagage soute</p>
-                ) : (
+                ) : passType === 'identity' ? (
                   <p>👤 Pour le Hajj, chaque pèlerin reçoit 1 QR code bracelet d&apos;identification (PH-P-XXXXX)</p>
+                ) : (
+                  <p>🌍 Chaque passeport reçoit 1 QR code sticker (PP-XXXXXX) — durée 1 an</p>
                 )}
               </div>
             </>
@@ -422,7 +466,7 @@ export default function GenererQRPage() {
 
             <Button
               className={`w-full text-white rounded-xl ${
-                passType === 'bagage' ? 'bg-[#1e3a8a] hover:bg-[#3b82f6]' : 'bg-emerald-600 hover:bg-emerald-700'
+                passType === 'bagage' ? 'bg-[#1e3a8a] hover:bg-[#3b82f6]' : passType === 'identity' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'
               }`}
               onClick={handleGenerateQR}
               disabled={qrGenerating}
@@ -450,7 +494,7 @@ export default function GenererQRPage() {
                 </Badge>
               </div>
               <div className="text-sm text-slate-500 dark:text-slate-400">
-                {getQrCount()} QR • {passType === 'bagage' ? 'Pass Bagage' : 'Pass Identity'} • En attente d&apos;attribution
+                {getQrCount()} QR • {passType === 'bagage' ? 'Pass Bagage' : passType === 'identity' ? 'Pass Identity' : 'Pass Passeport'} • En attente d&apos;attribution
               </div>
             </div>
 
@@ -460,7 +504,7 @@ export default function GenererQRPage() {
                 <div>
                   <p className="text-slate-500 dark:text-slate-400">Type</p>
                   <p className="text-slate-800 dark:text-white font-medium">
-                    {passType === 'bagage' ? 'Pass Bagage (Soute)' : 'Pass Identity (Bracelet)'}
+                    {passType === 'bagage' ? 'Pass Bagage (Soute)' : passType === 'identity' ? 'Pass Identity (Bracelet)' : 'Pass Passeport (Sticker)'}
                   </p>
                 </div>
                 <div>
@@ -477,7 +521,7 @@ export default function GenererQRPage() {
                 </div>
                 <div>
                   <p className="text-slate-500 dark:text-slate-400">Durée</p>
-                  <p className="text-slate-800 dark:text-white font-medium">2 mois (60 jours)</p>
+                  <p className="text-slate-800 dark:text-white font-medium">{passType === 'passeport' ? '1 an (365 jours)' : '2 mois (60 jours)'}</p>
                 </div>
               </div>
             </div>

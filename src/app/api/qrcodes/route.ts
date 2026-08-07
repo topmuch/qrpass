@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // 'hajj', 'identity', or 'all'
+    const type = searchParams.get('type'); // 'hajj', 'identity', 'passeport', or 'all'
     const search = searchParams.get('search');
     const agencyId = searchParams.get('agencyId');
 
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // ─── Identity (Pilgrim) QR sets ───
     // Show pilgrims unless type filter explicitly excludes them
-    if (type !== 'hajj') {
+    if (type !== 'hajj' && type !== 'passeport') {
       const pilgrimWhere: Record<string, unknown> = {};
       if (agencyId) {
         pilgrimWhere.agencyId = agencyId;
@@ -118,6 +118,46 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // ─── Passport QR sets ───
+    // Show passports unless type filter explicitly excludes them
+    if (type !== 'hajj' && type !== 'identity') {
+      const passportWhere: Record<string, unknown> = {};
+      if (agencyId) {
+        passportWhere.agencyId = agencyId;
+      }
+      if (search) {
+        passportWhere.OR = [
+          { qrCode: { contains: search.toUpperCase() } },
+          { fullName: { contains: search } },
+          { passportNumber: { contains: search.toUpperCase() } },
+        ];
+      }
+
+      const passports = await db.passport.findMany({
+        where: passportWhere,
+        include: { agency: true },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Each passport is its own "set" with 1 QR
+      passports.forEach((passport) => {
+        const setId = `PASSEPORT-${passport.qrCode}`;
+        setsMap.set(setId, {
+          id: setId,
+          setId: setId,
+          type: 'passeport',
+          agencyId: passport.agencyId,
+          agencyName: passport.agency?.name || null,
+          createdAt: passport.createdAt,
+          qrCount: 1,
+          references: [passport.qrCode],
+          status: passport.isActive ? 'active' : 'pending_activation',
+          travelerName: passport.fullName && passport.fullName.trim() !== '' ? passport.fullName : null,
+          baggageIds: [passport.id],
+        });
+      });
+    }
+
     // Convert to array and sort by date
     const sets = Array.from(setsMap.values()).sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -126,9 +166,10 @@ export async function GET(request: NextRequest) {
     // Calculate stats
     const stats = {
       totalSets: sets.length,
-      totalQr: baggages.length + (type !== 'hajj' ? (await db.pilgrim.count()) : 0),
+      totalQr: baggages.length + (type !== 'hajj' && type !== 'passeport' ? (await db.pilgrim.count()) : 0) + (type !== 'hajj' && type !== 'identity' ? (await db.passport.count()) : 0),
       hajjSets: sets.filter(s => s.type === 'hajj').length,
       identitySets: sets.filter(s => s.type === 'identity').length,
+      passeportSets: sets.filter(s => s.type === 'passeport').length,
     };
 
     return NextResponse.json({
@@ -173,6 +214,28 @@ export async function DELETE(request: NextRequest) {
       }
 
       await db.pilgrim.delete({ where: { id: pilgrim.id } });
+
+      return NextResponse.json({
+        success: true,
+        deletedCount: 1,
+        setId,
+        deletedReferences: [qrCode],
+      });
+    }
+
+    // Check if this is a Passport set
+    if (setId.startsWith('PASSEPORT-')) {
+      const qrCode = setId.replace('PASSEPORT-', '');
+      const passport = await db.passport.findUnique({ where: { qrCode } });
+
+      if (!passport) {
+        return NextResponse.json(
+          { error: 'Passport not found', setId },
+          { status: 404 }
+        );
+      }
+
+      await db.passport.delete({ where: { id: passport.id } });
 
       return NextResponse.json({
         success: true,

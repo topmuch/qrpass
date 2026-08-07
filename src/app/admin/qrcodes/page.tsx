@@ -42,6 +42,8 @@ interface Stats {
   totalSets: number;
   totalQr: number;
   hajjSets: number;
+  identitySets: number;
+  passeportSets: number;
 }
 
 interface Agency {
@@ -57,6 +59,8 @@ export default function QRCodesPage() {
     totalSets: 0,
     totalQr: 0,
     hajjSets: 0,
+    identitySets: 0,
+    passeportSets: 0,
 
   });
   const [loading, setLoading] = useState(true);
@@ -354,6 +358,7 @@ export default function QRCodesPage() {
     { id: 'all', label: 'Tous' },
     { id: 'hajj', label: '🧳 Bagage' },
     { id: 'identity', label: '👤 Identity' },
+    { id: 'passeport', label: '🌍 Passeport' },
   ];
 
   // KPI Cards
@@ -361,6 +366,8 @@ export default function QRCodesPage() {
     { title: 'Total Sets', value: stats.totalSets, icon: QrCode, color: 'text-[#b8860b]' },
     { title: 'Total QR', value: stats.totalQr, icon: Luggage, color: 'text-white' },
     { title: 'Hajj', value: stats.hajjSets, icon: Plane, color: 'text-green-400' },
+    { title: 'Identity', value: stats.identitySets, icon: Luggage, color: 'text-emerald-400' },
+    { title: 'Passeport', value: stats.passeportSets, icon: Luggage, color: 'text-violet-400' },
   ];
 
   // Calculate total QR in selection
@@ -529,10 +536,12 @@ export default function QRCodesPage() {
                       className="mt-1 w-4 h-4 rounded border-[#1a2238] bg-[#080c1a] text-[#b8860b] focus:ring-[#b8860b] accent-[#b8860b]"
                     />
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      set.type === 'identity' ? 'bg-emerald-600' : 'bg-[#1e3a8a]'
+                      set.type === 'identity' ? 'bg-emerald-600' : set.type === 'passeport' ? 'bg-violet-600' : 'bg-[#1e3a8a]'
                     }`}>
                       {set.type === 'identity' ? (
                         <span className="text-lg">👤</span>
+                      ) : set.type === 'passeport' ? (
+                        <span className="text-lg">🌍</span>
                       ) : (
                         <span className="text-lg">🧳</span>
                       )}
@@ -542,9 +551,9 @@ export default function QRCodesPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-bold text-white">{set.setId}</h3>
                         <span className={`px-2 py-0.5 text-[#e0e6f0] text-xs rounded ${
-                          set.type === 'identity' ? 'bg-emerald-600' : 'bg-[#1e3a8a]'
+                          set.type === 'identity' ? 'bg-emerald-600' : set.type === 'passeport' ? 'bg-violet-600' : 'bg-[#1e3a8a]'
                         }`}>
-                          {set.type === 'identity' ? '👤 Identity' : '🧳 Bagage'}
+                          {set.type === 'identity' ? '👤 Identity' : set.type === 'passeport' ? '🌍 Passeport' : '🧳 Bagage'}
                         </span>
                       </div>
                       <div className="text-[#a0a8b8] text-sm flex flex-wrap gap-3">
