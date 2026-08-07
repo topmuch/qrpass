@@ -744,20 +744,22 @@ export default function SuiviPage() {
       {/* ─── Sticky Header ─── */}
       <header className="sticky top-0 z-40 bg-[#f4b400] border-b-2 border-[#f4b400]/30 pt-[env(safe-area-inset-top,0px)] px-4 sm:px-5 md:px-8 py-2 sm:py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <button
-            onClick={() => window.history.back()}
-            className="flex items-center gap-1 text-white hover:text-[#f4b400] transition-colors text-sm font-medium min-h-[40px] px-2"
-            aria-label={t('tracking.back_to_scan')}
-          >
-            <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-            <span>{t('tracking.back_to_scan')}</span>
-          </button>
+          {/* PassHajj Logo */}
+          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '10px', padding: '3px', background: 'rgba(255,255,255,0.9)' }} />
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-1 text-[#0f172a] hover:text-white transition-colors text-xs sm:text-sm font-medium min-h-[32px] sm:min-h-[36px] px-1.5"
+              aria-label={t('tracking.back_to_scan')}
+            >
+              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+              <span className="hidden sm:inline">{t('tracking.back_to_scan')}</span>
+            </button>
             {/* Audio alert toggle */}
             <button
               onClick={toggleAudio}
-              className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-colors min-h-[40px] ${
+              className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 transition-colors min-h-[32px] sm:min-h-[36px] ${
                 audioEnabled
                   ? 'border-[#f4b400] bg-[#f4b400] text-[#0f172a]'
                   : 'border-[#0f172a] text-[#0f172a] hover:bg-[#f4b400]'
@@ -765,15 +767,15 @@ export default function SuiviPage() {
               aria-label={t('tracking.audio_alert_toggle_aria')}
               title={audioEnabled ? t('tracking.audio_alert_enabled') : t('tracking.audio_alert_disabled')}
             >
-              {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {audioEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#f4b400] transition-colors disabled:opacity-50"
+              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#f4b400] transition-colors disabled:opacity-50 min-h-[32px] sm:min-h-[36px]"
               aria-label={t('common.refresh')}
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
             <LanguageSelector lang={lang} setLang={setLang} />
           </div>

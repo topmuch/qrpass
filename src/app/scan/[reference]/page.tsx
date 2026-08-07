@@ -893,31 +893,32 @@ export default function ScanPage() {
       style={{ background: BRAND }}
       dir={dir}
     >
-      {/* ─── Top Bar: Edit button + Language toggle ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4" style={{ background: BRAND }}>
-        {/* ✏️ Modifier button — visible only for active/lost baggage */}
-        {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-white border border-black/10 rounded-full text-sm font-bold hover:bg-white/80 transition-colors min-h-[36px] sm:min-h-[40px] md:min-h-[44px]"
-            style={{ color: INK }}
-          >
-            <span>{t('finder.edit_btn')}</span>
-          </button>
-        )}
-        {isEditing && (
-          <div className="font-bold text-sm sm:text-base" style={{ color: INK }}>
-            {t('finder.edit_title')}
-          </div>
-        )}
-        {(!baggage || (baggageData?.status !== 'active' && baggageData?.status !== 'lost')) && <div />}
-        <div className="flex items-center gap-2">
+      {/* ─── Top Bar: Logo + Edit/Share/Language ─── */}
+      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3" style={{ background: BRAND }}>
+        {/* PassHajj Logo */}
+        <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* ✏️ Modifier button — visible only for active/lost baggage */}
+          {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && !isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-white border border-black/10 rounded-full text-xs sm:text-sm font-bold hover:bg-white/80 transition-colors min-h-[32px] sm:min-h-[36px]"
+              style={{ color: INK }}
+            >
+              <span>{t('finder.edit_btn')}</span>
+            </button>
+          )}
+          {isEditing && (
+            <span className="font-bold text-xs sm:text-sm px-2" style={{ color: INK }}>
+              {t('finder.edit_title')}
+            </span>
+          )}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 border border-black/10 rounded-full text-sm font-medium hover:bg-white transition-colors min-h-[36px]"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-white/80 border border-black/10 rounded-full text-xs sm:text-sm font-medium hover:bg-white transition-colors min-h-[32px] sm:min-h-[36px]"
             aria-label={i18n('shareBtn', lang)}
           >
-            <Share className="w-4 h-4" />
+            <Share className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{i18n('shareBtn', lang)}</span>
           </button>
           <LanguageSelector lang={lang} setLang={setLang} />
