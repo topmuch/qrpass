@@ -251,7 +251,7 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="flex items-center">
-              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="text-sm mt-1" style={{ color: MUTED }}>
               {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}
@@ -776,7 +776,7 @@ export default function ScanPage() {
       {/* ─── Top Bar: Logo + Edit/Share/Language ─── */}
       <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3" style={{ background: BRAND }}>
         {/* PassHajj Logo */}
-        <Image src="/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
+        <Image src="/logo-passhajj.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={handleShare}

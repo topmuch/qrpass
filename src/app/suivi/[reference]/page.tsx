@@ -745,7 +745,7 @@ export default function SuiviPage() {
       <header className="sticky top-0 z-40 bg-[#f4b400] border-b-2 border-[#f4b400]/30 pt-[env(safe-area-inset-top,0px)] px-4 sm:px-5 md:px-8 py-2 sm:py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
           {/* PassHajj Logo */}
-          <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '10px', padding: '3px', background: 'rgba(255,255,255,0.9)' }} />
+          <Image src="/logo-passhajj.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain', borderRadius: '10px', padding: '3px', background: 'rgba(255,255,255,0.9)' }} />
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button

@@ -270,7 +270,7 @@ function ConfirmationContent() {
 
       {/* Logo */}
       <div className="text-2xl font-extrabold tracking-tight text-black mb-4">
-        <Image src="/logo.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+        <Image src="/logo-passhajj.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
       </div>
 
       {/* Card */}

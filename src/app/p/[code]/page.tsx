@@ -617,6 +617,9 @@ export default function PilgrimScanPage() {
       ═══════════════════════════════════════════════════════════ */}
       {state === 'not_found' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
+          <div className="flex items-center">
+            <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+          </div>
           <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
             <AlertCircle className="w-10 h-10 text-red-500" />
           </div>
@@ -634,7 +637,7 @@ export default function PilgrimScanPage() {
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
           <div className="flex items-center mb-8">
-            <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+            <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
@@ -699,7 +702,7 @@ export default function PilgrimScanPage() {
           {/* ─── HEADER ─── */}
           <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <Image src="/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="flex items-center gap-2">
               {/* Share Profile Button */}

@@ -666,7 +666,7 @@ export default function PassportFinderPage() {
       <header className="w-full flex items-center justify-between px-4 sm:px-5 pt-2 pb-2">
         <div className="flex items-center gap-2">
           <Image
-            src="/logo.png"
+            src="/logo-passhajj.png"
             alt="PassHajj"
             width={130}
             height={48}
