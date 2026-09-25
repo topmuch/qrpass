@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +29,8 @@ import {
   MessageCircle,
   Lock,
   Languages,
+  Volume2,
+  Pause,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -491,6 +493,93 @@ export default function PassportFinderPage() {
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }, []);
+
+  // ─── AUDIO-GUIDE: voix trouveur adaptée au contexte (passeport trouvé) ───
+  const VOICE_GATE: Record<Lang, { title: string; desc: string; btn: string; badge: string; replay: string }> = {
+    fr: {
+      title: 'Vous avez trouvé un passeport !',
+      desc: 'Ce passeport est protégé par l\'Organe de la Gestion du Pèlerinage. Écoutez les instructions.',
+      btn: 'Écouter les instructions',
+      badge: 'GUIDE VOCAL',
+      replay: 'Réécouter le guide vocal',
+    },
+    ar: {
+      title: 'لقد عثرت على جواز سفر!',
+      desc: 'جواز السفر هذا محمي من قبل هيئة إدارة الحج. استمع إلى التعليمات.',
+      btn: 'استمع إلى التعليمات',
+      badge: 'الدليل الصوتي',
+      replay: 'إعادة الدليل الصوتي',
+    },
+    wo: {
+      title: 'Nanga feeke pasipoo bi!',
+      desc: 'Pasipoo bi tarmaalu na ci Organe de la Gestion du Pèlerinage. Déglu ndigël yi ngir dimaali boroom bi.',
+      btn: 'Déglul ndigël yi',
+      badge: 'GUIDE VOCAL',
+      replay: 'Wóolal ndigël yi',
+    },
+  };
+  const FINDER_VOICE: Record<Lang, string> = {
+    fr: '/audio/passeport-finder-fr.mp3',
+    ar: '/audio/passeport-finder-ar.mp3',
+    wo: '/audio/passeport-finder-wo.mp3',
+  };
+  const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [showVoiceGate, setShowVoiceGate] = useState(true);
+  const [voicePlaying, setVoicePlaying] = useState(false);
+  const [voiceDuration, setVoiceDuration] = useState<number | null>(null);
+
+  // Create the audio element once on mount (preload metadata only — .play() stays user-gated)
+  useEffect(() => {
+    const audio = new Audio(FINDER_VOICE.fr);
+    audio.preload = 'metadata';
+    audio.addEventListener('loadedmetadata', () => setVoiceDuration(Math.round(audio.duration) || null));
+    audio.addEventListener('ended', () => setVoicePlaying(false));
+    voiceAudioRef.current = audio;
+    return () => {
+      audio.pause();
+      voiceAudioRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Language switch → swap audio source, stop playback
+  useEffect(() => {
+    const audio = voiceAudioRef.current;
+    if (audio && !audio.paused) {
+      audio.pause();
+      setVoicePlaying(false);
+    }
+    if (audio) {
+      audio.src = FINDER_VOICE[lang];
+      audio.load();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const playFinderVoice = useCallback(() => {
+    try {
+      const audio = voiceAudioRef.current;
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play().then(() => setVoicePlaying(true)).catch(() => setVoicePlaying(false));
+    } catch { /* silent fail */ }
+  }, []);
+
+  const toggleFinderVoice = useCallback(() => {
+    const audio = voiceAudioRef.current;
+    if (!audio) return;
+    if (voicePlaying) {
+      audio.pause();
+      setVoicePlaying(false);
+    } else {
+      audio.play().then(() => setVoicePlaying(true)).catch(() => setVoicePlaying(false));
+    }
+  }, [voicePlaying]);
+
+  const handleVoiceGateTap = useCallback(() => {
+    playFinderVoice();
+    setShowVoiceGate(false);
+  }, [playFinderVoice]);
 
   // ─── Security question handler ───
   const handleSecurityCheck = useCallback(() => {
@@ -1576,6 +1665,67 @@ export default function PassportFinderPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ═══ AUDIO-GUIDE GATE — instructions vocales trouveur (contexte passeport) ═══ */}
+        {showVoiceGate && pageState === 'loaded' && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+            style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={VOICE_GATE[lang].title}
+          >
+            <div className="w-full max-w-[380px] rounded-[24px] overflow-hidden shadow-2xl" style={{ background: CARD_BG }}>
+              {/* Top: brand + title */}
+              <div className="px-6 pt-7 pb-6 text-center" style={{ background: '#1e3a8a' }}>
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-4 shadow-md overflow-hidden">
+                  <Image src="/logo-passhajj.png" alt="PassHajj" width={56} height={56} style={{ objectFit: 'contain' }} />
+                </div>
+                <h2 className="text-2xl font-extrabold text-white">{VOICE_GATE[lang].title}</h2>
+                <p className="text-sm text-white/80 mt-2 leading-relaxed">{VOICE_GATE[lang].desc}</p>
+                <span className="inline-flex items-center gap-1 mt-4 px-3 py-1 rounded-full border border-white/30 text-white text-xs font-bold tracking-widest font-mono">
+                  🔊 {qrCode}
+                </span>
+              </div>
+              {/* Bottom: big tap button + badge */}
+              <div className="px-6 py-6">
+                <button
+                  onClick={handleVoiceGateTap}
+                  className="w-full py-4 px-6 text-white rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2.5 min-h-[60px]"
+                  style={{ background: '#1e3a8a' }}
+                >
+                  <Volume2 className="w-6 h-6" />
+                  <span>{VOICE_GATE[lang].btn}</span>
+                </button>
+                <p className="mt-3 text-center text-[11px] font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-1.5" style={{ color: MUTED }}>
+                  <Volume2 className="w-3.5 h-3.5" />
+                  {VOICE_GATE[lang].badge}{voiceDuration ? ` · ${voiceDuration} S` : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ Floating replay button — bottom left, after gate dismissed ═══ */}
+        {!showVoiceGate && pageState === 'loaded' && (
+          <button
+            onClick={toggleFinderVoice}
+            aria-label={VOICE_GATE[lang].replay}
+            title={VOICE_GATE[lang].replay}
+            className="fixed bottom-[4.75rem] left-5 z-[55] w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: voicePlaying ? '#1e3a8a' : '#ffffff',
+              border: '3px solid #1e3a8a',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            }}
+          >
+            {voicePlaying ? (
+              <Pause className="w-5 h-5 text-white animate-pulse" />
+            ) : (
+              <Volume2 className="w-5 h-5" style={{ color: '#1e3a8a' }} />
+            )}
+          </button>
+        )}
       </main>
     </div>
   );
