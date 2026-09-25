@@ -41,7 +41,6 @@ export function PublicNavigation() {
           <div className="hidden md:flex items-center gap-6">
             <a href="/#solutions" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Solutions</a>
             <a href="/#comment" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Comment ça marche</a>
-            <a href="/#tarifs" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Tarifs</a>
             <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Contact</Link>
           </div>
 
@@ -74,7 +73,6 @@ export function PublicNavigation() {
             <div className="flex flex-col gap-3">
               <a href="/#solutions" className="text-slate-600 hover:text-slate-900 font-medium py-2" onClick={() => setIsOpen(false)}>Solutions</a>
               <a href="/#comment" className="text-slate-600 hover:text-slate-900 font-medium py-2" onClick={() => setIsOpen(false)}>Comment ça marche</a>
-              <a href="/#tarifs" className="text-slate-600 hover:text-slate-900 font-medium py-2" onClick={() => setIsOpen(false)}>Tarifs</a>
               <Link href="/contact" className="text-slate-600 hover:text-slate-900 font-medium py-2" onClick={() => setIsOpen(false)}>Contact</Link>
               <hr className="border-slate-100 my-1" />
               <Link href="/login" onClick={() => setIsOpen(false)}>
@@ -115,7 +113,6 @@ export function PublicFooter() {
             <ul className="space-y-2 text-white/50 text-sm">
               <li><a href="/#solutions" className="hover:text-white transition-colors">Solutions</a></li>
               <li><a href="/#comment" className="hover:text-white transition-colors">Comment ça marche</a></li>
-              <li><a href="/#tarifs" className="hover:text-white transition-colors">Tarifs</a></li>
               <li><Link href="/demo" className="hover:text-white transition-colors">Démo</Link></li>
             </ul>
           </div>

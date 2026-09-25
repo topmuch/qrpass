@@ -43,7 +43,6 @@ const NAV_LINKS = [
   { label: 'Accueil', href: '/' },
   { label: 'Checklist', href: '/checklist' },
   { label: 'À propos', href: '/#comment' },
-  { label: 'Tarifs', href: '/#tarifs' },
   { label: 'Contactez-nous', href: '/contact' },
 ];
 

@@ -187,7 +187,7 @@ function HeroSection() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
+                  className="rounded-[10px] px-6 h-12 text-sm font-medium bg-transparent! border-white/40! text-white! hover:bg-white/10! hover:text-white! backdrop-blur-sm transition-all duration-300"
                 >
                   Voir la démo
                   <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
@@ -246,8 +246,8 @@ function AboutSection() {
           >
             <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative">
               <Image
-                src="/images/landing-v2/hero-family-travel.png"
-                alt="Famille de voyageurs protégés par PassHajj"
+                src="/images/landing-v2/hero-hajj-couple.png"
+                alt="Couple de pèlerins africains en tenue de Hajj avec valises PassHajj"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -1199,125 +1199,6 @@ function TransportSection() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   PRICING — 3-column (HMC product cards style)
-   ══════════════════════════════════════════════════════════ */
-function PricingSection() {
-  return (
-    <section id="tarifs" className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
-      <BlurOrb size="h-64 w-64" color={JAUNE} opacity={0.08} position="-bottom-24 -right-24" />
-
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="text-center mb-16">
-          <Overline>Nos offres</Overline>
-          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight ${serif}`} style={{ color: INK }}>
-            Une solution pour chaque voyageur
-          </h2>
-        </motion.div>
-
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }} variants={stagger} className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Hajj & Omra */}
-          <motion.div variants={fadeUp} custom={0}>
-            <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-transparent transition-all duration-300">
-              <div className="h-36 bg-gradient-to-br from-[#1e3a5f] to-[#2e5a8f] relative flex items-center justify-center">
-                <div className="bg-gradient-to-t from-black/40 to-transparent absolute inset-0" />
-                <span className="relative text-5xl">🕋</span>
-              </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className={`text-xl font-semibold mb-1 ${serif}`} style={{ color: INK }}>Hajj & Omra</h3>
-                <p className="text-xs uppercase tracking-wider mb-4" style={{ color: MUTED }}>Via votre agence</p>
-                <div className="text-center mb-6 py-4 rounded-xl" style={{ backgroundColor: BG_TINTED }}>
-                  <span className="text-3xl font-bold" style={{ color: NAVY }}>Inclus</span>
-                  <p className="text-xs mt-1" style={{ color: MUTED }}>dans votre forfait voyage</p>
-                </div>
-                <ul className="space-y-2.5 flex-1 mb-6">
-                  {['3 bagages protégés', '2 QR codes soute', 'Activation 30 secondes', 'Alertes WhatsApp', 'Géré par l\'agence', '98% récupération'].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm" style={{ color: INK }}>
-                      <CheckCircle className="w-4 h-4 shrink-0" style={{ color: JAUNE }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/hajj-omra" className="group/link">
-                  <Button className="w-full rounded-[10px] h-11 text-sm font-medium transition-all" style={{ backgroundColor: NAVY, color: '#fff' }}>
-                    Découvrir
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/link:translate-x-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Voyage unique */}
-          <motion.div variants={fadeUp} custom={1}>
-            <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:border-transparent transition-all duration-300">
-              <div className="h-36 bg-gradient-to-br from-amber-600 to-yellow-500 relative flex items-center justify-center">
-                <div className="bg-gradient-to-t from-black/40 to-transparent absolute inset-0" />
-                <span className="relative text-5xl">✈️</span>
-              </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className={`text-xl font-semibold mb-1 ${serif}`} style={{ color: INK }}>Voyage unique</h3>
-                <p className="text-xs uppercase tracking-wider mb-4" style={{ color: MUTED }}>Voyageurs indépendants</p>
-                <div className="text-center mb-6 py-4 rounded-xl" style={{ backgroundColor: BG_TINTED }}>
-                  <span className="text-3xl font-bold" style={{ color: NAVY }}>4€</span>
-                  <p className="text-xs mt-1" style={{ color: MUTED }}>7 jours</p>
-                </div>
-                <ul className="space-y-2.5 flex-1 mb-6">
-                  {['1-2 bagages protégés', '2 QR codes', 'Alertes WhatsApp', 'Notification email', 'Sans app / batterie / GPS', 'Support 24/7'].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm" style={{ color: INK }}>
-                      <CheckCircle className="w-4 h-4 shrink-0" style={{ color: JAUNE }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/voyageurs-standard" className="group/link">
-                  <Button className="w-full rounded-[10px] h-11 text-sm font-medium transition-all" style={{ backgroundColor: JAUNE, color: NAVY }}>
-                    Commander
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/link:translate-x-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Multi-voyages — POPULAIRE */}
-          <motion.div variants={fadeUp} custom={2}>
-            <div className="group relative flex flex-col h-full bg-white rounded-2xl border-2 overflow-hidden hover:shadow-2xl transition-all duration-300" style={{ borderColor: JAUNE }}>
-              <div className="absolute top-0 right-0 z-10 text-xs font-bold px-4 py-1.5 rounded-bl-xl" style={{ backgroundColor: JAUNE, color: NAVY }}>POPULAIRE</div>
-              <div className="h-36 bg-gradient-to-br from-[#1e3a5f] to-[#2e5a8f] relative flex items-center justify-center">
-                <div className="bg-gradient-to-t from-black/40 to-transparent absolute inset-0" />
-                <span className="relative text-5xl">🌍</span>
-              </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className={`text-xl font-semibold mb-1 ${serif}`} style={{ color: INK }}>Multi-voyages</h3>
-                <p className="text-xs uppercase tracking-wider mb-4" style={{ color: MUTED }}>Voyageurs fréquents</p>
-                <div className="text-center mb-6 py-4 rounded-xl" style={{ backgroundColor: BG_TINTED }}>
-                  <span className="text-3xl font-bold" style={{ color: NAVY }}>7€</span>
-                  <p className="text-xs mt-1" style={{ color: MUTED }}>1 an</p>
-                </div>
-                <ul className="space-y-2.5 flex-1 mb-6">
-                  {['1-2 bagages protégés', '2 QR codes', 'Support prioritaire', 'Statistiques de scan', 'Sans app / batterie / GPS', 'RGPD certifié'].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm" style={{ color: INK }}>
-                      <CheckCircle className="w-4 h-4 shrink-0" style={{ color: JAUNE }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/voyageurs-standard" className="group/link">
-                  <Button className="w-full rounded-[10px] h-11 text-sm font-medium transition-all" style={{ backgroundColor: NAVY, color: '#fff' }}>
-                    Commander
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/link:translate-x-1" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════
    TESTIMONIALS — Carousel-style (HMC)
    ══════════════════════════════════════════════════════════ */
 function TestimonialsSection() {
@@ -1434,7 +1315,6 @@ export default function HomePage() {
         <FeaturesGrid />
         <HowItWorksSection />
         <TransportSection />
-        <PricingSection />
         <TestimonialsSection />
         <CTASection />
       </main>

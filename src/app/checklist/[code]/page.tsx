@@ -200,7 +200,6 @@ export default function ChecklistViewPage() {
             <a href="/" className="px-3 py-2 text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors rounded-lg hover:bg-slate-50">Accueil</a>
             <a href="/checklist" className="px-3 py-2 text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors rounded-lg hover:bg-slate-50">Checklist</a>
             <a href="/#comment" className="px-3 py-2 text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors rounded-lg hover:bg-slate-50">À propos</a>
-            <a href="/#tarifs" className="px-3 py-2 text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors rounded-lg hover:bg-slate-50">Tarifs</a>
             <a href="/contact" className="px-3 py-2 text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors rounded-lg hover:bg-slate-50">Contactez-nous</a>
           </div>
           <LanguageSelector lang={lang} setLang={setLang} variant="blue" />
