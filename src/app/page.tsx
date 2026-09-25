@@ -1287,7 +1287,7 @@ function CTASection() {
               </Button>
             </Link>
             <Link href="/devenir-partenaire" className="group">
-              <Button size="lg" variant="outline" className="rounded-[10px] px-6 h-12 text-sm font-medium border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all">
+              <Button size="lg" variant="outline" className="rounded-[10px] px-6 h-12 text-sm font-medium bg-transparent! border-white/40! text-white! hover:bg-white/10! hover:text-white! backdrop-blur-sm transition-all">
                 Devenir partenaire
                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -1306,7 +1306,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: BG_LIGHT }}>
       <PublicNavigation />
-      <main className="flex-1 pt-16">
+      <main className="flex-1 pt-24">
         <HeroSection />
         <AboutSection />
         <NosPassSection />

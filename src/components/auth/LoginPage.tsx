@@ -21,6 +21,9 @@ import {
   Luggage,
   Globe,
   Sparkles,
+  Phone,
+  MapPin,
+  Clock,
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -121,7 +124,6 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -130,14 +132,6 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
       router.replace(config.redirectPath);
     }
   }, [user, authLoading, isAgency, isSuperAdmin, variant, router, config.redirectPath]);
-
-  // Rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial(prev => (prev + 1) % config.testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [config.testimonials.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +196,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           {/* Top: Logo */}
           <div className="flex items-center justify-between">
             <Link href="/" className="group">
-              <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm p-2 border border-white/10 flex items-center justify-center group-hover:bg-white/15 transition-all">
+              <div className="w-24 h-24 rounded-[16px] bg-white p-2.5 shadow-2xl shadow-black/20 flex items-center justify-center group-hover:scale-105 transition-all">
                 <img src="/logo-mvp.webp" alt="PassHajj" className="w-full h-full object-contain" />
               </div>
             </Link>
@@ -244,33 +238,33 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             </div>
           </div>
 
-          {/* Bottom: Testimonial */}
+          {/* Bottom: Contact — New Vision Cargo */}
           <div className="relative">
-            <div className="border-l-2 border-blue-500/40 pl-5">
-              <p className="text-white/60 text-sm italic leading-relaxed mb-3">
-                &ldquo;{config.testimonials[activeTestimonial].text}&rdquo;
+            <div className="border-l-2 border-blue-500/40 pl-5 space-y-3">
+              <p className="text-white font-semibold text-sm tracking-wide flex items-center gap-2">
+                <Phone className="w-4 h-4 text-blue-400" />
+                New Vision Cargo
               </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
-                    {config.testimonials[activeTestimonial].name.split(' ').map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-white/80 text-xs font-medium">{config.testimonials[activeTestimonial].name}</p>
-                  <p className="text-white/30 text-[10px]">{config.testimonials[activeTestimonial].role}</p>
-                </div>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Phone className="w-4 h-4 text-blue-400/70 shrink-0 mt-0.5" />
+                <span>
+                  <a href="tel:+23566352505" className="hover:text-white transition-colors">+235 66 35 25 05</a>
+                  {' · '}
+                  <a href="tel:+23595729999" className="hover:text-white transition-colors">+235 95 72 99 99</a>
+                </span>
               </div>
-            </div>
-            {/* Dots indicator */}
-            <div className="flex gap-1.5 mt-4">
-              {config.testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveTestimonial(i)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeTestimonial ? 'bg-blue-500 w-4' : 'bg-white/20'}`}
-                />
-              ))}
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Mail className="w-4 h-4 text-blue-400/70 shrink-0 mt-0.5" />
+                <a href="mailto:contact@newvisioncargo.pro" className="hover:text-white transition-colors break-all">contact@newvisioncargo.pro</a>
+              </div>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <MapPin className="w-4 h-4 text-blue-400/70 shrink-0 mt-0.5" />
+                <span>Avenue Charles de Gaulle, N'Djaména, Tchad</span>
+              </div>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Clock className="w-4 h-4 text-blue-400/70 shrink-0 mt-0.5" />
+                <span>Lundi – Vendredi : 8h00 – 18h00<br />Samedi : 9h00 – 13h00</span>
+              </div>
             </div>
           </div>
         </div>

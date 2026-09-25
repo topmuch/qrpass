@@ -31,10 +31,10 @@ export function PublicNavigation() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm border-b border-slate-100' : 'bg-white/70 backdrop-blur-lg'}`}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/logo-mvp.webp" alt="PassHajj" width={72} height={72} style={{ objectFit: 'contain', borderRadius: '14px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} priority />
+            <Image src="/logo-mvp.webp" alt="PassHajj" width={88} height={88} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -100,7 +100,7 @@ export function PublicFooter() {
           {/* Logo */}
           <div>
             <div className="mb-4">
-              <Image src="/logo-mvp.webp" alt="PassHajj" width={64} height={64} style={{ objectFit: 'contain', borderRadius: '14px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/logo-mvp.webp" alt="PassHajj" width={80} height={80} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} />
             </div>
             <p className="text-white/50 text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
@@ -197,7 +197,7 @@ interface PublicLayoutProps {
 export default function PublicLayout({ 
   children, 
   showFooter = true,
-  paddingTop = "pt-16"
+  paddingTop = "pt-24"
 }: PublicLayoutProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">

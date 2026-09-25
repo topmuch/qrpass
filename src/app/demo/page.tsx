@@ -1,600 +1,224 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PublicLayout from '@/components/public/PublicLayout';
-import { Button } from "@/components/ui/button";
+import { QRCodeSVG } from 'qrcode.react';
 import {
   QrCode,
   MapPin,
-  MessageCircle,
-  CheckCircle,
   Smartphone,
-  Battery,
-  Zap,
-  ArrowRight,
   RefreshCw,
-  Send,
-  Clock
-} from "lucide-react";
+  Clock,
+  ShieldCheck,
+  ScanLine,
+  BellRing,
+  ArrowRight,
+  BatteryCharging,
+  WifiOff,
+} from 'lucide-react';
 
-// Types
-type Step = 'intro' | 'scan' | 'location' | 'whatsapp' | 'success';
+/* ══════════════════════════════════════════════════════════
+   TOKEN HORAIRE — le QR change chaque heure (reset 1h)
+   ══════════════════════════════════════════════════════════ */
+function buildHourToken(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const h = String(date.getHours()).padStart(2, '0');
+  return `DEMO-${y}${m}${d}-${h}`;
+}
 
-// Demo Page Component
+function msUntilNextHour(date: Date): number {
+  const next = new Date(date);
+  next.setHours(date.getHours() + 1, 0, 0, 0);
+  return next.getTime() - date.getTime();
+}
+
+function formatCountdown(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
+  const ss = String(totalSec % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+}
+
+/* ─── Étapes de la démo ─── */
+const DEMO_STEPS = [
+  {
+    icon: ScanLine,
+    title: '1. Scannez le QR code',
+    text: 'Pointez l\'appareil photo de votre téléphone sur le QR code affiché ci-dessus. Aucune application à installer.',
+    color: '#2563EB',
+  },
+  {
+    icon: MapPin,
+    title: '2. Le bagage est identifié',
+    text: 'La page du bagage s\'ouvre instantanément : propriétaire, vol, itinéraire et statut « bagage retrouvé ».',
+    color: '#F59E0B',
+  },
+  {
+    icon: BellRing,
+    title: '3. Le propriétaire est alerté',
+    text: 'Une alerte WhatsApp avec la géolocalisation est envoyée au propriétaire. La boucle est bouclée.',
+    color: '#10B981',
+  },
+];
+
 export default function DemoPage() {
-  const [currentStep, setCurrentStep] = useState<Step>('intro');
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [scanComplete, setScanComplete] = useState(false);
-  const [locationShared, setLocationShared] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
-  const [formData, setFormData] = useState({
-    name: 'Ahmed',
-    phone: '+221 77 123 45 67'
-  });
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState<Date | null>(null);
 
-  // Timer
+  // Horloge : tick chaque seconde (compte à rebours + reset horaire auto)
   useEffect(() => {
-    if (currentStep !== 'intro' && currentStep !== 'success') {
-      const timer = setInterval(() => {
-        setElapsedTime(prev => prev + 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [currentStep]);
+    setMounted(true);
+    setNow(new Date());
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // Handle Scan
-  const handleScan = () => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      setScanComplete(true);
-      setIsAnimating(false);
-      setTimeout(() => {
-        setCurrentStep('location');
-      }, 1500);
-    }, 2000);
-  };
+  const token = useMemo(() => (now ? buildHourToken(now) : null), [now]);
+  const countdown = now ? formatCountdown(msUntilNextHour(now)) : '--:--';
+  const validUntil = useMemo(() => {
+    if (!now) return null;
+    const end = new Date(now);
+    end.setMinutes(59, 59, 999);
+    return end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }, [now]);
 
-  // Handle Location
-  const handleLocation = () => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      setLocationShared(true);
-      setIsAnimating(false);
-      setTimeout(() => {
-        setCurrentStep('whatsapp');
-      }, 1500);
-    }, 2000);
-  };
-
-  // Handle WhatsApp
-  const handleWhatsApp = () => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      setMessageSent(true);
-      setIsAnimating(false);
-      setTimeout(() => {
-        setCurrentStep('success');
-      }, 1000);
-    }, 1500);
-  };
-
-  // Reset Demo
-  const resetDemo = () => {
-    setCurrentStep('intro');
-    setScanComplete(false);
-    setLocationShared(false);
-    setMessageSent(false);
-    setElapsedTime(0);
-  };
-
-  // Format time
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Timer display for header
-  const headerExtra = currentStep !== 'intro' && currentStep !== 'success' ? (
-    <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-      <Clock className="w-4 h-4 text-[#1E40AF]" />
-      <span className="text-white font-mono">{formatTime(elapsedTime)}</span>
-    </div>
-  ) : null;
+  const demoUrl = useMemo(() => {
+    if (!token || typeof window === 'undefined') return '';
+    return `${window.location.origin}/demo/scan?t=${token}`;
+  }, [token]);
 
   return (
-    <PublicLayout paddingTop="pt-20">
-      {/* Timer Display */}
-      {headerExtra && (
-        <div className="fixed top-20 right-4 z-40">
-          {headerExtra}
+    <PublicLayout>
+      {/* ─── Hero Démo ─── */}
+      <section className="relative overflow-hidden py-14 sm:py-20" style={{ background: 'linear-gradient(135deg, #0c1d3a 0%, #1e3a5f 55%, #254a75 100%)' }}>
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+        <div className="relative max-w-3xl mx-auto px-4 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-6" style={{ backgroundColor: 'rgba(245,158,11,0.15)', color: '#FCD34D' }}>
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            Démo live — active en ce moment
+          </span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
+            Essayez PassHajj <span style={{ color: '#FCD34D' }}>en conditions réelles</span>
+          </h1>
+          <p className="text-white/70 text-lg leading-relaxed max-w-xl mx-auto">
+            Scannez ce QR code avec votre téléphone comme le ferait une personne qui retrouve votre bagage.
+            La démo se réinitialise <strong className="text-white">automatiquement chaque heure</strong> avec un nouveau code.
+          </p>
         </div>
-      )}
+      </section>
 
-      <div className="relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1E40AF]/10 via-transparent to-[#1D4ED8]/10 pointer-events-none" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#1E40AF]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#1D4ED8]/20 rounded-full blur-3xl animate-pulse" />
+      {/* ─── QR + instructions ─── */}
+      <section className="py-14 sm:py-20" style={{ backgroundColor: '#F4F8FB' }}>
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Carte QR */}
+            <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: 'linear-gradient(90deg, #F59E0B, #FCD34D, #F59E0B)' }} />
+              <h2 className="text-xl font-bold mb-2" style={{ color: '#0f172a' }}>Bagage démo n° HAJJ26-DEMO</h2>
+              <p className="text-sm text-slate-500 mb-6">Scannez avec l&apos;appareil photo ou Google Lens</p>
 
-        <div className="max-w-4xl mx-auto px-4 py-8">
-
-          {/* INTRO STEP */}
-          {currentStep === 'intro' && (
-            <div className="text-center py-16 animate-fade-in">
-              <div className="inline-flex items-center gap-2 mb-6">
-                <span className="px-4 py-2 bg-[#1E40AF]/20 border border-[#1E40AF]/50 text-[#1E40AF] text-sm rounded-full font-medium animate-pulse">
-                  ✨ Découverte interactive
-                </span>
+              <div className="inline-block rounded-2xl border-4 p-5 mb-6" style={{ borderColor: '#0c1d3a', backgroundColor: '#fff' }}>
+                {mounted && token ? (
+                  <QRCodeSVG
+                    value={demoUrl}
+                    size={220}
+                    level="M"
+                    bgColor="#FFFFFF"
+                    fgColor="#0c1d3a"
+                  />
+                ) : (
+                  <div className="w-[220px] h-[220px] flex items-center justify-center bg-slate-50 rounded-xl">
+                    <QrCode className="w-16 h-16 text-slate-300 animate-pulse" />
+                  </div>
+                )}
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                <span className="bg-gradient-to-r from-[#1E40AF] to-[#1D4ED8] bg-clip-text text-transparent">
-                  Essayez PassHajj
-                </span>
-                <br />
-                <span className="text-white">en 60 secondes</span>
-              </h1>
-
-              <p className="text-[#a0a8b8] max-w-2xl mx-auto mb-8 text-lg">
-                Aucun compte, aucune application. Juste un QR code… et magie.
-                Découvrez comment protéger vos bagages en moins d&apos;une minute.
+              {/* Compte à rebours de réinitialisation */}
+              <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" style={{ backgroundColor: 'rgba(37,99,235,0.08)', color: '#2563EB' }}>
+                <RefreshCw className="w-4 h-4" />
+                Nouveau QR dans&nbsp;<span className="tabular-nums font-bold">{countdown}</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                Session démo valable jusqu&apos;à {validUntil ?? '—'} (reset toutes les 1h)
               </p>
 
-              {/* Features Pills */}
-              <div className="flex flex-wrap justify-center gap-4 mb-12">
-                <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                  <Smartphone className="w-4 h-4 text-[#1E40AF]" />
-                  <span className="text-[#a0a8b8] text-sm">Sans application</span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                  <Battery className="w-4 h-4 text-[#1D4ED8]" />
-                  <span className="text-[#a0a8b8] text-sm">Sans batterie</span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                  <Zap className="w-4 h-4 text-[#1E40AF]" />
-                  <span className="text-[#a0a8b8] text-sm">30 secondes</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setCurrentStep('scan')}
-                className="bg-[#1E40AF] text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-[#e01e5a] transition-all transform hover:scale-105 shadow-lg shadow-[#1E40AF]/30 inline-flex items-center gap-3"
+              <Link
+                href={`/demo/scan?t=${token ?? ''}`}
+                className="mt-6 inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-[10px] px-6 h-12 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+                style={{ backgroundColor: '#0c1d3a' }}
               >
-                <span className="text-2xl">▶️</span>
-                Démarrer la démo
-              </button>
-
-              <p className="mt-6 text-[#a0a8b8] text-sm">
-                Simulation interactive • Aucune donnée réelle requise
-              </p>
+                <Smartphone className="w-4 h-4" />
+                Ouvrir la démo sur cet appareil
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-          )}
 
-          {/* SCAN STEP */}
-          {currentStep === 'scan' && (
-            <div className="text-center py-8 animate-fade-in">
-              {/* Progress */}
-              <div className="flex items-center justify-center gap-2 mb-8">
-                {[1, 2, 3].map((step) => (
-                  <div
-                    key={step}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      step === 1 ? 'bg-[#1E40AF] w-8' : 'bg-[#1a2238]'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Étape 1 : Scannez le QR
-              </h2>
-              <p className="text-[#a0a8b8] mb-8">
-                Imaginez que vous scannez le QR code sur votre bagage
-              </p>
-
-              {/* QR Code Display */}
-              <div className="flex justify-center mb-8">
-                <div className={`relative ${isAnimating ? 'animate-pulse' : ''}`}>
-                  {/* Glow */}
-                  <div className="absolute inset-0 bg-[#1E40AF]/30 blur-3xl rounded-full" />
-
-                  {/* QR Card */}
-                  <div className={`relative bg-[#0d1220] rounded-3xl p-8 border-2 transition-all duration-500 ${
-                    scanComplete ? 'border-[#1e3a2e] bg-[#1e3a2e]/20' : 'border-[#1E40AF]/50'
-                  }`}>
-                    <div className="w-56 h-56 bg-white rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
-                      {/* Scan Animation */}
-                      {isAnimating && (
-                        <div className="absolute inset-0 bg-[#1E40AF]/20 flex items-center justify-center">
-                          <div className="w-full h-1 bg-[#1E40AF] animate-scan" />
-                        </div>
-                      )}
-
-                      {scanComplete ? (
-                        <div className="flex flex-col items-center animate-bounce">
-                          <CheckCircle className="w-24 h-24 text-[#1e3a2e]" />
-                          <span className="text-[#1e3a2e] font-bold mt-2">Activé !</span>
-                        </div>
-                      ) : (
-                        <>
-                          <QrCode className="w-36 h-36 text-[#080c1a]" />
-                          <p className="text-[#080c1a] font-mono text-lg mt-2 font-bold">DEMO-001</p>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="mt-6 text-center">
-                      {scanComplete ? (
-                        <div className="flex items-center justify-center gap-2 text-[#4ade80]">
-                          <CheckCircle className="w-5 h-5" />
-                          <span className="font-medium">Bagage activé avec succès !</span>
-                        </div>
-                      ) : (
-                        <p className="text-[#a0a8b8]">Référence: DEMO-001</p>
-                      )}
-                    </div>
+            {/* Étapes */}
+            <div className="space-y-5">
+              {DEMO_STEPS.map((step) => (
+                <div key={step.title} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex gap-4">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${step.color}14` }}>
+                    <step.icon className="w-6 h-6" style={{ color: step.color }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base mb-1" style={{ color: '#0f172a' }}>{step.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{step.text}</p>
                   </div>
                 </div>
-              </div>
+              ))}
 
-              {!scanComplete && (
-                <Button
-                  onClick={handleScan}
-                  disabled={isAnimating}
-                  className="bg-[#1E40AF] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#e01e5a] transition-all transform hover:scale-105 shadow-lg shadow-[#1E40AF]/30 inline-flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isAnimating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Scan en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Smartphone className="w-5 h-5" />
-                      Simuler le scan
-                    </>
-                  )}
-                </Button>
-              )}
-
-              {scanComplete && (
-                <div className="animate-fade-in">
-                  <p className="text-[#a0a8b8] mb-4">Préparation de la localisation...</p>
-                  <ArrowRight className="w-6 h-6 text-[#1E40AF] animate-bounce mx-auto" />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* LOCATION STEP */}
-          {currentStep === 'location' && (
-            <div className="text-center py-8 animate-fade-in">
-              {/* Progress */}
-              <div className="flex items-center justify-center gap-2 mb-8">
-                {[1, 2, 3].map((step) => (
-                  <div
-                    key={step}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      step === 2 ? 'bg-[#1D4ED8] w-8' : step < 2 ? 'bg-[#1E40AF]' : 'bg-[#1a2238]'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Étape 2 : Localisez-le
-              </h2>
-              <p className="text-[#a0a8b8] mb-8">
-                Partagez votre position pour faciliter la récupération
-              </p>
-
-              {/* Map Display */}
-              <div className="flex justify-center mb-8">
-                <div className="relative">
-                  <div className="bg-[#0d1220] rounded-3xl p-4 border border-[#1a2238] overflow-hidden">
-                    {/* Map Placeholder */}
-                    <div className={`w-80 h-64 bg-[#1a2238] rounded-2xl relative overflow-hidden transition-all ${
-                      locationShared ? 'border-2 border-[#1e3a2e]' : ''
-                    }`}>
-                      {/* Grid Pattern */}
-                      <div className="absolute inset-0 opacity-30">
-                        <div className="grid grid-cols-8 grid-rows-6 h-full gap-px">
-                          {[...Array(48)].map((_, i) => (
-                            <div key={i} className="bg-[#0d1220]" />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Roads */}
-                      <div className="absolute top-1/2 left-0 right-0 h-1 bg-[#0d1220]" />
-                      <div className="absolute top-0 bottom-0 left-1/3 w-1 bg-[#0d1220]" />
-                      <div className="absolute top-0 bottom-0 right-1/3 w-1 bg-[#0d1220]" />
-
-                      {/* Location Pin */}
-                      {locationShared && (
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce">
-                          <div className="relative">
-                            <div className="w-8 h-8 bg-[#1E40AF] rounded-full flex items-center justify-center shadow-lg shadow-[#1E40AF]/50">
-                              <MapPin className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-[#1E40AF]/30 rounded-full animate-ping" />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Center Point */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        {!locationShared && (
-                          <div className="w-4 h-4 bg-[#1D4ED8] rounded-full animate-pulse" />
-                        )}
-                      </div>
-
-                      {/* Location Label */}
-                      {locationShared && (
-                        <div className="absolute bottom-4 left-4 right-4 bg-[#0d1220]/90 rounded-lg p-3">
-                          <p className="text-white text-sm font-medium">Position enregistrée</p>
-                          <p className="text-[#a0a8b8] text-xs">Aéroport de Paris CDG, France</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {!locationShared && (
-                <Button
-                  onClick={handleLocation}
-                  disabled={isAnimating}
-                  className="bg-[#1D4ED8] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#c04800] transition-all transform hover:scale-105 shadow-lg shadow-[#1D4ED8]/30 inline-flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isAnimating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Localisation...
-                    </>
-                  ) : (
-                    <>
-                      <MapPin className="w-5 h-5" />
-                      Partager ma position
-                    </>
-                  )}
-                </Button>
-              )}
-
-              {locationShared && (
-                <div className="animate-fade-in">
-                  <div className="flex items-center justify-center gap-2 text-[#4ade80] mb-4">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-medium">Position enregistrée avec succès !</span>
-                  </div>
-                  <ArrowRight className="w-6 h-6 text-[#1D4ED8] animate-bounce mx-auto" />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* WHATSAPP STEP */}
-          {currentStep === 'whatsapp' && (
-            <div className="text-center py-8 animate-fade-in">
-              {/* Progress */}
-              <div className="flex items-center justify-center gap-2 mb-8">
-                {[1, 2, 3].map((step) => (
-                  <div
-                    key={step}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      step === 3 ? 'bg-[#25D366] w-8' : 'bg-[#1E40AF]'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Étape 3 : Envoyer au propriétaire
-              </h2>
-              <p className="text-[#a0a8b8] mb-8">
-                Recevez une notification si quelqu&apos;un trouve votre bagage
-              </p>
-
-              {/* WhatsApp Card */}
-              <div className="max-w-md mx-auto mb-8">
-                <div className="bg-[#0d1220] rounded-3xl p-6 border border-[#1a2238]">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-left text-white">Prénom</label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-[#080c1a] border border-[#1a2238] text-white focus:outline-none focus:border-[#25D366]"
-                        placeholder="Votre prénom"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-left text-white">WhatsApp</label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-[#080c1a] border border-[#1a2238] text-white focus:outline-none focus:border-[#25D366]"
-                        placeholder="+33 6 00 00 00 00"
-                      />
-                    </div>
-
-                    {/* Message Preview */}
-                    <div className="bg-[#25D366]/10 rounded-xl p-4 border border-[#25D366]/30">
-                      <div className="flex items-start gap-3">
-                        <MessageCircle className="w-5 h-5 text-[#25D366] shrink-0 mt-1" />
-                        <div className="text-left">
-                          <p className="text-white text-sm font-medium mb-1">Aperçu du message :</p>
-                          <p className="text-[#a0a8b8] text-xs italic">
-                            &quot;Bonjour {formData.name}, votre bagage DEMO-001 a été scanné.
-                            Cliquez ici pour voir sa localisation : [Lien sécurisé]&quot;
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {!messageSent && (
-                <Button
-                  onClick={handleWhatsApp}
-                  disabled={isAnimating}
-                  className="bg-[#25D366] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#20bd5a] transition-all transform hover:scale-105 shadow-lg shadow-[#25D366]/30 inline-flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isAnimating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Envoi en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      Envoyer la notification
-                    </>
-                  )}
-                </Button>
-              )}
-
-              {messageSent && (
-                <div className="animate-fade-in">
-                  <div className="flex items-center justify-center gap-2 text-[#4ade80] mb-4">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-medium">Message envoyé !</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* SUCCESS STEP */}
-          {currentStep === 'success' && (
-            <div className="py-8 animate-fade-in">
-              <div className="text-center bg-gradient-to-r from-[#1E40AF] to-[#1D4ED8] rounded-3xl p-12 relative overflow-hidden">
-                {/* Confetti Effect */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                  {[...Array(20)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-2 h-2 bg-white/30 rounded-full animate-confetti"
-                      style={{
-                        left: `${Math.random() * 100}%`,
-                        animationDelay: `${Math.random() * 2}s`,
-                        animationDuration: `${2 + Math.random() * 2}s`
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* Success Icon */}
-                <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce shadow-2xl">
-                  <span className="text-6xl">🎉</span>
-                </div>
-
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                  Wahoo !
-                </h2>
-
-                <p className="text-white/90 max-w-lg mx-auto mb-4 text-lg">
-                  Vous venez de protéger un bagage en <span className="font-bold">{formatTime(elapsedTime)}</span> secondes.
+              <div className="rounded-2xl p-6 border border-dashed" style={{ borderColor: '#c7d6e8', backgroundColor: 'rgba(37,99,235,0.03)' }}>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  <strong style={{ color: '#0f172a' }}>Sans application, sans batterie, sans GPS :</strong>{' '}
+                  le QR code imprimé sur l&apos;étiquette du bagage suffit. Celui de la démo expire chaque heure
+                  — exactement comme un QR réellement éphémère de PassHajj.
                 </p>
-
-                <p className="text-white/70 max-w-lg mx-auto mb-8">
-                  Sans application, sans batterie, sans GPS.
-                  Juste un simple QR code.
-                </p>
-
-                {/* Stats */}
-                <div className="flex flex-wrap justify-center gap-4 mb-8">
-                  <div className="bg-white/20 rounded-xl px-6 py-3">
-                    <div className="text-2xl font-bold text-white">{formatTime(elapsedTime)}</div>
-                    <div className="text-white/70 text-sm">Secondes</div>
-                  </div>
-                  <div className="bg-white/20 rounded-xl px-6 py-3">
-                    <div className="text-2xl font-bold text-white">3</div>
-                    <div className="text-white/70 text-sm">Étapes</div>
-                  </div>
-                  <div className="bg-white/20 rounded-xl px-6 py-3">
-                    <div className="text-2xl font-bold text-white">100%</div>
-                    <div className="text-white/70 text-sm">Sécurisé</div>
-                  </div>
+                <div className="flex flex-wrap gap-4 mt-4 text-xs font-medium text-slate-500">
+                  <span className="inline-flex items-center gap-1.5"><BatteryCharging className="w-4 h-4 text-emerald-500" /> Zéro batterie</span>
+                  <span className="inline-flex items-center gap-1.5"><WifiOff className="w-4 h-4 text-emerald-500" /> Fonctionne hors ligne</span>
+                  <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-500" /> Données chiffrées</span>
                 </div>
-
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button
-                    onClick={resetDemo}
-                    className="bg-white text-[#1E40AF] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all inline-flex items-center justify-center gap-2"
-                  >
-                    <RefreshCw className="w-5 h-5" />
-                    Recommencer
-                  </Button>
-                  <Link href="/contact">
-                    <Button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all inline-flex items-center justify-center gap-2">
-                      <span>📦</span>
-                      Commander maintenant
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Features Recap */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                {[
-                  { icon: Smartphone, label: "Sans application", color: "#1E40AF" },
-                  { icon: Battery, label: "Sans batterie", color: "#1D4ED8" },
-                  { icon: MapPin, label: "Sans GPS", color: "#1e3a2e" },
-                  { icon: Zap, label: "30 secondes", color: "#1E40AF" },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-[#0d1220] rounded-xl p-4 border border-[#1a2238] text-center"
-                  >
-                    <item.icon className="w-6 h-6 mx-auto mb-2" style={{ color: item.color }} />
-                    <span className="text-[#a0a8b8] text-sm">{item.label}</span>
-                  </div>
-                ))}
               </div>
             </div>
-          )}
-
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* CSS for animations */}
-      <style jsx global>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes scan {
-          0% { transform: translateY(0); }
-          50% { transform: translateY(200px); }
-          100% { transform: translateY(0); }
-        }
-
-        @keyframes confetti {
-          0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out forwards;
-        }
-
-        .animate-scan {
-          animation: scan 1.5s ease-in-out infinite;
-        }
-
-        .animate-confetti {
-          animation: confetti 3s linear infinite;
-        }
-      `}</style>
+      {/* ─── CTA ─── */}
+      <section className="py-14 px-4" style={{ backgroundColor: '#0c1d3a' }}>
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Convaincu ? Protégez vos bagages dès aujourd&apos;hui
+          </h2>
+          <p className="text-white/60 mb-8">
+            Commandez vos QR codes PassHajj ou proposez la solution à vos pèlerins.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/hajj-omra"
+              className="inline-flex items-center justify-center gap-2 rounded-[10px] px-6 h-12 text-sm font-semibold shadow-lg transition-all hover:shadow-xl"
+              style={{ backgroundColor: '#F59E0B', color: '#0c1d3a' }}
+            >
+              Hajj &amp; Omra
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/devenir-partenaire"
+              className="inline-flex items-center justify-center gap-2 rounded-[10px] px-6 h-12 text-sm font-semibold bg-transparent! border-white/40! text-white! hover:bg-white/10! hover:text-white! transition-all"
+            >
+              Devenir partenaire
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </PublicLayout>
   );
 }

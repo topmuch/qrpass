@@ -18,6 +18,9 @@ import {
   Luggage,
   Globe,
   Fingerprint,
+  Phone,
+  MapPin,
+  Clock,
 } from 'lucide-react';
 
 /* ══════════════════════════════════════════════════════════
@@ -29,19 +32,6 @@ const STATS = [
   { value: '850+', label: 'Agences partenaires' },
   { value: '45+', label: 'Pays couverts' },
   { value: '99.9%', label: 'Disponibilité' },
-];
-
-const TESTIMONIALS = [
-  {
-    name: 'Fatou Diallo',
-    role: 'Agence Hajj Express',
-    text: 'PassHajj a transformé notre gestion de bagages. Zéro perte depuis 2 ans.',
-  },
-  {
-    name: 'Moussa Koné',
-    role: 'Voyages Sahel',
-    text: 'Le dashboard est simple et efficace. Nos clients sont rassurés.',
-  },
 ];
 
 /* ══════════════════════════════════════════════════════════
@@ -82,53 +72,6 @@ function FloatingIcon({
 }
 
 /* ══════════════════════════════════════════════════════════
-   ANIMATED TESTIMONIAL
-   ══════════════════════════════════════════════════════════ */
-
-function AnimatedTestimonial({
-  testimonial,
-  isActive,
-}: {
-  testimonial: (typeof TESTIMONIALS)[number];
-  isActive: boolean;
-}) {
-  return (
-    <AnimatePresence mode="wait">
-      {isActive && (
-        <motion.div
-          key={testimonial.name}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="space-y-3"
-        >
-          <p className="text-white/60 text-sm italic leading-relaxed">
-            &ldquo;{testimonial.text}&rdquo;
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-700/30">
-              <span className="text-white text-xs font-bold">
-                {testimonial.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </span>
-            </div>
-            <div>
-              <p className="text-white/85 text-xs font-medium">
-                {testimonial.name}
-              </p>
-              <p className="text-white/35 text-[10px]">{testimonial.role}</p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════ */
 
@@ -143,7 +86,6 @@ export default function AgenceLoginPage() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   // Redirect if already logged in as agency
   useEffect(() => {
@@ -152,14 +94,6 @@ export default function AgenceLoginPage() {
       router.replace('/agence/tableau-de-bord');
     }
   }, [user, authLoading, isAgency, router]);
-
-  // Rotate testimonials every 5s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -270,7 +204,7 @@ export default function AgenceLoginPage() {
           <div className="flex items-center">
             <Link href="/" className="group">
               <motion.div
-                className="w-[76px] h-[76px] rounded-2xl bg-white/[0.1] backdrop-blur-md p-2.5 border border-white/[0.15] flex items-center justify-center group-hover:bg-white/[0.16] transition-all duration-300 shadow-xl shadow-black/10"
+                className="w-24 h-24 rounded-[16px] bg-white p-2.5 flex items-center justify-center transition-all duration-300 shadow-xl shadow-black/10"
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -356,7 +290,7 @@ export default function AgenceLoginPage() {
             </motion.div>
           </div>
 
-          {/* Bottom: Testimonial with gold accent border */}
+          {/* Bottom: Contact — New Vision Cargo */}
           <motion.div
             className="relative"
             initial={{ opacity: 0, y: 16 }}
@@ -364,34 +298,33 @@ export default function AgenceLoginPage() {
             transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
             <div
-              className="border-l-2 pl-5"
+              className="border-l-2 pl-5 space-y-3"
               style={{ borderColor: 'rgba(197, 166, 67, 0.5)' }}
             >
-              <div className="min-h-[72px]">
-                {TESTIMONIALS.map((t, i) => (
-                  <AnimatedTestimonial
-                    key={t.name}
-                    testimonial={t}
-                    isActive={i === activeTestimonial}
-                  />
-                ))}
+              <p className="text-white font-semibold text-sm tracking-wide flex items-center gap-2">
+                <Phone className="w-4 h-4 text-[#f4b400]" />
+                New Vision Cargo
+              </p>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Phone className="w-4 h-4 text-[#f4b400]/70 shrink-0 mt-0.5" />
+                <span>
+                  <a href="tel:+23566352505" className="hover:text-white transition-colors">+235 66 35 25 05</a>
+                  {' · '}
+                  <a href="tel:+23595729999" className="hover:text-white transition-colors">+235 95 72 99 99</a>
+                </span>
               </div>
-            </div>
-
-            {/* Dots indicator */}
-            <div className="flex gap-1.5 mt-4">
-              {TESTIMONIALS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveTestimonial(i)}
-                  aria-label={`Témoignage ${i + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === activeTestimonial
-                      ? 'bg-[#f4b400] w-4'
-                      : 'bg-white/20 w-1.5 hover:bg-white/35'
-                  }`}
-                />
-              ))}
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Mail className="w-4 h-4 text-[#f4b400]/70 shrink-0 mt-0.5" />
+                <a href="mailto:contact@newvisioncargo.pro" className="hover:text-white transition-colors break-all">contact@newvisioncargo.pro</a>
+              </div>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <MapPin className="w-4 h-4 text-[#f4b400]/70 shrink-0 mt-0.5" />
+                <span>Avenue Charles de Gaulle, N&apos;Djaména, Tchad</span>
+              </div>
+              <div className="flex items-start gap-2.5 text-white/60 text-sm">
+                <Clock className="w-4 h-4 text-[#f4b400]/70 shrink-0 mt-0.5" />
+                <span>Lundi – Vendredi : 8h00 – 18h00<br />Samedi : 9h00 – 13h00</span>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -416,7 +349,7 @@ export default function AgenceLoginPage() {
             className="lg:hidden flex items-center justify-center mb-8"
             variants={itemVariants}
           >
-            <div className="w-16 h-16 rounded-2xl p-2 flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
+            <div className="w-20 h-20 rounded-[16px] p-2 bg-white flex items-center justify-center shadow-lg">
               <img
                 src="/logo-mvp.webp"
                 alt="PassHajj"
