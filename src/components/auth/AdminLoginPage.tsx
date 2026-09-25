@@ -341,7 +341,7 @@ export default function AdminLoginPage() {
               <div className="relative w-20 h-20 rounded-2xl bg-white/[0.07] backdrop-blur-sm p-2 border border-blue-500/20 flex items-center justify-center group-hover:bg-white/[0.12] group-hover:border-blue-500/40 transition-all duration-300">
                 {/* Glow effect behind logo */}
                 <div className="absolute -inset-1 rounded-2xl bg-blue-500/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
+                <img src="/logo-mvp.webp" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
               </div>
             </Link>
           </motion.div>
@@ -499,7 +499,7 @@ export default function AdminLoginPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="relative w-20 h-20 rounded-2xl p-2 border flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(244,180,0,0.2)' }}>
-              <img src="/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
+              <img src="/logo-mvp.webp" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
             </div>
           </motion.div>
 

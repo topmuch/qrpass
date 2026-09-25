@@ -276,7 +276,7 @@ export default function AgenceLoginPage() {
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
                 <img
-                  src="/logo.png"
+                  src="/logo-mvp.webp"
                   alt="PassHajj"
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
@@ -418,7 +418,7 @@ export default function AgenceLoginPage() {
           >
             <div className="w-16 h-16 rounded-2xl p-2 flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
               <img
-                src="/logo.png"
+                src="/logo-mvp.webp"
                 alt="PassHajj"
                 className="w-full h-full object-contain"
               />

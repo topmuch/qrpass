@@ -34,7 +34,7 @@ export function PublicNavigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="PassHajj" width={210} height={81} style={{ objectFit: 'contain', borderRadius: '16px', padding: '6px', background: 'rgba(255,255,255,0.9)' }} priority />
+            <Image src="/logo-mvp.webp" alt="PassHajj" width={72} height={72} style={{ objectFit: 'contain', borderRadius: '14px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -102,7 +102,7 @@ export function PublicFooter() {
           {/* Logo */}
           <div>
             <div className="mb-4">
-              <Image src="/logo.png" alt="PassHajj" width={210} height={81} style={{ objectFit: 'contain', borderRadius: '16px', padding: '6px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/logo-mvp.webp" alt="PassHajj" width={64} height={64} style={{ objectFit: 'contain', borderRadius: '14px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <p className="text-white/50 text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
