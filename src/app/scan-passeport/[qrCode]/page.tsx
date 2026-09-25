@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'qrcode';
@@ -754,18 +755,7 @@ export default function PassportFinderPage() {
       {/* ─── Brand Header ─── */}
       <header className="w-full flex items-center justify-between px-4 sm:px-5 pt-2 pb-2">
         <div className="flex items-center gap-2">
-          <Image
-            src="/logo-passhajj.png"
-            alt="PassHajj"
-            width={130}
-            height={48}
-            style={{
-              objectFit: 'contain',
-              borderRadius: '12px',
-              padding: '4px',
-              background: 'rgba(255,255,255,0.9)',
-            }}
-          />
+          <BrandLogo width={130} />
           <Badge
             className="text-xs font-semibold px-2.5 py-1 border-0"
             style={{ background: INK, color: WHITE }}
@@ -1678,8 +1668,8 @@ export default function PassportFinderPage() {
             <div className="w-full max-w-[380px] rounded-[24px] overflow-hidden shadow-2xl" style={{ background: CARD_BG }}>
               {/* Top: brand + title */}
               <div className="px-6 pt-7 pb-6 text-center" style={{ background: '#1e3a8a' }}>
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-4 shadow-md overflow-hidden">
-                  <Image src="/logo-passhajj.png" alt="PassHajj" width={56} height={56} style={{ objectFit: 'contain' }} />
+                <div className="inline-flex items-center justify-center mb-4 shadow-md rounded-[14px]">
+                  <BrandLogo width={64} />
                 </div>
                 <h2 className="text-2xl font-extrabold text-white">{VOICE_GATE[lang].title}</h2>
                 <p className="text-sm text-white/80 mt-2 leading-relaxed">{VOICE_GATE[lang].desc}</p>

@@ -3,8 +3,8 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { CheckCircle, Info, Volume2, Pause } from 'lucide-react';
+import { Info, Volume2, Pause } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 
 // ─── Brand constants ───
 const BG = '#f4b400';
@@ -111,7 +111,7 @@ function VoiceGuide({ type }: { type: 'baggage' | 'identity' | 'passeport' }) {
         <div className="flex-1 min-w-0">
           <p className="font-bold text-sm text-black">🔊 Guide vocal</p>
           <p className="text-xs" style={{ color: MUTED }}>
-            {playing ? 'Lecture en cours…' : 'Appuyez pour écouter les conseils importants'}
+            {playing ? 'Lecture en cours…' : 'Cliquez pour écouter la voix'}
           </p>
           <div className="h-1.5 rounded-full mt-2 overflow-hidden" style={{ background: 'rgba(0,0,0,0.08)' }}>
             <div
@@ -363,9 +363,9 @@ function ConfirmationContent() {
     <main className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: BG, color: TEXT }}>
       <Confetti />
 
-      {/* Logo */}
-      <div className="text-2xl font-extrabold tracking-tight text-black mb-4">
-        <Image src="/logo-passhajj.png" alt="PassHajj" width={120} height={46} style={{ objectFit: 'contain' }} />
+      {/* Logo — harmonisé (BrandLogo) */}
+      <div className="mb-4">
+        <BrandLogo />
       </div>
 
       {/* Card */}
@@ -373,14 +373,6 @@ function ConfirmationContent() {
         className="bg-white w-full max-w-[420px] rounded-[20px] p-8 shadow-lg text-center"
         style={{ animation: 'slideUp 0.4s ease' }}
       >
-        {/* Success Icon */}
-        <div
-          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ background: SUCCESS, animation: 'scaleIn 0.5s ease 0.2s both' }}
-        >
-          <CheckCircle className="w-10 h-10 text-white" strokeWidth={3} />
-        </div>
-
         {/* Title */}
         <h1 className="text-2xl font-extrabold mb-2">Activation Confirmée ! ✅</h1>
         <p className="text-sm mb-6" style={{ color: MUTED }}>
@@ -539,18 +531,6 @@ function ConfirmationContent() {
           >
             💬 Partager sur WhatsApp
           </a>
-          <Link
-            href="/select"
-            className="w-full py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-colors"
-          >
-            ➕ Activer un autre produit
-          </Link>
-          <Link
-            href="/"
-            className="w-full py-4 rounded-[14px] font-bold text-base flex items-center justify-center gap-2 border-2 border-black bg-white text-black hover:bg-gray-50 transition-colors"
-          >
-            🏠 Retour à l&apos;accueil
-          </Link>
         </div>
       </div>
 

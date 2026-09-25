@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -348,18 +349,7 @@ export default function FinderPage() {
       {/* ─── Brand Header ─── */}
       <header className="w-full flex items-center justify-between px-5 pt-4 pb-2">
         <div className="flex items-center gap-2">
-          <Image
-            src="/logo-passhajj.png"
-            alt="PassHajj"
-            width={140}
-            height={52}
-            style={{
-              objectFit: 'contain',
-              borderRadius: '12px',
-              padding: '4px',
-              background: 'rgba(255,255,255,0.9)',
-            }}
-          />
+          <BrandLogo width={140} />
           <Badge
             className="text-xs font-semibold px-2.5 py-1 border-0"
             style={{ background: NAVY, color: WHITE }}

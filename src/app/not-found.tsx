@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BrandLogo from '@/components/BrandLogo';
 import { QrCode, Home, ArrowLeft } from 'lucide-react';
 
 export default function NotFound() {
@@ -9,7 +10,7 @@ export default function NotFound() {
       <div className="text-center text-white max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto" style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.85)' }} />
+          <BrandLogo width={150} />
         </div>
 
         {/* 404 */}

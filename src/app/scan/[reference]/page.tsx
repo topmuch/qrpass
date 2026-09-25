@@ -83,6 +83,7 @@ const I18N: Record<string, Record<Language, string>> = {
     ar: 'سيتم إخطار المالك عبر واتساب. يظل رقمه سريا.',
   },
   photoLabel: { fr: 'Photo du bagage', en: 'Bag Photo', ar: 'صورة الحقيبة' },
+  photoUnavailable: { fr: 'Photo momentanément indisponible', en: 'Photo temporarily unavailable', ar: 'الصورة غير متوفرة حالياً' },
   hotelLabel: { fr: 'HÉBERGEMENT', en: 'ACCOMMODATION', ar: 'الإقامة' },
   hotelNameLabel: { fr: 'Hôtel actuel', en: 'Current Hotel', ar: 'الفندق الحالي' },
   hotelAddressLabel: { fr: 'Adresse', en: 'Address', ar: 'العنوان' },
@@ -1039,15 +1040,22 @@ export default function ScanPage() {
             </div>
 
             {/* Baggage Photo — helps finder identify the luggage */}
-            {baggage.photoUrl && !baggagePhotoError && (
+            {baggage.photoUrl && (
               <div className="mt-3 pt-3 border-t border-gray-100">
                 <p className="text-xs font-medium mb-2" style={{ color: MUTED }}>📸 {i18n('photoLabel', lang)}</p>
-                <img
-                  src={getPhotoDisplayUrl(baggage.photoUrl) || baggage.photoUrl}
-                  alt={i18n('photoLabel', lang)}
-                  className="max-w-full max-h-40 object-cover rounded-lg"
-                  onError={() => setBaggagePhotoError(true)}
-                />
+                {baggagePhotoError ? (
+                  <div className="flex flex-col items-center justify-center py-6 bg-gray-50 rounded-lg text-gray-400">
+                    <span className="text-2xl mb-1">📷</span>
+                    <span className="text-xs">{i18n('photoUnavailable', lang)}</span>
+                  </div>
+                ) : (
+                  <img
+                    src={getPhotoDisplayUrl(baggage.photoUrl) || baggage.photoUrl}
+                    alt={i18n('photoLabel', lang)}
+                    className="max-w-full max-h-40 object-cover rounded-lg"
+                    onError={() => setBaggagePhotoError(true)}
+                  />
+                )}
               </div>
             )}
           </div>

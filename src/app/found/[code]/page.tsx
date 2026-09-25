@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Luggage, UserCircle, AlertCircle, Globe, ChevronRight, Shield, BookOpen } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -184,18 +185,7 @@ export default function FoundSelectorPage() {
       {/* ─── Header ─── */}
       <div className="w-full flex items-center justify-between px-5 pt-4 pb-2">
         <div className="flex items-center">
-          <Image
-            src="/logo-passhajj.png"
-            alt="PassHajj"
-            width={150}
-            height={58}
-            style={{
-              objectFit: 'contain',
-              borderRadius: '14px',
-              padding: '5px',
-              background: 'rgba(255,255,255,0.9)',
-            }}
-          />
+          <BrandLogo width={150} />
         </div>
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>

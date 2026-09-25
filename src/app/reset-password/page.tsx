@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 import Link from 'next/link';
 import { Lock, Eye, EyeOff, ArrowLeft, RefreshCw, CheckCircle, ShieldCheck } from 'lucide-react';
 
@@ -71,7 +72,7 @@ function ResetPasswordContent() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center gap-3">
-            <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+            <BrandLogo width={150} />
           </Link>
           <p className="text-slate-500 mt-3 text-sm">Nouveau mot de passe</p>
         </div>

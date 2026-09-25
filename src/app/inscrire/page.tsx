@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
+import BrandLogo from '@/components/BrandLogo';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -231,7 +232,7 @@ function InscrireContent() {
           <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
         </Link>
         <div className="flex items-center gap-2">
-          <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+          <BrandLogo width={150} />
         </div>
         <LanguageSelector lang={lang} setLang={setLang} />
       </header>

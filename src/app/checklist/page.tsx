@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -260,7 +261,7 @@ function ChecklistPageContent() {
         <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5">
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+              <BrandLogo width={150} />
             </Link>
             <div className="hidden md:flex items-center gap-1">
               {NAV_LINKS.map((link) => (
@@ -358,7 +359,7 @@ function ChecklistPageContent() {
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 py-2.5">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain" />
+            <BrandLogo width={150} />
           </Link>
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => (

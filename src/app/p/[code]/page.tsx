@@ -26,6 +26,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import BrandLogo from '@/components/BrandLogo';
 import { HAJJ_STAGES, getStageLabel, getStageDesc, getStageMessage, holySiteToStageKey, type HajjStageKey, type HajjStage } from '@/lib/hajj-stages';
 
 // ─── Helper: Convert a stored photoUrl to a displayable URL ───
@@ -451,6 +452,14 @@ export default function PilgrimScanPage() {
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
 
+  // ─── QR réel : encode l'URL complète du profil (scannable par n'importe quel téléphone) ───
+  const [qrTargetUrl, setQrTargetUrl] = useState<string>('');
+  useEffect(() => {
+    if (pilgrim?.qrCode) {
+      setQrTargetUrl(`${window.location.origin}/p/${pilgrim.qrCode}`);
+    }
+  }, [pilgrim?.qrCode]);
+
   // NOTE: Edit functionality removed from public page — only agency dashboard can edit
 
   // ─── i18n helper ───
@@ -707,7 +716,7 @@ export default function PilgrimScanPage() {
       {state === 'not_found' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-auto">
           <div className="flex items-center">
-            <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+            <BrandLogo width={150} />
           </div>
           <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
             <AlertCircle className="w-10 h-10 text-red-500" />
@@ -726,7 +735,7 @@ export default function PilgrimScanPage() {
       {state === 'not_activated' && (
         <div className="flex-1 flex flex-col items-center justify-center w-full">
           <div className="flex items-center mb-8">
-            <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+            <BrandLogo width={150} />
           </div>
           <div className="w-full max-w-[400px] text-center">
             <div className="rounded-[24px] p-8 mb-6" style={{ background: CARD_BG, boxShadow: SHADOW }}>
@@ -791,7 +800,7 @@ export default function PilgrimScanPage() {
           {/* ─── HEADER ─── */}
           <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+              <BrandLogo width={150} />
             </div>
             <div className="flex items-center gap-2">
               {/* Share Profile Button */}
@@ -917,7 +926,7 @@ export default function PilgrimScanPage() {
                   {/* QR Code */}
                   <div className="mt-3 flex flex-col items-center">
                     <div className="bg-white rounded-xl p-1.5" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-                      <QRCodeSVG value={pilgrim.qrCode} size={80} level="M" />
+                      <QRCodeSVG value={qrTargetUrl || pilgrim.qrCode} size={80} level="M" />
                     </div>
                     <span className="text-white/80 text-[10px] font-mono mt-1">{pilgrim.qrCode}</span>
                   </div>
@@ -1427,8 +1436,8 @@ export default function PilgrimScanPage() {
               <div className="w-full max-w-[380px] rounded-[24px] overflow-hidden shadow-2xl" style={{ background: CARD_BG }}>
                 {/* Top: brand + title */}
                 <div className="px-6 pt-7 pb-6 text-center" style={{ background: '#1e3a8a' }}>
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-4 shadow-md overflow-hidden">
-                    <Image src="/logo-passhajj.png" alt="PassHajj" width={56} height={56} style={{ objectFit: 'contain' }} />
+                  <div className="inline-flex items-center justify-center mb-4 shadow-md rounded-[14px]">
+                    <BrandLogo width={64} />
                   </div>
                   <h2 className="text-2xl font-extrabold text-white">{VOICE_GATE[lang].title}</h2>
                   <p className="text-sm text-white/80 mt-2 leading-relaxed">{VOICE_GATE[lang].desc}</p>

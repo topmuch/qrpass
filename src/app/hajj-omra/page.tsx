@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BrandLogo from '@/components/BrandLogo';
 import { Button } from "@/components/ui/button";
 import {
   QrCode,
@@ -26,7 +27,7 @@ function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain brightness-0 invert" />
+            <BrandLogo width={150} />
           </Link>
 
           {/* Desktop Nav */}
@@ -397,7 +398,7 @@ function Footer() {
           {/* Logo */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/logo-passhajj.png" alt="PassHajj" className="h-16 w-auto object-contain brightness-0 invert" />
+              <BrandLogo width={150} />
             </div>
             <p className="text-[#a0a8b8] text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
