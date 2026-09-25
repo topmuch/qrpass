@@ -349,7 +349,7 @@ export default function FinderPage() {
       <header className="w-full flex items-center justify-between px-5 pt-4 pb-2">
         <div className="flex items-center gap-2">
           <Image
-            src="/logo.png"
+            src="/logo-passhajj.png"
             alt="PassHajj"
             width={140}
             height={52}
