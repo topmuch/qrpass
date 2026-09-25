@@ -14,7 +14,8 @@ import {
   Send,
   ArrowRight,
   Globe,
-  Headphones
+  Headphones,
+  Building2
 } from "lucide-react";
 
 function ContactContent() {
@@ -64,7 +65,7 @@ function ContactContent() {
             Contactez-nous
           </h1>
           <p className="text-white/70 max-w-2xl mx-auto text-lg leading-relaxed">
-            Une question sur PassHajj ? Un projet de partenariat ? Notre équipe est là pour vous accompagner.
+            Une question sur PassHajj ? Un projet de partenariat ? L'équipe <strong className="text-white">New Vision Cargo</strong> est là pour vous accompagner.
           </p>
         </div>
       </section>
@@ -75,7 +76,7 @@ function ContactContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-20 relative z-10">
             {/* WhatsApp */}
             <a
-              href="https://wa.me/33745349339"
+              href="https://wa.me/23566352505"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
@@ -84,7 +85,7 @@ function ContactContent() {
                 <MessageCircle style={{ color: '#25D366' }} className="w-7 h-7" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">WhatsApp</h3>
-              <p className="text-gray-500 text-sm mb-3">Réponse rapide garantie</p>
+              <p className="text-gray-500 text-sm mb-3">+235 66 35 25 05 — Réponse rapide garantie</p>
               <span style={{ color: '#25D366' }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                 Écrire sur WhatsApp <ArrowRight className="w-4 h-4" />
               </span>
@@ -92,14 +93,14 @@ function ContactContent() {
 
             {/* Email */}
             <a
-              href="mailto:contact@qrbags.com"
+              href="mailto:contact@newvisioncargo.pro"
               className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
             >
               <div style={{ background: `${GOLD}15`, width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Mail style={{ color: GOLD }} className="w-7 h-7" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Email</h3>
-              <p className="text-gray-500 text-sm mb-3">Réponse sous 24h ouvrées</p>
+              <p className="text-gray-500 text-sm mb-3">contact@newvisioncargo.pro</p>
               <span style={{ color: NAVY }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                 Envoyer un email <ArrowRight className="w-4 h-4" />
               </span>
@@ -107,14 +108,14 @@ function ContactContent() {
 
             {/* Téléphone */}
             <a
-              href="tel:+33745349339"
+              href="tel:+23566352505"
               className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 text-center group"
             >
               <div style={{ background: `${NAVY}10`, width: '56px', height: '56px', borderRadius: '16px', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Phone style={{ color: NAVY }} className="w-7 h-7" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Téléphone</h3>
-              <p className="text-gray-500 text-sm mb-3">+33 7 45 34 93 39</p>
+              <p className="text-gray-500 text-sm mb-3">+235 66 35 25 05 · +235 95 72 99 99</p>
               <span style={{ color: NAVY }} className="font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                 Appeler maintenant <ArrowRight className="w-4 h-4" />
               </span>
@@ -131,6 +132,18 @@ function ContactContent() {
             <div className="lg:col-span-2 space-y-4">
               <h2 className="text-2xl font-bold mb-6" style={{ color: NAVY }}>Nos coordonnées</h2>
 
+              {/* Société */}
+              <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div style={{ background: `${NAVY}0a`, minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Building2 style={{ color: NAVY }} className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Société</h3>
+                  <p className="text-gray-500 text-sm font-semibold">New Vision Cargo</p>
+                  <p className="text-gray-500 text-sm">Protection intelligente Hajj &amp; Omrah</p>
+                </div>
+              </div>
+
               {/* Adresse */}
               <div className="flex items-start gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
                 <div style={{ background: `${GOLD}12`, minWidth: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -138,8 +151,8 @@ function ContactContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Adresse</h3>
-                  <p className="text-gray-500 text-sm">43 Rue Maryse Bastié</p>
-                  <p className="text-gray-500 text-sm">78300 Poissy, France</p>
+                  <p className="text-gray-500 text-sm">Avenue Charles de Gaulle</p>
+                  <p className="text-gray-500 text-sm">N'Djaména, Tchad</p>
                 </div>
               </div>
 
@@ -150,8 +163,8 @@ function ContactContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Horaires</h3>
-                  <p className="text-gray-500 text-sm">Lun - Ven : 9h - 18h (CET)</p>
-                  <p className="text-gray-500 text-sm">Support 24/7 pour les urgences</p>
+                  <p className="text-gray-500 text-sm">Lundi - Vendredi : 8h00 - 18h00</p>
+                  <p className="text-gray-500 text-sm">Samedi : 9h00 - 13h00</p>
                 </div>
               </div>
 
@@ -162,7 +175,7 @@ function ContactContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Support pèlerins</h3>
-                  <p className="text-gray-500 text-sm">Assistance dédiée Hajj & Omrah</p>
+                  <p className="text-gray-500 text-sm">+235 66 35 25 05 · +235 95 72 99 99</p>
                   <p className="text-gray-500 text-sm">Multilingue (FR, EN, AR)</p>
                 </div>
               </div>
@@ -174,13 +187,14 @@ function ContactContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base mb-1" style={{ color: NAVY }}>Site web</h3>
-                  <p className="text-gray-500 text-sm">passhajjj.qrbags.com</p>
+                  <p className="text-gray-500 text-sm">newvisioncargo.pro</p>
+                  <p className="text-gray-500 text-sm">passhajj.qrbags.com</p>
                 </div>
               </div>
 
               {/* Map */}
               <a
-                href="https://maps.google.com/?q=43+Rue+Maryse+Bastie+78300+Poissy+France"
+                href="https://maps.google.com/?q=Avenue+Charles+de+Gaulle,+N%27Djam%C3%A9na,+Tchad"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY}cc)` }}

@@ -21,6 +21,7 @@ import {
   Navigation,
   Share,
   Loader2,
+  Volume2,
 } from "lucide-react";
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
@@ -131,6 +132,16 @@ const I18N: Record<string, Record<Language, string>> = {
   // Share
   shareBtn: { fr: 'Partager', en: 'Share', ar: 'مشاركة' },
   shareCopied: { fr: 'Lien copié !', en: 'Link copied!', ar: 'تم نسخ الرابط!' },
+  // Audio guide for the finder (voice instructions like qrbags.com)
+  audioGateTitle: { fr: 'Vous avez trouvé un bagage !', en: 'Found a bag!', ar: 'لقد وجدت حقيبة!' },
+  audioGateDesc: {
+    fr: "Appuyez sur le bouton ci-dessous : les instructions audio vous guideront pour contacter le propriétaire.",
+    en: 'Tap the button below: audio instructions will guide you to contact the owner.',
+    ar: 'اضغط على الزر أدناه: التعليمات الصوتية سترشدك للاتصال بالمالك.',
+  },
+  audioGateBtn: { fr: 'Écouter les instructions', en: 'Tap to contact', ar: 'استمع للتعليمات' },
+  audioGateBadge: { fr: 'INSTRUCTIONS AUDIO', en: 'AUDIO INSTRUCTIONS', ar: 'تعليمات صوتية' },
+  audioReplayAria: { fr: 'Réécouter les instructions', en: 'Replay instructions', ar: 'إعادة التعليمات الصوتية' },
 };
 
 /** Shorthand to get inline i18n string */
@@ -475,6 +486,45 @@ export default function ScanPage() {
   const [scanConfirmed, setScanConfirmed] = useState(false);
   const hasConfirmedRef = useRef(false);
 
+  // AUDIO-GUIDE: voice instructions gate (like qrbags.com finder page)
+  const FINDER_VOICE: Record<string, string> = {
+    fr: '/audio/finder-voice-fr.mp3',
+    en: '/audio/finder-voice-en.mp3',
+    ar: '/audio/finder-voice-ar.mp3',
+  };
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [showAudioGate, setShowAudioGate] = useState(true);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioDurationSec, setAudioDurationSec] = useState<number | null>(null);
+
+  const getFinderAudio = useCallback(() => {
+    if (!audioRef.current) {
+      const audio = new Audio(FINDER_VOICE[lang] || FINDER_VOICE.fr);
+      audio.preload = 'auto';
+      audio.addEventListener('loadedmetadata', () => {
+        setAudioDurationSec(Math.round(audio.duration) || null);
+      });
+      audio.addEventListener('ended', () => setAudioPlaying(false));
+      audioRef.current = audio;
+    }
+    return audioRef.current;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const playFinderVoice = useCallback(() => {
+    try {
+      const audio = getFinderAudio();
+      audio.currentTime = 0;
+      audio.play().then(() => setAudioPlaying(true)).catch(() => setAudioPlaying(false));
+    } catch { /* silent fail */ }
+  }, [getFinderAudio]);
+
+  const handleAudioGateTap = useCallback(() => {
+    playFinderVoice();
+    setShowAudioGate(false);
+  }, [playFinderVoice]);
+
+
   // Silent GPS auto-capture on page load
   const [autoGps, setAutoGps] = useState<{ lat: number; lng: number } | null>(null);
   useEffect(() => {
@@ -792,6 +842,63 @@ export default function ScanPage() {
 
       {/* SuccessOverlay — Premium scan confirmation */}
       <SuccessOverlay show={scanConfirmed} messageKey="scan.success" t={t} />
+
+      {/* ═══ AUDIO GATE — voice instructions overlay (blocks until tapped, like qrbags.com) ═══ */}
+      {showAudioGate && baggage && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+          style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={i18n('audioGateTitle', lang)}
+        >
+          <div className="w-full max-w-[380px] rounded-[24px] overflow-hidden shadow-2xl" style={{ background: CARD_BG }}>
+            {/* Top: brand + title (dark navy like qrbags gate) */}
+            <div className="px-6 pt-7 pb-6 text-center" style={{ background: ACCENT }}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-4 shadow-md overflow-hidden">
+                <Image src="/logo-passhajj.png" alt="PassHajj" width={56} height={56} style={{ objectFit: 'contain' }} />
+              </div>
+              <h2 className="text-2xl font-extrabold text-white">{i18n('audioGateTitle', lang)}</h2>
+              <p className="text-sm text-white/80 mt-2 leading-relaxed">{i18n('audioGateDesc', lang)}</p>
+              <span className="inline-flex items-center gap-1 mt-4 px-3 py-1 rounded-full border border-white/30 text-white text-xs font-bold tracking-widest font-mono">
+                🔊 {reference}
+              </span>
+            </div>
+            {/* Bottom: big tap button + badge */}
+            <div className="px-6 py-6">
+              <button
+                onClick={handleAudioGateTap}
+                className="w-full py-4 px-6 text-white rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2.5 min-h-[60px]"
+                style={{ background: ACCENT }}
+              >
+                <Volume2 className="w-6 h-6" />
+                <span>{i18n('audioGateBtn', lang)}</span>
+              </button>
+              <p className="mt-3 text-center text-[11px] font-bold tracking-[0.2em] uppercase flex items-center justify-center gap-1.5" style={{ color: MUTED }}>
+                <Volume2 className="w-3.5 h-3.5" />
+                {i18n('audioGateBadge', lang)}{audioDurationSec ? ` · ${audioDurationSec} S` : ''}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Floating replay button — bottom left, visible after gate dismissed ═══ */}
+      {!showAudioGate && baggage && (
+        <button
+          onClick={playFinderVoice}
+          aria-label={i18n('audioReplayAria', lang)}
+          title={i18n('audioReplayAria', lang)}
+          className="fixed bottom-[4.75rem] left-5 z-[55] w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-95"
+          style={{
+            background: audioPlaying ? ACCENT : '#ffffff',
+            border: `3px solid ${BRAND}`,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          }}
+        >
+          <Volume2 className={`w-5 h-5 ${audioPlaying ? 'text-white animate-pulse' : ''}`} style={{ color: audioPlaying ? '#fff' : INK }} />
+        </button>
+      )}
 
       {/* Success Toast — inline confirmation */}
       {showSuccess && (

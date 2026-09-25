@@ -74,6 +74,51 @@ export default function FoundSelectorPage() {
   const [state, setState] = useState<PageState>('loading');
   const [lookupData, setLookupData] = useState<LookupResult | null>(null);
 
+  // Pass Passeport modal state (3rd module selector)
+  const [showPassportModal, setShowPassportModal] = useState(false);
+  const [passportCode, setPassportCode] = useState('');
+  const [passportChecking, setPassportChecking] = useState(false);
+  const [passportError, setPassportError] = useState<string | null>(null);
+
+  // Open the passport modal (prefill PP- if the scanned code is one, rare since PP- redirects early)
+  const openPassportModal = () => {
+    setPassportCode(code.startsWith('PP-') ? code : '');
+    setPassportError(null);
+    setShowPassportModal(true);
+  };
+
+  // Validate the PP- code then route: not activated → activation page, else finder page
+  const handlePassportSubmit = async () => {
+    const ppCode = passportCode.trim().toUpperCase();
+    if (!ppCode) {
+      setPassportError('Veuillez entrer votre code Pass Passeport (ex : PP-3M8N5K)');
+      return;
+    }
+    setPassportChecking(true);
+    setPassportError(null);
+    try {
+      const res = await fetch(`/api/passeport/${encodeURIComponent(ppCode)}`);
+      if (res.status === 404) {
+        setPassportError('Code passeport non trouvé. Vérifiez le code sur votre sticker.');
+        return;
+      }
+      if (!res.ok) {
+        setPassportError('Erreur de vérification. Réessayez.');
+        return;
+      }
+      const data = await res.json();
+      if (data.status === 'not_activated') {
+        router.push('/activate/passeport?code=' + encodeURIComponent(ppCode));
+      } else {
+        router.push('/scan-passeport/' + encodeURIComponent(ppCode));
+      }
+    } catch {
+      setPassportError('Erreur de connexion. Réessayez.');
+    } finally {
+      setPassportChecking(false);
+    }
+  };
+
   // Lookup the code
   useEffect(() => {
     if (!code) return;
@@ -350,16 +395,8 @@ export default function FoundSelectorPage() {
                     </div>
                   </motion.div>
                 )}
-              </div>
 
-              {/* Trust note */}
-              <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
-                <Shield className="w-4 h-4" />
-                <span>PassHajj · Protection intelligente Hajj & Omrah</span>
-              </div>
-
-              {/* Pass Passeport Card - for PP- codes that reach selector */}
-              {code.startsWith('PP-') && (
+                {/* Pass Passeport Card — 3rd module, always visible (enter PP- code) */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -368,7 +405,7 @@ export default function FoundSelectorPage() {
                   <div
                     className="rounded-[20px] p-5 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
                     style={{ background: CARD_BG }}
-                    onClick={() => router.push('/scan-passeport/' + code)}
+                    onClick={openPassportModal}
                   >
                     <div className="flex items-center gap-4 w-full">
                       <div
@@ -389,7 +426,87 @@ export default function FoundSelectorPage() {
                     </div>
                   </div>
                 </motion.div>
+              </div>
+
+              {/* Pass Passeport modal — enter PP- code then validate + route */}
+              {showPassportModal && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[70] flex items-center justify-center px-4"
+                  style={{ background: 'rgba(0,0,0,0.55)' }}
+                  onClick={() => setShowPassportModal(false)}
+                >
+                  <motion.div
+                    initial={{ scale: 0.92, y: 16 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                    className="w-full max-w-[400px] rounded-[20px] p-6 shadow-2xl"
+                    style={{ background: CARD_BG }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: '#6366f1' }}>
+                        <BookOpen className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold" style={{ color: INK }}>Pass Passeport</h3>
+                        <p className="text-xs" style={{ color: MUTED }}>Entrez le code sur le sticker du passeport</p>
+                      </div>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={passportCode}
+                      onChange={(e) => { setPassportCode(e.target.value); setPassportError(null); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handlePassportSubmit(); }}
+                      placeholder="PP-3M8N5K"
+                      autoFocus
+                      className="w-full px-4 py-3.5 rounded-xl text-base font-mono font-semibold uppercase tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-[#6366f1] transition-all"
+                      style={{ background: INPUT_BG, color: INK, border: passportError ? '2px solid #ef4444' : '2px solid #e5e7eb' }}
+                    />
+
+                    {passportError && (
+                      <p className="mt-2 text-sm font-medium text-red-500 text-center">{passportError}</p>
+                    )}
+
+                    <button
+                      onClick={handlePassportSubmit}
+                      disabled={passportChecking}
+                      className="w-full mt-4 py-4 px-6 text-white rounded-[14px] font-bold text-base transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2 min-h-[54px]"
+                      style={{ background: '#6366f1' }}
+                    >
+                      {passportChecking ? (
+                        <>
+                          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Vérification…</span>
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="w-5 h-5" />
+                          <span>Ouvrir mon Pass Passeport</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => setShowPassportModal(false)}
+                      className="w-full mt-2 py-3 text-sm font-semibold rounded-xl transition-colors hover:bg-black/5"
+                      style={{ color: MUTED }}
+                    >
+                      Annuler
+                    </button>
+                  </motion.div>
+                </motion.div>
               )}
+
+              {/* Trust note */}
+              <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: 'rgba(0,0,0,0.6)' }}>
+                <Shield className="w-4 h-4" />
+                <span>PassHajj · Protection intelligente Hajj & Omrah</span>
+              </div>
+
             </motion.div>
           )}
         </AnimatePresence>
