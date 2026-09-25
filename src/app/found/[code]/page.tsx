@@ -140,7 +140,7 @@ export default function FoundSelectorPage() {
       <div className="w-full flex items-center justify-between px-5 pt-4 pb-2">
         <div className="flex items-center">
           <Image
-            src="/logo.png"
+            src="/logo-passhajj.png"
             alt="PassHajj"
             width={150}
             height={58}
