@@ -147,7 +147,7 @@ export async function POST(
   } catch (error) {
     console.error('Activate pilgrim error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', message: 'Une erreur interne est survenue. Veuillez réessayer.' },
       { status: 500, headers: corsHeaders }
     );
   }

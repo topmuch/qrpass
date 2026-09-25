@@ -281,9 +281,20 @@ function IdentityActivateContent() {
         }
         router.push(`/activate/confirmation?${params.toString()}`);
       } else {
-        const errorData = await response.json();
+        let errorData: Record<string, unknown> = {};
+        try {
+          errorData = await response.json();
+        } catch {
+          // ignore parse errors
+        }
+        const apiMessage =
+          (errorData.message as string) ||
+          (errorData.error as string) ||
+          "Erreur lors de l'activation";
         toast({
-          title: errorData.message || "Erreur lors de l'activation",
+          title: response.status === 404
+            ? 'Ce code bracelet est introuvable. Vérifiez le code et réessayez.'
+            : apiMessage,
           variant: 'destructive',
         });
       }

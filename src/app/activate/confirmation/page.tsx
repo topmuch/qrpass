@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, Info } from 'lucide-react';
+import { CheckCircle, Info, Volume2, Pause } from 'lucide-react';
 
 // ─── Brand constants ───
 const BG = '#f4b400';
@@ -38,6 +38,101 @@ interface ConfirmationData {
   hotelAddress: string;
   // Shared
   photo: string | null;
+}
+
+// ─── Voice Guide Component (guide audio de la page de confirmation) ───
+function VoiceGuide({ type }: { type: 'baggage' | 'identity' | 'passeport' }) {
+  const VOICE_SRC: Record<string, string> = {
+    baggage: '/audio/confirmation-voice-baggage.mp3',
+    identity: '/audio/confirmation-voice-identity.mp3',
+    passeport: '/audio/confirmation-voice-passeport.mp3',
+  };
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  const toggle = () => {
+    if (!audioRef.current) {
+      const audio = new Audio(VOICE_SRC[type]);
+      audio.preload = 'metadata';
+      audio.addEventListener('loadedmetadata', () => setDuration(audio.duration || 0));
+      audio.addEventListener('timeupdate', () => setCurrent(audio.currentTime));
+      audio.addEventListener('ended', () => {
+        setPlaying(false);
+        setCurrent(0);
+      });
+      audioRef.current = audio;
+    }
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else {
+      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+  };
+
+  const fmt = (s: number) => {
+    if (!Number.isFinite(s) || s <= 0) return '';
+    const m = Math.floor(s / 60);
+    const sec = Math.round(s % 60);
+    return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${sec} s`;
+  };
+
+  const progress = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;
+
+  return (
+    <div
+      className="mb-6 rounded-2xl border-2 text-left"
+      style={{ borderColor: '#f4b400', background: '#fffbeb' }}
+    >
+      <div className="flex items-center gap-3 p-4">
+        {/* Play / Pause button */}
+        <button
+          onClick={toggle}
+          aria-label={playing ? 'Mettre en pause le guide vocal' : 'Écouter le guide vocal'}
+          className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white shadow-md transition-all hover:scale-105 active:scale-95 ${playing ? 'animate-pulse' : ''}`}
+          style={{ background: playing ? SUCCESS : BTN_PRIMARY }}
+        >
+          {playing ? <Pause className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
+
+        {/* Label + progress */}
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-black">🔊 Guide vocal</p>
+          <p className="text-xs" style={{ color: MUTED }}>
+            {playing ? 'Lecture en cours…' : 'Appuyez pour écouter les conseils importants'}
+          </p>
+          <div className="h-1.5 rounded-full mt-2 overflow-hidden" style={{ background: 'rgba(0,0,0,0.08)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: `${progress}%`, background: SUCCESS }}
+            />
+          </div>
+        </div>
+
+        {/* Duration badge */}
+        {duration > 0 && (
+          <span
+            className="text-xs font-bold px-2 py-1 rounded-full shrink-0"
+            style={{ background: 'rgba(244,180,0,0.15)', color: '#92400e' }}
+          >
+            {fmt(duration)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ─── Confetti Component ───
@@ -291,6 +386,9 @@ function ConfirmationContent() {
         <p className="text-sm mb-6" style={{ color: MUTED }}>
           {subtitle}
         </p>
+
+        {/* Voice Guide — guide audio des conseils post-activation */}
+        <VoiceGuide type={data.type} />
 
         {/* Summary Box */}
         <div className="bg-gray-50 rounded-2xl p-5 text-left mb-6">

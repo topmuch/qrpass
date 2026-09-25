@@ -67,6 +67,10 @@ const PUBLIC_API_PREFIXES = [
   '/api/landing',
   '/api/route',  // health check
   '/api/pilgrims/lookup',  // QR code lookup (public - called when scanning QR)
+  '/api/pilgrims/activate',  // Bracelet activation (public - pilgrim just scanned their QR, no login)
+  '/api/pilgrims/upload-photo',  // Photo upload during public activation
+  '/api/pilgrims/report',  // Finder report (public - someone found a pilgrim in need)
+  '/api/pilgrims/update-stage',  // Pilgrim updates own journey stage from public bracelet page
   '/api/serve-upload',  // Uploaded files (public - baggage photos)
   '/api/leader',  // PassHajj Manager PWA (uses OTP auth, not session)
   '/api/finder',  // Finder lookup (public - anyone who finds a QR code)
@@ -75,9 +79,6 @@ const PUBLIC_API_PREFIXES = [
 // Known protected sub-routes under /api/pilgrims (everything else under /api/pilgrims/ is a public QR code lookup)
 const PILGRIM_PROTECTED_SUBROUTES = [
   '/api/pilgrims/generate',
-  '/api/pilgrims/activate',
-  '/api/pilgrims/upload-photo',
-  '/api/pilgrims/report',
   '/api/pilgrims/backfill',
 ];
 
