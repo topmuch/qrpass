@@ -284,7 +284,7 @@ function AboutSection() {
               className="text-lg leading-relaxed mb-8"
               style={{ color: MUTED }}
             >
-              Créée par MMASOLUTION, PassHajj est la première solution de protection
+              Créée par New Vision Cargo, PassHajj est la première solution de protection
               intelligente des bagages pour les pèlerins et voyageurs. Zéro application,
               zéro batterie, zéro GPS — un QR code suffit.
             </motion.p>

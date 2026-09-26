@@ -55,7 +55,7 @@ function ExpiredContent() {
       `📅 Expiré le: ${formatDate(expiredAt)}\n\n` +
       `Je souhaite renouveler la protection de ce bagage.`
     );
-    window.open(`https://wa.me/33745349339?text=${message}`, '_blank');
+    window.open(`https://wa.me/23566352505?text=${message}`, '_blank');
   };
 
   return (

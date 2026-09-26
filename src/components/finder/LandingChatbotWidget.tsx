@@ -4,8 +4,8 @@ import { Bot, X, Send, User, MessageCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 /** QRPass WhatsApp SAV */
-const QRPASSS_WHATSAPP_URL = 'https://wa.me/221784858226';
-const QRPASSS_WHATSAPP_URL_2 = 'https://wa.me/33745349339';
+const QRPASSS_WHATSAPP_URL = 'https://wa.me/23566352505';
+const QRPASSS_WHATSAPP_URL_2 = 'https://wa.me/23566352505';
 
 /** Regex to detect all URLs in messages */
 const ALL_URLS_REGEX = /https?:\/\/[^\s)\]}>]+/gi;
@@ -56,10 +56,10 @@ export default function LandingChatbotWidget() {
     : ['كيف أفعّل رمز QR الخاص بي؟', 'أين حقيبتي؟', 'ما هي الأسعار؟', 'كيف يعمل؟'];
 
   const errorMessage = lang === 'fr'
-    ? 'Je rencontre un problème technique. Contactez le SAV : contact@qrbags.com'
+    ? 'Je rencontre un problème technique. Contactez le SAV : contact@newvisioncargo.pro'
     : lang === 'en'
-    ? 'I am experiencing a technical issue. Contact support: contact@qrbags.com'
-    : 'أواجه مشكلة تقنية. تواصل مع الدعم: contact@qrbags.com';
+    ? 'I am experiencing a technical issue. Contact support: contact@newvisioncargo.pro'
+    : 'أواجه مشكلة تقنية. تواصل مع الدعم: contact@newvisioncargo.pro';
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return;

@@ -4,10 +4,10 @@ import { db } from '@/lib/db';
 // Default settings
 const defaultSettings = {
   // Company Info
-  company_name: 'QRPass',
-  company_address: 'Poissy, France',
-  company_phone: '+33 7 45 34 93 39',
-  company_email: 'contact@qrbags.com',
+  company_name: 'New Vision Cargo',
+  company_address: "Avenue Charles de Gaulle, N'Djaména, Tchad",
+  company_phone: '+235 66 35 25 05 · +235 95 72 99 99',
+  company_email: 'contact@newvisioncargo.pro',
   company_logo: '',
   // SEO
   seo_title: 'QRPass - Protection intelligente des bagages',

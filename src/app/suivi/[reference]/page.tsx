@@ -49,7 +49,7 @@ const INK = '#0f172a';    // noir — texte sur jaune, bordures dashed
 const CREAM = '#f4b400';  // (alias — désormais bleu QRPass)
 const URGENT_RED = '#EF4444';
 const URGENT_BG = '#FEF2F2';
-const QRPASS_SUPPORT_PHONE = '+33745349339';
+const QRPASS_SUPPORT_PHONE = '+23566352505';
 
 // ═══════════════════════════════════════════════════════
 //  TYPES
@@ -728,7 +728,7 @@ export default function SuiviPage() {
   const supportBody = encodeURIComponent(
     `Bonjour, je rencontre un problème avec mon bagage ${reference}.\n\nDescription du problème :\n`
   );
-  const supportHref = `mailto:contact@qrbags.com?subject=${supportSubject}&body=${supportBody}`;
+  const supportHref = `mailto:contact@newvisioncargo.pro?subject=${supportSubject}&body=${supportBody}`;
 
   // Checklist CTA link
   const checklistHref = `/checklist?ref=${encodeURIComponent(reference)}&source=tracking_page`;

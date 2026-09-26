@@ -127,7 +127,7 @@ function AProposContent() {
       <section className="py-16 max-w-4xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold text-white mb-6">Qui sommes-nous ?</h2>
         <p className="text-[#e0e6f0] mb-8 max-w-2xl mx-auto leading-relaxed">
-          PassHajj est développé par <strong className="text-[#b8860b]">MMASOLUTION</strong>, une entreprise
+          PassHajj est développé par <strong className="text-[#b8860b]">New Vision Cargo</strong>, une entreprise
           spécialisée dans les solutions digitales pour le tourisme religieux et les voyages internationaux.
           Notre équipe combine des expertises en technologie, logistique et expérience client pour créer
           des solutions qui font la différence.
@@ -136,20 +136,34 @@ function AProposContent() {
         <div className="bg-[#0a0f2c] rounded-xl border border-[#1a1a3a] p-8 max-w-xl mx-auto">
           <div className="flex flex-col gap-4 text-[#a0a8b8]">
             <div className="flex items-center justify-center gap-2">
+              <span className="text-xl">🏢</span>
+              <span>New Vision Cargo — Protection intelligente Hajj &amp; Omrah</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
               <span className="text-xl">📍</span>
-              <span>43 Rue Maryse Bastié, 78300 Poissy, France</span>
+              <span>Avenue Charles de Gaulle, N&apos;Djaména, Tchad</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <span className="text-xl">📞</span>
-              <a href="tel:+33745349339" className="hover:text-[#1E40AF] transition-colors">
-                +33 7 45 34 93 39
+              <a href="tel:+23566352505" className="hover:text-[#1E40AF] transition-colors">
+                +235 66 35 25 05 · +235 95 72 99 99
+              </a>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xl">💬</span>
+              <a href="https://wa.me/23566352505" target="_blank" rel="noopener noreferrer" className="hover:text-[#1E40AF] transition-colors">
+                WhatsApp : +235 66 35 25 05
               </a>
             </div>
             <div className="flex items-center justify-center gap-2">
               <span className="text-xl">✉️</span>
-              <a href="mailto:contact@qrbags.com" className="hover:text-[#1E40AF] transition-colors">
-                contact@qrbags.com
+              <a href="mailto:contact@newvisioncargo.pro" className="hover:text-[#1E40AF] transition-colors">
+                contact@newvisioncargo.pro
               </a>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xl">🕐</span>
+              <span>Lundi - Vendredi : 8h00 - 18h00 · Samedi : 9h00 - 13h00</span>
             </div>
           </div>
         </div>

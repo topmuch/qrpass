@@ -17,7 +17,7 @@ export default function Confidentialite() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">1. Introduction</h2>
               <p className="mb-4">
-                La société MMASOLUTION s&apos;engage à protéger la vie privée des utilisateurs de son site PassHajj. La présente politique de confidentialité a pour but de vous informer sur la manière dont nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD).
+                La société New Vision Cargo s&apos;engage à protéger la vie privée des utilisateurs de son site PassHajj. La présente politique de confidentialité a pour but de vous informer sur la manière dont nous collectons, utilisons et protégeons vos données personnelles, conformément à la réglementation en vigueur sur la protection des données (dont le Règlement Général sur la Protection des Données, RGPD).
               </p>
               <p>
                 En utilisant notre site et nos services, vous acceptez les pratiques décrites dans cette politique de confidentialité.
@@ -103,7 +103,7 @@ export default function Confidentialite() {
                 <li><strong>Droit à la limitation :</strong> limiter le traitement de vos données</li>
               </ul>
               <p>
-                Pour exercer ces droits, contactez-nous à : <a href="mailto:contact@qrbags.com" className="text-[#b8860b] hover:underline">contact@qrbags.com</a>
+                Pour exercer ces droits, contactez-nous à : <a href="mailto:contact@newvisioncargo.pro" className="text-[#b8860b] hover:underline">contact@newvisioncargo.pro</a>
               </p>
             </section>
 
@@ -135,11 +135,14 @@ export default function Confidentialite() {
                 Pour toute question relative à cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter :
               </p>
               <p>
-                <strong>Email :</strong> <a href="mailto:contact@qrbags.com" className="text-[#b8860b] hover:underline">contact@qrbags.com</a><br />
-                <strong>Adresse :</strong> Poissy, France
+                <strong>Email :</strong> <a href="mailto:contact@newvisioncargo.pro" className="text-[#b8860b] hover:underline">contact@newvisioncargo.pro</a><br />
+                <strong>Téléphone :</strong> +235 66 35 25 05 · +235 95 72 99 99<br />
+                <strong>WhatsApp :</strong> +235 66 35 25 05<br />
+                <strong>Adresse :</strong> Avenue Charles de Gaulle, N&apos;Djaména, Tchad<br />
+                <strong>Horaires :</strong> Lundi - Vendredi : 8h00 - 18h00 · Samedi : 9h00 - 13h00
               </p>
               <p className="mt-4">
-                Vous avez également le droit d&apos;introduire une réclamation auprès de la CNIL (Commission Nationale de l&apos;Informatique et des Libertés) si vous estimez que le traitement de vos données n&apos;est pas conforme à la réglementation.
+                Vous avez également le droit d&apos;introduire une réclamation auprès de l&apos;autorité de protection des données à caractère personnel compétente si vous estimez que le traitement de vos données n&apos;est pas conforme à la réglementation.
               </p>
             </section>
           </div>

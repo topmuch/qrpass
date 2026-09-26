@@ -64,7 +64,7 @@ const ACCENT = '#1e3a8a';    // dark blue — CTA button
 const INPUT_BG = '#f8fafc';  // light gray — info rows
 const BTN_PRIMARY = '#111827'; // noir — edit buttons
 
-const FALLBACK_PHONE = '33745349339';
+const FALLBACK_PHONE = '23566352505';
 
 // ─── Inline i18n for the new card-based design ───
 const I18N: Record<string, Record<Language, string>> = {

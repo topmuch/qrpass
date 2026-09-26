@@ -486,15 +486,15 @@ function Footer() {
             <ul className="space-y-2 text-[#a0a8b8] text-sm">
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#1D4ED8]" />
-                +33 7 45 34 93 39
+                +235 66 35 25 05 · +235 95 72 99 99
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#1D4ED8]" />
-                contact@qrbags.com
+                contact@newvisioncargo.pro
               </li>
               <li className="flex items-center gap-2">
                 <MapPinned className="w-4 h-4 text-[#1D4ED8]" />
-                Poissy, France
+                Avenue Charles de Gaulle, N'Djaména, Tchad
               </li>
             </ul>
           </div>

@@ -71,9 +71,9 @@ interface ChatResponse {
 // ═══════════════════════════════════════════════════════
 
 const FALLBACK_RESPONSES: Record<Language, string> = {
-  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : contact@qrbags.com',
-  en: 'I am experiencing a technical issue. Please contact support: contact@qrbags.com',
-  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: contact@qrbags.com',
+  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : contact@newvisioncargo.pro',
+  en: 'I am experiencing a technical issue. Please contact support: contact@newvisioncargo.pro',
+  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: contact@newvisioncargo.pro',
 };
 
 // ═══════════════════════════════════════════════════════
@@ -87,8 +87,8 @@ function buildSystemPrompt(locale: Language): string {
     fr: `Tu es l'assistant QRPass, un agent de support intelligent sur la page d'accueil. Réponds en français, de façon concise (max 3 phrases) et empathique. Tu connais TOUT sur QRPass.
 
 🏛️ ENTREPRISE QRPass :
-• Nom : QRPass — édité par MMASOLUTION
-• Siège social : 43 Rue Maryse Bastié, 78300 Poissy, France
+• Nom : QRPass — édité par New Vision Cargo
+• Siège social : Avenue Charles de Gaulle, N'Djaména, Tchad
 • Origine : Né à Dakar (Sénégal), déployé dans 15 pays
 • Site web : https://passhajjj.qrbags.com
 • Mission : Protection intelligente des bagages pour voyageurs et pèlerins
@@ -135,14 +135,14 @@ function buildSystemPrompt(locale: Language): string {
 • Devis personnalisé sous 24h : ${appUrl}/devenir-partenaire
 
 🆘 CONTACT & SAV :
-• Email général : contact@qrbags.com
-• Email SAV : contact@qrbags.com
-• Téléphone : +33 7 45 34 93 39
-• WhatsApp principal : +33 7 45 34 93 39 → https://wa.me/33745349339
-• WhatsApp SAV : +221 78 4858226 → https://wa.me/221784858226
-• Horaires : Lun-Ven 9h-18h, support d'urgence 24/7
+• Email général : contact@newvisioncargo.pro
+• Email SAV : contact@newvisioncargo.pro
+• Téléphone : +235 66 35 25 05 · +235 95 72 99 99
+• WhatsApp principal : +235 66 35 25 05 → https://wa.me/23566352505
+• WhatsApp SAV : +235 66 35 25 05 → https://wa.me/23566352505
+• Horaires : Lun-Ven 8h-18h, Sam 9h-13h, support d'urgence 24/7
 • Délai réponse : <2h pour le SAV, sous 24h pour le formulaire de contact
-• IMPORTANT : Quand tu mentionnes le WhatsApp, donne TOUJOURS le lien https://wa.me/221784858226 ou https://wa.me/33745349339 et encourage l'utilisateur à cliquer dessus.
+• IMPORTANT : Quand tu mentionnes le WhatsApp, donne TOUJOURS le lien https://wa.me/23566352505 et encourage l'utilisateur à cliquer dessus.
 
 RÈGLES :
 - Réponds sur TOUT ce qui concerne QRPass : l'entreprise, le siège, l'adresse, le produit, les tarifs, le fonctionnement, les partenaires, le SAV, les pages du site.
@@ -155,8 +155,8 @@ RÈGLES :
     en: `You are the QRPass assistant, an intelligent support agent on the landing page. Respond in English, concisely (max 3 sentences) and empathetically. You know EVERYTHING about QRPass.
 
 🏛️ COMPANY QRPass:
-• Name: QRPass — published by MMASOLUTION
-• Headquarters: 43 Rue Maryse Bastié, 78300 Poissy, France
+• Name: QRPass — published by New Vision Cargo
+• Headquarters: Avenue Charles de Gaulle, N'Djaména, Tchad
 • Origin: Born in Dakar (Senegal), deployed in 15 countries
 • Website: https://passhajjj.qrbags.com
 • Mission: Intelligent baggage protection for travelers and pilgrims
@@ -203,14 +203,14 @@ RÈGLES :
 • Personalized quote within 24h: ${appUrl}/devenir-partenaire
 
 🆘 CONTACT & SUPPORT:
-• General email: contact@qrbags.com
-• Support email: contact@qrbags.com
-• Phone: +33 7 45 34 93 39
-• Main WhatsApp: +33 7 45 34 93 39 → https://wa.me/33745349339
-• Support WhatsApp: +221 78 4858226 → https://wa.me/221784858226
+• General email: contact@newvisioncargo.pro
+• Support email: contact@newvisioncargo.pro
+• Phone: +235 66 35 25 05 · +235 95 72 99 99
+• Main WhatsApp: +235 66 35 25 05 · +235 95 72 99 99 → https://wa.me/23566352505
+• Support WhatsApp: +235 66 35 25 05 → https://wa.me/23566352505
 • Hours: Mon-Fri 9am-6pm, emergency support 24/7
 • Response time: <2h for support, within 24h for contact form
-• IMPORTANT: When mentioning WhatsApp, ALWAYS include the link https://wa.me/221784858226 or https://wa.me/33745349339 and encourage the user to click it.
+• IMPORTANT: When mentioning WhatsApp, ALWAYS include the link https://wa.me/23566352505 or https://wa.me/23566352505 and encourage the user to click it.
 
 RULES:
 - Respond about EVERYTHING related to QRPass: the company, headquarters, address, product, pricing, how it works, partners, support, site pages.
@@ -223,7 +223,7 @@ RULES:
     ar: `أنت مساعد QRPass، وكيل دعم ذكي على الصفحة الرئيسية. أجب باللغة العربية، بطريقة موجزة (بحد أقصى 3 جمل) وبلطف. تعرف كل شيء عن QRPass.
 
 🏛️ شركة QRPass:
-• الاسم: QRPass — تصدرها شركة MMASOLUTION
+• الاسم: QRPass — تصدرها شركة New Vision Cargo
 • المقر الرئيسي: 43 Rue Maryse Bastié، 78300 بواسي، فرنسا
 • المنشأ: ولدت في داكار (السنغال)، منتشرة في 15 دولة
 • الموقع: https://passhajjj.qrbags.com
@@ -271,14 +271,14 @@ RULES:
 • عرض أسعار مخصص خلال 24 ساعة: ${appUrl}/devenir-partenaire
 
 🆘 الاتصال والدعم:
-• البريد العام: contact@qrbags.com
-• بريد الدعم: contact@qrbags.com
-• الهاتف: +33 7 45 34 93 39
-• واتساب رئيسي: +33 7 45 34 93 39 → https://wa.me/33745349339
-• واتساب الدعم: +221 78 4858226 → https://wa.me/221784858226
+• البريد العام: contact@newvisioncargo.pro
+• بريد الدعم: contact@newvisioncargo.pro
+• الهاتف: +235 66 35 25 05 · +235 95 72 99 99
+• واتساب رئيسي: +235 66 35 25 05 · +235 95 72 99 99 → https://wa.me/23566352505
+• واتساب الدعم: +235 66 35 25 05 → https://wa.me/23566352505
 • الساعات: الاثنين-الجمعة 9ص-6م، دعم طوارئ 24/7
 • وقت الرد: أقل من ساعتين للدعم، خلال 24 ساعة لنموذج الاتصال
-• مهم: عند ذكر واتساب، ضع دائماً الرابط https://wa.me/221784858226 أو https://wa.me/33745349339 وشجّع المستخدم على النقر.
+• مهم: عند ذكر واتساب، ضع دائماً الرابط https://wa.me/23566352505 أو https://wa.me/23566352505 وشجّع المستخدم على النقر.
 
 القواعد:
 • أجب عن كل ما يتعلق بـ QRPass: الشركة، المقر، العنوان، المنتج، الأسعار، كيف يعمل، الشركاء، الدعم، صفحات الموقع.

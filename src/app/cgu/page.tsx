@@ -143,10 +143,10 @@ export default function CGU() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">10. Protection des données</h2>
               <p className="mb-4">
-                Les données personnelles collectées par PassHajj sont traitées conformément à notre <a href="/confidentialite" className="text-[#b8860b] hover:underline">Politique de confidentialité</a> et dans le respect du Règlement Général sur la Protection des Données (RGPD).
+                Les données personnelles collectées par PassHajj sont traitées conformément à notre <a href="/confidentialite" className="text-[#b8860b] hover:underline">Politique de confidentialité</a> et dans le respect de la réglementation applicable sur la protection des données (dont le Règlement Général sur la Protection des Données, RGPD).
               </p>
               <p>
-                Pour toute question relative à vos données personnelles, contactez-nous à : contact@qrbags.com
+                Pour toute question relative à vos données personnelles, contactez-nous à : <a href="mailto:contact@newvisioncargo.pro" className="text-[#b8860b] hover:underline">contact@newvisioncargo.pro</a>
               </p>
             </section>
 
@@ -172,7 +172,7 @@ export default function CGU() {
             <section>
               <h2 className="text-2xl font-semibold text-slate-900 mb-4">13. Droit applicable et juridiction</h2>
               <p>
-                Les présentes CGU sont soumises au droit français. En cas de litige relatif à l&apos;interprétation ou à l&apos;exécution des présentes CGU, et à défaut d&apos;accord amiable, les tribunaux français seront seuls compétents.
+                Les présentes CGU sont soumises au droit tchadien. En cas de litige relatif à l&apos;interprétation ou à l&apos;exécution des présentes CGU, et à défaut d&apos;accord amiable, les tribunaux compétents de N&apos;Djaména, Tchad, seront seuls compétents.
               </p>
             </section>
 
@@ -182,8 +182,12 @@ export default function CGU() {
                 Pour toute question relative aux présentes CGU, vous pouvez nous contacter :
               </p>
               <p>
-                <strong>Email :</strong> <a href="mailto:contact@qrbags.com" className="text-[#b8860b] hover:underline">contact@qrbags.com</a><br />
-                <strong>Adresse :</strong> Poissy, France
+                <strong>Société :</strong> New Vision Cargo<br />
+                <strong>Email :</strong> <a href="mailto:contact@newvisioncargo.pro" className="text-[#b8860b] hover:underline">contact@newvisioncargo.pro</a><br />
+                <strong>Téléphone :</strong> +235 66 35 25 05 · +235 95 72 99 99<br />
+                <strong>WhatsApp :</strong> +235 66 35 25 05<br />
+                <strong>Adresse :</strong> Avenue Charles de Gaulle, N&apos;Djaména, Tchad<br />
+                <strong>Horaires :</strong> Lundi - Vendredi : 8h00 - 18h00 · Samedi : 9h00 - 13h00
               </p>
             </section>
           </div>

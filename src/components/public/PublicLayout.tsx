@@ -173,7 +173,7 @@ export function PublicFooter() {
 
           {/* Map Link */}
           <a
-            href="https://maps.google.com/?q=Poissy+France"
+            href="https://maps.google.com/?q=Avenue+Charles+de+Gaulle,+N%27Djam%C3%A9na,+Tchad"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/40 hover:text-white text-sm flex items-center gap-1 transition-colors"

@@ -61,9 +61,9 @@ export const metadata: Metadata = {
     "qr code", "sécurité", "protection", "identité", "urgence médicale",
     "groupe sanguin", "allergie", "personne âgée", "pèlerin perdu",
   ],
-  authors: [{ name: "PassHajj Team" }, { name: "MMASOLUTION" }],
-  creator: "MMASOLUTION",
-  publisher: "PassHajj",
+  authors: [{ name: "PassHajj Team" }, { name: "New Vision Cargo" }],
+  creator: "New Vision Cargo",
+  publisher: "New Vision Cargo",
   metadataBase: new URL("https://passhajjj.qrbags.com"),
 
   // PWA Icons
@@ -270,11 +270,11 @@ export default function RootLayout({
               "foundingDate": "2024",
               "founder": {
                 "@type": "Organization",
-                "name": "MMASOLUTION"
+                "name": "New Vision Cargo"
               },
               "contactPoint": {
                 "@type": "ContactPoint",
-                "telephone": "+33-7-45-34-93-39",
+                "telephone": "+235-66-35-25-05",
                 "contactType": "customer service",
                 "availableLanguage": ["French", "English", "Arabic"],
                 "areaServed": {

@@ -79,9 +79,9 @@ interface ChatResponse {
 
 const FALLBACK_RESPONSES: Record<Language, string> = {
   // CHATBOT-KB: Fallback orienté SAV (pas "contactez le propriétaire")
-  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : contact@qrbags.com',
-  en: 'I am experiencing a technical issue. Please contact support: contact@qrbags.com',
-  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: contact@qrbags.com',
+  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : contact@newvisioncargo.pro',
+  en: 'I am experiencing a technical issue. Please contact support: contact@newvisioncargo.pro',
+  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: contact@newvisioncargo.pro',
 };
 
 // ═══════════════════════════════════════════════════════
@@ -102,8 +102,8 @@ function buildSystemPrompt(locale: Language, contextStr: string): string {
     fr: `Tu es l'assistant QRPass, un agent de support intelligent. Réponds en français, de façon concise (max 3 phrases) et empathique. Tu connais TOUT sur QRPass.
 
 🏛️ ENTREPRISE QRPass :
-• Nom : QRPass — édité par MMASOLUTION
-• Siège social : 43 Rue Maryse Bastié, 78300 Poissy, France
+• Nom : QRPass — édité par New Vision Cargo
+• Siège social : Avenue Charles de Gaulle, N'Djaména, Tchad
 • Origine : Né à Dakar (Sénégal), déployé dans 15 pays
 • Site web : https://passhajjj.qrbags.com
 • Mission : Protection intelligente des bagages pour voyageurs et pèlerins
@@ -139,10 +139,10 @@ function buildSystemPrompt(locale: Language, contextStr: string): string {
 • Revenus : jusqu'à 3€ par QR code vendu, sans investissement, service clé en main
 
 🆘 CONTACT & SAV :
-• Email : contact@qrbags.com | WhatsApp SAV : +221 78 4858226 → https://wa.me/221784858226
-• Téléphone : +33 7 45 34 93 39 | Lun-Ven 9h-18h GMT, urgence 24/7
+• Email : contact@newvisioncargo.pro | WhatsApp SAV : +235 66 35 25 05 → https://wa.me/23566352505
+• Téléphone : +235 66 35 25 05 | Lun-Ven 8h-18h, Sam 9h-13h, urgence 24/7
 • Délai réponse : <2h. Orientations empathiques vers le SAV si hors scope ou sensible.
-• IMPORTANT : Quand tu mentionnes le WhatsApp SAV, donne TOUJOURS le lien https://wa.me/221784858226 et encourage l'utilisateur à cliquer dessus.
+• IMPORTANT : Quand tu mentionnes le WhatsApp SAV, donne TOUJOURS le lien https://wa.me/23566352505 et encourage l'utilisateur à cliquer dessus.
 
 CONTEXTE BAGAGE ACTUEL :
 ${contextStr}
@@ -158,8 +158,8 @@ RÈGLES :
     en: `You are the QRPass assistant, an intelligent support agent. Respond in English, concisely (max 3 sentences) and empathetically. You know EVERYTHING about QRPass.
 
 🏛️ COMPANY QRPass:
-• Name: QRPass — published by MMASOLUTION
-• Headquarters: 43 Rue Maryse Bastié, 78300 Poissy, France
+• Name: QRPass — published by New Vision Cargo
+• Headquarters: Avenue Charles de Gaulle, N'Djaména, Tchad
 • Origin: Born in Dakar (Senegal), deployed in 15 countries
 • Website: https://passhajjj.qrbags.com
 • Mission: Intelligent baggage protection for travelers and pilgrims
@@ -195,10 +195,10 @@ RÈGLES :
 • Revenue: up to 3€ per QR code sold, no investment required
 
 🆘 CONTACT & SUPPORT:
-• Email: contact@qrbags.com | WhatsApp: +221 78 4858226 → https://wa.me/221784858226
-• Phone: +33 7 45 34 93 39 | Mon-Fri 9am-6pm GMT, emergency 24/7
+• Email: contact@newvisioncargo.pro | WhatsApp: +235 66 35 25 05 → https://wa.me/23566352505
+• Phone: +235 66 35 25 05 | Mon-Fri 8am-6pm, Sat 9am-1pm, emergency 24/7
 • Response time: <2h. Empathetic redirection to support if off-scope or sensitive.
-• IMPORTANT: When mentioning WhatsApp, ALWAYS include the link https://wa.me/221784858226 and encourage the user to click it.
+• IMPORTANT: When mentioning WhatsApp, ALWAYS include the link https://wa.me/23566352505 and encourage the user to click it.
 
 CURRENT BAGGAGE CONTEXT:
 ${contextStr}
@@ -214,7 +214,7 @@ RULES:
     ar: `أنت مساعد QRPass، وكيل دعم ذكي. أجب باللغة العربية، بطريقة موجزة (بحد أقصى 3 جمل) وبلطف. تعرف كل شيء عن QRPass.
 
 🏛️ شركة QRPass:
-• الاسم: QRPass — تصدرها شركة MMASOLUTION
+• الاسم: QRPass — تصدرها شركة New Vision Cargo
 • المقر الرئيسي: 43 Rue Maryse Bastié، 78300 بواسي، فرنسا
 • المنشأ: ولدت في داكار (السنغال)، منتشرة في 15 دولة
 • الموقع: https://passhajjj.qrbags.com
@@ -251,10 +251,10 @@ RULES:
 • إيرادات: حتى 3€ لكل رمز QR مباع، بدون استثمار
 
 🆘 الاتصال والدعم:
-• البريد: contact@qrbags.com | واتساب الدعم: +221 78 4858226 → https://wa.me/221784858226
-• الهاتف: +33 7 45 34 93 39 | الاثنين-الجمعة 9ص-6م GMT، طوارئ 24/7
+• البريد: contact@newvisioncargo.pro | واتساب الدعم: +235 66 35 25 05 → https://wa.me/23566352505
+• الهاتف: +235 66 35 25 05 | الاثنين-الجمعة 8ص-6م، السبت 9ص-1م، طوارئ 24/7
 • وقت الرد: <2 ساعة. توجيه بلطف إلى الدعم إذا خارج النطاق.
-• مهم: عند ذكر واتساب، ضع دائماً الرابط https://wa.me/221784858226 وشجّع المستخدم على النقر.
+• مهم: عند ذكر واتساب، ضع دائماً الرابط https://wa.me/23566352505 وشجّع المستخدم على النقر.
 
 سياق الأمتعة الحالي :
 ${contextStr}
