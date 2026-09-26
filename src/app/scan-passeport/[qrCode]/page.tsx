@@ -32,6 +32,7 @@ import {
   Languages,
   Volume2,
   Pause,
+  Sparkles,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,9 @@ import { toast } from '@/hooks/use-toast';
 // ═══════════════════════════════════════════════════════════════
 
 const GOLD_ACTUAL = '#D4AF37';
-const GOLD = '#059669';
+const NAVY = '#1e3a8a';
+const NAVY_DEEP = '#0b1530';
+const GOLD_SOFT = '#f7e08a';
 const INK = '#0f172a';
 const MUTED = '#64748b';
 const WHITE = '#ffffff';
@@ -100,6 +103,21 @@ function getStatusConfig(status: string) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  MRZ DÉCORATIF (style ligne de lecture machine d'un passeport)
+// ═══════════════════════════════════════════════════════════════
+
+function buildMrzLines(fullName: string | null | undefined, qrCode: string): [string, string] {
+  const name = (fullName || 'PASSPORT HOLDER').toUpperCase().replace(/[^A-Z ]/g, '').trim();
+  const parts = name.split(/\s+/).filter(Boolean);
+  const surname = (parts.length > 1 ? parts[parts.length - 1] : parts[0] || 'HOLDER').slice(0, 12);
+  const given = (parts.length > 1 ? parts.slice(0, -1).join('<') : '').slice(0, 14);
+  const line1 = `P<TCD${surname}<<${given}`.replace(/[^A-Z<]/g, '').padEnd(38, '<');
+  const code = (qrCode || 'PP-XXXXXXXX').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+  const line2 = `${code}TCD<${'<'.repeat(27)}`.slice(0, 38).padEnd(38, '<');
+  return [line1, line2];
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  DATA TYPES
 // ═══════════════════════════════════════════════════════════════
 
@@ -151,7 +169,7 @@ type Lang = 'fr' | 'ar' | 'wo';
 const translations: Record<string, Record<Lang, string>> = {
   passeportTrouve: {
     fr: 'PASSEPORT TROUVÉ',
-    ar: 'جواز سفر مفقود',
+    ar: 'جواز سفر تم العثور عليه',
     wo: 'Pasipoo bi ñaan',
   },
   passeportPerdu: {
@@ -239,6 +257,66 @@ const translations: Record<string, Record<Lang, string>> = {
     ar: 'إجابة خاطئة. يرجى المحاولة مرة أخرى.',
     wo: 'Tontu bi laaka. Jëm fii.',
   },
+  subActive: {
+    fr: "Merci d'avoir trouvé ce passeport ! Suivez les étapes ci-dessous pour le rendre à son propriétaire.",
+    ar: 'شكرا لإيجاد هذا الجواز! اتبع الخطوات أدناه لإعادته إلى صاحبه.',
+    wo: 'Jërëjëf ngir fekke pasipoo bi! Toppatikoo yoon yi ngir ko yokk boroom bi.',
+  },
+  subLost: {
+    fr: 'Ce passeport a été signalé perdu. Merci de contacter son propriétaire pour le lui rendre.',
+    ar: 'تم الإبلاغ عن فقدان هذا الجواز. يُرجى الاتصال بصاحبه لإعادته إليه.',
+    wo: 'Pasipoo bi ñaan nañu ko ne mothiou. Jëndal boroom bi ngir ko yokk.',
+  },
+  subFound: {
+    fr: 'Ce passeport a été retrouvé et son propriétaire a été notifié.',
+    ar: 'تم العثور على هذا الجواز وتم إبلاغ صاحبه.',
+    wo: 'Pasipoo bi nangu na ñu ko fekke te boroom bi nañu ko wax.',
+  },
+  stepsTitle: {
+    fr: '3 étapes simples pour rendre ce passeport',
+    ar: '3 خطوات بسيطة لإعادة الجواز',
+    wo: 'Ñetti yoon yu woyof ngir yokk pasipoo bi',
+  },
+  step1Title: {
+    fr: 'Contactez le propriétaire',
+    ar: 'اتصل بصاحب الجواز',
+    wo: 'Jëndal boroom bi',
+  },
+  step1Desc: {
+    fr: 'Envoyez un message WhatsApp — son numéro reste confidentiel.',
+    ar: 'أرسل رسالة واتساب — رقمه يبقى سريا.',
+    wo: 'Yónnee bataaxal WhatsApp — nombor bi bañ koy sott.',
+  },
+  step2Title: {
+    fr: "Déposez le passeport à son hôtel",
+    ar: 'اذهب الى الفندق',
+    wo: 'Jëli otel bi',
+  },
+  step2Desc: {
+    fr: "Remettez-le à la réception de l'hôtel où il séjourne.",
+    ar: 'سلّمه في استقبال الفندق الذي يقيم فيه.',
+    wo: 'Joxal ko ci résepsyoŋ otel bi mu dëkk.',
+  },
+  step3Title: {
+    fr: 'Signalez la trouvaille',
+    ar: 'أبلغ عن العثور',
+    wo: 'Xamal ne fekk nga ko',
+  },
+  step3Desc: {
+    fr: 'Remplissez le formulaire — le propriétaire est notifié immédiatement.',
+    ar: 'املأ الاستمارة — يُبلَّغ صاحب الجواز فورا.',
+    wo: 'Fàtti form bi — boroom bi nañu ko xam lolo gaaw.',
+  },
+  quickContact: {
+    fr: 'CONTACT RAPIDE',
+    ar: 'اتصال سريع',
+    wo: 'JOKKOO GAAS',
+  },
+  securityTitle: {
+    fr: 'Vérification de sécurité',
+    ar: 'تحقق أمني',
+    wo: 'Séqarité',
+  },
   verifier: {
     fr: 'Vérifier',
     ar: 'تحقق',
@@ -311,12 +389,17 @@ function InfoRow({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-start gap-3 py-1.5">
-      <span className="flex-shrink-0 mt-0.5">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium" style={{ color: MUTED }}>{label}</p>
+    <div className="flex items-start gap-3 py-2">
+      <span
+        className="w-9 h-9 rounded-[11px] flex items-center justify-center flex-shrink-0"
+        style={{ background: '#f4f6fb', border: '1px solid #edf0f6' }}
+      >
+        {icon}
+      </span>
+      <div className="flex-1 min-w-0 pt-0.5">
+        <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: MUTED }}>{label}</p>
         <p
-          className={`text-sm font-semibold break-words ${mono ? 'font-mono' : ''}`}
+          className={`text-sm font-bold break-words ${mono ? 'font-mono' : ''}`}
           style={{ color: INK }}
         >
           {value}
@@ -344,15 +427,18 @@ function LanguageSelector({
   ];
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg overflow-hidden border border-white/30">
+    <div
+      className="flex items-center gap-0.5 rounded-lg overflow-hidden border border-white/30"
+      style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+    >
       {langs.map((l) => (
         <button
           key={l.code}
           onClick={() => setLang(l.code)}
           className={`px-2.5 py-1 text-xs font-bold transition-all ${
             lang === l.code
-              ? 'bg-white text-emerald-800'
-              : 'bg-transparent text-white/80 hover:bg-white/20'
+              ? 'bg-white text-[#1e3a8a]'
+              : 'bg-transparent text-white/85 hover:bg-white/20'
           }`}
         >
           {l.label}
@@ -730,6 +816,9 @@ export default function PassportFinderPage() {
 
   const expirationFormatted = formatDate(passportData?.expirationDate);
 
+  // Lignes MRZ décoratives (style livret passeport)
+  const [mrzLine1, mrzLine2] = buildMrzLines(passportData?.fullName, qrCode || '');
+
   // ═══════════════════════════════════════════════════════════════
   //  RENDER
   // ═══════════════════════════════════════════════════════════════
@@ -738,10 +827,23 @@ export default function PassportFinderPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #D4AF37 0%, #059669 60%)' }}
+      className="min-h-screen flex flex-col relative overflow-x-hidden"
+      style={{ background: 'linear-gradient(180deg, #0b1530 0%, #152457 45%, #1e3a8a 100%)' }}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
+      {/* Animations locales */}
+      <style>{`
+        @keyframes spFadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spPulseRing { 0% { transform: scale(0.85); opacity: 0.9; } 75% { transform: scale(1.5); opacity: 0; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes spFloaty { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-7px); } }
+      `}</style>
+
+      {/* Halos décoratifs */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute -top-24 -right-20 w-80 h-80 rounded-full" style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.20) 0%, transparent 65%)' }} />
+        <div className="absolute top-[30%] -left-24 w-80 h-80 rounded-full" style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.14) 0%, transparent 65%)' }} />
+        <div className="absolute bottom-24 -right-16 w-72 h-72 rounded-full" style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.10) 0%, transparent 65%)' }} />
+      </div>
       {/* ─── Bismillah ─── */}
       <div className="w-full text-center pt-3 pb-0">
         <p
@@ -757,19 +859,11 @@ export default function PassportFinderPage() {
         <div className="flex items-center gap-2">
           <BrandLogo width={130} />
           <Badge
-            className="text-xs font-semibold px-2.5 py-1 border-0"
-            style={{ background: INK, color: WHITE }}
+            className="text-xs font-bold px-2.5 py-1 border-0"
+            style={{ background: GOLD_ACTUAL, color: NAVY_DEEP }}
           >
             <BookOpen className="w-3 h-3 mr-1" />
             Passeport
-          </Badge>
-          {/* Certification stamp */}
-          <Badge
-            className="text-xs font-semibold px-2.5 py-1 border-0"
-            style={{ background: '#15803d', color: WHITE }}
-          >
-            <ShieldCheck className="w-3 h-3 mr-1" />
-            Certifié
           </Badge>
         </div>
         {/* Language selector */}
@@ -965,18 +1059,31 @@ export default function PassportFinderPage() {
               exit="exit"
               className="w-full max-w-md flex flex-col gap-4"
             >
-              {/* ─── Header Section ─── */}
-              <div className="text-center mb-1">
-                <div
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-3 shadow-md"
-                  style={{ background: GOLD }}
-                >
-                  <Globe className="w-9 h-9 text-white" />
+              {/* ─── HERO ─── */}
+              <div className="text-center mb-2" style={{ animation: 'spFadeInUp 0.5s ease both' }}>
+                {/* Emblème avec anneaux pulsés */}
+                <div className="relative inline-flex items-center justify-center mb-4">
+                  <span
+                    className="absolute w-24 h-24 rounded-full"
+                    style={{ border: '2px solid rgba(212,175,55,0.55)', animation: 'spPulseRing 2.6s ease-out infinite' }}
+                  />
+                  <span
+                    className="absolute w-24 h-24 rounded-full"
+                    style={{ border: '2px solid rgba(212,175,55,0.30)', animation: 'spPulseRing 2.6s ease-out infinite 1.3s' }}
+                  />
+                  <div
+                    className="relative w-20 h-20 rounded-[22px] flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, #f7e08a 0%, #D4AF37 50%, #a97f16 100%)',
+                      boxShadow: '0 12px 32px rgba(212,175,55,0.38)',
+                      animation: 'spFloaty 4s ease-in-out infinite',
+                    }}
+                  >
+                    <BookOpen className="w-10 h-10" style={{ color: NAVY_DEEP }} />
+                  </div>
                 </div>
-                <h1
-                  className="text-2xl md:text-3xl font-extrabold leading-tight"
-                  style={{ color: INK }}
-                >
+
+                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight text-white">
                   {isLost
                     ? `🚨 ${t('passeportPerdu', lang)}`
                     : isFound
@@ -985,50 +1092,49 @@ export default function PassportFinderPage() {
                   }
                 </h1>
                 <p
-                  className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto font-semibold"
-                  style={{ color: WHITE }}
+                  className="mt-2.5 text-sm md:text-base leading-relaxed max-w-md mx-auto font-medium"
+                  style={{ color: 'rgba(255,255,255,0.88)' }}
                 >
                   {isLost
-                    ? 'Ce passeport a été signalé perdu. Merci de le retourner à son propriétaire.'
+                    ? t('subLost', lang)
                     : isFound
-                      ? 'Ce passeport a été signalé comme retrouvé. Le propriétaire a été notifié.'
-                      : 'Merci d\'avoir trouvé ce passeport ! Le propriétaire sera contacté immédiatement.'}
+                      ? t('subFound', lang)
+                      : t('subActive', lang)}
                 </p>
 
-                {/* Expiration date display */}
-                {expirationFormatted && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{ background: 'rgba(255,255,255,0.2)', color: WHITE }}
-                  >
-                    <CalendarDays className="w-3.5 h-3.5" />
-                    {t('valideJusquau', lang)} {expirationFormatted}
-                  </div>
-                )}
-
-                {/* Status Badge */}
-                <div className="flex items-center justify-center gap-2 mt-3">
+                {/* Chips : validité + statut */}
+                <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                  {expirationFormatted && (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/25"
+                      style={{ background: 'rgba(255,255,255,0.10)', color: WHITE }}
+                    >
+                      <CalendarDays className="w-3.5 h-3.5" style={{ color: GOLD_SOFT }} />
+                      {t('valideJusquau', lang)} {expirationFormatted}
+                    </span>
+                  )}
                   {isLost && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(239,68,68,0.45)' }}>
                       🚨 PERDU
                     </span>
                   )}
                   {isFound && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(59,130,246,0.45)' }}>
                       ✅ RETROUVÉ
                     </span>
                   )}
                   {isActive && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">
+                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(16,185,129,0.45)' }}>
                       ● ACTIF
                     </span>
                   )}
                 </div>
 
-                {/* Certification badge */}
+                {/* Certification */}
                 <div className="mt-3">
                   <span
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{ background: '#15803d', color: WHITE }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border border-white/20"
+                    style={{ background: 'rgba(255,255,255,0.08)', color: GOLD_SOFT }}
                   >
                     <ShieldCheck className="w-3.5 h-3.5" />
                     {t('certifieMinistere', lang)}
@@ -1036,11 +1142,78 @@ export default function PassportFinderPage() {
                 </div>
               </div>
 
-              {/* ═══ CARD 1: PASSPORT INFO ═══ */}
+              {/* ─── STEPPER : 3 étapes pour rendre le passeport ─── */}
+              {!isFound && (
+                <div
+                  className="w-full rounded-[20px] p-5 sm:p-6"
+                  style={{
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    animation: 'spFadeInUp 0.5s ease 0.08s both',
+                  }}
+                >
+                  <h2 className="text-xs uppercase tracking-[0.2em] font-bold mb-5 flex items-center justify-center gap-2" style={{ color: GOLD_SOFT }}>
+                    <Sparkles className="w-4 h-4" />
+                    {t('stepsTitle', lang)}
+                  </h2>
+
+                  <div className="relative">
+                    {/* Ligne verticale pointillée */}
+                    <div
+                      className="absolute start-[17px] top-5 bottom-5 border-s-2 border-dashed"
+                      style={{ borderColor: 'rgba(255,255,255,0.25)' }}
+                      aria-hidden="true"
+                    />
+                    <div className="space-y-5 relative">
+                      {[
+                        { title: t('step1Title', lang), desc: t('step1Desc', lang) },
+                        { title: t('step2Title', lang), desc: t('step2Desc', lang) },
+                        { title: t('step3Title', lang), desc: t('step3Desc', lang) },
+                      ].map((s, i) => (
+                        <div key={i} className="flex items-start gap-3.5 relative">
+                          <span
+                            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-extrabold text-sm"
+                            style={{
+                              background: 'linear-gradient(135deg, #f7e08a, #D4AF37)',
+                              color: NAVY_DEEP,
+                              boxShadow: '0 4px 14px rgba(212,175,55,0.4)',
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                          <div className="flex-1 min-w-0 pt-0.5">
+                            <p className="text-sm font-bold text-white">{s.title}</p>
+                            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.72)' }}>{s.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ═══ CARD 1: PASSEPORT — style livret ═══ */}
               <div
-                className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg"
-                style={{ background: CARD_BG }}
+                className="w-full rounded-[22px] overflow-hidden shadow-2xl"
+                style={{ background: CARD_BG, animation: 'spFadeInUp 0.5s ease 0.12s both' }}
               >
+                {/* Bande couverture */}
+                <div className="px-5 sm:px-6 py-4 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, #14265c 0%, #1e3a8a 100%)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #f7e08a, #D4AF37)' }}>
+                      <BookOpen className="w-5 h-5" style={{ color: NAVY_DEEP }} />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold tracking-[0.28em] text-white">PASSEPORT</p>
+                      <p className="text-[10px] font-bold tracking-[0.14em] font-mono" style={{ color: GOLD_SOFT }}>{qrCode}</p>
+                    </div>
+                  </div>
+                  <Globe className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} />
+                </div>
+
+                <div className="p-5 sm:p-6">
                 <h2
                   className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2"
                   style={{ color: INK }}
@@ -1052,8 +1225,8 @@ export default function PassportFinderPage() {
                 {/* Photo + Name header */}
                 <div className="flex items-center gap-4 mb-4">
                   <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm"
-                    style={{ background: '#f1f5f9' }}
+                    className="w-[68px] h-[68px] rounded-2xl flex items-center justify-center shrink-0 overflow-hidden"
+                    style={{ background: '#f1f5f9', border: '2.5px solid #D4AF37', boxShadow: '0 6px 18px rgba(212,175,55,0.25)' }}
                   >
                     {passportData.photoUrl ? (
                       <img
@@ -1065,39 +1238,40 @@ export default function PassportFinderPage() {
                       <User className="w-8 h-8" style={{ color: MUTED }} />
                     )}
                   </div>
-                  <div>
-                    <p className="text-lg font-bold" style={{ color: INK }}>
+                  <div className="min-w-0">
+                    <p className="text-lg font-extrabold" style={{ color: INK }}>
                       {passportData.fullName || 'Non renseigné'}
                     </p>
                     {passportData.nationality && (
-                      <p className="text-sm" style={{ color: MUTED }}>
+                      <p className="text-sm font-medium mt-0.5" style={{ color: MUTED }}>
                         {getFlag(passportData.nationality)} {passportData.nationality}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 my-2" />
 
                 {/* Masked Passport Number */}
                 <InfoRow
-                  icon={<Hash className="w-4 h-4" style={{ color: GOLD }} />}
+                  icon={<Hash className="w-4 h-4" style={{ color: NAVY }} />}
                   label={t('numeroPasseport', lang)}
                   value={passportData.passportNumber || 'Non renseigné'}
                   mono
                 />
 
-                <div className="border-t border-gray-100 my-2" />
 
                 {/* Status Badge */}
-                <div className="flex items-start gap-3 py-1.5">
-                  <span className="flex-shrink-0 mt-0.5">
-                    <Shield className="w-4 h-4" style={{ color: GOLD }} />
+                <div className="flex items-start gap-3 py-2">
+                  <span
+                    className="w-9 h-9 rounded-[11px] flex items-center justify-center flex-shrink-0"
+                    style={{ background: '#f4f6fb', border: '1px solid #edf0f6' }}
+                  >
+                    <Shield className="w-4 h-4" style={{ color: NAVY }} />
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium" style={{ color: MUTED }}>{t('statut', lang)}</p>
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: MUTED }}>{t('statut', lang)}</p>
                     <span
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-0.5"
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1"
                       style={{
                         color: getStatusConfig(passportData.passportStatus || apiData?.status || 'active').color,
                         background: getStatusConfig(passportData.passportStatus || apiData?.status || 'active').bgColor,
@@ -1111,8 +1285,7 @@ export default function PassportFinderPage() {
                 {/* Gender */}
                 {passportData.gender && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
+                        <InfoRow
                       icon={<span className="text-sm">{passportData.gender === 'M' ? '👨' : '👩'}</span>}
                       label="Sexe"
                       value={passportData.gender === 'M' ? 'Masculin' : 'Féminin'}
@@ -1123,11 +1296,10 @@ export default function PassportFinderPage() {
                 {/* Date of Birth */}
                 {passportData.dateOfBirth && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
-                      icon={<CalendarDays className="w-4 h-4" style={{ color: GOLD }} />}
+                        <InfoRow
+                      icon={<CalendarDays className="w-4 h-4" style={{ color: NAVY }} />}
                       label="Date de naissance"
-                      value={passportData.dateOfBirth}
+                      value={formatDate(passportData.dateOfBirth) || passportData.dateOfBirth}
                     />
                   </>
                 )}
@@ -1135,8 +1307,7 @@ export default function PassportFinderPage() {
                 {/* Expiration Date */}
                 {expirationFormatted && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
+                        <InfoRow
                       icon={<CalendarDays className="w-4 h-4" style={{ color: GOLD_ACTUAL }} />}
                       label={t('valideJusquau', lang)}
                       value={expirationFormatted}
@@ -1147,9 +1318,8 @@ export default function PassportFinderPage() {
                 {/* Travel Destination */}
                 {passportData.travelDestination && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
-                      icon={<Plane className="w-4 h-4" style={{ color: GOLD }} />}
+                        <InfoRow
+                      icon={<Plane className="w-4 h-4" style={{ color: NAVY }} />}
                       label="Destination"
                       value={passportData.travelDestination}
                     />
@@ -1159,9 +1329,8 @@ export default function PassportFinderPage() {
                 {/* Home Address */}
                 {passportData.homeAddress && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
-                      icon={<Home className="w-4 h-4" style={{ color: GOLD }} />}
+                        <InfoRow
+                      icon={<Home className="w-4 h-4" style={{ color: NAVY }} />}
                       label="Adresse"
                       value={passportData.homeAddress}
                     />
@@ -1170,53 +1339,48 @@ export default function PassportFinderPage() {
 
                 {/* Hotel Section — using dedicated hotel fields */}
                 {hasHotel && (
-                  <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <div className="flex items-start gap-3 py-1.5">
-                      <span className="flex-shrink-0 mt-0.5">
-                        <Building2 className="w-4 h-4" style={{ color: GOLD }} />
+                  <div className="mt-3 rounded-[14px] p-4" style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: '#eef2ff' }}>
+                        <Building2 className="w-4 h-4" style={{ color: NAVY }} />
                       </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium" style={{ color: MUTED }}>Hôtel</p>
-                        {hotelName && (
-                          <p className="text-sm font-semibold" style={{ color: INK }}>{hotelName}</p>
-                        )}
-                        {hotelAddress && (
-                          <p className="text-xs mt-0.5" style={{ color: MUTED }}>{hotelAddress}</p>
-                        )}
-                        {hotelPhone && (
-                          <a
-                            href={`tel:${hotelPhone.replace(/[^0-9+]/g, '')}`}
-                            className="text-xs mt-1 inline-flex items-center gap-1 font-semibold"
-                            style={{ color: INFO }}
-                          >
-                            <Phone className="w-3 h-3" />
-                            {hotelPhone}
-                          </a>
-                        )}
-                      </div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: MUTED }}>Hôtel</p>
                     </div>
-                    {/* Déposer à l'hôtel button */}
+                    {hotelName && (
+                      <p className="text-sm font-bold" style={{ color: INK }}>{hotelName}</p>
+                    )}
+                    {hotelAddress && (
+                      <p className="text-xs mt-0.5" style={{ color: MUTED }}>{hotelAddress}</p>
+                    )}
+                    {hotelPhone && (
+                      <a
+                        href={`tel:${hotelPhone.replace(/[^0-9+]/g, '')}`}
+                        className="text-xs mt-1.5 inline-flex items-center gap-1 font-bold"
+                        style={{ color: INFO }}
+                      >
+                        <Phone className="w-3 h-3" />
+                        {hotelPhone}
+                      </a>
+                    )}
                     {hotelMapsQuery && (
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelMapsQuery)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98]"
-                        style={{ background: '#7c3aed' }}
+                        className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] text-white"
+                        style={{ background: 'linear-gradient(135deg, #1e3a8a, #1e40af)', boxShadow: '0 6px 16px rgba(30,58,138,0.3)' }}
                       >
                         <MapPin className="w-4 h-4" />
                         {t('deposerHotel', lang)}
                       </a>
                     )}
-                  </>
+                  </div>
                 )}
 
                 {/* Agency */}
                 {passportData.agency && (
                   <>
-                    <div className="border-t border-gray-100 my-2" />
-                    <InfoRow
+                        <InfoRow
                       icon={<span className="text-sm">🏢</span>}
                       label="Agence"
                       value={passportData.agency.name}
@@ -1225,31 +1389,45 @@ export default function PassportFinderPage() {
                 )}
 
                 {/* Secure Contact Note */}
-                <div className="border-t border-gray-100 my-2" />
-                <div className="flex items-start gap-3 py-1.5">
-                  <span className="text-lg flex-shrink-0 mt-0.5">🔒</span>
+                <div className="mt-4 rounded-[14px] p-4 flex items-start gap-3" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                  <span className="w-9 h-9 rounded-[11px] flex items-center justify-center flex-shrink-0" style={{ background: '#dcfce7' }}>
+                    <Lock className="w-4 h-4" style={{ color: SUCCESS }} />
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium" style={{ color: MUTED }}>Contact</p>
-                    <p className="text-sm font-semibold" style={{ color: INK }}>Contact sécurisé</p>
-                    <p className="text-xs mt-0.5 leading-relaxed" style={{ color: MUTED }}>
+                    <p className="text-sm font-bold" style={{ color: '#065f46' }}>Contact sécurisé</p>
+                    <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#047857' }}>
                       Le propriétaire sera notifié via WhatsApp. Son numéro reste confidentiel.
                     </p>
                   </div>
+                </div>
+                </div>
+
+                {/* Bande MRZ décorative — style livret passeport */}
+                <div className="px-5 sm:px-6 py-3.5" style={{ background: '#f1f5f9', borderTop: '1px dashed #cbd5e1' }}>
+                  <p className="font-mono text-[9.5px] leading-[1.7] tracking-[0.06em] text-center break-all" style={{ color: '#64748b' }}>
+                    {mrzLine1}<br />{mrzLine2}
+                  </p>
                 </div>
               </div>
 
               {/* ═══ ACTION BUTTONS: Appeler l'hôtel & Contacter le propriétaire ═══ */}
               {(isActive || isLost) && (
                 <div
-                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg"
-                  style={{ background: CARD_BG }}
+                  className="w-full rounded-[20px] p-5 sm:p-6"
+                  style={{
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    animation: 'spFadeInUp 0.5s ease 0.16s both',
+                  }}
                 >
                   <h2
-                    className="text-xs uppercase tracking-widest font-bold mb-4 flex items-center gap-2"
-                    style={{ color: INK }}
+                    className="text-xs uppercase tracking-[0.2em] font-bold mb-4 flex items-center gap-2"
+                    style={{ color: GOLD_SOFT }}
                   >
                     <Phone className="w-4 h-4" />
-                    CONTACT RAPIDE
+                    {t('quickContact', lang)}
                   </h2>
 
                   <div className="grid grid-cols-1 gap-3">
@@ -1263,8 +1441,8 @@ export default function PassportFinderPage() {
                       }
                       target={passportData.whatsapp ? '_blank' : undefined}
                       rel={passportData.whatsapp ? 'noopener noreferrer' : undefined}
-                      className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
-                      style={{ background: '#25D366' }}
+                      className="w-full py-4 px-6 rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[58px] text-white"
+                      style={{ background: 'linear-gradient(135deg, #2be07f 0%, #25D366 55%, #1eb857 100%)', boxShadow: '0 10px 26px rgba(37,211,102,0.35)' }}
                     >
                       <MessageCircle className="w-6 h-6" />
                       {t('contacterProprietaire', lang)}
@@ -1274,8 +1452,8 @@ export default function PassportFinderPage() {
                     {hotelPhone ? (
                       <a
                         href={`tel:${hotelPhone.replace(/[^0-9+]/g, '')}`}
-                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
-                        style={{ background: INK }}
+                        className="w-full py-4 px-6 rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[58px]"
+                        style={{ background: WHITE, color: NAVY }}
                       >
                         <Phone className="w-6 h-6" />
                         {t('appelerHotel', lang)} ({hotelPhone})
@@ -1285,8 +1463,8 @@ export default function PassportFinderPage() {
                         href={`https://www.google.com/search?q=${encodeURIComponent(hotelMapsQuery)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
-                        style={{ background: INK }}
+                        className="w-full py-4 px-6 rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[58px]"
+                        style={{ background: WHITE, color: NAVY }}
                       >
                         <Building2 className="w-6 h-6" />
                         {t('appelerHotel', lang)}
@@ -1296,8 +1474,8 @@ export default function PassportFinderPage() {
                         href={`https://www.google.com/search?q=${encodeURIComponent(passportData.homeAddress)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-4 px-6 rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[56px] text-white"
-                        style={{ background: INK }}
+                        className="w-full py-4 px-6 rounded-[16px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 min-h-[58px]"
+                        style={{ background: WHITE, color: NAVY }}
                       >
                         <Building2 className="w-6 h-6" />
                         {t('appelerHotel', lang)}
@@ -1305,8 +1483,9 @@ export default function PassportFinderPage() {
                     ) : null}
                   </div>
 
-                  <p className="text-xs mt-3 text-center" style={{ color: MUTED }}>
-                    🔒 Le numéro du propriétaire reste confidentiel. La mise en relation se fait via WhatsApp.
+                  <p className="text-xs mt-3.5 text-center flex items-center justify-center gap-1.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                    <Lock className="w-3.5 h-3.5 flex-shrink-0" />
+                    Le numéro du propriétaire reste confidentiel. La mise en relation se fait via WhatsApp.
                   </p>
                 </div>
               )}
@@ -1314,8 +1493,8 @@ export default function PassportFinderPage() {
               {/* ═══ CARD 2: ACTIVE PASSPORT MESSAGE ═══ */}
               {isActive && !isLost && !isFound && (
                 <div
-                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg text-center"
-                  style={{ background: '#d1fae5' }}
+                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-xl text-center"
+                  style={{ background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)', border: '1px solid #6ee7b7', animation: 'spFadeInUp 0.5s ease 0.2s both' }}
                 >
                   <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: SUCCESS }} />
                   <h3 className="text-lg font-bold mb-2" style={{ color: SUCCESS }}>
@@ -1346,8 +1525,8 @@ export default function PassportFinderPage() {
                           setSecurityStep('form');
                         }
                       }}
-                      className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
-                      style={{ background: INK }}
+                      className="w-full py-4 px-6 rounded-[16px] font-extrabold text-lg md:text-xl transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2.5 min-h-[58px]"
+                      style={{ background: 'linear-gradient(135deg, #f7e08a 0%, #D4AF37 55%, #c39a1f 100%)', color: NAVY_DEEP, boxShadow: '0 12px 30px rgba(212,175,55,0.4)' }}
                     >
                       <Phone className="w-5 h-5" />
                       <span>
@@ -1357,13 +1536,15 @@ export default function PassportFinderPage() {
                   ) : securityStep === 'question' ? (
                     /* ─── Security Question Step ─── */
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Lock className="w-5 h-5" style={{ color: GOLD_ACTUAL }} />
+                      <div className="flex items-center gap-2.5 mb-1">
+                        <span className="w-9 h-9 rounded-[11px] flex items-center justify-center flex-shrink-0" style={{ background: '#fdf6e3', border: '1px solid #f0e0b0' }}>
+                          <Lock className="w-4 h-4" style={{ color: GOLD_ACTUAL }} />
+                        </span>
                         <h3
                           className="text-sm font-bold uppercase tracking-widest"
                           style={{ color: INK }}
                         >
-                          Vérification de sécurité
+                          {t('securityTitle', lang)}
                         </h3>
                       </div>
                       <p className="text-sm" style={{ color: MUTED }}>
@@ -1401,8 +1582,8 @@ export default function PassportFinderPage() {
                       </div>
                       <button
                         onClick={handleSecurityCheck}
-                        className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
-                        style={{ background: INK }}
+                        className="w-full py-4 px-6 rounded-[16px] font-extrabold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-2 min-h-[56px]"
+                        style={{ background: 'linear-gradient(135deg, #f7e08a 0%, #D4AF37 55%, #c39a1f 100%)', color: NAVY_DEEP, boxShadow: '0 10px 26px rgba(212,175,55,0.35)' }}
                       >
                         <ShieldCheck className="w-5 h-5" />
                         {t('verifier', lang)}
@@ -1535,8 +1716,8 @@ export default function PassportFinderPage() {
                       <button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="w-full py-4 px-6 text-white rounded-[14px] font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
-                        style={{ background: INK }}
+                        className="w-full py-4 px-6 rounded-[16px] font-extrabold text-lg transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[58px]"
+                        style={{ background: 'linear-gradient(135deg, #f7e08a 0%, #D4AF37 55%, #c39a1f 100%)', color: NAVY_DEEP, boxShadow: '0 12px 30px rgba(212,175,55,0.4)' }}
                       >
                         {isSubmitting ? (
                           <>
@@ -1558,20 +1739,40 @@ export default function PassportFinderPage() {
               {/* ═══ REPORT SUBMITTED SUCCESS ═══ */}
               {reportSubmitted && (
                 <div
-                  className="w-full rounded-[20px] p-6 sm:p-8 shadow-lg text-center"
-                  style={{ background: '#d1fae5' }}
+                  className="w-full rounded-[22px] p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden"
+                  style={{ background: CARD_BG, animation: 'spFadeInUp 0.45s ease both' }}
                 >
+                  {/* Étincelles dorées animées */}
+                  {[
+                    { top: '16%', left: '14%', d: 0 },
+                    { top: '9%', left: '50%', d: 0.15 },
+                    { top: '18%', left: '84%', d: 0.3 },
+                    { top: '55%', left: '8%', d: 0.2 },
+                    { top: '60%', left: '91%', d: 0.35 },
+                  ].map((s, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: [0, 1, 0], scale: [0, 1.25, 0] }}
+                      transition={{ duration: 1.4, delay: 0.3 + s.d, repeat: Infinity, repeatDelay: 1.8 }}
+                      className="absolute w-2.5 h-2.5 rounded-full"
+                      style={{ top: s.top, left: s.left, background: GOLD_ACTUAL }}
+                      aria-hidden="true"
+                    />
+                  ))}
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+                    initial={{ scale: 0, rotate: -18 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 12, delay: 0.05 }}
+                    className="mx-auto mb-4 w-20 h-20 rounded-full flex items-center justify-center"
+                    style={{ background: '#d1fae5', border: '3px solid #059669' }}
                   >
-                    <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: SUCCESS }} />
+                    <CheckCircle className="w-10 h-10" style={{ color: SUCCESS }} />
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: SUCCESS }}>
+                  <h3 className="text-xl font-extrabold mb-2" style={{ color: SUCCESS }}>
                     Signalement envoyé ! ✓
                   </h3>
-                  <p className="text-sm mb-4" style={{ color: '#065f46' }}>
+                  <p className="text-sm mb-4 leading-relaxed" style={{ color: '#065f46' }}>
                     Merci pour votre aide. Le propriétaire du passeport a été notifié
                     et sera contacté avec les informations que vous avez fournies.
                   </p>
@@ -1585,8 +1786,8 @@ export default function PassportFinderPage() {
               {/* ═══ CARD: FOUND PASSPORT INFO ═══ */}
               {isFound && (
                 <div
-                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg text-center"
-                  style={{ background: '#dbeafe' }}
+                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-xl text-center"
+                  style={{ background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', border: '1px solid #93c5fd', animation: 'spFadeInUp 0.5s ease 0.16s both' }}
                 >
                   <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: INFO }} />
                   <h3 className="text-lg font-bold mb-2" style={{ color: INFO }}>
@@ -1602,15 +1803,17 @@ export default function PassportFinderPage() {
               {/* ═══ BACKUP QR CODE ═══ */}
               {backupQrUrl && (
                 <div
-                  className="w-full rounded-[20px] p-5 sm:p-6 shadow-lg flex flex-col items-center"
-                  style={{ background: CARD_BG }}
+                  className="w-full rounded-[20px] p-5 sm:p-6 flex flex-col items-center"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
                 >
-                  <img
-                    src={backupQrUrl}
-                    alt="QR Code backup"
-                    className="w-28 h-28"
-                  />
-                  <p className="text-xs mt-2 font-medium" style={{ color: MUTED }}>
+                  <div className="bg-white p-2.5 rounded-[14px] shadow-lg">
+                    <img
+                      src={backupQrUrl}
+                      alt="QR Code backup"
+                      className="w-28 h-28"
+                    />
+                  </div>
+                  <p className="text-xs mt-2.5 font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>
                     Scanner pour accéder à cette page
                   </p>
                 </div>
@@ -1626,10 +1829,10 @@ export default function PassportFinderPage() {
                   Que cette rencontre soit bénie par le Tout-Puissant 🤲
                 </p>
 
-                <p className="text-xs font-medium" style={{ color: INK }}>
+                <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   PassHajj — Service officiel de protection des passeports
                 </p>
-                <p className="text-xs mt-1" style={{ color: MUTED }}>
+                <p className="text-xs mt-1 font-mono" style={{ color: 'rgba(255,255,255,0.55)' }}>
                   Code QR : {qrCode}
                 </p>
 
@@ -1704,13 +1907,13 @@ export default function PassportFinderPage() {
             title={VOICE_GATE[lang].replay}
             className="fixed bottom-[4.75rem] left-5 z-[55] w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-95"
             style={{
-              background: voicePlaying ? '#1e3a8a' : '#ffffff',
-              border: '3px solid #1e3a8a',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+              background: voicePlaying ? GOLD_ACTUAL : '#ffffff',
+              border: '3px solid #D4AF37',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.35)',
             }}
           >
             {voicePlaying ? (
-              <Pause className="w-5 h-5 text-white animate-pulse" />
+              <Pause className="w-5 h-5 animate-pulse" style={{ color: NAVY_DEEP }} />
             ) : (
               <Volume2 className="w-5 h-5" style={{ color: '#1e3a8a' }} />
             )}
