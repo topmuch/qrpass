@@ -245,17 +245,19 @@ function HajjActivateContent() {
   return (
     <main dir={dir} className="min-h-screen flex flex-col items-center" style={{ background: BG, color: TEXT, padding: '16px' }}>
 
-      {/* ─── Header ─── */}
-      <div className="w-full max-w-[420px] flex items-center justify-between mb-6">
-        <div>
-          <div className="text-2xl font-extrabold tracking-tight text-black">
+      {/* ─── Header : logo centré ─── */}
+      <div className="w-full max-w-[420px] relative flex items-center justify-center mb-6">
+        <div className="text-center">
+          <div className="flex justify-center">
             <BrandLogo width={120} />
           </div>
           <div className="text-sm mt-1" style={{ color: MUTED }}>
             Activez votre bagage en 2 minutes
           </div>
         </div>
-        <LangSelector lang={lang} setLang={setLang} />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+          <LangSelector lang={lang} setLang={setLang} />
+        </div>
       </div>
 
       {/* ─── Progress Bar ─── */}

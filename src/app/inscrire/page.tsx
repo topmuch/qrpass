@@ -222,20 +222,22 @@ function InscrireContent() {
       className="min-h-[100dvh] min-h-screen bg-[#f4b400] flex flex-col px-4 sm:px-5 md:px-8 pb-[env(safe-area-inset-bottom,0px)]"
       dir={dir}
     >
-      {/* ─── Header ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#f4b400]">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-medium transition-opacity hover:opacity-70 min-h-[44px]"
-          style={{ color: INK }}
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <BrandLogo width={150} />
+      {/* ─── Header : logo parfaitement centré (flex-1 de part et d'autre) ─── */}
+      <header className="sticky top-0 z-40 flex items-center pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#f4b400]">
+        <div className="flex-1 flex justify-start min-w-0">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-medium transition-opacity hover:opacity-70 min-h-[44px]"
+            style={{ color: INK }}
+          >
+            <ArrowLeft className="w-5 h-5 shrink-0" />
+            <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
+          </Link>
         </div>
-        <LanguageSelector lang={lang} setLang={setLang} />
+        <BrandLogo width={110} />
+        <div className="flex-1 flex justify-end min-w-0">
+          <LanguageSelector lang={lang} setLang={setLang} />
+        </div>
       </header>
 
       {/* ─── Container ─── */}

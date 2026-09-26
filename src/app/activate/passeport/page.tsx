@@ -257,13 +257,13 @@ function PasseportActivateContent() {
       className="min-h-screen flex flex-col items-center px-4 py-6"
       style={{ background: BG, color: TEXT }}
     >
-      {/* ─── Header / Logo ─── */}
-      <div className="w-full max-w-[420px] mb-5">
-        <div className="text-2xl font-extrabold tracking-tight text-black">
+      {/* ─── Header / Logo centré ─── */}
+      <div className="w-full max-w-[420px] mb-5 text-center">
+        <div className="flex justify-center">
           <BrandLogo width={150} />
         </div>
         <p className="text-sm mt-1" style={{ color: MUTED }}>
-          🛂 Sticker Passeport — Protection & Restitution
+          🛂 Sticker Passeport — Protection &amp; Restitution
         </p>
       </div>
 
