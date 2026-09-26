@@ -13,7 +13,6 @@ import {
   Building2,
   ArrowRight,
   CheckCircle,
-  Fingerprint,
   KeyRound,
   Mail,
   Lock,
@@ -36,9 +35,6 @@ interface LoginConfig {
   type: LoginVariant;
   title: string;
   subtitle: string;
-  demoEmail: string;
-  demoPassword: string;
-  demoLabel: string;
   role: string;
   redirectPath: string;
   accentColor: string;
@@ -57,9 +53,6 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'agence',
     title: 'Bienvenue',
     subtitle: 'Connectez-vous à votre espace agence pour gérer vos bagages et QR codes',
-    demoEmail: 'agence@qrpass.com',
-    demoPassword: 'agence123',
-    demoLabel: 'Agence',
     role: 'agency',
     redirectPath: '/agence/tableau-de-bord',
     accentColor: '#2563EB',
@@ -84,9 +77,6 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'superadmin',
     title: 'Administration',
     subtitle: 'Accès réservé aux administrateurs de la plateforme PassHajj',
-    demoEmail: 'admin@qrpass.com',
-    demoPassword: 'admin123',
-    demoLabel: 'SuperAdmin',
     role: 'superadmin',
     redirectPath: '/admin/tableau-de-bord',
     accentColor: '#0F172A',
@@ -159,11 +149,6 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemo = () => {
-    setEmail(config.demoEmail);
-    setPassword(config.demoPassword);
   };
 
   const isAgence = variant === 'agence';
@@ -331,7 +316,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField(null)}
                   className="w-full bg-transparent border-none outline-none text-slate-900 placeholder-slate-400 py-3.5 px-3 text-sm"
-                  placeholder={variant === 'agence' ? 'vous@agence.com' : 'admin@qrpass.com'}
+                  placeholder="votre@email.com"
                   required
                 />
               </div>
@@ -409,28 +394,6 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
               )}
             </button>
           </form>
-
-          {/* Demo Account Card */}
-          <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
-                  <Fingerprint className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-slate-700">Compte démo</p>
-                  <p className="text-[10px] text-slate-400 font-mono">{config.demoEmail} / {config.demoPassword}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemo}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
-              >
-                Remplir
-              </button>
-            </div>
-          </div>
 
           {/* Switch */}
           <div className="mt-8 text-center text-sm text-slate-500">

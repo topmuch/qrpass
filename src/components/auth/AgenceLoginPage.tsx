@@ -17,7 +17,6 @@ import {
   Plane,
   Luggage,
   Globe,
-  Fingerprint,
   Phone,
   MapPin,
   Clock,
@@ -121,11 +120,6 @@ export default function AgenceLoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemo = () => {
-    setEmail('agence@qrpass.com');
-    setPassword('agence123');
   };
 
   /* ── Framer Motion Variants ── */
@@ -434,7 +428,7 @@ export default function AgenceLoginPage() {
                     onBlur={() => setFocusedField(null)}
                     className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm"
                     style={{ color: '#0c1d3a' }}
-                    placeholder="vous@agence.com"
+                    placeholder="votre@email.com"
                     required
                     autoComplete="email"
                   />
@@ -537,37 +531,6 @@ export default function AgenceLoginPage() {
                 )}
               </motion.button>
             </form>
-          </motion.div>
-
-          {/* Demo Account Card */}
-          <motion.div
-            className="mt-6 p-4 rounded-xl border"
-            style={{ background: 'rgba(255,255,255,0.6)', borderColor: 'rgba(244,180,0,0.15)' }}
-            variants={itemVariants}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm" style={{ background: 'linear-gradient(135deg, #0c1d3a, #1e3a5f)' }}>
-                  <Fingerprint className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: '#0c1d3a' }}>
-                    Compte démo
-                  </p>
-                  <p className="text-[10px] font-mono leading-relaxed" style={{ color: '#94a3b8' }}>
-                    agence@qrpass.com / agence123
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemo}
-                className="text-xs font-semibold px-3.5 py-2 rounded-lg text-white active:scale-[0.97] transition-all duration-200 shadow-sm"
-                style={{ background: '#0c1d3a' }}
-              >
-                Remplir
-              </button>
-            </div>
           </motion.div>
 
           {/* Switch to Admin */}

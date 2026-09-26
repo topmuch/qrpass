@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +13,6 @@ import {
   Loader2,
   Shield,
   QrCode,
-  Fingerprint,
   KeyRound,
   Activity,
   Server,
@@ -275,12 +274,6 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
-
-  /* ─── Demo fill ─── */
-  const fillDemo = useCallback(() => {
-    setEmail('admin@qrpass.com');
-    setPassword('admin123');
-  }, []);
 
   const currentTestimonial = TESTIMONIALS[activeTestimonial];
   const initials = currentTestimonial.name
@@ -577,7 +570,7 @@ export default function AdminLoginPage() {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     className="w-full bg-transparent border-none outline-none text-white placeholder-white/20 py-3.5 px-3 text-sm"
-                    placeholder="admin@qrpass.com"
+                    placeholder="votre@email.com"
                     required
                     autoComplete="email"
                   />
@@ -681,37 +674,6 @@ export default function AdminLoginPage() {
                 </button>
               </motion.div>
             </form>
-          </motion.div>
-
-          {/* Demo Account Card */}
-          <motion.div
-            className="mt-6 p-4 rounded-xl border"
-            style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(244,180,0,0.1)' }}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.75 }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(244,180,0,0.1)' }}>
-                  <Fingerprint className="w-4 h-4" style={{ color: '#f4b400' }} />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.65)' }}>Compte démo</p>
-                  <p className="text-[10px] font-mono mt-0.5" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                    admin@qrpass.com / admin123
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemo}
-                className="text-xs font-semibold px-4 py-2 rounded-lg border transition-all duration-200 active:scale-95"
-                style={{ background: 'rgba(244,180,0,0.1)', color: '#f4b400', borderColor: 'rgba(244,180,0,0.2)' }}
-              >
-                Remplir
-              </button>
-            </div>
           </motion.div>
 
           {/* Switch to Agency */}

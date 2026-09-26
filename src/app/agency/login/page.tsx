@@ -140,12 +140,6 @@ export default function AgencyLoginPage() {
     }
   };
 
-  /* ── Fill demo credentials ── */
-  const fillDemo = () => {
-    setEmail('agence@qrpass.com');
-    setPassword('agence123');
-  };
-
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* ══════════════════════════════════════════════════
@@ -461,7 +455,7 @@ export default function AgencyLoginPage() {
                         onBlur={() => setFocusedField(null)}
                         className="w-full bg-transparent border-none outline-none placeholder-slate-400 py-3.5 px-3 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
                         style={{ color: '#1e3a5f' }}
-                        placeholder="vous@agence.com"
+                        placeholder="votre@email.com"
                         required
                         autoComplete="email"
                       />
@@ -568,43 +562,6 @@ export default function AgencyLoginPage() {
                 </form>
               </CardContent>
             </Card>
-          </motion.div>
-
-          {/* Demo Account Card */}
-          <motion.div
-            className="mt-6 p-4 rounded-xl border"
-            style={{
-              background: 'rgba(255,255,255,0.6)',
-              borderColor: 'rgba(244,180,0,0.15)',
-            }}
-            variants={itemVariants}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm"
-                  style={{ background: 'linear-gradient(135deg, #1e3a5f, #0c1d3a)' }}
-                >
-                  <ShieldCheck className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: '#1e3a5f' }}>
-                    Compte démo
-                  </p>
-                  <p className="text-[10px] font-mono leading-relaxed text-slate-400">
-                    agence@qrpass.com / agence123
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={fillDemo}
-                className="text-xs font-semibold px-3.5 py-2 rounded-lg text-white active:scale-[0.97] transition-all duration-200 shadow-sm"
-                style={{ background: '#1e3a5f' }}
-              >
-                Remplir
-              </button>
-            </div>
           </motion.div>
 
           {/* Switch to Admin */}

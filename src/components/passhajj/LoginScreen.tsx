@@ -188,25 +188,6 @@ export default function LoginScreen() {
               <div key={i}>{icon}</div>
             ))}
           </div>
-
-          {/* Demo hint */}
-          <div className="text-center text-xs text-gray-400 pt-2 border-t border-gray-100">
-            <p className="font-medium mb-1">Codes de démonstration :</p>
-            <div className="flex justify-center gap-3">
-              {['1234', '5678', '9999'].map((code) => (
-                <button
-                  key={code}
-                  onClick={() => {
-                    setOtp(code);
-                    setError('');
-                  }}
-                  className="px-3 py-1 bg-gray-100 rounded-lg font-mono text-gray-600 hover:bg-gray-200 transition-colors"
-                >
-                  {code}
-                </button>
-              ))}
-            </div>
-          </div>
         </CardContent>
       </Card>
 
