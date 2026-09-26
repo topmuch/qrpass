@@ -797,12 +797,10 @@ export default function PilgrimScanPage() {
       ═══════════════════════════════════════════════════════════ */}
       {state === 'active' && pilgrim && (
         <>
-          {/* ─── HEADER ─── */}
-          <div className="w-full max-w-[420px] flex justify-between items-center mb-4">
-            <div className="flex items-center">
-              <BrandLogo width={150} />
-            </div>
-            <div className="flex items-center gap-2">
+          {/* ─── HEADER : logo centré ─── */}
+          <div className="w-full max-w-[420px] relative flex justify-center items-center mb-4">
+            <BrandLogo width={150} />
+            <div className="absolute right-0 inset-y-0 flex items-center gap-2">
               {/* Share Profile Button */}
               <button
                 onClick={async () => {

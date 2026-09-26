@@ -226,7 +226,8 @@ function InscrireContent() {
       <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3 md:py-4 bg-[#f4b400]">
         <Link
           href="/"
-          className="flex items-center gap-2 text-white hover:text-[#f4b400] transition-colors min-h-[44px]"
+          className="flex items-center gap-2 font-medium transition-opacity hover:opacity-70 min-h-[44px]"
+          style={{ color: INK }}
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm md:text-base font-medium">{t('inscrire.back')}</span>
@@ -247,7 +248,7 @@ function InscrireContent() {
           >
             {qrFromUrl ? `✨ ${t('inscrire.voyageur_badge')}` : `🧳 ${t('inscrire.title')}`}
           </span>
-          <p className="mt-3 text-white text-base md:text-lg leading-relaxed max-w-md mx-auto">
+          <p className="mt-3 text-base md:text-lg leading-relaxed max-w-md mx-auto font-semibold" style={{ color: INK }}>
             {qrFromUrl ? t('inscrire.welcome_desc') : t('inscrire.subtitle')}
           </p>
         </div>
@@ -255,7 +256,7 @@ function InscrireContent() {
         {/* ─── Status Indicator ─── */}
         <div className="flex items-center justify-center gap-2 mb-5">
           <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: ACCENT }} />
-          <span className="text-sm font-bold uppercase tracking-widest text-white">
+          <span className="text-sm font-bold uppercase tracking-widest" style={{ color: INK }}>
             {step === 1 ? t('transport.select_mode') : t('inscrire.step_2_subtitle')}
           </span>
         </div>

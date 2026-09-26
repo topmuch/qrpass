@@ -34,7 +34,6 @@ import {
   Pause,
   Sparkles,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import PhoneInput from '@/components/ui/PhoneInput';
@@ -90,16 +89,16 @@ function getFlag(nationality: string | null | undefined): string {
 //  PASSPORT STATUS CONFIG
 // ═══════════════════════════════════════════════════════════════
 
-const PASSPORT_STATUS_MAP: Record<string, { label: string; color: string; bgColor: string }> = {
-  active: { label: 'Actif', color: SUCCESS, bgColor: '#d1fae5' },
-  lost: { label: 'Perdu', color: DANGER, bgColor: '#fee2e2' },
-  found: { label: 'Retrouvé', color: INFO, bgColor: '#dbeafe' },
-  pending_activation: { label: 'Non activé', color: '#f59e0b', bgColor: '#fef3c7' },
-  blocked: { label: 'Bloqué', color: MUTED, bgColor: '#f1f5f9' },
+const PASSPORT_STATUS_MAP: Record<string, { label: Record<Lang, string>; color: string; bgColor: string }> = {
+  active: { label: { fr: 'Actif', en: 'Active', ar: 'نشط' }, color: SUCCESS, bgColor: '#d1fae5' },
+  lost: { label: { fr: 'Perdu', en: 'Lost', ar: 'مفقود' }, color: DANGER, bgColor: '#fee2e2' },
+  found: { label: { fr: 'Retrouvé', en: 'Returned', ar: 'تم استرداده' }, color: INFO, bgColor: '#dbeafe' },
+  pending_activation: { label: { fr: 'Non activé', en: 'Not activated', ar: 'غير مفعّل' }, color: '#f59e0b', bgColor: '#fef3c7' },
+  blocked: { label: { fr: 'Bloqué', en: 'Blocked', ar: 'محظور' }, color: MUTED, bgColor: '#f1f5f9' },
 };
 
 function getStatusConfig(status: string) {
-  return PASSPORT_STATUS_MAP[status] || { label: status, color: MUTED, bgColor: '#f1f5f9' };
+  return PASSPORT_STATUS_MAP[status] || { label: { fr: status, en: status, ar: status }, color: MUTED, bgColor: '#f1f5f9' };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -164,163 +163,163 @@ interface ApiResponse {
 //  TRANSLATIONS
 // ═══════════════════════════════════════════════════════════════
 
-type Lang = 'fr' | 'ar' | 'wo';
+type Lang = 'fr' | 'en' | 'ar';
 
 const translations: Record<string, Record<Lang, string>> = {
   passeportTrouve: {
     fr: 'PASSEPORT TROUVÉ',
     ar: 'جواز سفر تم العثور عليه',
-    wo: 'Pasipoo bi ñaan',
+    en: 'PASSPORT FOUND',
   },
   passeportPerdu: {
     fr: 'PASSEPORT PERDU',
     ar: 'جواز سفر مفقود',
-    wo: 'Pasipoo bi gën na',
+    en: 'PASSPORT LOST',
   },
   passeportRetrouve: {
     fr: 'PASSEPORT RETROUVÉ',
     ar: 'جواز سفر مسترد',
-    wo: 'Pasipoo bi nangoo',
+    en: 'PASSPORT RETURNED',
   },
   contacterProprietaire: {
     fr: 'Envoyer un message (WhatsApp)',
     ar: 'اتصل بصاحب الجواز',
-    wo: 'Jëndal boroom bi',
+    en: 'Send a message (WhatsApp)',
   },
   deposerHotel: {
     fr: "Déposer à l'hôtel",
     ar: 'اذهب الى الفندق',
-    wo: 'Jëli otel bi',
+    en: 'Drop off at the hotel',
   },
   appelerHotel: {
     fr: "Appeler l'hôtel",
     ar: 'اتصل بالفندق',
-    wo: 'Wël otel bi',
+    en: 'Call the hotel',
   },
   signalerPasseport: {
     fr: 'Signaler ce passeport trouvé',
     ar: 'ابلغ عن الجواز',
-    wo: 'Xamal sa pasipoo bi',
+    en: 'Report this found passport',
   },
   proprietaire: {
     fr: 'PROPRIÉTAIRE',
     ar: 'صاحب الجواز',
-    wo: 'BOROOM BI',
+    en: 'OWNER',
   },
   numeroPasseport: {
     fr: 'N° passeport',
     ar: 'رقم الجواز',
-    wo: 'Nomba pasipoo',
+    en: 'Passport No.',
   },
   nationalite: {
     fr: 'Nationalité',
     ar: 'الجنسية',
-    wo: 'Réew',
+    en: 'Nationality',
   },
   statut: {
     fr: 'Statut',
     ar: 'الحالة',
-    wo: 'Stat bi',
+    en: 'Status',
   },
   certifieMinistere: {
     fr: 'Certifié par le Ministère du Hajj du Sénégal',
     ar: 'معتمد من وزارة الحج السنغالية',
-    wo: 'Jaaru ngir Ministeer u Hajj u Senegaal',
+    en: 'Certified by the Ministry of Hajj of Senegal',
   },
   serviceAgree: {
     fr: "Service agréé par l'Autorité saoudienne du Hajj",
     ar: 'خدمة معتمدة من السلطات السعودية للحج',
-    wo: 'Servis bëgg nañu ko ndigél u Aotorité saoudienne u Hajj',
+    en: 'Service approved by the Saudi Hajj Authority',
   },
   donneesCryptees: {
     fr: 'Données cryptées – conformité RGPD',
     ar: 'بيانات مشفرة – توافق RGPD',
-    wo: 'Données yif – bépp RGPD',
+    en: 'Encrypted data – GDPR compliant',
   },
   valideJusquau: {
     fr: 'Valide jusqu\'au',
     ar: 'صالح حتى',
-    wo: 'Baax ba',
+    en: 'Valid until',
   },
   securityQuestion: {
     fr: 'Quel est le nom de l\'hôtel de destination ?',
     ar: 'ما اسم فندق الوجهة؟',
-    wo: 'Nan lan mo otel u destinasioŋ bi?',
+    en: "What is the name of the destination hotel?",
   },
   securityHint: {
     fr: 'Pour votre sécurité, veuillez répondre à cette question',
     ar: 'لأمانك، يرجى الإجابة على هذا السؤال',
-    wo: 'Ngir sa kaaraange, jañ nga tuumaali laaj bii',
+    en: 'For your security, please answer this question',
   },
   securityError: {
     fr: 'Réponse incorrecte. Veuillez réessayer.',
     ar: 'إجابة خاطئة. يرجى المحاولة مرة أخرى.',
-    wo: 'Tontu bi laaka. Jëm fii.',
+    en: 'Incorrect answer. Please try again.',
   },
   subActive: {
     fr: "Merci d'avoir trouvé ce passeport ! Suivez les étapes ci-dessous pour le rendre à son propriétaire.",
     ar: 'شكرا لإيجاد هذا الجواز! اتبع الخطوات أدناه لإعادته إلى صاحبه.',
-    wo: 'Jërëjëf ngir fekke pasipoo bi! Toppatikoo yoon yi ngir ko yokk boroom bi.',
+    en: 'Thank you for finding this passport! Follow the steps below to return it to its owner.',
   },
   subLost: {
     fr: 'Ce passeport a été signalé perdu. Merci de contacter son propriétaire pour le lui rendre.',
     ar: 'تم الإبلاغ عن فقدان هذا الجواز. يُرجى الاتصال بصاحبه لإعادته إليه.',
-    wo: 'Pasipoo bi ñaan nañu ko ne mothiou. Jëndal boroom bi ngir ko yokk.',
+    en: 'This passport has been reported lost. Please contact its owner to return it.',
   },
   subFound: {
     fr: 'Ce passeport a été retrouvé et son propriétaire a été notifié.',
     ar: 'تم العثور على هذا الجواز وتم إبلاغ صاحبه.',
-    wo: 'Pasipoo bi nangu na ñu ko fekke te boroom bi nañu ko wax.',
+    en: 'This passport has been found and its owner has been notified.',
   },
   stepsTitle: {
     fr: '3 étapes simples pour rendre ce passeport',
     ar: '3 خطوات بسيطة لإعادة الجواز',
-    wo: 'Ñetti yoon yu woyof ngir yokk pasipoo bi',
+    en: '3 simple steps to return this passport',
   },
   step1Title: {
     fr: 'Contactez le propriétaire',
     ar: 'اتصل بصاحب الجواز',
-    wo: 'Jëndal boroom bi',
+    en: 'Contact the owner',
   },
   step1Desc: {
     fr: 'Envoyez un message WhatsApp — son numéro reste confidentiel.',
     ar: 'أرسل رسالة واتساب — رقمه يبقى سريا.',
-    wo: 'Yónnee bataaxal WhatsApp — nombor bi bañ koy sott.',
+    en: 'Send a WhatsApp message — their number stays confidential.',
   },
   step2Title: {
     fr: "Déposez le passeport à son hôtel",
     ar: 'اذهب الى الفندق',
-    wo: 'Jëli otel bi',
+    en: 'Drop the passport at their hotel',
   },
   step2Desc: {
     fr: "Remettez-le à la réception de l'hôtel où il séjourne.",
     ar: 'سلّمه في استقبال الفندق الذي يقيم فيه.',
-    wo: 'Joxal ko ci résepsyoŋ otel bi mu dëkk.',
+    en: 'Hand it to the reception of the hotel where they are staying.',
   },
   step3Title: {
     fr: 'Signalez la trouvaille',
     ar: 'أبلغ عن العثور',
-    wo: 'Xamal ne fekk nga ko',
+    en: 'Report the find',
   },
   step3Desc: {
     fr: 'Remplissez le formulaire — le propriétaire est notifié immédiatement.',
     ar: 'املأ الاستمارة — يُبلَّغ صاحب الجواز فورا.',
-    wo: 'Fàtti form bi — boroom bi nañu ko xam lolo gaaw.',
+    en: 'Fill in the form — the owner is notified immediately.',
   },
   quickContact: {
     fr: 'CONTACT RAPIDE',
     ar: 'اتصال سريع',
-    wo: 'JOKKOO GAAS',
+    en: 'QUICK CONTACT',
   },
   securityTitle: {
     fr: 'Vérification de sécurité',
     ar: 'تحقق أمني',
-    wo: 'Séqarité',
+    en: 'Security check',
   },
   verifier: {
     fr: 'Vérifier',
     ar: 'تحقق',
-    wo: 'Sét',
+    en: 'Verify',
   },
 };
 
@@ -422,8 +421,8 @@ function LanguageSelector({
 }) {
   const langs: { code: Lang; label: string }[] = [
     { code: 'fr', label: 'FR' },
+    { code: 'en', label: 'EN' },
     { code: 'ar', label: 'AR' },
-    { code: 'wo', label: 'WO' },
   ];
 
   return (
@@ -597,18 +596,18 @@ export default function PassportFinderPage() {
       badge: 'الدليل الصوتي',
       replay: 'إعادة الدليل الصوتي',
     },
-    wo: {
-      title: 'Nanga feeke pasipoo bi!',
-      desc: 'Pasipoo bi tarmaalu na ci Organe de la Gestion du Pèlerinage. Déglu ndigël yi ngir dimaali boroom bi.',
-      btn: 'Déglul ndigël yi',
-      badge: 'GUIDE VOCAL',
-      replay: 'Wóolal ndigël yi',
+    en: {
+      title: "You've found a passport!",
+      desc: 'This passport is protected by the Hajj Management Authority. Listen to the instructions.',
+      btn: 'Listen to the instructions',
+      badge: 'VOICE GUIDE',
+      replay: 'Replay the voice guide',
     },
   };
   const FINDER_VOICE: Record<Lang, string> = {
     fr: '/audio/passeport-finder-fr.mp3',
+    en: '/audio/passeport-finder-en.mp3',
     ar: '/audio/passeport-finder-ar.mp3',
-    wo: '/audio/passeport-finder-wo.mp3',
   };
   const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
   const [showVoiceGate, setShowVoiceGate] = useState(true);
@@ -854,20 +853,13 @@ export default function PassportFinderPage() {
         </p>
       </div>
 
-      {/* ─── Brand Header ─── */}
-      <header className="w-full flex items-center justify-between px-4 sm:px-5 pt-2 pb-2">
-        <div className="flex items-center gap-2">
-          <BrandLogo width={130} />
-          <Badge
-            className="text-xs font-bold px-2.5 py-1 border-0"
-            style={{ background: GOLD_ACTUAL, color: NAVY_DEEP }}
-          >
-            <BookOpen className="w-3 h-3 mr-1" />
-            Passeport
-          </Badge>
-        </div>
+      {/* ─── Brand Header : logo centré ─── */}
+      <header className="w-full relative flex items-center justify-center px-4 sm:px-5 pt-2 pb-2">
+        <BrandLogo width={130} />
         {/* Language selector */}
-        <LanguageSelector lang={lang} setLang={setLang} />
+        <div className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2">
+          <LanguageSelector lang={lang} setLang={setLang} />
+        </div>
       </header>
 
       {/* ─── Main Content ─── */}
@@ -1059,40 +1051,10 @@ export default function PassportFinderPage() {
               exit="exit"
               className="w-full max-w-md flex flex-col gap-4"
             >
-              {/* ─── HERO ─── */}
+              {/* ─── HERO épuré : logo centré en header, texte d'accueil seul ─── */}
               <div className="text-center mb-2" style={{ animation: 'spFadeInUp 0.5s ease both' }}>
-                {/* Emblème avec anneaux pulsés */}
-                <div className="relative inline-flex items-center justify-center mb-4">
-                  <span
-                    className="absolute w-24 h-24 rounded-full"
-                    style={{ border: '2px solid rgba(212,175,55,0.55)', animation: 'spPulseRing 2.6s ease-out infinite' }}
-                  />
-                  <span
-                    className="absolute w-24 h-24 rounded-full"
-                    style={{ border: '2px solid rgba(212,175,55,0.30)', animation: 'spPulseRing 2.6s ease-out infinite 1.3s' }}
-                  />
-                  <div
-                    className="relative w-20 h-20 rounded-[22px] flex items-center justify-center"
-                    style={{
-                      background: 'linear-gradient(135deg, #f7e08a 0%, #D4AF37 50%, #a97f16 100%)',
-                      boxShadow: '0 12px 32px rgba(212,175,55,0.38)',
-                      animation: 'spFloaty 4s ease-in-out infinite',
-                    }}
-                  >
-                    <BookOpen className="w-10 h-10" style={{ color: NAVY_DEEP }} />
-                  </div>
-                </div>
-
-                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight text-white">
-                  {isLost
-                    ? `🚨 ${t('passeportPerdu', lang)}`
-                    : isFound
-                      ? `✅ ${t('passeportRetrouve', lang)}`
-                      : `📘 ${t('passeportTrouve', lang)}`
-                  }
-                </h1>
                 <p
-                  className="mt-2.5 text-sm md:text-base leading-relaxed max-w-md mx-auto font-medium"
+                  className="text-sm md:text-base leading-relaxed max-w-md mx-auto font-medium"
                   style={{ color: 'rgba(255,255,255,0.88)' }}
                 >
                   {isLost
@@ -1101,45 +1063,6 @@ export default function PassportFinderPage() {
                       ? t('subFound', lang)
                       : t('subActive', lang)}
                 </p>
-
-                {/* Chips : validité + statut */}
-                <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
-                  {expirationFormatted && (
-                    <span
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/25"
-                      style={{ background: 'rgba(255,255,255,0.10)', color: WHITE }}
-                    >
-                      <CalendarDays className="w-3.5 h-3.5" style={{ color: GOLD_SOFT }} />
-                      {t('valideJusquau', lang)} {expirationFormatted}
-                    </span>
-                  )}
-                  {isLost && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(239,68,68,0.45)' }}>
-                      🚨 PERDU
-                    </span>
-                  )}
-                  {isFound && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(59,130,246,0.45)' }}>
-                      ✅ RETROUVÉ
-                    </span>
-                  )}
-                  {isActive && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-full" style={{ boxShadow: '0 4px 16px rgba(16,185,129,0.45)' }}>
-                      ● ACTIF
-                    </span>
-                  )}
-                </div>
-
-                {/* Certification */}
-                <div className="mt-3">
-                  <span
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border border-white/20"
-                    style={{ background: 'rgba(255,255,255,0.08)', color: GOLD_SOFT }}
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    {t('certifieMinistere', lang)}
-                  </span>
-                </div>
               </div>
 
               {/* ─── STEPPER : 3 étapes pour rendre le passeport ─── */}
@@ -1277,7 +1200,7 @@ export default function PassportFinderPage() {
                         background: getStatusConfig(passportData.passportStatus || apiData?.status || 'active').bgColor,
                       }}
                     >
-                      {getStatusConfig(passportData.passportStatus || apiData?.status || 'active').label}
+                      {getStatusConfig(passportData.passportStatus || apiData?.status || 'active').label[lang]}
                     </span>
                   </div>
                 </div>

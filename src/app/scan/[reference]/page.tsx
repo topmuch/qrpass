@@ -259,17 +259,19 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
   return (
     <main dir={lang === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen flex flex-col items-center justify-center p-5 md:p-8" style={{ background: BRAND }}>
       <div className="relative max-w-[420px] w-full">
-        {/* ─── Header ─── */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <div className="flex items-center">
+        {/* ─── Header : logo centré ─── */}
+        <div className="relative flex items-center justify-center mb-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center">
               <Image src="/logo-passhajj.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="text-sm mt-1" style={{ color: MUTED }}>
               {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}
             </div>
           </div>
-          <LanguageSelector lang={lang} setLang={setLang} />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2">
+            <LanguageSelector lang={lang} setLang={setLang} />
+          </div>
         </div>
 
         {/* ─── White Card ─── */}
@@ -824,11 +826,11 @@ export default function ScanPage() {
       style={{ background: BRAND }}
       dir={dir}
     >
-      {/* ─── Top Bar: Logo + Edit/Share/Language ─── */}
-      <header className="sticky top-0 z-40 flex items-center justify-between pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3" style={{ background: BRAND }}>
+      {/* ─── Top Bar : logo centré + Edit/Share/Language ─── */}
+      <header className="sticky top-0 z-40 flex items-center justify-center pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3" style={{ background: BRAND }}>
         {/* PassHajj Logo */}
-        <Image src="/logo-passhajj.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '12px', padding: '4px', background: 'rgba(255,255,255,0.9)' }} />
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <Image src="/logo-passhajj.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+        <div className="absolute right-0 sm:right-1 top-1/2 -translate-y-1/2 flex items-center gap-1.5 sm:gap-2 pr-4 sm:pr-5">
           <button
             onClick={handleShare}
             className="flex items-center gap-1 px-2.5 py-1.5 bg-white/80 border border-black/10 rounded-full text-xs sm:text-sm font-medium hover:bg-white transition-colors min-h-[32px] sm:min-h-[36px]"
@@ -917,39 +919,13 @@ export default function ScanPage() {
       {/* ─── Container ─── */}
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col py-4 sm:py-6 md:py-2">
 
-        {/* ═══ HEADER: Luggage icon + "BAGAGE TROUVÉ" + white thank-you text ═══ */}
+        {/* ═══ HEADER épuré : logo centré en top bar, texte de remerciement seul ═══ */}
         <div className="text-center mb-5 sm:mb-6" style={{ animation: 'fadeInUp 0.4s ease forwards' }}>
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-3 shadow-md" style={{ background: '#f4b400' }}>
-            <Luggage className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: INK }}>
-            {isDeclaredLost
-              ? `🚨 ${i18n('lostTitle', lang)}`
-              : i18n('title', lang)}
-          </h1>
-          {/* White text below "Bagage trouvé" — always visible */}
-          <p className="mt-2 text-sm md:text-base leading-relaxed max-w-md mx-auto font-semibold" style={{ color: '#ffffff' }}>
+          <p className="text-sm md:text-base leading-relaxed max-w-md mx-auto font-semibold" style={{ color: '#ffffff' }}>
             {isDeclaredLost
               ? i18n('lostSubtitle', lang)
               : i18n('subtitle', lang)}
           </p>
-
-          {/* ═══ Scan Status Badges ═══ */}
-          <div className="flex items-center justify-center gap-2 mt-3">
-            {isDeclaredLost ? (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
-                🚨 {i18n('lostBadge', lang)}
-              </span>
-            ) : baggageData?.baggage?.status === 'scanned' ? (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
-                📍 {i18n('localizedBadge', lang)}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-400 text-white text-xs font-bold rounded-full">
-                {i18n('scannedBadge', lang)}
-              </span>
-            )}
-          </div>
         </div>
 
         {/* ═══ EMERGENCY PANEL for Lost Baggage ═══ */}

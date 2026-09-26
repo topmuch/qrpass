@@ -3,7 +3,8 @@
 # V2 — Textes DIRECTS validés par le client (26/09/2026)
 #  - N°1,2,3,4,7,10 : corrections client (FR)
 #  - N°5,6,8,9,11   : miroir EN/AR des corrections FR
-#  - N°12 (wolof)   : INCHANGÉ (pas de voix wolof edge-tts)
+#  - Passeport : FR/EN/AR (audio wolof SUPPRIMÉ à la demande client —
+#    plus d'audio WO, la page propose FR/EN/AR uniquement)
 # Mêmes noms de fichiers → zéro modification de code.
 # ═══════════════════════════════════════════════════════════════════
 set -e
@@ -73,6 +74,10 @@ gen fr-FR-DeniseNeural \
 "Bonjour ! Vous avez trouvé un passeport protégé. Merci beaucoup ! Appuyez sur \"Contacter le propriétaire\" et remplissez le formulaire : il sera alerté immédiatement pour venir le récupérer." \
 passeport-finder-fr.mp3
 
+gen en-GB-SoniaNeural \
+"Hello! You've found a protected passport. Thank you so much! Tap \"Contact the owner\" and fill in the form — they'll be alerted instantly to come and collect it." \
+passeport-finder-en.mp3
+
 gen ar-SA-ZariyahNeural \
 "مرحباً! لقد عثرت على جواز سفر محمي. شكراً جزيلاً! اضغط \"تواصل مع المالك\" وأدخل معلوماتك ليتم تنبيهه فوراً ليأتي لاستلام جوازه." \
 passeport-finder-ar.mp3
@@ -82,10 +87,9 @@ echo "=== Récapitulatif (durée / volume moyen) ==="
 for f in confirmation-voice-identity confirmation-voice-baggage confirmation-voice-passeport \
          finder-voice-fr finder-voice-en finder-voice-ar \
          identity-finder-fr identity-finder-en identity-finder-ar \
-         passeport-finder-fr passeport-finder-ar; do
+         passeport-finder-fr passeport-finder-en passeport-finder-ar; do
   d=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$AUD/$f.mp3")
   v=$(ffmpeg -i "$AUD/$f.mp3" -af volumedetect -f null - 2>&1 | rg -o "mean_volume: [-0-9.]+ dB")
   echo "$f.mp3 : ${d%.*} s | $v"
 done
-echo ""
-echo "passeport-finder-wo.mp3 : inchangé (voix wolof conservée)"
+
