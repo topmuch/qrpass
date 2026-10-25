@@ -1,7 +1,7 @@
 # QRPass - Dockerfile for Coolify
 FROM node:20-alpine
 # Force rebuild
-ARG CACHEBUST=1
+ARG CACHEBUST=2
 
 # Install required packages
 RUN apk add --no-cache git libc6-compat sqlite curl
