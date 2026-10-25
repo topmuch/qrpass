@@ -334,7 +334,7 @@ export default function AdminLoginPage() {
               <div className="relative w-24 h-24 rounded-[16px] bg-white p-2.5 shadow-2xl flex items-center justify-center transition-all duration-300">
                 {/* Glow effect behind logo */}
                 <div className="absolute -inset-1 rounded-2xl bg-blue-500/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src="/logo-mvp.webp" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
+                <img src="/brand/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
               </div>
             </Link>
           </motion.div>
@@ -469,7 +469,7 @@ export default function AdminLoginPage() {
       <div className="w-full lg:w-[48%] min-h-screen flex items-center justify-center px-6 py-12 sm:px-10 relative" style={{ background: 'linear-gradient(180deg, #0c1d3a 0%, #0f2444 40%, #0c1d3a 100%)' }}>
         {/* Subtle decorative elements */}
         <div className="absolute top-20 left-10 w-64 h-64 rounded-full opacity-[0.06]" style={{ background: 'radial-gradient(circle, #f4b400, transparent)' }} />
-        <div className="absolute bottom-20 right-10 w-48 h-48 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
+        <div className="absolute bottom-20 right-10 w-48 h-48 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #02265D, transparent)' }} />
         {/* Gold accent line at top */}
         <div
           className="absolute top-0 left-0 right-0 h-0.5"
@@ -492,7 +492,7 @@ export default function AdminLoginPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="relative w-24 h-24 rounded-[16px] p-2.5 bg-white shadow-2xl flex items-center justify-center">
-              <img src="/logo-mvp.webp" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
+              <img src="/brand/logo.png" alt="PassHajj" className="w-full h-full object-contain relative z-10" />
             </div>
           </motion.div>
 

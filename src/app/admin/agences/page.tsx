@@ -599,8 +599,8 @@ export default function AgencesPage() {
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Total agences</p>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white">{agencies.length}</p>
               </div>
-              <div className="w-12 h-12 bg-[#2563EB]/10 dark:bg-[#2563EB]/20 rounded-xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-[#2563EB]" />
+              <div className="w-12 h-12 bg-[#02265D]/10 dark:bg-[#02265D]/20 rounded-xl flex items-center justify-center">
+                <Building className="w-6 h-6 text-[#02265D]" />
               </div>
             </div>
           </CardContent>
@@ -624,7 +624,7 @@ export default function AgencesPage() {
       {/* Agencies Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : agencies.length === 0 ? (
         <div className="text-center py-12 text-slate-500 dark:text-slate-400">Aucune agence</div>

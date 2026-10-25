@@ -14,7 +14,7 @@ export default function NotFound() {
         </div>
 
         {/* 404 */}
-        <h1 className="text-8xl font-bold bg-gradient-to-r from-[#1E40AF] to-[#1D4ED8] bg-clip-text text-transparent mb-4">
+        <h1 className="text-8xl font-bold bg-gradient-to-r from-[#1E40AF] to-[#02265D] bg-clip-text text-transparent mb-4">
           404
         </h1>
 

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 /**
- * BrandLogo — logo PassHajj harmonisé sur tout le site.
+ * BrandLogo — logo Bagtrack harmonisé sur tout le site.
  * Traitement unique : coins arrondis 14px, padding 5px, fond blanc translucide.
  * Utiliser <BrandLogo /> (150px) ou <BrandLogo width={120} /> pour les en-têtes compacts.
  */
@@ -13,12 +13,12 @@ const LOGO_STYLE: React.CSSProperties = {
 };
 
 export default function BrandLogo({ width = 150 }: { width?: number }) {
-  // Ratio original du fichier logo : 150 × 58
-  const height = Math.round((width * 58) / 150);
+  // Ratio original du fichier logo : 277 × 114
+  const height = Math.round((width * 114) / 277);
   return (
     <Image
-      src="/logo-passhajj.png"
-      alt="PassHajj"
+      src="/brand/logo.png"
+      alt="Bagtrack"
       width={width}
       height={height}
       style={LOGO_STYLE}

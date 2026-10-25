@@ -99,7 +99,7 @@ export default function AgencyReportsPage() {
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#02265D]"
           >
             <option value="week">7 derniers jours</option>
             <option value="month">Ce mois</option>
@@ -128,7 +128,7 @@ export default function AgencyReportsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : data ? (
         <div className="space-y-6">
@@ -172,7 +172,7 @@ export default function AgencyReportsPage() {
             {/* Daily Evolution Chart */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#2563EB]" />
+                <Calendar className="w-5 h-5 text-[#02265D]" />
                 Évolution quotidienne
               </h3>
               <div className="space-y-3">
@@ -181,7 +181,7 @@ export default function AgencyReportsPage() {
                     <span className="text-sm text-slate-500 dark:text-slate-400 w-20">{day.label}</span>
                     <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#2563EB] to-[#ff9f00] rounded-full transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-[#02265D] to-[#ff9f00] rounded-full transition-all duration-500"
                         style={{ width: `${(day.count / maxDaily) * 100}%` }}
                       />
                     </div>
@@ -194,7 +194,7 @@ export default function AgencyReportsPage() {
             {/* Weekly Evolution Chart */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#2563EB]" />
+                <TrendingUp className="w-5 h-5 text-[#02265D]" />
                 Évolution hebdomadaire
               </h3>
               <div className="space-y-3">
@@ -274,9 +274,9 @@ export default function AgencyReportsPage() {
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-slate-500 dark:text-slate-400 text-sm">Scans enregistrés</span>
-                    <QrCode className="w-4 h-4 text-[#2563EB]" />
+                    <QrCode className="w-4 h-4 text-[#02265D]" />
                   </div>
-                  <p className="text-3xl font-bold text-[#2563EB]">{data.scanLogsCount}</p>
+                  <p className="text-3xl font-bold text-[#02265D]">{data.scanLogsCount}</p>
                   <p className="text-xs text-slate-400 mt-1">Total sur la période</p>
                 </div>
               </div>
@@ -284,10 +284,10 @@ export default function AgencyReportsPage() {
           </div>
 
           {/* Public Page Info */}
-          <div className="bg-gradient-to-r from-[#2563EB]/10 to-[#ff9f00]/10 rounded-2xl p-6 border border-[#2563EB]/20">
+          <div className="bg-gradient-to-r from-[#02265D]/10 to-[#ff9f00]/10 rounded-2xl p-6 border border-[#02265D]/20">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-[#2563EB]/20 rounded-xl flex items-center justify-center">
-                <Share2 className="w-6 h-6 text-[#2563EB]" />
+              <div className="w-12 h-12 bg-[#02265D]/20 rounded-xl flex items-center justify-center">
+                <Share2 className="w-6 h-6 text-[#02265D]" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
@@ -296,13 +296,13 @@ export default function AgencyReportsPage() {
                 <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
                   Partagez ce lien avec vos clients pour leur montrer les bagages que vous protégez :
                 </p>
-                <code className="bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-sm text-[#2563EB] border border-slate-200 dark:border-slate-700">
+                <code className="bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-sm text-[#02265D] border border-slate-200 dark:border-slate-700">
                   {typeof window !== 'undefined' ? window.location.origin : ''}/agency/{agencyData?.slug || 'agency'}
                 </code>
               </div>
               <button
                 onClick={handleSharePublicPage}
-                className="px-4 py-2 bg-[#2563EB] hover:bg-[#ff9f00] text-white rounded-xl text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-[#02265D] hover:bg-[#ff9f00] text-white rounded-xl text-sm font-medium transition-colors"
               >
                 Copier le lien
               </button>

@@ -480,7 +480,7 @@ export default function ParametresPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <RefreshCw className="w-8 h-8 text-[#2563EB] animate-spin" />
+            <RefreshCw className="w-8 h-8 text-[#02265D] animate-spin" />
           </div>
         )}
 
@@ -490,7 +490,7 @@ export default function ParametresPage() {
             {/* Logo Section */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#2563EB]" />
+                <ImageIcon className="w-5 h-5 text-[#02265D]" />
                 Logo de l&apos;entreprise
               </h3>
               <div className="flex items-start gap-6">
@@ -532,7 +532,7 @@ export default function ParametresPage() {
             {/* Company Info */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#2563EB]" />
+                <Building2 className="w-5 h-5 text-[#02265D]" />
                 Informations de l&apos;entreprise
               </h3>
               <div className="grid gap-4">
@@ -544,7 +544,7 @@ export default function ParametresPage() {
                     type="text"
                     value={settings.company_name}
                     onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                 </div>
                 <div>
@@ -556,7 +556,7 @@ export default function ParametresPage() {
                     type="text"
                     value={settings.company_address}
                     onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -569,7 +569,7 @@ export default function ParametresPage() {
                       type="tel"
                       value={settings.company_phone}
                       onChange={(e) => setSettings({ ...settings, company_phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                     />
                   </div>
                   <div>
@@ -581,7 +581,7 @@ export default function ParametresPage() {
                       type="email"
                       value={settings.company_email}
                       onChange={(e) => setSettings({ ...settings, company_email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                     />
                   </div>
                 </div>
@@ -596,7 +596,7 @@ export default function ParametresPage() {
             {/* SEO Image */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#2563EB]" />
+                <ImageIcon className="w-5 h-5 text-[#02265D]" />
                 Image SEO (Open Graph)
               </h3>
               <div className="flex items-start gap-6">
@@ -638,7 +638,7 @@ export default function ParametresPage() {
             {/* SEO Info */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Search className="w-5 h-5 text-[#2563EB]" />
+                <Search className="w-5 h-5 text-[#02265D]" />
                 Référencement (SEO)
               </h3>
               <div className="grid gap-4">
@@ -650,7 +650,7 @@ export default function ParametresPage() {
                     type="text"
                     value={settings.seo_title}
                     onChange={(e) => setSettings({ ...settings, seo_title: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                   <p className="text-slate-400 text-xs mt-1">
                     {settings.seo_title.length}/60 caractères (recommandé)
@@ -664,7 +664,7 @@ export default function ParametresPage() {
                     value={settings.seo_description}
                     onChange={(e) => setSettings({ ...settings, seo_description: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB] resize-none"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D] resize-none"
                   />
                   <p className="text-slate-400 text-xs mt-1">
                     {settings.seo_description.length}/160 caractères (recommandé)
@@ -678,7 +678,7 @@ export default function ParametresPage() {
                     type="text"
                     value={settings.seo_keywords}
                     onChange={(e) => setSettings({ ...settings, seo_keywords: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                 </div>
               </div>
@@ -692,7 +692,7 @@ export default function ParametresPage() {
             {/* Currency */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-[#2563EB]" />
+                <DollarSign className="w-5 h-5 text-[#02265D]" />
                 Devise
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -703,7 +703,7 @@ export default function ParametresPage() {
                     className={`
                       flex items-center gap-3 p-4 rounded-2xl border transition-all
                       ${settings.currency === currency.code
-                        ? 'border-[#2563EB] bg-[#2563EB]/10 text-slate-800 dark:text-white'
+                        ? 'border-[#02265D] bg-[#02265D]/10 text-slate-800 dark:text-white'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400 hover:text-slate-800'
                       }
                     `}
@@ -713,7 +713,7 @@ export default function ParametresPage() {
                     </span>
                     <span className="text-sm">{currency.name}</span>
                     {settings.currency === currency.code && (
-                      <CheckCircle className="w-5 h-5 text-[#2563EB] ml-auto" />
+                      <CheckCircle className="w-5 h-5 text-[#02265D] ml-auto" />
                     )}
                   </button>
                 ))}
@@ -723,7 +723,7 @@ export default function ParametresPage() {
             {/* Languages */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Languages className="w-5 h-5 text-[#2563EB]" />
+                <Languages className="w-5 h-5 text-[#02265D]" />
                 Langues disponibles
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
@@ -737,7 +737,7 @@ export default function ParametresPage() {
                       className={`
                         flex items-center gap-3 p-3 rounded-2xl border transition-all
                         ${isActive
-                          ? 'border-[#2563EB] bg-[#2563EB]/10 text-slate-800 dark:text-white'
+                          ? 'border-[#02265D] bg-[#02265D]/10 text-slate-800 dark:text-white'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-400 dark:text-slate-500 hover:text-slate-600'
                         }
                       `}
@@ -761,7 +761,7 @@ export default function ParametresPage() {
                 <select
                   value={settings.default_language}
                   onChange={(e) => setSettings({ ...settings, default_language: e.target.value })}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                 >
                   {AVAILABLE_LANGUAGES.filter(lang => settings.languages.split(',').includes(lang.code)).map((lang) => (
                     <option key={lang.code} value={lang.code}>
@@ -780,7 +780,7 @@ export default function ParametresPage() {
             {/* Provider Selection */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Server className="w-5 h-5 text-[#2563EB]" />
+                <Server className="w-5 h-5 text-[#02265D]" />
                 Fournisseur Email
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -791,7 +791,7 @@ export default function ParametresPage() {
                     className={`
                       flex items-start gap-4 p-4 rounded-2xl border transition-all text-left
                       ${emailSettings.provider === provider.id
-                        ? 'border-[#2563EB] bg-[#2563EB]/10'
+                        ? 'border-[#02265D] bg-[#02265D]/10'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                       }
                     `}
@@ -801,7 +801,7 @@ export default function ParametresPage() {
                       <div className="flex items-center gap-2">
                         <h4 className="text-slate-800 dark:text-white font-semibold">{provider.name}</h4>
                         {emailSettings.provider === provider.id && (
-                          <CheckCircle className="w-5 h-5 text-[#2563EB]" />
+                          <CheckCircle className="w-5 h-5 text-[#02265D]" />
                         )}
                       </div>
                       <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{provider.description}</p>
@@ -814,7 +814,7 @@ export default function ParametresPage() {
             {/* Sender Settings */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Mail className="w-5 h-5 text-[#2563EB]" />
+                <Mail className="w-5 h-5 text-[#02265D]" />
                 Expéditeur & Destinataire
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -827,7 +827,7 @@ export default function ParametresPage() {
                     value={emailSettings.fromEmail}
                     onChange={(e) => setEmailSettings({ ...emailSettings, fromEmail: e.target.value })}
                     placeholder="noreply@votredomaine.com"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                 </div>
                 <div>
@@ -839,7 +839,7 @@ export default function ParametresPage() {
                     value={emailSettings.fromName}
                     onChange={(e) => setEmailSettings({ ...emailSettings, fromName: e.target.value })}
                     placeholder="PassHajj"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -851,7 +851,7 @@ export default function ParametresPage() {
                     value={emailSettings.recipientEmail || ''}
                     onChange={(e) => setEmailSettings({ ...emailSettings, recipientEmail: e.target.value || null })}
                     placeholder="admin@votredomaine.com — L'email qui reçoit les notifications (bagages perdus/trouvés, messages de contact...)"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                   />
                   <p className="mt-1.5 text-xs text-slate-400">
                     Si vide, les notifications seront envoyées à l'email expéditeur ({emailSettings.fromEmail})
@@ -864,7 +864,7 @@ export default function ParametresPage() {
             {emailSettings.provider === 'smtp' && (
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                  <Server className="w-5 h-5 text-[#2563EB]" />
+                  <Server className="w-5 h-5 text-[#02265D]" />
                   Configuration SMTP
                 </h3>
                 <div className="grid gap-4">
@@ -878,7 +878,7 @@ export default function ParametresPage() {
                         value={emailSettings.smtpHost || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpHost: e.target.value || null })}
                         placeholder="smtp.example.com"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                       />
                     </div>
                     <div>
@@ -890,7 +890,7 @@ export default function ParametresPage() {
                         value={emailSettings.smtpPort || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpPort: e.target.value ? parseInt(e.target.value) : null })}
                         placeholder="587"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                       />
                     </div>
                   </div>
@@ -904,7 +904,7 @@ export default function ParametresPage() {
                         value={emailSettings.smtpUser || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpUser: e.target.value || null })}
                         placeholder="user@example.com"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                       />
                     </div>
                     <div>
@@ -917,7 +917,7 @@ export default function ParametresPage() {
                           value={emailSettings.smtpPassword || ''}
                           onChange={(e) => setEmailSettings({ ...emailSettings, smtpPassword: e.target.value || null })}
                           placeholder="••••••••"
-                          className="w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                          className="w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                         />
                         <button
                           type="button"
@@ -941,7 +941,7 @@ export default function ParametresPage() {
                           className={`
                             px-4 py-2 rounded-xl border transition-all text-sm
                             ${emailSettings.smtpEncryption === option.id
-                              ? 'border-[#2563EB] bg-[#2563EB]/10 text-slate-800 dark:text-white'
+                              ? 'border-[#02265D] bg-[#02265D]/10 text-slate-800 dark:text-white'
                               : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
                             }
                           `}
@@ -958,7 +958,7 @@ export default function ParametresPage() {
             {/* Test Email Section */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Send className="w-5 h-5 text-[#2563EB]" />
+                <Send className="w-5 h-5 text-[#02265D]" />
                 Tester la configuration
               </h3>
               <div className="flex gap-4">
@@ -967,12 +967,12 @@ export default function ParametresPage() {
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+                  className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
                 />
                 <button
                   onClick={handleTestEmail}
                   disabled={sendingTest}
-                  className="flex items-center gap-2 px-6 py-3 bg-[#2563EB] text-white rounded-xl font-medium hover:bg-[#ff6600] transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-3 bg-[#02265D] text-white rounded-xl font-medium hover:bg-[#ff6600] transition-colors disabled:opacity-50"
                 >
                   {sendingTest ? (
                     <>

@@ -68,7 +68,7 @@ function ScanContent() {
             <div className="px-8 py-6 space-y-4">
               <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(37,99,235,0.08)' }}>
-                  <Luggage className="w-7 h-7" style={{ color: '#2563EB' }} />
+                  <Luggage className="w-7 h-7" style={{ color: '#02265D' }} />
                 </div>
                 <div>
                   <p className="font-bold" style={{ color: '#0f172a' }}>Valise rigide marine · 23 kg</p>
@@ -101,7 +101,7 @@ function ScanContent() {
               {/* Propriétaire */}
               <div className="flex items-center gap-3 text-sm">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(37,99,235,0.08)' }}>
-                  <User className="w-5 h-5" style={{ color: '#2563EB' }} />
+                  <User className="w-5 h-5" style={{ color: '#02265D' }} />
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-400 text-xs uppercase tracking-wide">Propriétaire</p>
@@ -165,7 +165,7 @@ function ScanContent() {
 
           {/* Retour démo */}
           <div className="text-center mt-8">
-            <Link href="/demo" className="inline-flex items-center gap-2 text-sm font-semibold hover:underline" style={{ color: '#2563EB' }}>
+            <Link href="/demo" className="inline-flex items-center gap-2 text-sm font-semibold hover:underline" style={{ color: '#02265D' }}>
               <Send className="w-4 h-4" />
               Retourner à la page démo
             </Link>

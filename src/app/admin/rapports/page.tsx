@@ -108,7 +108,7 @@ export default function AdminReportsPage() {
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#02265D]"
           >
             <option value="week">7 derniers jours</option>
             <option value="month">Ce mois</option>
@@ -128,7 +128,7 @@ export default function AdminReportsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : data ? (
         <div className="space-y-6">
@@ -180,7 +180,7 @@ export default function AdminReportsPage() {
             {/* Daily Evolution Chart */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#2563EB]" />
+                <Calendar className="w-5 h-5 text-[#02265D]" />
                 Évolution quotidienne
               </h3>
               <div className="space-y-3">
@@ -189,7 +189,7 @@ export default function AdminReportsPage() {
                     <span className="text-sm text-slate-500 dark:text-slate-400 w-20">{day.label}</span>
                     <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#2563EB] to-[#ff9f00] rounded-full transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-[#02265D] to-[#ff9f00] rounded-full transition-all duration-500"
                         style={{ width: `${(day.count / maxDaily) * 100}%` }}
                       />
                     </div>
@@ -202,7 +202,7 @@ export default function AdminReportsPage() {
             {/* Weekly Evolution Chart */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#2563EB]" />
+                <TrendingUp className="w-5 h-5 text-[#02265D]" />
                 Évolution hebdomadaire
               </h3>
               <div className="space-y-3">
@@ -283,9 +283,9 @@ export default function AdminReportsPage() {
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-slate-500 dark:text-slate-400 text-sm">Scans enregistrés</span>
-                    <QrCode className="w-4 h-4 text-[#2563EB]" />
+                    <QrCode className="w-4 h-4 text-[#02265D]" />
                   </div>
-                  <p className="text-3xl font-bold text-[#2563EB]">{data.scanLogsCount}</p>
+                  <p className="text-3xl font-bold text-[#02265D]">{data.scanLogsCount}</p>
                   <p className="text-xs text-slate-400 mt-1">Total sur la période</p>
                 </div>
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">

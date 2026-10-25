@@ -220,7 +220,7 @@ export default function EtiquettesPage() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Header
-      ctx.fillStyle = set.type === 'hajj' ? '#1D4ED8' : '#f59e0b';
+      ctx.fillStyle = set.type === 'hajj' ? '#02265D' : '#f59e0b';
       ctx.fillRect(0, 0, canvas.width, headerHeight);
 
       ctx.fillStyle = '#ffffff';
@@ -247,12 +247,12 @@ export default function EtiquettesPage() {
 
         const qrUrl = `${window.location.origin}/found/${set.references[i]}`;
         const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        const qrSvg = <QRCodeSVG value={qrUrl} size={qrSize - 40} level="H" fgColor={set.type === 'hajj' ? '#1D4ED8' : '#f59e0b'} />;
+        const qrSvg = <QRCodeSVG value={qrUrl} size={qrSize - 40} level="H" fgColor={set.type === 'hajj' ? '#02265D' : '#f59e0b'} />;
 
         // Use a promise-based approach to render SVG to canvas
         const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${qrSize - 40}" height="${qrSize - 40}">
           <rect width="100%" height="100%" fill="white"/>
-          ${generateQRPath(qrUrl, qrSize - 40, set.type === 'hajj' ? '#1D4ED8' : '#f59e0b')}
+          ${generateQRPath(qrUrl, qrSize - 40, set.type === 'hajj' ? '#02265D' : '#f59e0b')}
         </svg>`;
 
         const img = new Image();
@@ -717,7 +717,7 @@ export default function EtiquettesPage() {
                       level="H"
                       includeMargin={true}
                       bgColor="#f8fafc"
-                      fgColor={selectedSet.type === 'hajj' ? '#1D4ED8' : '#f59e0b'}
+                      fgColor={selectedSet.type === 'hajj' ? '#02265D' : '#f59e0b'}
                     />
                     <p className="text-slate-800 dark:text-white font-mono font-bold mt-2 text-sm">
                       {ref}

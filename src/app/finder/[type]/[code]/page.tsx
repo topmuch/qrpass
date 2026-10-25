@@ -52,7 +52,7 @@ const WHITE = '#ffffff';
 const INK = '#0f172a';
 const MUTED = '#64748b';
 const GREEN_IDENTITY = '#059669';
-const BLUE_BAGGAGE = '#2563eb';
+const BLUE_BAGGAGE = '#02265d';
 const DANGER = '#dc2626';
 const WARNING = '#f59e0b';
 
@@ -113,7 +113,7 @@ function getFlag(nationality: string | null | undefined): string {
 const BAGGAGE_STATUS_MAP: Record<string, { label: string; color: string; bgColor: string }> = {
   with_me: { label: 'Avec moi', color: '#059669', bgColor: '#d1fae5' },
   lost: { label: 'Perdu', color: '#dc2626', bgColor: '#fee2e2' },
-  found: { label: 'Retrouvé', color: '#2563eb', bgColor: '#dbeafe' },
+  found: { label: 'Retrouvé', color: '#02265d', bgColor: '#dbeafe' },
   delivered: { label: 'Livré', color: '#059669', bgColor: '#d1fae5' },
   in_transit: { label: 'En transit', color: '#f59e0b', bgColor: '#fef3c7' },
 };

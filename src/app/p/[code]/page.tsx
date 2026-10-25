@@ -49,7 +49,7 @@ const TEXT = '#1a1a1a';
 const MUTED = '#6b7280';
 const DANGER = '#dc2626';
 const SUCCESS = '#10b981';
-const BLUE = '#3b82f6';
+const BLUE = '#02265D';
 const WA_GREEN = '#25D366';
 const RADIUS = '20px';
 const SHADOW = '0 8px 24px rgba(0,0,0,0.12)';
@@ -1149,8 +1149,8 @@ export default function PilgrimScanPage() {
                 style={{
                   background: CARD_BG,
                   boxShadow: SHADOW,
-                  borderLeft: lang === 'ar' ? 'none' : '5px solid #3b82f6',
-                  borderRight: lang === 'ar' ? '5px solid #3b82f6' : 'none',
+                  borderLeft: lang === 'ar' ? 'none' : '5px solid #02265D',
+                  borderRight: lang === 'ar' ? '5px solid #02265D' : 'none',
                   animation: 'fadeInUp 0.4s ease forwards',
                   animationDelay: '0.2s',
                   opacity: 0,
@@ -1165,7 +1165,7 @@ export default function PilgrimScanPage() {
                 {activeHotel ? (
                   <div className="space-y-2 mb-4">
                     <div className="flex items-start gap-3 p-3 rounded-xl" style={{ background: '#eff6ff' }}>
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#3b82f6' }}>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: '#02265D' }}>
                         <MapPin className="w-5 h-5 text-white" />
                       </div>
                       <div>

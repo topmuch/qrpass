@@ -148,7 +148,7 @@ function Confetti() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const colors = ['#f4b400', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6', '#f59e0b'];
+    const colors = ['#f4b400', '#10b981', '#02265D', '#ef4444', '#8b5cf6', '#f59e0b'];
     const particles: Array<{
       x: number;
       y: number;

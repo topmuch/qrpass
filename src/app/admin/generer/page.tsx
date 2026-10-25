@@ -466,7 +466,7 @@ export default function GenererQRPage() {
 
             <Button
               className={`w-full text-white rounded-xl ${
-                passType === 'bagage' ? 'bg-[#1e3a8a] hover:bg-[#3b82f6]' : passType === 'identity' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'
+                passType === 'bagage' ? 'bg-[#1e3a8a] hover:bg-[#02265D]' : passType === 'identity' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-violet-600 hover:bg-violet-700'
               }`}
               onClick={handleGenerateQR}
               disabled={qrGenerating}
@@ -531,7 +531,7 @@ export default function GenererQRPage() {
 
       {/* Info Cards */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6] rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#02265D] rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <QrCode className="w-8 h-8" />
             <div>

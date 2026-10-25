@@ -198,7 +198,7 @@ function Sidebar({
       {/* Sidebar - Orange Background */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-[280px] bg-[#2563EB]
+        w-[280px] bg-[#02265D]
         transform transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         flex flex-col shadow-2xl
@@ -415,7 +415,7 @@ export default function AdminRootLayout({
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
           <span className="text-slate-500">Vérification...</span>
         </div>
       </div>

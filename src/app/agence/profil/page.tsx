@@ -258,7 +258,7 @@ export default function ProfilPage() {
             style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe' }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-4 h-4" style={{ color: '#3b82f6' }} />
+              <Crown className="w-4 h-4" style={{ color: '#02265D' }} />
               <p className="text-sm font-medium" style={{ color: '#1e40af' }}>Abonnement</p>
             </div>
             <p className="text-xl font-bold" style={{ color: NAVY }}>Premium</p>

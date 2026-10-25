@@ -129,7 +129,7 @@ export default function SecurityAuditPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
-            <Shield className="w-7 h-7 text-[#2563EB]" />
+            <Shield className="w-7 h-7 text-[#02265D]" />
             Sécurité & Audit
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
@@ -214,7 +214,7 @@ export default function SecurityAuditPage() {
       <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#2563EB]" />
+            <Activity className="w-5 h-5 text-[#02265D]" />
             Sessions actives
           </CardTitle>
         </CardHeader>
@@ -273,7 +273,7 @@ export default function SecurityAuditPage() {
       <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-[#2563EB]" />
+            <Clock className="w-5 h-5 text-[#02265D]" />
             Historique des connexions
           </CardTitle>
         </CardHeader>

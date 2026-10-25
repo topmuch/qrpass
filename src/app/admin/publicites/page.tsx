@@ -358,7 +358,7 @@ export default function PublicitesPage() {
           </Button>
           <Button
             onClick={openCreateModal}
-            className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white rounded-xl"
+            className="bg-[#02265D] hover:bg-[#02265D]/90 text-white rounded-xl"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nouvelle publicité
@@ -511,7 +511,7 @@ export default function PublicitesPage() {
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
                     <div className="flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
                     </div>
                   </td>
                 </tr>
@@ -524,7 +524,7 @@ export default function PublicitesPage() {
                       <Button
                         onClick={openCreateModal}
                         variant="link"
-                        className="text-[#2563EB] mt-2"
+                        className="text-[#02265D] mt-2"
                       >
                         Créer la première publicité
                       </Button>
@@ -744,8 +744,8 @@ export default function PublicitesPage() {
                   <Label className="text-slate-700 dark:text-slate-300">Emplacement</Label>
                   <div className="mt-1 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#2563EB]/20 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-[#2563EB]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="w-8 h-8 rounded-lg bg-[#02265D]/20 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-[#02265D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                       </div>
@@ -878,7 +878,7 @@ export default function PublicitesPage() {
                 <Button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white"
+                  className="bg-[#02265D] hover:bg-[#02265D]/90 text-white"
                 >
                   {saving ? (
                     <RefreshCw className="w-4 h-4 animate-spin mr-2" />

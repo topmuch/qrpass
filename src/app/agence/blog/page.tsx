@@ -90,14 +90,14 @@ export default function AgencyBlogPage() {
       <div className="mb-8">
         <Link
           href="/agence/tableau-de-bord"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-[#2563EB] dark:hover:text-[#2563EB] transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-[#02265D] dark:hover:text-[#02265D] transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour au tableau de bord
         </Link>
         
         <div className="flex items-center gap-3 mt-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#2563EB]/20 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#02265D]/20 flex items-center justify-center">
             <span className="text-2xl">📰</span>
           </div>
           <div>
@@ -113,7 +113,7 @@ export default function AgencyBlogPage() {
           onClick={() => setSelectedCategory('all')}
           variant={selectedCategory === 'all' ? 'default' : 'outline'}
           className={`rounded-xl ${selectedCategory === 'all' 
-            ? 'bg-[#2563EB] hover:bg-[#2563EB]/90 text-white' 
+            ? 'bg-[#02265D] hover:bg-[#02265D]/90 text-white' 
             : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
           }`}
         >
@@ -125,7 +125,7 @@ export default function AgencyBlogPage() {
             onClick={() => setSelectedCategory(key)}
             variant={selectedCategory === key ? 'default' : 'outline'}
             className={`rounded-xl ${selectedCategory === key 
-              ? 'bg-[#2563EB] hover:bg-[#2563EB]/90 text-white' 
+              ? 'bg-[#02265D] hover:bg-[#02265D]/90 text-white' 
               : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
             }`}
           >
@@ -137,7 +137,7 @@ export default function AgencyBlogPage() {
       {/* Posts List */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : posts.length === 0 ? (
         <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
@@ -155,7 +155,7 @@ export default function AgencyBlogPage() {
             
             return (
               <Link key={post.id} href={`/agence/blog/${post.slug}`}>
-                <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl hover:shadow-md hover:border-[#2563EB]/30 transition-all cursor-pointer group">
+                <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl hover:shadow-md hover:border-[#02265D]/30 transition-all cursor-pointer group">
                   <CardContent className="p-0">
                     <div className="flex flex-col sm:flex-row">
                       {/* Cover Image */}
@@ -178,7 +178,7 @@ export default function AgencyBlogPage() {
                         </span>
 
                         {/* Title */}
-                        <h2 className="text-lg font-semibold text-slate-800 dark:text-white mt-2 group-hover:text-[#2563EB] transition-colors">
+                        <h2 className="text-lg font-semibold text-slate-800 dark:text-white mt-2 group-hover:text-[#02265D] transition-colors">
                           {post.title}
                         </h2>
 
@@ -205,7 +205,7 @@ export default function AgencyBlogPage() {
                         </div>
 
                         {/* Read More */}
-                        <div className="flex items-center gap-1 text-[#2563EB] text-sm mt-3 font-medium">
+                        <div className="flex items-center gap-1 text-[#02265D] text-sm mt-3 font-medium">
                           Lire l'article
                           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </div>

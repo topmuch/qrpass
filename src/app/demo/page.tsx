@@ -48,7 +48,7 @@ const DEMO_STEPS = [
     icon: ScanLine,
     title: '1. Scannez le QR code',
     text: 'Pointez l\'appareil photo de votre téléphone sur le QR code affiché ci-dessus. Aucune application à installer.',
-    color: '#2563EB',
+    color: '#02265D',
   },
   {
     icon: MapPin,
@@ -140,7 +140,7 @@ export default function DemoPage() {
               </div>
 
               {/* Compte à rebours de réinitialisation */}
-              <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" style={{ backgroundColor: 'rgba(37,99,235,0.08)', color: '#2563EB' }}>
+              <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" style={{ backgroundColor: 'rgba(37,99,235,0.08)', color: '#02265D' }}>
                 <RefreshCw className="w-4 h-4" />
                 Nouveau QR dans&nbsp;<span className="tabular-nums font-bold">{countdown}</span>
               </div>

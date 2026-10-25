@@ -320,7 +320,7 @@ export default function BlogAdminPage() {
         </div>
         <Button
           onClick={openCreateModal}
-          className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white rounded-xl"
+          className="bg-[#02265D] hover:bg-[#02265D]/90 text-white rounded-xl"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nouvel article
@@ -393,7 +393,7 @@ export default function BlogAdminPage() {
       {/* Posts Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : data?.posts.length === 0 ? (
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-slate-200 dark:border-slate-700 text-center">
@@ -403,7 +403,7 @@ export default function BlogAdminPage() {
             <Button
               onClick={openCreateModal}
               variant="link"
-              className="text-[#2563EB] mt-2"
+              className="text-[#02265D] mt-2"
             >
               Créer le premier article
             </Button>
@@ -689,7 +689,7 @@ export default function BlogAdminPage() {
                 <Button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white"
+                  className="bg-[#02265D] hover:bg-[#02265D]/90 text-white"
                 >
                   {saving ? (
                     <RefreshCw className="w-4 h-4 animate-spin mr-2" />

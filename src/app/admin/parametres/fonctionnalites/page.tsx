@@ -721,7 +721,7 @@ export default function FonctionnalitesPage() {
       {/* Loading State */}
       {loading && !data && (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       )}
 
@@ -806,7 +806,7 @@ export default function FonctionnalitesPage() {
               <div className="mt-6 flex justify-end">
                 <Button
                   onClick={() => setShowTestModal(false)}
-                  className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white rounded-xl"
+                  className="bg-[#02265D] hover:bg-[#02265D]/90 text-white rounded-xl"
                 >
                   Fermer
                 </Button>
@@ -912,7 +912,7 @@ export default function FonctionnalitesPage() {
                   href={currentConfig.helpLink.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-[#2563EB] hover:underline mt-4"
+                  className="inline-flex items-center gap-1 text-sm text-[#02265D] hover:underline mt-4"
                 >
                   <ExternalLink className="w-3 h-3" />
                   {currentConfig.helpLink.label}
@@ -930,7 +930,7 @@ export default function FonctionnalitesPage() {
                 <Button
                   onClick={saveConfig}
                   disabled={savingConfig}
-                  className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white"
+                  className="bg-[#02265D] hover:bg-[#02265D]/90 text-white"
                 >
                   {savingConfig ? (
                     <RefreshCw className="w-4 h-4 animate-spin mr-2" />

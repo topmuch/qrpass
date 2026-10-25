@@ -7,7 +7,7 @@
  */
 
 export const BRAND      = '#1e3a8a';  // Bleu Marine — primary brand color
-export const BRAND_LIGHT = '#3b82f6'; // Bleu clair — hover, gradients
+export const BRAND_LIGHT = '#02265D'; // Bleu clair — hover, gradients
 export const ACCENT     = '#fbbf24';  // Doré — CTA, highlights, badges
 export const INK        = '#0f172a';  // Noir profond — texte principal
 export const SUCCESS    = '#10b981';  // Vert émeraude — succès, Identity product
@@ -15,7 +15,7 @@ export const DANGER     = '#ef4444';  // Rouge — erreurs, problème section
 
 export const BRAND_COLORS = {
   BRAND,            // #1e3a8a  Bleu Marine principal
-  BRAND_LIGHT,      // #3b82f6  Bleu clair
+  BRAND_LIGHT,      // #02265D  Bleu clair
   ACCENT,           // #fbbf24  Doré
   INK,              // #0f172a  Noir profond
   SUCCESS,          // #10b981  Vert succès

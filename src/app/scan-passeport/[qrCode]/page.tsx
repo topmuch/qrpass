@@ -54,7 +54,7 @@ const CARD_BG = '#ffffff';
 const INPUT_BG = '#f8fafc';
 const DANGER = '#dc2626';
 const SUCCESS = '#059669';
-const INFO = '#2563eb';
+const INFO = '#02265d';
 
 // ═══════════════════════════════════════════════════════════════
 //  NATIONALITY → FLAG EMOJI MAPPING

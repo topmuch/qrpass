@@ -509,7 +509,7 @@ export default function HajjAdminPage() {
           {/* Pilgrim Cards */}
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
             </div>
           ) : filteredPilgrims.length === 0 ? (
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-slate-200 dark:border-slate-700 text-center">
@@ -771,7 +771,7 @@ export default function HajjAdminPage() {
           {/* Pass Identity Cards */}
           {passIdLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
             </div>
           ) : passIdentities.length === 0 ? (
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 border border-slate-200 dark:border-slate-700 text-center">

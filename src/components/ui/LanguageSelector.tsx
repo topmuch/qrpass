@@ -10,7 +10,7 @@ interface Props {
   lang: Language;
   setLang: (l: Language) => void;
   /** 'mustard' = yellow #c5a643 + ink #1a1a1a (legacy /scan, /suivi).
-   *  'blue' = blue-600 #2563eb + slate-900 (homepage /checklist theme).
+   *  'blue' = blue-600 #02265d + slate-900 (homepage /checklist theme).
    *  Defaults to 'mustard' for backward compatibility. */
   variant?: Variant;
 }

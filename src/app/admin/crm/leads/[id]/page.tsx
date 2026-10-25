@@ -233,7 +233,7 @@ export default function LeadDetailPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center py-20">
-          <div className="animate-spin w-8 h-8 border-4 border-slate-300 border-t-[#2563EB] rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-slate-300 border-t-[#02265D] rounded-full" />
         </div>
       </div>
     );

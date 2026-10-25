@@ -617,7 +617,7 @@ export default function TripDetailPage() {
                     {(['Aéroport', 'Bus', 'Hôtel', 'Haram'] as const).map((zone) => {
                       const count = scanStats?.byZone?.[zone] ?? 0;
                       const zoneColors: Record<string, string> = {
-                        Aéroport: '#3b82f6',
+                        Aéroport: '#02265D',
                         Bus: '#f59e0b',
                         Hôtel: '#8b5cf6',
                         Haram: '#10b981',

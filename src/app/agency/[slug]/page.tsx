@@ -54,7 +54,7 @@ export default async function PublicAgencyPage({ params }: PageProps) {
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#2563EB] to-[#ff9f00] rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#02265D] to-[#ff9f00] rounded-2xl flex items-center justify-center shadow-lg">
                 <QrCode className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -139,8 +139,8 @@ export default async function PublicAgencyPage({ params }: PageProps) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#2563EB]/10 to-[#2563EB]/5 rounded-xl flex items-center justify-center">
-                        <QrCode className="w-5 h-5 text-[#2563EB]" />
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#02265D]/10 to-[#02265D]/5 rounded-xl flex items-center justify-center">
+                        <QrCode className="w-5 h-5 text-[#02265D]" />
                       </div>
                       <div>
                         <p className="font-mono font-medium text-slate-800 dark:text-white">
@@ -188,8 +188,8 @@ export default async function PublicAgencyPage({ params }: PageProps) {
                 href={`tel:${agency.phone}`}
                 className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               >
-                <div className="w-10 h-10 bg-[#2563EB]/10 rounded-xl flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-[#2563EB]" />
+                <div className="w-10 h-10 bg-[#02265D]/10 rounded-xl flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-[#02265D]" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Téléphone</p>
@@ -202,8 +202,8 @@ export default async function PublicAgencyPage({ params }: PageProps) {
                 href={`mailto:${agency.email}`}
                 className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
               >
-                <div className="w-10 h-10 bg-[#2563EB]/10 rounded-xl flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-[#2563EB]" />
+                <div className="w-10 h-10 bg-[#02265D]/10 rounded-xl flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-[#02265D]" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
@@ -212,8 +212,8 @@ export default async function PublicAgencyPage({ params }: PageProps) {
               </a>
             )}
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-              <div className="w-10 h-10 bg-[#2563EB]/10 rounded-xl flex items-center justify-center">
-                <Globe className="w-5 h-5 text-[#2563EB]" />
+              <div className="w-10 h-10 bg-[#02265D]/10 rounded-xl flex items-center justify-center">
+                <Globe className="w-5 h-5 text-[#02265D]" />
               </div>
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Statut</p>
@@ -227,7 +227,7 @@ export default async function PublicAgencyPage({ params }: PageProps) {
         <footer className="mt-8 text-center text-slate-400 dark:text-slate-500 text-sm pb-8">
           <p className="flex items-center justify-center gap-2">
             <QrCode className="w-4 h-4" />
-            Propulsé par <span className="font-semibold text-[#2563EB]">PassHajj</span>
+            Propulsé par <span className="font-semibold text-[#02265D]">PassHajj</span>
           </p>
           <p className="mt-1 text-xs">
             Protection intelligente des bagages

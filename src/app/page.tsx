@@ -563,7 +563,7 @@ function PassIdentitySection() {
 function PassPasseportSection() {
   return (
     <section className="relative py-20 sm:py-28 overflow-hidden" style={{ backgroundColor: BG_TINTED }}>
-      <BlurOrb size="h-64 w-64" color="#3b82f6" opacity={0.08} position="-top-24 -right-24" />
+      <BlurOrb size="h-64 w-64" color="#02265D" opacity={0.08} position="-top-24 -right-24" />
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -585,7 +585,7 @@ function PassPasseportSection() {
               />
             </div>
             {/* Glow */}
-            <div className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-15" style={{ background: 'radial-gradient(ellipse, #3b82f6 0%, transparent 70%)' }} />
+            <div className="absolute -inset-4 -z-10 rounded-3xl blur-2xl opacity-15" style={{ background: 'radial-gradient(ellipse, #02265D 0%, transparent 70%)' }} />
           </motion.div>
 
           {/* Content */}
@@ -596,7 +596,7 @@ function PassPasseportSection() {
             variants={stagger}
           >
             <motion.div variants={fadeUp}>
-              <Overline color="#3b82f6">Pass Passeport</Overline>
+              <Overline color="#02265D">Pass Passeport</Overline>
             </motion.div>
             <motion.h2
               variants={fadeUp}
@@ -605,7 +605,7 @@ function PassPasseportSection() {
               style={{ color: INK }}
             >
               Passeport perdu ?{' '}
-              <span style={{ color: '#3b82f6' }}>On vous alerte instantanément</span>
+              <span style={{ color: '#02265D' }}>On vous alerte instantanément</span>
             </motion.h2>
             <motion.p
               variants={fadeUp}
@@ -627,7 +627,7 @@ function PassPasseportSection() {
                 { num: '3', title: 'Alerte WhatsApp + position GPS du trouveur', desc: 'Vous savez immédiatement où récupérer votre passeport' },
               ].map((step) => (
                 <div key={step.num} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base font-bold shadow-sm" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base font-bold shadow-sm" style={{ backgroundColor: '#02265D', color: '#fff' }}>
                     {step.num}
                   </div>
                   <div>
@@ -649,7 +649,7 @@ function PassPasseportSection() {
                 { icon: <Globe className="w-5 h-5" />, label: 'Hajj, Omra & voyages' },
               ].map((feat, idx) => (
                 <div key={idx} className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: '#eff6ff' }}>
-                  <span style={{ color: '#3b82f6' }}>{feat.icon}</span>
+                  <span style={{ color: '#02265D' }}>{feat.icon}</span>
                   <span className="text-sm font-medium" style={{ color: INK }}>{feat.label}</span>
                 </div>
               ))}
@@ -657,7 +657,7 @@ function PassPasseportSection() {
 
             {/* Scenarios */}
             <motion.div variants={fadeUp} custom={5}>
-              <h4 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#3b82f6' }}>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#02265D' }}>
                 Pourquoi c&apos;est critique
               </h4>
               <div className="space-y-2">
@@ -668,7 +668,7 @@ function PassPasseportSection() {
                   'Démarches consulales longues et coûteuses à Jeddah',
                 ].map((s, idx) => (
                   <div key={idx} className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#3b82f6' }} />
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#02265D' }} />
                     <span className="text-sm" style={{ color: MUTED }}>{s}</span>
                   </div>
                 ))}
@@ -717,7 +717,7 @@ function NosPassSection() {
             {[
               { emoji: '🧳', title: 'Pass Bagage', color: '#f59e0b', bg: '#fffbeb' },
               { emoji: '🪪', title: 'Pass Identity', color: '#10b981', bg: '#ecfdf5' },
-              { emoji: '📘', title: 'Pass Passeport', color: '#3b82f6', bg: '#eff6ff' },
+              { emoji: '📘', title: 'Pass Passeport', color: '#02265D', bg: '#eff6ff' },
             ].map((p, i) => (
               <motion.div
                 key={p.title}

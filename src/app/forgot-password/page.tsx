@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                   disabled={loading || !email}
                   className="w-full py-3.5 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-300 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                    background: 'linear-gradient(135deg, #02265D, #02265D)',
                     boxShadow: '0 8px 24px rgba(37,99,235,0.2)',
                   }}
                 >

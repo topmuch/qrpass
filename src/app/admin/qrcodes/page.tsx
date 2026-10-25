@@ -403,7 +403,7 @@ export default function QRCodesPage() {
             </button>
             <Link
               href="/admin/generer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#b8860b] text-white rounded-lg hover:bg-[#3b82f6] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#b8860b] text-white rounded-lg hover:bg-[#02265D] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Générer nouveau
@@ -587,7 +587,7 @@ export default function QRCodesPage() {
                     <button
                       onClick={() => handleDownloadSet(set)}
                       disabled={isDownloading && selectedSet?.id === set.id}
-                      className="w-10 h-10 rounded-lg bg-[#b8860b] flex items-center justify-center text-white hover:bg-[#3b82f6] transition-colors disabled:opacity-50"
+                      className="w-10 h-10 rounded-lg bg-[#b8860b] flex items-center justify-center text-white hover:bg-[#02265D] transition-colors disabled:opacity-50"
                       title="Télécharger ZIP"
                     >
                       {isDownloading && selectedSet?.id === set.id ? (
@@ -909,7 +909,7 @@ export default function QRCodesPage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => handleDownloadSet(selectedSet)}
-                  className="flex-1 py-3 bg-[#b8860b] text-white rounded-lg hover:bg-[#3b82f6] transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-[#b8860b] text-white rounded-lg hover:bg-[#02265D] transition-colors flex items-center justify-center gap-2"
                 >
                   <FileArchive className="w-4 h-4" />
                   Télécharger ZIP

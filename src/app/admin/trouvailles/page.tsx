@@ -200,8 +200,8 @@ export default function TrouvaillesPage() {
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Total scans</p>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.total === 0 ? '—' : stats.total}</p>
               </div>
-              <div className="w-12 h-12 bg-[#2563EB]/10 dark:bg-[#2563EB]/20 rounded-xl flex items-center justify-center">
-                <QrCode className="w-6 h-6 text-[#2563EB]" />
+              <div className="w-12 h-12 bg-[#02265D]/10 dark:bg-[#02265D]/20 rounded-xl flex items-center justify-center">
+                <QrCode className="w-6 h-6 text-[#02265D]" />
               </div>
             </div>
           </CardContent>
@@ -261,7 +261,7 @@ export default function TrouvaillesPage() {
                 placeholder="Rechercher par référence, voyageur..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2.5 px-4 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB]"
+                className="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2.5 px-4 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#02265D]"
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
             </div>
@@ -304,7 +304,7 @@ export default function TrouvaillesPage() {
             <select
               value={countryFilter}
               onChange={(e) => setCountryFilter(e.target.value)}
-              className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2 px-3 text-slate-800 dark:text-white focus:outline-none focus:border-[#2563EB]"
+              className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2 px-3 text-slate-800 dark:text-white focus:outline-none focus:border-[#02265D]"
             >
               <option value="all">Tous les pays</option>
               {countries.map((country) => (
@@ -320,7 +320,7 @@ export default function TrouvaillesPage() {
       {/* Scan Logs Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-12 h-12 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-500 dark:text-slate-400">Chargement...</p>
         </div>
       ) : scanLogs.length === 0 ? (
@@ -380,7 +380,7 @@ export default function TrouvaillesPage() {
                           href={mapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#2563EB] text-xs hover:underline flex items-center gap-1"
+                          className="text-[#02265D] text-xs hover:underline flex items-center gap-1"
                         >
                           {log.latitude?.toFixed(3)}, {log.longitude?.toFixed(3)}
                           <ExternalLink className="w-3 h-3" aria-hidden="true" />
@@ -399,7 +399,7 @@ export default function TrouvaillesPage() {
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all group"
                       title="Voir détails"
                     >
-                      <Eye className="w-4 h-4 group-hover:text-[#2563EB] transition-colors" aria-hidden="true" />
+                      <Eye className="w-4 h-4 group-hover:text-[#02265D] transition-colors" aria-hidden="true" />
                       Détails
                     </button>
                   </div>
@@ -479,7 +479,7 @@ export default function TrouvaillesPage() {
                     href={getMapsUrl(selectedLog.latitude, selectedLog.longitude) || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[#2563EB] text-sm hover:underline mt-2"
+                    className="inline-flex items-center gap-1 text-[#02265D] text-sm hover:underline mt-2"
                   >
                     Voir sur Google Maps
                     <ExternalLink className="w-3 h-3" aria-hidden="true" />

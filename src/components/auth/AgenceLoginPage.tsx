@@ -204,7 +204,7 @@ export default function AgenceLoginPage() {
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
                 <img
-                  src="/logo-mvp.webp"
+                  src="/brand/logo.png"
                   alt="PassHajj"
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
@@ -345,7 +345,7 @@ export default function AgenceLoginPage() {
           >
             <div className="w-20 h-20 rounded-[16px] p-2 bg-white flex items-center justify-center shadow-lg">
               <img
-                src="/logo-mvp.webp"
+                src="/brand/logo.png"
                 alt="PassHajj"
                 className="w-full h-full object-contain"
               />

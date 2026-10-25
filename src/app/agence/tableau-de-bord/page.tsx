@@ -1593,7 +1593,7 @@ export default function AgencyDashboardPage() {
                           console.error('Error updating baggage:', error);
                         }
                       }}
-                      className="w-full py-2 bg-[#2563EB] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
+                      className="w-full py-2 bg-[#02265D] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       Enregistrer
                     </button>

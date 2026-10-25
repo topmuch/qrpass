@@ -90,8 +90,8 @@ function AgencyCard({
         className="w-full p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left"
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#2563EB]/10 dark:bg-[#2563EB]/20 flex items-center justify-center">
-            <Building className="w-6 h-6 text-[#2563EB]" />
+          <div className="w-12 h-12 rounded-xl bg-[#02265D]/10 dark:bg-[#02265D]/20 flex items-center justify-center">
+            <Building className="w-6 h-6 text-[#02265D]" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-slate-800 dark:text-white">{agency.name}</h3>
@@ -153,8 +153,8 @@ function AgencyCard({
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 dark:bg-[#2563EB]/20 flex items-center justify-center">
-                          <QrCode className="w-4 h-4 text-[#2563EB]" />
+                        <div className="w-8 h-8 rounded-lg bg-[#02265D]/10 dark:bg-[#02265D]/20 flex items-center justify-center">
+                          <QrCode className="w-4 h-4 text-[#02265D]" />
                         </div>
                         <span className="text-slate-800 dark:text-white font-mono font-medium text-sm">
                           {baggage.reference}
@@ -324,8 +324,8 @@ export default function VoyageursAdminPage() {
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Total agences</p>
                 <p className="text-3xl font-bold text-slate-800 dark:text-white">{agencies.length}</p>
               </div>
-              <div className="w-12 h-12 bg-[#2563EB]/10 dark:bg-[#2563EB]/20 rounded-xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-[#2563EB]" />
+              <div className="w-12 h-12 bg-[#02265D]/10 dark:bg-[#02265D]/20 rounded-xl flex items-center justify-center">
+                <Building className="w-6 h-6 text-[#02265D]" />
               </div>
             </div>
           </CardContent>
@@ -382,7 +382,7 @@ export default function VoyageursAdminPage() {
             placeholder="Rechercher par agence, voyageur ou référence..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#02265D]/20 focus:border-[#02265D] transition-all"
           />
         </div>
         <div className="flex gap-2">
@@ -405,7 +405,7 @@ export default function VoyageursAdminPage() {
       {/* Agencies List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       ) : filteredAgencies.length === 0 ? (
         <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">

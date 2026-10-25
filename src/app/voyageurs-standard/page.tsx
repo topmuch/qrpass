@@ -32,21 +32,21 @@ function Navigation() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#procedure" className="text-[#e0e6f0] hover:text-[#1D4ED8] transition-colors">Procédure</a>
-            <a href="#avantages" className="text-[#e0e6f0] hover:text-[#1D4ED8] transition-colors">Avantages</a>
-            <a href="#tarifs" className="text-[#e0e6f0] hover:text-[#1D4ED8] transition-colors">Tarifs</a>
+            <a href="#procedure" className="text-[#e0e6f0] hover:text-[#02265D] transition-colors">Procédure</a>
+            <a href="#avantages" className="text-[#e0e6f0] hover:text-[#02265D] transition-colors">Avantages</a>
+            <a href="#tarifs" className="text-[#e0e6f0] hover:text-[#02265D] transition-colors">Tarifs</a>
           </div>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <Link href="/demo">
-              <Button variant="ghost" className="text-[#e0e6f0] hover:text-[#1D4ED8]">
+              <Button variant="ghost" className="text-[#e0e6f0] hover:text-[#02265D]">
                 <Play className="w-4 h-4 mr-1" />
                 Démo
               </Button>
             </Link>
             <Link href="/#contact">
-              <Button className="bg-[#1D4ED8] hover:bg-[#c04800] text-white font-medium shadow-lg shadow-[#1D4ED8]/20">
+              <Button className="bg-[#02265D] hover:bg-[#c04800] text-white font-medium shadow-lg shadow-[#02265D]/20">
                 Commander
               </Button>
             </Link>
@@ -65,7 +65,7 @@ function Navigation() {
 // Hero Section
 function HeroSection() {
   return (
-    <section className="pt-16 bg-gradient-to-br from-[#1D4ED8] to-[#e67e22] relative overflow-hidden">
+    <section className="pt-16 bg-gradient-to-br from-[#02265D] to-[#e67e22] relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-10 right-10 text-8xl">✈️</div>
@@ -168,7 +168,7 @@ function ProcedureSection() {
         {/* Title */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Comment ça <span className="text-[#1D4ED8]">marche ?</span>
+            Comment ça <span className="text-[#02265D]">marche ?</span>
           </h2>
           <p className="text-[#a0a8b8] text-lg">
             Une protection en 4 étapes simples, sans intermédiaire
@@ -180,10 +180,10 @@ function ProcedureSection() {
           {steps.map((item, index) => (
             <div
               key={index}
-              className="relative bg-[#0d1220] rounded-xl p-6 border border-[#1a2238] hover:border-[#1D4ED8]/50 transition-all group"
+              className="relative bg-[#0d1220] rounded-xl p-6 border border-[#1a2238] hover:border-[#02265D]/50 transition-all group"
             >
               {/* Step Number */}
-              <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-r from-[#1D4ED8] to-[#e67e22] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-[#1D4ED8]/30">
+              <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-r from-[#02265D] to-[#e67e22] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-[#02265D]/30">
                 {item.step}
               </div>
 
@@ -220,7 +220,7 @@ function AdvantagesSection() {
         {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Pourquoi choisir <span className="text-[#1D4ED8]">PassHajj Voyageurs ?</span>
+            Pourquoi choisir <span className="text-[#02265D]">PassHajj Voyageurs ?</span>
           </h2>
         </div>
 
@@ -229,7 +229,7 @@ function AdvantagesSection() {
           {advantages.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 bg-[#0a0f2c] rounded-xl p-4 border border-[#1a2238] hover:border-[#1D4ED8]/30 transition-all"
+              className="flex items-center gap-3 bg-[#0a0f2c] rounded-xl p-4 border border-[#1a2238] hover:border-[#02265D]/30 transition-all"
             >
               <span className="text-xl">{item.icon}</span>
               <span className="text-[#e0e6f0]">{item.text}</span>
@@ -238,9 +238,9 @@ function AdvantagesSection() {
         </div>
 
         {/* Security Box */}
-        <div className="bg-gradient-to-r from-[#1D4ED8]/20 to-[#e67e22]/20 rounded-xl p-6 border border-[#1D4ED8]/30">
+        <div className="bg-gradient-to-r from-[#02265D]/20 to-[#e67e22]/20 rounded-xl p-6 border border-[#02265D]/30">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#1D4ED8] rounded-lg flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 bg-[#02265D] rounded-lg flex items-center justify-center shrink-0">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -270,7 +270,7 @@ function PricingSection() {
         "Notification email",
         "Activation instantanée"
       ],
-      color: "#1D4ED8",
+      color: "#02265D",
       popular: false
     },
     {
@@ -295,7 +295,7 @@ function PricingSection() {
         {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Tarifs <span className="text-[#1D4ED8]">simples</span>
+            Tarifs <span className="text-[#02265D]">simples</span>
           </h2>
           <p className="text-[#a0a8b8] text-lg">
             Choisissez la formule adaptée à vos besoins
@@ -321,7 +321,7 @@ function PricingSection() {
               <p className="text-[#a0a8b8] text-sm mb-4">{plan.subtitle}</p>
 
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-bold text-[#1D4ED8]">{plan.price}</span>
+                <span className="text-4xl font-bold text-[#02265D]">{plan.price}</span>
               </div>
 
               <p className="text-[#a0a8b8] text-sm mb-6">{plan.duration}</p>
@@ -329,7 +329,7 @@ function PricingSection() {
               <div className="space-y-3 mb-6">
                 {plan.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-2 text-[#e0e6f0]">
-                    <span className="text-[#1D4ED8]">✓</span>
+                    <span className="text-[#02265D]">✓</span>
                     <span className="text-sm">{feature}</span>
                   </div>
                 ))}
@@ -373,7 +373,7 @@ function TestimonialsSection() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ils nous font <span className="text-[#1D4ED8]">confiance</span>
+            Ils nous font <span className="text-[#02265D]">confiance</span>
           </h2>
         </div>
 
@@ -381,18 +381,18 @@ function TestimonialsSection() {
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="bg-[#0a0f2c] rounded-xl p-6 border border-[#1a2238] hover:border-[#1D4ED8]/30 transition-colors"
+              className="bg-[#0a0f2c] rounded-xl p-6 border border-[#1a2238] hover:border-[#02265D]/30 transition-colors"
             >
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-[#1D4ED8] fill-[#1D4ED8]" />
+                  <Star key={i} className="w-5 h-5 text-[#02265D] fill-[#02265D]" />
                 ))}
               </div>
               <p className="text-[#e0e6f0] mb-6 leading-relaxed italic">
                 &ldquo;{t.content}&rdquo;
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#1D4ED8]/30 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 bg-[#02265D]/30 rounded-full flex items-center justify-center text-2xl">
                   {t.avatar}
                 </div>
                 <div>
@@ -411,7 +411,7 @@ function TestimonialsSection() {
 // CTA Section
 function CTASection() {
   return (
-    <section className="py-20 px-4 bg-gradient-to-r from-[#1D4ED8] to-[#e67e22]">
+    <section className="py-20 px-4 bg-gradient-to-r from-[#02265D] to-[#e67e22]">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
           Prêt à protéger<br />vos bagages ?
@@ -422,7 +422,7 @@ function CTASection() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/#contact">
-            <Button className="bg-white text-[#1D4ED8] px-8 py-6 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all shadow-xl">
+            <Button className="bg-white text-[#02265D] px-8 py-6 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all shadow-xl">
               🎟️ Commander maintenant
             </Button>
           </Link>
@@ -465,9 +465,9 @@ function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-white">Produit</h4>
             <ul className="space-y-2 text-[#a0a8b8] text-sm">
-              <li><Link href="/hajj-omra" className="hover:text-[#1D4ED8] transition-colors">Hajj & Omra</Link></li>
-              <li><Link href="/voyageurs-standard" className="hover:text-[#1D4ED8] transition-colors">Voyageurs Standard</Link></li>
-              <li><Link href="/demo" className="hover:text-[#1D4ED8] transition-colors">Démo</Link></li>
+              <li><Link href="/hajj-omra" className="hover:text-[#02265D] transition-colors">Hajj & Omra</Link></li>
+              <li><Link href="/voyageurs-standard" className="hover:text-[#02265D] transition-colors">Voyageurs Standard</Link></li>
+              <li><Link href="/demo" className="hover:text-[#02265D] transition-colors">Démo</Link></li>
             </ul>
           </div>
 
@@ -475,8 +475,8 @@ function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-white">Entreprise</h4>
             <ul className="space-y-2 text-[#a0a8b8] text-sm">
-              <li><Link href="/devenir-partenaire" className="hover:text-[#1D4ED8] transition-colors">Devenir Partenaire</Link></li>
-              <li><a href="/#contact" className="hover:text-[#1D4ED8] transition-colors">Contact</a></li>
+              <li><Link href="/devenir-partenaire" className="hover:text-[#02265D] transition-colors">Devenir Partenaire</Link></li>
+              <li><a href="/#contact" className="hover:text-[#02265D] transition-colors">Contact</a></li>
             </ul>
           </div>
 
@@ -485,15 +485,15 @@ function Footer() {
             <h4 className="font-semibold mb-4 text-white">Contact</h4>
             <ul className="space-y-2 text-[#a0a8b8] text-sm">
               <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#1D4ED8]" />
+                <Phone className="w-4 h-4 text-[#02265D]" />
                 +235 66 35 25 05 · +235 95 72 99 99
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#1D4ED8]" />
+                <Mail className="w-4 h-4 text-[#02265D]" />
                 contact@newvisioncargo.pro
               </li>
               <li className="flex items-center gap-2">
-                <MapPinned className="w-4 h-4 text-[#1D4ED8]" />
+                <MapPinned className="w-4 h-4 text-[#02265D]" />
                 Avenue Charles de Gaulle, N'Djaména, Tchad
               </li>
             </ul>
@@ -507,13 +507,13 @@ function Footer() {
           </p>
 
           <div className="flex items-center gap-4">
-            <a href="https://facebook.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#1D4ED8] transition-colors" aria-label="Facebook">
+            <a href="https://facebook.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#02265D] transition-colors" aria-label="Facebook">
               <Facebook className="w-5 h-5" aria-hidden="true" />
             </a>
-            <a href="https://instagram.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#1D4ED8] transition-colors" aria-label="Instagram">
+            <a href="https://instagram.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#02265D] transition-colors" aria-label="Instagram">
               <Instagram className="w-5 h-5" aria-hidden="true" />
             </a>
-            <a href="https://twitter.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#1D4ED8] transition-colors" aria-label="Twitter">
+            <a href="https://twitter.com/qrpass" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#02265D] transition-colors" aria-label="Twitter">
               <Twitter className="w-5 h-5" aria-hidden="true" />
             </a>
           </div>

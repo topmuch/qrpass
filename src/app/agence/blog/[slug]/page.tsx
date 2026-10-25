@@ -99,7 +99,7 @@ export default function BlogPostPage() {
       // Italic
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       // Links
-      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-[#2563EB] hover:underline" target="_blank" rel="noopener">$1</a>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-[#02265D] hover:underline" target="_blank" rel="noopener">$1</a>')
       // Images
       .replace(/!\[(.+?)\]\((.+?)\)/g, '<img src="$2" alt="$1" class="rounded-xl my-4 max-w-full h-auto" />')
       // Unordered lists
@@ -107,7 +107,7 @@ export default function BlogPostPage() {
       // Ordered lists
       .replace(/^\d+\. (.+)$/gm, '<li class="text-slate-600 dark:text-slate-300 ml-4 list-decimal">$1</li>')
       // Blockquotes
-      .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-[#2563EB] pl-4 my-4 italic text-slate-600 dark:text-slate-400">$1</blockquote>')
+      .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-[#02265D] pl-4 my-4 italic text-slate-600 dark:text-slate-400">$1</blockquote>')
       // Paragraphs
       .replace(/\n\n/g, '</p><p class="text-slate-600 dark:text-slate-300 leading-relaxed my-4">')
       // Line breaks
@@ -122,7 +122,7 @@ export default function BlogPostPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#2563EB]/30 border-t-[#2563EB] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#02265D]/30 border-t-[#02265D] rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ export default function BlogPostPage() {
             <p className="text-slate-500 dark:text-slate-400 mb-4">{error || 'Article non trouvé'}</p>
             <Button
               onClick={() => router.push('/agence/blog')}
-              className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white rounded-xl"
+              className="bg-[#02265D] hover:bg-[#02265D]/90 text-white rounded-xl"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour au blog
@@ -154,7 +154,7 @@ export default function BlogPostPage() {
       {/* Back Button */}
       <Link
         href="/agence/blog"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-[#2563EB] dark:hover:text-[#2563EB] transition-colors mb-6"
+        className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-[#02265D] dark:hover:text-[#02265D] transition-colors mb-6"
       >
         <ChevronLeft className="w-4 h-4" />
         Retour au blog
