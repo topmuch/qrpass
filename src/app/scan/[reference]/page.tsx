@@ -263,7 +263,7 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
         <div className="relative flex items-center justify-center mb-6">
           <div className="text-center">
             <div className="flex items-center justify-center">
-              <Image src="/brand/logo.png" alt="PassHajj" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+              <Image src="/brand/logo.png" alt="Bagtrack" width={150} height={58} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
             </div>
             <div className="text-sm mt-1" style={{ color: MUTED }}>
               {isHajj ? t('inscrire.subtitle') : t('inscrire.subtitle')}
@@ -829,7 +829,7 @@ export default function ScanPage() {
       {/* ─── Top Bar : logo centré + Edit/Share/Language ─── */}
       <header className="sticky top-0 z-40 flex items-center justify-center pt-[env(safe-area-inset-top,0px)] px-0 py-2 sm:py-3" style={{ background: BRAND }}>
         {/* PassHajj Logo */}
-        <Image src="/brand/logo.png" alt="PassHajj" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
+        <Image src="/brand/logo.png" alt="Bagtrack" width={130} height={50} style={{ objectFit: 'contain', borderRadius: '14px', padding: '5px', background: 'rgba(255,255,255,0.9)' }} />
         <div className="absolute right-0 sm:right-1 top-1/2 -translate-y-1/2 flex items-center gap-1.5 sm:gap-2 pr-4 sm:pr-5">
           <button
             onClick={handleShare}
@@ -859,7 +859,7 @@ export default function ScanPage() {
             {/* Top: brand + title (dark navy like qrbags gate) */}
             <div className="px-6 pt-7 pb-6 text-center" style={{ background: ACCENT }}>
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-4 shadow-md overflow-hidden">
-                <Image src="/brand/logo.png" alt="PassHajj" width={56} height={56} style={{ objectFit: 'contain' }} />
+                <Image src="/brand/logo.png" alt="Bagtrack" width={56} height={56} style={{ objectFit: 'contain' }} />
               </div>
               <h2 className="text-2xl font-extrabold text-white">{i18n('audioGateTitle', lang)}</h2>
               <p className="text-sm text-white/80 mt-2 leading-relaxed">{i18n('audioGateDesc', lang)}</p>

@@ -205,7 +205,7 @@ export default function AgenceLoginPage() {
               >
                 <img
                   src="/brand/logo.png"
-                  alt="PassHajj"
+                  alt="Bagtrack"
                   className="w-full h-full object-contain drop-shadow-lg"
                 />
               </motion.div>
@@ -346,7 +346,7 @@ export default function AgenceLoginPage() {
             <div className="w-20 h-20 rounded-[16px] p-2 bg-white flex items-center justify-center shadow-lg">
               <img
                 src="/brand/logo.png"
-                alt="PassHajj"
+                alt="Bagtrack"
                 className="w-full h-full object-contain"
               />
             </div>

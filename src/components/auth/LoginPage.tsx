@@ -182,7 +182,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           <div className="flex items-center justify-between">
             <Link href="/" className="group">
               <div className="w-24 h-24 rounded-[16px] bg-white p-2.5 shadow-2xl shadow-black/20 flex items-center justify-center group-hover:scale-105 transition-all">
-                <img src="/brand/logo.png" alt="PassHajj" className="w-full h-full object-contain" />
+                <img src="/brand/logo.png" alt="Bagtrack" className="w-full h-full object-contain" />
               </div>
             </Link>
           </div>
@@ -264,7 +264,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center mb-10">
             <div className="w-20 h-20 rounded-2xl bg-slate-900 p-2.5 flex items-center justify-center">
-              <img src="/brand/logo.png" alt="PassHajj" className="w-full h-full object-contain" />
+              <img src="/brand/logo.png" alt="Bagtrack" className="w-full h-full object-contain" />
             </div>
           </div>
 

@@ -12,7 +12,7 @@ const LOGO_STYLE: React.CSSProperties = {
   background: 'rgba(255,255,255,0.9)',
 };
 
-export default function BrandLogo({ width = 150 }: { width?: number }) {
+export default function BrandLogo({ width = 277 }: { width?: number }) {
   // Ratio original du fichier logo : 277 × 114
   const height = Math.round((width * 114) / 277);
   return (
