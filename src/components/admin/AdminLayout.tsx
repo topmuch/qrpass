@@ -89,7 +89,7 @@ export default function AdminLayout({
           <div className="p-5 border-b border-[#1a1a3a]">
             <div className="flex items-center justify-between">
               <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-                <img src="/brand/logo.png" alt="Bagtrack" className="h-20 w-auto object-contain " />
+                <img src="/brand/logo.png" alt="Bagtrack" className="h-14 w-auto object-contain " />
               </Link>
               <button
                 className="lg:hidden text-[#94a3b8] hover:text-white transition-colors"

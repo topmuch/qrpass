@@ -34,7 +34,7 @@ export function PublicNavigation() {
         <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/brand/logo.png" alt="Bagtrack" width={277} height={114} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} priority />
+            <Image src="/brand/logo.png" alt="Bagtrack" width={180} height={74} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} priority />
           </Link>
 
           {/* Desktop Nav */}
@@ -100,7 +100,7 @@ export function PublicFooter() {
           {/* Logo */}
           <div>
             <div className="mb-4">
-              <Image src="/brand/logo.png" alt="Bagtrack" width={277} height={114} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} />
+              <Image src="/brand/logo.png" alt="Bagtrack" width={180} height={74} style={{ objectFit: 'contain', borderRadius: '16px', padding: '5px', background: 'rgba(255,255,255,0.95)' }} />
             </div>
             <p className="text-white/50 text-sm">
               Protection intelligente des bagages pour voyageurs et pèlerins.
